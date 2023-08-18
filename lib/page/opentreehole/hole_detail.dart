@@ -1176,6 +1176,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               : length ~/ Constant.POST_COUNT_PER_PAGE
         });
       },
+      searchKeyWord: _renderMode == RenderMode.SEARCH_RESULT
+          ? _searchKeyword
+          : null,
     );
 
     if (_multiSelectMode && _selectedFloors.contains(floor.floor_id)) {

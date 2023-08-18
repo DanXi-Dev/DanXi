@@ -348,6 +348,7 @@ class OTFloorWidget extends StatelessWidget {
   final void Function()? onTap;
   final void Function()? onLongPress;
   final ImageTapCallback? onTapImage;
+  final String? searchKeyWord;
 
   const OTFloorWidget({
     Key? key,
@@ -360,11 +361,22 @@ class OTFloorWidget extends StatelessWidget {
     this.parentHole,
     required this.hasBackgroundImage,
     this.onTapImage,
+    this.searchKeyWord,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final bool needGenerateTags = (index == 0);
+
+    const int foldLimit = 500;
+    const int showCharCount = 15;
+    String? fullContent;
+    String? subContent;
+    // Use renderText to remove latex, image links and mentions
+    final bool foldLongFloor = searchKeyWord != null &&
+        floor.content != null &&
+        renderText(floor.content!, '', '').length > foldLimit;
+
     void onLinkTap(String? url) {
       BrowserUtil.openUrl(url!, context);
     }
@@ -379,6 +391,22 @@ class OTFloorWidget extends StatelessWidget {
     }
 
     final nameColor = floor.anonyname?.hashColor() ?? Colors.red;
+
+    if (foldLongFloor) {
+      fullContent = renderText(floor.content!, '', '').replaceAll('\n', ' ');
+      final int keywordIndex = fullContent.indexOf(searchKeyWord!);
+      int startIndex = keywordIndex - showCharCount;
+      int endIndex = keywordIndex + searchKeyWord!.length + showCharCount;
+      if (startIndex < 0) {
+        startIndex = 0;
+        subContent = "${fullContent.substring(startIndex, endIndex)}...";
+      } else if (endIndex > fullContent.length) {
+        endIndex = fullContent.length;
+        subContent = "...${fullContent.substring(startIndex, endIndex)}";
+      } else {
+        subContent = "...${fullContent.substring(startIndex, endIndex)}...";
+      }
+    }
 
     final cardChild = InkWell(
       onTap: onTap,
@@ -502,11 +530,14 @@ class OTFloorWidget extends StatelessWidget {
         color: isInMention && PlatformX.isCupertino(context)
             ? Theme.of(context).dividerColor.withOpacity(0.05)
             : getDefaultCardBackgroundColor(context, hasBackgroundImage),
-        child: (floor.deleted == true || floor.fold?.isNotEmpty == true)
+        child: (foldLongFloor == true ||
+                floor.deleted == true ||
+                floor.fold?.isNotEmpty == true)
             ? ExpansionTileX(
                 title: Text(
                   floor.deleteReason ??
                       floor.foldReason ??
+                      subContent ??
                       "_error_incomplete_data_",
                   style: TextStyle(color: Theme.of(context).hintColor),
                 ),
