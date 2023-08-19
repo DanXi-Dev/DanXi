@@ -374,7 +374,9 @@ class OTFloorWidget extends StatelessWidget {
     String? subContent;
     // Use renderText to remove latex, image links and mentions
     if (searchKeyWord != null && floor.content != null) {
-      fullContent = renderText(floor.content!, '', '').replaceAll('\n', ' ');
+      fullContent = renderText(
+              floor.content!, S.of(context).image_tag, S.of(context).formula)
+          .replaceAll('\n', ' ');
     }
     final bool foldLongFloor =
         fullContent != null && fullContent.length > foldLimit;
