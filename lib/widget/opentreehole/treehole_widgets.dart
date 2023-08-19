@@ -48,6 +48,9 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
 
+/// The ellipsis char. From packages/flutter/lib/src/rendering/paragraph.dart.
+const String _kEllipsis = '\u2026';
+
 Color? getDefaultCardBackgroundColor(
         BuildContext context, bool hasBackgroundImage) =>
     hasBackgroundImage
@@ -402,7 +405,7 @@ class OTFloorWidget extends StatelessWidget {
       final int keywordIndex = fullContent.indexOf(searchKeyWord!);
       int startIndex = keywordIndex - showCharCount;
       if (startIndex > 0) {
-        subContent = "…${fullContent.substring(startIndex)}";
+        subContent = "$_kEllipsis${fullContent.substring(startIndex)}";
       } else {
         subContent = fullContent;
       }
