@@ -107,7 +107,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// Listener to the url scheme.
   /// debounced to avoid duplicated events.
-  static final StateStreamListener<Uri?> _uniLinksSubscription = StateStreamListener();
+  static final StateStreamListener<Uri?> _uniLinksSubscription =
+      StateStreamListener();
 
   /// If we need to send the QR code to iWatch now.
   ///
@@ -275,6 +276,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
         break;
     }
   }
@@ -353,7 +355,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }, onError: (Object error) {
           // Handle exception by warning the user their action did not succeed
           return Noticing.showErrorDialog(context, error);
-        }), hashCode);
+        }),
+        hashCode);
   }
 
   /// Jump to the specified element e.g. hole, floor.
@@ -377,10 +380,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             .loadSpecificHole(postId))!;
         if (mounted) {
           smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-          "post": hole,
-        });
+            "post": hole,
+          });
         }
-
       } else if (element == 'floor') {
         final floor = (await OpenTreeHoleRepository.getInstance()
             .loadSpecificFloor(postId))!;
@@ -512,13 +514,15 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     await PlatformX.getUniqueDeviceId(),
                     PushNotificationServiceType.APNS);
           } catch (e, st) {
-            Noticing.showNotice(
-                context,
-                S.of(context).push_notification_reg_failed_des(
-                    ErrorPageWidget.generateUserFriendlyDescription(
-                        S.of(context), e,
-                        stackTrace: st)),
-                title: S.of(context).push_notification_reg_failed);
+            if (mounted) {
+              Noticing.showNotice(
+                  context,
+                  S.of(context).push_notification_reg_failed_des(
+                      ErrorPageWidget.generateUserFriendlyDescription(
+                          S.of(context), e,
+                          stackTrace: st)),
+                  title: S.of(context).push_notification_reg_failed);
+            }
           }
           break;
         case 'get_token':
