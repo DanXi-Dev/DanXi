@@ -53,7 +53,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
     // Divide canteens into different zones.
     // e.g. 光华，南区，南苑，枫林，张江（枫林和张江无明显划分）
     trafficInfo.forEach((key, value) {
-      List<String> locations = key.split("\n");
+      List<String> locations = key.split("-");
       String? zone, canteenName;
       if (locations.length == 1) {
         zone = areaName;
@@ -62,6 +62,19 @@ class DataCenterRepository extends BaseRepositoryWithDio {
         locations.removeAt(0);
       }
       canteenName = locations.join(' ');
+      if (zone == '北区') {
+        zone = '北区食堂';
+      } else if (zone!.contains('南区')) {
+        if (canteenName.contains('南苑')) {
+          zone = '南苑食堂';
+        } else if (canteenName.contains('教工')) {
+          zone = '南区教工食堂';
+        } else {
+          zone = '南区食堂';
+        }
+      } else if (canteenName == '文图咖啡馆') {
+        zone = '文科图书馆';
+      }
       if (!zoneTraffic.containsKey(zone)) {
         zoneTraffic[zone] = {};
       }
@@ -87,9 +100,14 @@ class DataCenterRepository extends BaseRepositoryWithDio {
     if (response.data.toString().contains("仅")) {
       throw UnsuitableTimeException();
     }
-    var dataString =
-        response.data!.between("}", "</script>", headGreedy: false)!;
-    var jsonExtraction = RegExp(r'\[.+\]').allMatches(dataString);
+    // Regex cannot match things like [..\n..], so replace it with '-'
+    // Notice that we need to replace the exact word '\n' in the string,
+    // not the line break in the end of a line. So use r'\n' or '\\n', not '\n'
+    // It also unifies delimiter in string for generateSummary
+    var dataString = response.data!
+        .between("<script>", "</script>", headGreedy: false)!
+        .replaceAll(r"\n", "-");
+    var jsonExtraction = RegExp(r'\[.+?\]').allMatches(dataString);
     List<dynamic> names = jsonDecode(
         jsonExtraction.elementAt(areaCode * 3).group(0)!.replaceAll("'", "\""));
     List<dynamic>? cur = jsonDecode(jsonExtraction
