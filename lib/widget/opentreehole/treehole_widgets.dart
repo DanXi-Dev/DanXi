@@ -48,6 +48,9 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
 
+/// The ellipsis char. From packages/flutter/lib/src/rendering/paragraph.dart.
+const String _kEllipsis = '\u2026';
+
 Color? getDefaultCardBackgroundColor(
         BuildContext context, bool hasBackgroundImage) =>
     hasBackgroundImage
@@ -348,6 +351,7 @@ class OTFloorWidget extends StatelessWidget {
   final void Function()? onTap;
   final void Function()? onLongPress;
   final ImageTapCallback? onTapImage;
+  final String? searchKeyWord;
 
   const OTFloorWidget({
     Key? key,
@@ -360,11 +364,26 @@ class OTFloorWidget extends StatelessWidget {
     this.parentHole,
     required this.hasBackgroundImage,
     this.onTapImage,
+    this.searchKeyWord,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final bool needGenerateTags = (index == 0);
+
+    const int foldLimit = 500;
+    const int showCharCount = 15;
+    String? fullContent;
+    String? subContent;
+    // Use renderText to remove latex, image links and mentions
+    if (searchKeyWord != null && floor.content != null) {
+      fullContent = renderText(
+              floor.content!, S.of(context).image_tag, S.of(context).formula)
+          .replaceAll('\n', ' ');
+    }
+    final bool foldLongFloor =
+        fullContent != null && fullContent.length > foldLimit;
+
     void onLinkTap(String? url) {
       BrowserUtil.openUrl(url!, context);
     }
@@ -379,6 +398,24 @@ class OTFloorWidget extends StatelessWidget {
     }
 
     final nameColor = floor.anonyname?.hashColor() ?? Colors.red;
+
+    Linkify? foldedWidget;
+
+    if (foldLongFloor) {
+      final int keywordIndex = fullContent.indexOf(searchKeyWord!);
+      int startIndex = keywordIndex - showCharCount;
+      if (startIndex > 0) {
+        subContent = "$_kEllipsis${fullContent.substring(startIndex)}";
+      } else {
+        subContent = fullContent;
+      }
+      foldedWidget = LinkifyX(
+        text: subContent,
+        style: TextStyle(fontSize: 16, color: Theme.of(context).hintColor),
+        maxLines: 3,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
 
     final cardChild = InkWell(
       onTap: onTap,
@@ -502,14 +539,18 @@ class OTFloorWidget extends StatelessWidget {
         color: isInMention && PlatformX.isCupertino(context)
             ? Theme.of(context).dividerColor.withOpacity(0.05)
             : getDefaultCardBackgroundColor(context, hasBackgroundImage),
-        child: (floor.deleted == true || floor.fold?.isNotEmpty == true)
+        child: (foldLongFloor ||
+                floor.deleted == true ||
+                floor.fold?.isNotEmpty == true)
             ? ExpansionTileX(
-                title: Text(
-                  floor.deleteReason ??
-                      floor.foldReason ??
-                      "_error_incomplete_data_",
-                  style: TextStyle(color: Theme.of(context).hintColor),
-                ),
+                title: foldLongFloor
+                    ? foldedWidget!
+                    : Text(
+                        floor.deleteReason ??
+                            floor.foldReason ??
+                            "_error_incomplete_data_",
+                        style: TextStyle(color: Theme.of(context).hintColor),
+                      ),
                 children: [cardChild],
               )
             : cardChild,
