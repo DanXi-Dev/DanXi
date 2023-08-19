@@ -396,19 +396,22 @@ class OTFloorWidget extends StatelessWidget {
 
     final nameColor = floor.anonyname?.hashColor() ?? Colors.red;
 
+    Linkify? foldedWidget;
+
     if (foldLongFloor) {
       final int keywordIndex = fullContent.indexOf(searchKeyWord!);
       int startIndex = keywordIndex - showCharCount;
-      int endIndex = keywordIndex + searchKeyWord!.length + showCharCount;
-      if (startIndex < 0) {
-        startIndex = 0;
-        subContent = "${fullContent.substring(startIndex, endIndex)}...";
-      } else if (endIndex > fullContent.length) {
-        endIndex = fullContent.length;
-        subContent = "...${fullContent.substring(startIndex, endIndex)}";
+      if (startIndex > 0) {
+        subContent = "…${fullContent.substring(startIndex)}";
       } else {
-        subContent = "...${fullContent.substring(startIndex, endIndex)}...";
+        subContent = fullContent;
       }
+      foldedWidget = LinkifyX(
+        text: subContent,
+        style: TextStyle(fontSize: 16, color: Theme.of(context).hintColor),
+        maxLines: 3,
+        overflow: TextOverflow.ellipsis,
+      );
     }
 
     final cardChild = InkWell(
@@ -533,17 +536,18 @@ class OTFloorWidget extends StatelessWidget {
         color: isInMention && PlatformX.isCupertino(context)
             ? Theme.of(context).dividerColor.withOpacity(0.05)
             : getDefaultCardBackgroundColor(context, hasBackgroundImage),
-        child: (foldLongFloor == true ||
+        child: (foldLongFloor ||
                 floor.deleted == true ||
                 floor.fold?.isNotEmpty == true)
             ? ExpansionTileX(
-                title: Text(
-                  floor.deleteReason ??
-                      floor.foldReason ??
-                      subContent ??
-                      "_error_incomplete_data_",
-                  style: TextStyle(color: Theme.of(context).hintColor),
-                ),
+                title: foldLongFloor
+                    ? foldedWidget!
+                    : Text(
+                        floor.deleteReason ??
+                            floor.foldReason ??
+                            "_error_incomplete_data_",
+                        style: TextStyle(color: Theme.of(context).hintColor),
+                      ),
                 children: [cardChild],
               )
             : cardChild,
