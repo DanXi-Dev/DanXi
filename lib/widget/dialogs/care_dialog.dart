@@ -1,3 +1,6 @@
+import 'package:dan_xi/util/browser_util.dart';
+import 'package:dan_xi/widget/opentreehole/post_render.dart';
+import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -16,11 +19,17 @@ class _CareDialogState extends State<CareDialog> {
   Widget build(BuildContext context) {
     return PlatformAlertDialog(
       title: Text(S.of(context).danxi_care),
-      content: Text(S.of(context).danxi_care_message),
+      content: SingleChildScrollView(
+        child: PostRenderWidget(
+          content: S.of(context).danxi_care_message,
+          render: kMarkdownRender,
+          onTapLink: (url) => BrowserUtil.openUrl(url!, null),
+          hasBackgroundImage: false,
+      )),
       actions: [
         PlatformDialogAction(
-          child: const Text("OK"),
-          onPressed: ()=>{Navigator.of(context).pop()},
+          child: Text(S.of(context).i_see),
+          onPressed: () => Navigator.of(context).pop(),
         )
       ],
     );
