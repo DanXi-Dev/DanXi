@@ -320,7 +320,7 @@
   "project_page": "项目网页",
   "punishment_history_of": "##{name} 的封禁历史",
   "push_notification_reg_failed": "推送通知注册失败",
-  "push_notification_reg_failed_des": "您可能暂时无法收到推动通知\n错误：{error}",
+  "push_notification_reg_failed_des": "您可能暂时无法收到推送通知\n错误：{error}",
   "quote": "引用",
   "qr_code_terms_not_agreed": "需要接受条款",
   "rank": "排名",
