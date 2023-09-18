@@ -48,19 +48,19 @@ class _ReviewVoteWidgetState extends State<ReviewVoteWidget> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      child: Row(
-        // mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           IconButton(
-            iconSize: 12,
-            padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
-            alignment: Alignment.centerRight,
+            iconSize: 20,
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+            alignment: Alignment.bottomCenter,
             icon: Icon(
-              _reviewVote > 0 ? Icons.thumb_up : Icons.thumb_up_outlined,
+              Icons.keyboard_arrow_up,
               color: _reviewVote > 0
                   ? Colors.blue
-                  : Theme.of(context).textTheme.bodyText1!.color,
+                  : Theme.of(context).textTheme.bodyLarge!.color,
             ),
             onPressed: () {
               if (_reviewVote != 0) return;
@@ -73,16 +73,14 @@ class _ReviewVoteWidgetState extends State<ReviewVoteWidget> {
           ),
           Text(
             _reviewTotalVote.toString(),
-            style: const TextStyle(fontSize: 12),
+            style: const TextStyle(fontSize: 20),
           ),
           IconButton(
-            iconSize: 12,
-            padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-            alignment: Alignment.centerLeft,
+            iconSize: 20,
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+            alignment: Alignment.topCenter,
             icon: Icon(
-              _reviewVote < 0
-                  ? Icons.thumb_down
-                  : Icons.thumb_down_outlined,
+              Icons.keyboard_arrow_down,
               color: _reviewVote < 0
                   // set its color
                   ? Colors.red

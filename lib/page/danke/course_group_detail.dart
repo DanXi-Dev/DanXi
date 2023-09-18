@@ -23,10 +23,12 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
+import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
+import 'package:dan_xi/model/pair.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/opentreehole/image_viewer.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
@@ -38,6 +40,9 @@ import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/widget/danke/course_review_widget.dart';
+import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -58,6 +63,16 @@ import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
 
 import '../../model/opentreehole/history.dart';
+import '../../util/stream_listener.dart';
+import '../../widget/libraries/round_chip.dart';
+
+class RefreshFilterEvent {
+  // 0: Teacher filter, 1: Time filter
+  final int filterType;
+  final String newFilter;
+
+  RefreshFilterEvent(this.newFilter, this.filterType);
+}
 
 class CourseGroupDetail extends StatefulWidget {
   final Map<String, dynamic>? arguments;
@@ -71,15 +86,26 @@ class CourseGroupDetail extends StatefulWidget {
 class CourseGroupDetailState extends State<CourseGroupDetail> {
   /// Unrelated to the state.
   /// These fields should only be initialized once when created.
-  late CourseGroup _course;
+  late CourseGroup _courses;
   String? _searchKeyword;
   FileImage? _backgroundImage;
+  Set<String> teacherSet = {};
+  Set<Pair<int, int>> timeSet = {};
 
   /// Fields related to the display states.
   bool shouldScrollToEnd = false;
 
-  final PagedListViewController<OTFloor> _listViewController =
-      PagedListViewController<OTFloor>();
+  String teacherFilter = "*";
+  String timeFilter = "*";
+
+  final StateStreamListener<RefreshFilterEvent> _refreshSubscription =
+      StateStreamListener();
+
+  final PagedListViewController<CourseReview> _listViewController =
+      PagedListViewController<CourseReview>();
+
+  final GlobalKey<RefreshIndicatorState> indicatorKey =
+      GlobalKey<RefreshIndicatorState>();
 
   /*
   bool get hasPrefetchedAllData =>
@@ -89,7 +115,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
    */
 
   /// Reload/load the (new) content and set the [_content] future.
-  Future<List<OTFloor>?> _loadContent(int page) async {
+  Future<List<CourseReview>?> _loadContent(int page) async {
     /*
     if (_searchKeyword != null) {
       var result = await OpenTreeHoleRepository.getInstance().loadSearchResults(
@@ -102,14 +128,19 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
     }
 
      */
-    return null;
+    List<CourseReview> result = [CourseReview.dummy()];
+    for (var elem in _courses.courseList!) {
+      result += elem.reviewList!;
+    }
+
+    return result;
   }
 
   @override
   void initState() {
     super.initState();
     if (widget.arguments!.containsKey('group')) {
-      _course = widget.arguments!['group'];
+      _courses = widget.arguments!['group'];
       /*
       // Cache preloaded floor only when user views the Hole
       for (var floor
@@ -118,48 +149,44 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
       }
 
        */
+
+      for (var elem in _courses.courseList!) {
+        teacherSet.add(elem.teachers!);
+        timeSet.add(Pair(elem.year!, elem.semester!));
+      }
     }
     shouldScrollToEnd = widget.arguments!.containsKey('scroll_to_end') &&
         widget.arguments!['scroll_to_end'] == true;
 
     StateProvider.needScreenshotWarning = true;
+
+    _refreshSubscription.bindOnlyInvalid(
+        Constant.eventBus.on<RefreshFilterEvent>().listen((event) {
+          setState(() {
+            switch (event.filterType) {
+              case 0:
+                teacherFilter = event.newFilter;
+                break;
+              case 1:
+                timeFilter = event.newFilter;
+                break;
+            }
+          });
+
+          indicatorKey.currentState?.show();
+        }),
+        hashCode);
   }
 
-  /// Refresh the list view.
-  ///
-  /// if [ignorePrefetch] and [hasPrefetchedAllData], it will discard the prefetched data first.
-  Future<void> refreshListView(
-      {bool scrollToEnd = false, bool ignorePrefetch = true}) async {
-    Future<void> realRefresh() async {
-      if (scrollToEnd) _listViewController.queueScrollToEnd();
-      await _listViewController.notifyUpdate(
-          useInitialData: false, queueDataClear: true);
-    }
-
-    /*
-    if (ignorePrefetch && hasPrefetchedAllData) {
-      // Reset variable to make [hasPrefetchedAllData] false
-      setState(() {
-        shouldScrollToEnd = false;
-        _course.floors?.prefetch =
-            _course.floors?.prefetch?.take(Constant.POST_COUNT_PER_PAGE).toList();
-      });
-
-      // Wait build() complete (so `allDataReceiver` has been set to `null`), then trigger a refresh in
-      // the list view.
-      Completer<void> completer = Completer();
-      WidgetsBinding.instance.addPostFrameCallback((_) => realRefresh()
-          .then(completer.complete, onError: completer.completeError));
-      return completer.future;
-    }
-
-     */
-    return realRefresh();
+  /// Refresh the whole list.
+  Future<void> refreshList() async {
+    await refreshSelf();
   }
 
   @override
   void dispose() {
     StateProvider.needScreenshotWarning = false;
+    _refreshSubscription.cancel();
     super.dispose();
   }
 
@@ -176,30 +203,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
        */
     });
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
-    Future<List<OTFloor>>? allDataReceiver;
-    final pagedListView = PagedListView<OTFloor>(
-      initialData: [],
-      pagedController: _listViewController,
-      noneItem: OTFloor.dummy(),
-      withScrollbar: true,
-      scrollController: PrimaryScrollController.of(context),
-      dataReceiver: _loadContent,
-      // If we need to scroll to the end, we should prefetch all the data beforehand.
-      // See also [prefetchAllFloors] in [TreeHoleSubpageState].
-      allDataReceiver: allDataReceiver,
-      shouldScrollToEnd: shouldScrollToEnd,
-      builder: _getListItems,
-      loadingBuilder: (BuildContext context) => Container(
-        padding: const EdgeInsets.all(8),
-        child: Center(child: PlatformCircularProgressIndicator()),
-      ),
-      endBuilder: (context) => Center(
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Text(S.of(context).end_reached),
-        ),
-      ),
-    );
 
     return PlatformScaffold(
       iosContentPadding: false,
@@ -209,7 +212,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
         title: TopController(
           controller: PrimaryScrollController.of(context),
           child: Text(_searchKeyword == null
-              ? "#${_course.code}"
+              ? "#${_courses.code}"
               : S.of(context).search_result),
         ),
         trailingActions: [
@@ -245,30 +248,128 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
           ]
         ],
       ),
-      body: Builder(
-        // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-        builder: (context) => Container(
-          decoration: _backgroundImage == null
-              ? null
-              : BoxDecoration(
-                  image: DecorationImage(
-                      image: _backgroundImage!, fit: BoxFit.cover)),
-          child: _searchKeyword == null
-              ? RefreshIndicator(
-                  edgeOffset: MediaQuery.of(context).padding.top,
-                  color: Theme.of(context).colorScheme.secondary,
-                  backgroundColor: Theme.of(context).dialogBackgroundColor,
-                  onRefresh: () async {
-                    HapticFeedback.mediumImpact();
-                    await refreshListView();
-                  },
-                  child: pagedListView,
-                )
-              : pagedListView,
+      body: _buildBody(context),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
+    Future<List<CourseReview>>? allDataReceiver;
+    final pagedListView = PagedListView<CourseReview>(
+      pagedController: _listViewController,
+      noneItem: CourseReview.dummy(),
+      withScrollbar: true,
+      scrollController: PrimaryScrollController.of(context),
+      dataReceiver: _loadContent,
+      // If we need to scroll to the end, we should prefetch all the data beforehand.
+      // See also [prefetchAllFloors] in [TreeHoleSubpageState].
+      allDataReceiver: allDataReceiver,
+      shouldScrollToEnd: shouldScrollToEnd,
+      builder: _getListItems,
+      headBuilder: (ctx) => _buildHead(ctx),
+      loadingBuilder: (BuildContext context) => Container(
+        padding: const EdgeInsets.all(8),
+        child: Center(child: PlatformCircularProgressIndicator()),
+      ),
+      endBuilder: (context) => Center(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Text(S.of(context).end_reached),
+        ),
+      ),
+    );
+
+    return Builder(
+      // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
+      builder: (context) => Container(
+        decoration: _backgroundImage == null
+            ? null
+            : BoxDecoration(
+                image: DecorationImage(
+                    image: _backgroundImage!, fit: BoxFit.cover)),
+        child: RefreshIndicator(
+          key: indicatorKey,
+          edgeOffset: MediaQuery.of(context).padding.top,
+          color: Theme.of(context).colorScheme.secondary,
+          backgroundColor: Theme.of(context).dialogBackgroundColor,
+          onRefresh: () async {
+            HapticFeedback.mediumImpact();
+            // Refresh the list...
+            await refreshList();
+          },
+          child: pagedListView,
         ),
       ),
     );
   }
+
+  Widget _buildHead(BuildContext context) => Card(
+      color: Theme.of(context).cardTheme.color?.withOpacity(0.8),
+      child: ListTile(
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 5, horizontal: 3),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(_courses.getFullName(),
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(_courses.code!,
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: SizedBox(
+                    width: 56,
+                    child: OTLeadingTag(
+                      color: Colors.orange,
+                      text: "${_courses.credit!.toStringAsFixed(1)} 学分",
+                    )),
+              ),
+              const Divider(
+                height: 5,
+                thickness: 1,
+              ),
+              Text(S.of(context).course_teacher_name,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Wrap(children: [
+                    FilterTagWidget(
+                        selected: teacherFilter == "*",
+                        text: "全部",
+                        filter: "*",
+                        filterType: 0),
+                    ...teacherSet.map((e) => FilterTagWidget(
+                        selected: teacherFilter == e,
+                        text: e,
+                        filter: e,
+                        filterType: 0))
+                  ])),
+              const Divider(
+                height: 5,
+                thickness: 1,
+              ),
+              Text(S.of(context).course_schedule,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Wrap(children: [
+                    FilterTagWidget(
+                      selected: timeFilter == "*",
+                      text: "全部",
+                      filter: "*",
+                      filterType: 1,
+                    ),
+                    ...timeSet.map((e) {
+                      String filter = "${e.first} ${e.second}";
+                      return FilterTagWidget(
+                        selected: timeFilter == filter,
+                        text: "${e.first}学年-${e.second == 1 ? "秋季" : "春季"}",
+                        filter: filter,
+                        filterType: 1,
+                      );
+                    })
+                  ])),
+            ],
+          )));
 
   Future<void> _onTapScrollToEnd(_) async {
     /*
@@ -295,70 +396,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
       list.map((e) => OTTag.fromJson(jsonDecode(jsonEncode(e)))).toList();
 
   List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {
-    List<Widget> buildAdminPenaltyMenu(BuildContext menuContext, OTFloor e) {
-      Future<void> onExecutePenalty(int level) async {
-        // Confirm the operation
-        bool? confirmed = await Noticing.showConfirmationDialog(context,
-            "You are going to add a penalty of level $level to floor ${e.floor_id} in its division. Are you sure?",
-            isConfirmDestructive: true);
-        if (confirmed != true) return;
-
-        int? result = await OpenTreeHoleRepository.getInstance()
-            .adminAddPenalty(e.floor_id, level);
-        if (result != null && result < 300 && mounted) {
-          Noticing.showMaterialNotice(
-              context, S.of(context).operation_successful);
-        }
-      }
-
-      Future<void> onExecutePenaltyDays() async {
-        // Input the number of days
-        String? dayStr = await Noticing.showInputDialog(
-            context, "Please input the number of days");
-        if (dayStr == null) return;
-        int? days = int.tryParse(dayStr);
-        if (days == null) return;
-
-        // Confirm the operation
-        bool? confirmed = await Noticing.showConfirmationDialog(context,
-            "You are going to add a penalty of $days days to floor ${e.floor_id} in its division. Are you sure?",
-            isConfirmDestructive: true);
-        if (confirmed != true) return;
-
-        int? result = await OpenTreeHoleRepository.getInstance()
-            .adminAddPenaltyDays(e.floor_id, days);
-        if (result != null && result < 300 && mounted) {
-          Noticing.showMaterialNotice(
-              context, S.of(context).operation_successful);
-        }
-      }
-
-      return [
-        PlatformContextMenuItem(
-          onPressed: () => onExecutePenalty(1),
-          menuContext: menuContext,
-          child: Text(S.of(context).level(1)),
-        ),
-        PlatformContextMenuItem(
-          onPressed: () => onExecutePenalty(2),
-          menuContext: menuContext,
-          child: Text(S.of(context).level(2)),
-        ),
-        PlatformContextMenuItem(
-          onPressed: () => onExecutePenalty(3),
-          menuContext: menuContext,
-          isDestructive: true,
-          child: Text(S.of(context).level(3)),
-        ),
-        PlatformContextMenuItem(
-          onPressed: onExecutePenaltyDays,
-          menuContext: menuContext,
-          isDestructive: true,
-          child: const Text("Custom penalty..."),
-        ),
-      ];
-    }
-
     List<Widget> menu = [
       if (e.is_me == true && e.deleted == false)
         PlatformContextMenuItem(
@@ -409,100 +446,9 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
     return menu;
   }
 
-  Widget _getListItems(BuildContext context, ListProvider<OTFloor> dataProvider,
-      int index, OTFloor floor,
+  Widget _getListItems(BuildContext context,
+      ListProvider<CourseReview> dataProvider, int index, CourseReview review,
       {bool isNested = false}) {
-    Future<List<ImageUrlInfo>?> loadPageImage(
-        BuildContext pageContext, int pageIndex) async {
-      List<OTFloor>? result;
-      result = [];
-      if (result == null || result.isEmpty) {
-        return null;
-      } else {
-        List<ImageUrlInfo> imageList = [];
-        for (var floor in result) {
-          if (floor.content == null) continue;
-          imageList.addAll(extractAllImagesInFloor(floor.content!));
-        }
-        return imageList;
-      }
-    }
-
-    return OTFloorWidget(
-      hasBackgroundImage: _backgroundImage != null,
-      floor: floor,
-      index: _searchKeyword == null ? index : null,
-      isInMention: isNested,
-      parentHole: null,
-      onLongPress: () async {
-        showPlatformModalSheet(
-            context: context,
-            builder: (BuildContext context) => PlatformContextMenu(
-                actions: _buildContextMenu(context, floor),
-                cancelButton: CupertinoActionSheetAction(
-                  child: Text(S.of(context).cancel),
-                  onPressed: () => Navigator.of(context).pop(),
-                )));
-      },
-      onTap: () async {
-        if (_searchKeyword == null) {
-          int? replyId;
-          if (await OTEditor.createNewReply(context, _course.id, replyId)) {
-            await refreshListView(scrollToEnd: true);
-          }
-        } else {
-          // fixme: duplicate of [OTFloorMentionWidget.showFloorDetail].
-          ProgressFuture progressDialog = showProgressDialog(
-              loadingText: S.of(context).loading, context: context);
-          try {
-            OTHole? hole = await OpenTreeHoleRepository.getInstance()
-                .loadSpecificHole(floor.hole_id!);
-            if (mounted) {
-              smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-                "post": await prefetchAllFloors(hole!),
-                "locate": floor
-              });
-            }
-          } catch (e, st) {
-            Noticing.showErrorDialog(context, e, trace: st);
-          } finally {
-            progressDialog.dismiss(showAnim: false);
-          }
-        }
-      },
-      onTapImage: (String? url, Object heroTag) {
-        final int length = _listViewController.length();
-        smartNavigatorPush(context, '/image/detail', arguments: {
-          'preview_url': url,
-          'hd_url': OpenTreeHoleRepository.getInstance()
-              .extractHighDefinitionImageUrl(url!),
-          'hero_tag': heroTag,
-          'image_list': extractAllImages(),
-          'loader': loadPageImage,
-          'last_page': length % Constant.POST_COUNT_PER_PAGE == 0
-              ? (length ~/ Constant.POST_COUNT_PER_PAGE - 1)
-              : length ~/ Constant.POST_COUNT_PER_PAGE
-        });
-      },
-    );
-  }
-
-  Iterable<ImageUrlInfo> extractAllImagesInFloor(String content) {
-    final imageExp = RegExp(r'!\[.*?\]\((.*?)\)');
-    return imageExp.allMatches(content).map((e) => ImageUrlInfo(
-        e.group(1),
-        OpenTreeHoleRepository.getInstance()
-            .extractHighDefinitionImageUrl(e.group(1)!)));
-  }
-
-  List<ImageUrlInfo> extractAllImages() {
-    List<ImageUrlInfo> imageList = [];
-    final int length = _listViewController.length();
-    for (int i = 0; i < length; i++) {
-      var floor = _listViewController.getElementAt(i);
-      if (floor.content == null) continue;
-      imageList.addAll(extractAllImagesInFloor(floor.content!));
-    }
-    return imageList;
+    return CourseReviewWidget(review: review);
   }
 }

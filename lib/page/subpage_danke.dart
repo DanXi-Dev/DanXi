@@ -279,7 +279,7 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
   }
 
   Future<Widget> _loadContent() async {
-    return Future.delayed(const Duration(seconds: 2),
+    return Future.delayed(const Duration(seconds: 1),
         () => Column(children: [CourseGroupCardWidget(courses: CourseGroup.dummy())]));
   }
 
@@ -288,7 +288,7 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
         ? const RandomReviewWidgets(
             departmentName: "A-soul",
             courseName: "嘉然今天吃什么",
-            courseCode: "やりますね114514",
+            courseCode: "TSHE114514",
             userId: "1919810",
             reviewContent:
                 "关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋",

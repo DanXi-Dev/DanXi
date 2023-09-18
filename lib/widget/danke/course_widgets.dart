@@ -21,6 +21,7 @@ import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
 import 'package:dan_xi/model/opentreehole/report.dart';
+import 'package:dan_xi/page/danke/course_group_detail.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
@@ -115,7 +116,7 @@ class CourseGroupCardWidget extends StatelessWidget {
                             children: [
                               // todo add course information style
                               Text(
-                                "${courses.department} / ${courses.name}",
+                                courses.getFullName(),
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold),
                                 softWrap: true,
@@ -189,4 +190,37 @@ class CourseGroupCardWidget extends StatelessWidget {
     );
     throw UnimplementedError();
   }
+}
+
+class FilterTagWidget extends StatelessWidget {
+  final bool selected;
+  final String text;
+  final String filter;
+  final int filterType;
+
+  const FilterTagWidget(
+      {Key? key,
+      required this.selected,
+      required this.text,
+      required this.filter,
+      required this.filterType})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: Flex(
+          direction: Axis.horizontal,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RoundChip(
+              onTap: () {
+                if (!selected) {
+                  RefreshFilterEvent(filter, filterType).fire();
+                }
+              },
+              label: text,
+              color: selected ? Colors.pinkAccent : Colors.white70,
+            ),
+          ]));
 }

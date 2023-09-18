@@ -64,61 +64,63 @@ class CourseReviewWidget extends StatelessWidget {
       color: translucent
           ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
           : null,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(8.0)),
       ),
       // credits group
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        ListTile(
-          contentPadding: const EdgeInsets.fromLTRB(0, 3, 0, 2),
-          title: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              alignment: WrapAlignment.spaceBetween,
-              runSpacing: 4,
-              children: [
-                Column(
-                  children: [
-                    // course name, department name, course code and credits
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // use Expanded wrap the text to avoid overflow
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // todo add card information style
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 2),
-                                child:
-                                    ReviewerHeader(userId: review.reviewer_id!),
-                              ),
-                              const Divider(),
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 2),
-                                child: Text(
-                                  review.content!,
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .bodyText1
-                                          ?.color,
-                                      fontSize: 15),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const ReviewVoteWidget(reviewVote: 0, reviewTotalVote: 10),
+        Expanded(
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                alignment: WrapAlignment.spaceBetween,
+                runSpacing: 4,
+                children: [
+                  Column(
+                    children: [
+                      // course name, department name, course code and credits
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // use Expanded wrap the text to avoid overflow
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // todo add card information style
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 2),
+                                  child: ReviewerHeader(
+                                      userId: review.reviewer_id!),
                                 ),
-                              ),
-                            ],
+                                const Divider(),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 2),
+                                  child: Text(
+                                    review.content!,
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color,
+                                        fontSize: 15),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ]),
-        ),
-        // rating and comment count
+                        ],
+                      ),
+                    ],
+                  ),
+                ]),
+          ),
+        )
       ]),
     );
   }
