@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/danke/course.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
@@ -47,6 +48,7 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
 
+import '../../model/danke/course_group.dart';
 import '../opentreehole/treehole_widgets.dart';
 
 Color? getDefaultCardBackgroundColor(
@@ -71,26 +73,13 @@ String totalRatingCalc(double score) {
   return rating;
 }
 
-class CourseCardWidget extends StatelessWidget {
+class CourseGroupCardWidget extends StatelessWidget {
   // changeable style of the card
   final bool translucent;
+  final CourseGroup courses;
 
-  final String departmentName;
-  final String courseName;
-
-  // list of numbers of credits
-  final List<int> credits;
-  final String courseCode;
-  final double courseScore;
-
-  const CourseCardWidget(
-      {Key? key,
-      this.departmentName = "未知院系",
-      this.courseName = "未知课程",
-      required this.credits,
-      required this.courseCode,
-      this.courseScore = -1.0,
-      this.translucent = false})
+  CourseGroupCardWidget(
+      {Key? key, required this.courses, this.translucent = false})
       : super(key: key);
 
   @override
@@ -126,14 +115,14 @@ class CourseCardWidget extends StatelessWidget {
                             children: [
                               // todo add course information style
                               Text(
-                                "$departmentName / $courseName",
+                                "${courses.department} / ${courses.name}",
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold),
                                 softWrap: true,
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                courseCode,
+                                courses.code!,
                                 textAlign: TextAlign.left,
                                 style: const TextStyle(fontSize: 12),
                               ),
@@ -148,10 +137,10 @@ class CourseCardWidget extends StatelessWidget {
                           spacing: 5,
                           // for each credit in credits create a text
                           children: <Widget>[
-                            ...credits.map((credit) => OTLeadingTag(
-                                  color: Colors.orange,
-                                  text: "$credit 学分",
-                                )),
+                            OTLeadingTag(
+                              color: Colors.orange,
+                              text: "${courses.credit!.toStringAsFixed(1)} 学分",
+                            ),
                           ],
                         ),
                       ],
@@ -159,6 +148,8 @@ class CourseCardWidget extends StatelessWidget {
                   ],
                 ),
               ]),
+          onTap: () => smartNavigatorPush(context, "/danke/courseDetail",
+              arguments: {"group": courses}),
         ),
         const Divider(
           height: 5,
@@ -168,30 +159,29 @@ class CourseCardWidget extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 3, 13, 6),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Text(
-                "评分: ${totalRatingCalc(courseScore)}",
+                // fixme add backend support instead of hardcoding
+                "3",
                 style: infoStyle,
               ),
-              const Spacer(),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Text(
-                    // fixme add backend support instead of hardcoding
-                    "3",
-                    style: infoStyle,
-                  ),
+                  Icon(
+                      // fixme PlatformX.isMaterial(context) treehole_widgets.dart: 234
+                      CupertinoIcons.ellipses_bubble,
+                      size: infoStyle.fontSize,
+                      color: infoStyle.color),
                   const SizedBox(
                     width: 3,
                   ),
-                  Icon(
-                    // fixme PlatformX.isMaterial(context) treehole_widgets.dart: 234
-                      CupertinoIcons.ellipses_bubble,
-                      size: infoStyle.fontSize,
-                      color: infoStyle.color)
+                  Text(
+                    courses.getTotalReviewCount().toString(),
+                    style: infoStyle,
+                  )
                 ],
-              )
+              ),
             ],
           ),
         ),

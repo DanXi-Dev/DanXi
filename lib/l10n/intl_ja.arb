@@ -81,6 +81,7 @@
   "current_connection_no_wifi": "WLANに接続していない",
   "current_date": "現在の日付：",
   "danke": "授業評価",
+  "danke_search_hint": "授業名称・授業番号",
   "dashboard": "ホーム",
   "dashboard_layout": "ホームページのレイアウト",
   "day_ago": "{num}日前",

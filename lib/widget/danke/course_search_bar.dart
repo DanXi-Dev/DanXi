@@ -52,7 +52,7 @@ class _CourseSearchBarState extends State<CourseSearchBar> {
   //   super.initState();
   // }
 
-void _onFocusChange() {
+  void _onFocusChange() {
     if (_focusNode.hasFocus) {
       widget.onSearch(_controller.text);
     }
@@ -68,7 +68,7 @@ void _onFocusChange() {
   // increase the height of the search bar
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+      padding: const EdgeInsets.fromLTRB(0, 0, 10, 10),
       child: Row(
         children: [
           PlatformIconButton(
@@ -80,33 +80,33 @@ void _onFocusChange() {
           ),
           Expanded(
             child: SizedBox(
-              height: 40,
-              child: PlatformWidget(
-                cupertino: (_, __) => CupertinoTextField(
-                  keyboardType: TextInputType.text,
-                  // press enter key to search
-                  textInputAction: TextInputAction.search,
-                  controller: _controller,
-                  // todo placeholder language
-                  placeholder: "搜索课程名称或代码",
-                  // increase text size and hint text size
-                  style: const TextStyle(fontSize: 16),
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: CupertinoDynamicColor.resolve(
-                        CupertinoColors.secondarySystemGroupedBackground,
-                        context),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  onSubmitted: (value) {
-                    widget.onSearch(value);
-                  },
-                  focusNode: _focusNode,
-                  onTapOutside: (e) {
-                    _focusNode.unfocus();
-                    _onFocusChange();
-                  },
+              child: PlatformTextField(
+                autofocus: true,
+                keyboardType: TextInputType.text,
+                // press enter key to search
+                textInputAction: TextInputAction.search,
+                controller: _controller,
+                // todo placeholder language
+                hintText: S.of(context).danke_search_hint,
+                // increase text size and hint text size
+                style: const TextStyle(fontSize: 16),
+                /*
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                  color: CupertinoDynamicColor.resolve(
+                      CupertinoColors.secondarySystemGroupedBackground,
+                      context),
+                  borderRadius: BorderRadius.circular(20),
                 ),
+                 */
+                onSubmitted: (value) {
+                  widget.onSearch(value);
+                },
+                focusNode: _focusNode,
+                onTapOutside: (e) {
+                  _focusNode.unfocus();
+                  _onFocusChange();
+                },
               ),
             ),
           ),

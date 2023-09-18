@@ -22,19 +22,15 @@ part 'course.g.dart';
 
 @JsonSerializable()
 class Course {
-  int? course_id;
-  String? course_name;
-  String? course_code;
-  String? code_id;
-  double? credit;
-  String? department;
+  // 该课在同课程代码课程组中的编号
+  // 例: PTSD11451.04 的 subId 为 4
+  int? subId;
   String? teachers;
-  int? max_student;
-  int? week_hour;
+  int? maxStudent;
 
   /// (Copied from docs)
   /// 学年。如果是非秋季学期，则年数为（实际日期年数 - 1）。
-  String? year;
+  int? year;
 
   /// (Copied from docs)
   /// 学期。
@@ -43,32 +39,27 @@ class Course {
   //     3：（第二年的）春季学期；
   //     4：（第二年的）暑假
   int? semester;
-  List<CourseReview>? review_list;
+  double? rating;
+  List<CourseReview>? reviewList;
 
   Course(
-      this.course_id,
-      this.course_name,
-      this.course_code,
-      this.code_id,
-      this.credit,
-      this.department,
+      this.subId,
       this.teachers,
-      this.max_student,
-      this.week_hour,
+      this.maxStudent,
       this.year,
       this.semester,
-      this.review_list);
+      this.rating,
+      this.reviewList);
 
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseToJson(this);
 
-  factory Course.dummy() => Course(-3, "Asoul虚拟偶像运营与管理", "OP114514", "01", 4.0,
-      "计算机科学与技术系", "Asoul", 100, 4, "2021", 1, [CourseReview.dummy()]);
+  factory Course.dummy() => Course(1, "嘉然", 1145, 1919, 1, 4.9, [CourseReview.dummy()]);
   @override
   bool operator ==(Object other) =>
-      (other is Course) && course_id == other.course_id;
+      (other is Course) && subId == other.subId;
 
   @override
-  int get hashCode => course_id ?? course_name.hashCode;
+  int get hashCode => subId ?? subId.hashCode;
 }

@@ -85,6 +85,7 @@
   "current_connection_no_wifi": "Not connected to WLAN",
   "current_date": "Current date: ",
   "danke": "Course",
+  "danke_search_hint": "Class name or Class ID",
   "dashboard": "Dashboard",
   "dashboard_layout": "Dashboard Layout",
   "day_ago": "{num} d ago",

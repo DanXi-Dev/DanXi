@@ -22,23 +22,38 @@ part 'course_group.g.dart';
 
 @JsonSerializable()
 class CourseGroup {
+  // 课程代码
   int? id;
   String? name;
   String? code;
   String? department;
-  List<Course>? course_list;
+  int? weekHour;
+  double? credit;
+  List<Course>? courseList;
 
-  CourseGroup(this.id, this.name, this.code, this.department, this.course_list);
+  CourseGroup(this.id, this.name, this.code, this.department, this.weekHour,
+      this.credit, this.courseList);
 
   @override
   String toString() {
-    return 'CourseGroup{id: $id, name: $name, code: $code, department: $department, course_list: $course_list}';
+    return 'CourseGroup{id: $id, name: $name, code: $code, department: $department, weekHour: $weekHour, credit: $credit, course_list: $courseList}';
+  }
+
+  int getTotalReviewCount() {
+    int sum = 0;
+    for (var element in courseList!) {
+      sum += element.reviewList!.length;
+    }
+    return sum;
   }
 
   factory CourseGroup.fromJson(Map<String, dynamic> json) =>
       _$CourseGroupFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseGroupToJson(this);
+
+  factory CourseGroup.dummy() => CourseGroup(
+      -1, "Asoul虚拟偶像运营与管理", "OP114514", "计算机科学与技术系", 4, 4.0, [Course.dummy()]);
 
   @override
   bool operator ==(Object other) => (other is CourseGroup) && id == other.id;

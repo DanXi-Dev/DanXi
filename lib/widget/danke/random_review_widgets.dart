@@ -64,12 +64,14 @@ class RandomReviewWidgets extends StatelessWidget {
 
   // review information
   final String userId;
+  final String courseCode;
   final String reviewContent;
 
   const RandomReviewWidgets(
       {Key? key,
       this.departmentName = "未知院系",
       this.courseName = "未知课程",
+      this.courseCode = "PTSD114514",
       this.userId = "未知用户",
       this.reviewContent = "未知评论",
       this.translucent = false})
@@ -104,6 +106,12 @@ class RandomReviewWidgets extends StatelessWidget {
                 Column(
                   children: [
                     // course name, department name, course code and credits
+                    Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 2),
+                        child: Text(courseCode,
+                            style: const TextStyle(color: Colors.white24))),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

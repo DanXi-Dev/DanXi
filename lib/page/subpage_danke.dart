@@ -17,8 +17,8 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/danke/course.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
-import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/widget/danke/course_search_bar.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -31,9 +31,11 @@ import 'package:dan_xi/widget/danke/review_vote_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
+import '../model/danke/course_group.dart';
 import '../widget/danke/course_review_widget.dart';
 import '../widget/danke/random_review_widgets.dart';
 
@@ -220,13 +222,18 @@ class DankeSubPage extends PlatformSubpage<DankeSubPage> {
 }
 
 class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
-  double searchBarPositionBoxHeight = 220;
+  // When searching is idle, show random reviews
+  bool idle = true;
+  double searchBarPositionBoxHeight = 180;
+
+  FileImage? _backgroundImage;
 
   void _searchCourse(String text) {
     // todo change page layout
     setState(
       () {
-        searchBarPositionBoxHeight = text.isEmpty ? 220 : 0;
+        idle = text.isEmpty;
+        searchBarPositionBoxHeight = idle ? 180 : 0;
       },
     );
     // search from course list
@@ -234,42 +241,67 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
 
   @override
   Widget buildPage(BuildContext context) {
+    _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     return Container(
-      // padding top
-      padding: const EdgeInsets.only(top: 105),
-      child: Column(children: [
-        // animated sized box
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          height: searchBarPositionBoxHeight,
-        ),
-        CourseSearchBar(
-          onSearch: (String text) {
-            _searchCourse(text);
-          },
-        ),
-        // const CourseCardWidget(
-        //     departmentName: "A-soul",
-        //     courseName: "嘉然今天吃什么",
-        //     courseCode: "PTSD114514",
-        //     credits: [2],
-        //     courseScore: 5),
-        const RandomReviewWidgets(
-          departmentName: "A-soul",
-          courseName: "嘉然今天吃什么",
-          userId: "1919810",
-          reviewContent:
-              "关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋",
-        ),
+        // padding top
+        decoration: _backgroundImage == null
+            ? null
+            : BoxDecoration(
+                image: DecorationImage(
+                    image: _backgroundImage!, fit: BoxFit.cover)),
+        child: Column(
+          mainAxisAlignment:
+              idle ? MainAxisAlignment.center : MainAxisAlignment.start,
+          children: [
+            // animated sized box
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              height: searchBarPositionBoxHeight,
+            ),
+            CourseSearchBar(
+              onSearch: (String text) {
+                _searchCourse(text);
+              },
+            ),
+            /*
         const ReviewVoteWidget(
           reviewTotalVote: 10,
           reviewVote: 0,
         ),
         CourseReviewWidget(
           review: CourseReview.dummy(),
-        ),
-      ]),
-      // button
-    );
+        )
+         */
+            _buildPageContent(context)
+          ],
+          // button
+        ));
+  }
+
+  Future<Widget> _loadContent() async {
+    return Future.delayed(const Duration(seconds: 2),
+        () => Column(children: [CourseGroupCardWidget(courses: CourseGroup.dummy())]));
+  }
+
+  Widget _buildPageContent(BuildContext context) {
+    return idle
+        ? const RandomReviewWidgets(
+            departmentName: "A-soul",
+            courseName: "嘉然今天吃什么",
+            courseCode: "やりますね114514",
+            userId: "1919810",
+            reviewContent:
+                "关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋",
+          )
+        : Expanded(
+            child: FutureBuilder(
+                future: _loadContent(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return snapshot.data as Widget;
+                  } else {
+                    return Center(child: PlatformCircularProgressIndicator());
+                  }
+                }));
   }
 }

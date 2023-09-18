@@ -81,6 +81,7 @@
   "current_connection_no_wifi": "没有连接到 WLAN",
   "current_date": "当前日期：",
   "danke": "评教",
+  "danke_search_hint": "课程名称 或 课程代码",
   "dashboard": "首页",
   "dashboard_layout": "首页布局",
   "day_ago": "{num}天前",
