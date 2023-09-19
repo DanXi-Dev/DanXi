@@ -101,6 +101,32 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         },
       ));
 
+  Future<List<RoomInfo>?> getRoomInfo(PersonInfo? info, String areaName,
+      String? buildingName, DateTime date) async {
+    var repository;
+    await EmptyClassroomRepository.getInstance()
+        .checkConnection()
+        .then((connected) {
+      if (connected) {
+        repository = EmptyClassroomRepository.getInstance();
+      } else {
+        repository = EhallEmptyClassroomRepository.getInstance();
+        showPlatformDialog(
+            context: context,
+            builder: (BuildContext context) => PlatformAlertDialog(
+                  title: Text(S.of(context).lan_connection_issue_1),
+                  content: Text(S.of(context).empty_classroom_warning),
+                  actions: <Widget>[
+                    PlatformDialogAction(
+                        child: PlatformText(S.of(context).i_see),
+                        onPressed: () => Navigator.pop(context)),
+                  ],
+                ));
+      }
+    });
+    return repository.getBuildingRoomInfo(info, areaName, buildingName, date);
+  }
+
   @override
   Widget build(BuildContext context) {
     // Build tags and texts.
@@ -297,13 +323,11 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
               ),
               Expanded(
                 child: FutureWidget<List<RoomInfo>?>(
-                    future: LazyFuture.pack(
-                        EmptyClassroomRepository.getInstance()
-                            .getBuildingRoomInfo(
-                                _personInfo,
-                                _buildingList[_selectBuildingIndex]!.data![0],
-                                _buildingList[_selectBuildingIndex]!.data,
-                                selectDate)),
+                    future: LazyFuture.pack(getRoomInfo(
+                        _personInfo,
+                        _buildingList[_selectBuildingIndex]!.data![0],
+                        _buildingList[_selectBuildingIndex]!.data,
+                        selectDate!)),
                     successBuilder: (BuildContext context,
                             AsyncSnapshot<dynamic> snapshot) =>
                         WithScrollbar(
@@ -332,7 +356,8 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
             Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Column(
+                  Expanded(
+                      child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -345,7 +370,7 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                         style: TextStyle(color: Theme.of(context).hintColor),
                       ),
                     ],
-                  ),
+                  )),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: _buildBusinessViewForRoom(element),
@@ -427,7 +452,7 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
           decoration: BoxDecoration(
               border: slot == time
                   ? Border.all(
-                color: Theme.of(context).textTheme.bodyLarge!.color!,
+                      color: Theme.of(context).textTheme.bodyLarge!.color!,
                       width: 1.5,
                     )
                   : null,
