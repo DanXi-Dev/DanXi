@@ -35,7 +35,7 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   EmptyClassroomRepository._();
 
   @override
-  Dio dio = Dio(BaseOptions(connectTimeout: 1000, receiveTimeout: 2000));
+  Dio dio = Dio(BaseOptions(connectTimeout: 3000, receiveTimeout: 3000));
 
   static final _instance = EmptyClassroomRepository._();
 
