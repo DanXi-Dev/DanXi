@@ -42,8 +42,8 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   factory EmptyClassroomRepository.getInstance() => _instance;
 
   /// Get [RoomInfo]s at [buildingName] on [date].
-  Future<List<RoomInfo>?> getBuildingRoomInfo(PersonInfo? info, String areaName,
-      String? buildingName, DateTime date) async {
+  Future<List<RoomInfo>?> getBuildingRoomInfo(
+      _, __, String? buildingName, DateTime date) async {
     List<RoomInfo> result = [];
     final Response<String> classroomIdData =
         await dio.get(classroomIdUrl(buildingName, date));
@@ -54,11 +54,12 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
       final classroomInfo = classroomIds[i];
       final classroomName = classroomInfo['room'];
       final classroomId = classroomInfo['id'];
-      final start = response.data!.indexOf("c$classroomId");
+      // quotation mark is necessary
+      final start = response.data!.indexOf("\"c$classroomId\"");
       int end;
       if (i != classroomIds.length - 1) {
         final nextClassroom = classroomIds[i + 1];
-        end = response.data!.indexOf("r${nextClassroom['id']}");
+        end = response.data!.indexOf("\"r${nextClassroom['id']}\"");
       } else {
         end = response.data!.indexOf("innerHTML");
       }
@@ -67,15 +68,17 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
       final patternForUsages =
           RegExp(r'<td style="background-color[^"]*">(.*?)<\/td>');
       final match1 = patternForSeats.firstMatch(html);
-      String? roomCapability;
+      String? roomCapacity;
       if (match1 != null) {
-        roomCapability = match1.group(1);
+        roomCapacity = match1.group(1);
       }
-      RoomInfo info = RoomInfo(classroomName, date, roomCapability);
+      RoomInfo info = RoomInfo(classroomName, date, roomCapacity);
       info.busy = [];
       bool first = true;
       final match2 = patternForUsages.allMatches(html);
       for (final match in match2) {
+        // the first <td> is used for showing capacity, not course
+        // so we ignore it
         if (first) {
           first = false;
           continue;
@@ -87,6 +90,7 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
           info.busy!.add(true);
         }
       }
+      // remove last course (14th)
       info.busy!.removeLast();
       result.add(info);
     }
