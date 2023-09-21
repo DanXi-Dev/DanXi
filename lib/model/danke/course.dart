@@ -22,10 +22,10 @@ part 'course.g.dart';
 
 @JsonSerializable()
 class Course {
-  // 该课在同课程代码课程组中的编号
-  // 例: PTSD11451.04 的 subId 为 4
+  @JsonKey(name: 'id')
   int? subId;
   String? teachers;
+  @JsonKey(name: 'max_student')
   int? maxStudent;
 
   /// (Copied from docs)

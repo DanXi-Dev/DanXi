@@ -19,6 +19,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
+import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/widget/danke/course_search_bar.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -38,125 +39,6 @@ import 'package:provider/provider.dart';
 import '../model/danke/course_group.dart';
 import '../widget/danke/course_review_widget.dart';
 import '../widget/danke/random_review_widgets.dart';
-
-// class DankeSubPage extends PlatformSubpage<DankeSubPage> {
-//   @override
-//   DankeSubPageState createState() => DankeSubPageState();
-//
-//   const DankeSubPage({Key? key}) : super(key: key);
-//
-//   @override
-//   Create<Widget> get title => (cxt) => Text(S.of(cxt).danke);
-//
-//   @override
-//   Create<List<AppBarButtonItem>> get trailing {
-//     return (cxt) => [
-//           AppBarButtonItem(S.of(cxt).refresh, Icon(PlatformIcons(cxt).refresh),
-//               () {
-//             RefreshPageEvent().fire();
-//           }),
-//           AppBarButtonItem(
-//               S.of(cxt).reset,
-//               Icon(PlatformX.isMaterial(cxt)
-//                   ? Icons.medical_services_outlined
-//                   : CupertinoIcons.rays), () {
-//             ResetWebViewEvent().fire();
-//           }),
-//         ];
-//   }
-// }
-//
-// class RefreshPageEvent {}
-//
-// class ResetWebViewEvent {}
-//
-// class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
-//   InAppWebViewController? webViewController;
-//   static final StateStreamListener<RefreshPageEvent> _refreshSubscription =
-//       StateStreamListener();
-//   static final StateStreamListener<ResetWebViewEvent> _resetSubscription =
-//       StateStreamListener();
-//
-//   URLRequest get urlRequest => URLRequest(
-//           url: Uri.https('danke.fduhole.com', '/jump', {
-//         'access': SettingsProvider.getInstance().fduholeToken?.access,
-//         'refresh': SettingsProvider.getInstance().fduholeToken?.refresh,
-//       }));
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     _refreshSubscription.bindOnlyInvalid(
-//         Constant.eventBus
-//             .on<RefreshPageEvent>()
-//             .listen((event) => webViewController?.reload()),
-//         hashCode);
-//     _resetSubscription.bindOnlyInvalid(
-//         Constant.eventBus.on<ResetWebViewEvent>().listen((event) async {
-//           if (!mounted) return;
-//           bool? confirmed = await Noticing.showConfirmationDialog(
-//               context, S.of(context).fix_danke_description,
-//               title: S.of(context).fix);
-//           if (confirmed == true) {
-//             await webViewController?.clearCache();
-//
-//             if (PlatformX.isAndroid) {
-//               await WebStorageManager.instance().android.deleteAllData();
-//             }
-//             if (PlatformX.isIOS) {
-//               final manager = WebStorageManager.instance().ios;
-//               var records = await manager.fetchDataRecords(
-//                   dataTypes: IOSWKWebsiteDataType.values);
-//               await manager.removeDataFor(
-//                   dataTypes: IOSWKWebsiteDataType.values,
-//                   dataRecords: records.filter((element) =>
-//                       element.displayName?.contains("fduhole.com") ?? false));
-//             }
-//
-//             await HttpAuthCredentialDatabase.instance()
-//                 .clearAllAuthCredentials();
-//
-//             await CookieManager.instance().deleteAllCookies();
-//
-//             await webViewController?.loadUrl(urlRequest: urlRequest);
-//           }
-//         }),
-//         hashCode);
-//   }
-//
-//   @override
-//   void dispose() {
-//     super.dispose();
-//     _refreshSubscription.cancel();
-//     _resetSubscription.cancel();
-//   }
-//
-//   @override
-//   Widget buildPage(BuildContext context) {
-//     InAppWebViewOptions settings =
-//         InAppWebViewOptions(userAgent: Constant.version);
-//
-//     return SafeArea(
-//       child: WillPopScope(
-//         onWillPop: () async {
-//           if (webViewController != null &&
-//               await webViewController!.canGoBack()) {
-//             await webViewController!.goBack();
-//             return false;
-//           }
-//           return true;
-//         },
-//         child: InAppWebView(
-//           initialOptions: InAppWebViewGroupOptions(crossPlatform: settings),
-//           initialUrlRequest: urlRequest,
-//           onWebViewCreated: (InAppWebViewController controller) {
-//             webViewController = controller;
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 class DankeSubPage extends PlatformSubpage<DankeSubPage> {
   @override
@@ -225,6 +107,7 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
   // When searching is idle, show random reviews
   bool idle = true;
   double searchBarPositionBoxHeight = 180;
+  String searchText = '';
 
   FileImage? _backgroundImage;
 
@@ -234,10 +117,9 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
       () {
         idle = text.isEmpty;
         searchBarPositionBoxHeight = idle ? 180 : 0;
+        searchText = text;
       },
     );
-
-    // search from course list
   }
 
   @override
@@ -280,29 +162,38 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
   }
 
   Future<Widget> _loadContent() async {
-    return Future.delayed(const Duration(seconds: 1),
-        () => Column(children: [CourseGroupCardWidget(courses: CourseGroup.dummy())]));
+    var courses =
+        await CurriculumBoardRepository.getInstance().getCourseGroups();
+    return Column(children: [
+      ...courses!
+          .filter((element) => element.name!.contains(searchText))
+          .map((e) => CourseGroupCardWidget(courses: e))
+    ]);
+  }
+
+  Future<Widget> _loadRandomReview() async {
+    var json = await CurriculumBoardRepository.getInstance().getRandomReview();
+    debugPrint(json);
+    return const RandomReviewWidgets(
+      departmentName: "A-soul",
+      courseName: "嘉然今天吃什么",
+      courseCode: "TSHE114514",
+      userId: "1919810",
+      reviewContent:
+          "关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋",
+    );
   }
 
   Widget _buildPageContent(BuildContext context) {
-    return idle
-        ? const RandomReviewWidgets(
-            departmentName: "A-soul",
-            courseName: "嘉然今天吃什么",
-            courseCode: "TSHE114514",
-            userId: "1919810",
-            reviewContent:
-                "关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋",
-          )
-        : Expanded(
-            child: FutureBuilder(
-                future: _loadContent(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return snapshot.data as Widget;
-                  } else {
-                    return Center(child: PlatformCircularProgressIndicator());
-                  }
-                }));
+    return Expanded(
+        child: FutureBuilder(
+            future: idle ? _loadRandomReview() : _loadContent(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return snapshot.data as Widget;
+              } else {
+                return Center(child: PlatformCircularProgressIndicator());
+              }
+            }));
   }
 }

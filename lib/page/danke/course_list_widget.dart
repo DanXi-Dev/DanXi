@@ -41,13 +41,13 @@ class CourseListWidgetState extends State<CourseListWidget> {
   late Future<List<CourseGroup>?> _future;
   List<CourseGroup>? _groups;
 
-  Future<List<CourseGroup>?> _setFuture(JWToken? token) {
+  Future<List<CourseGroup>?> _setFuture() {
     return LazyFuture.pack(
-        CurriculumBoardRepository.getInstance().getCourseGroups(token!));
+        CurriculumBoardRepository.getInstance().getCourseGroups());
   }
 
   Future<List<CourseGroup>?> refresh() {
-    _future = _setFuture(context.read<FDUHoleProvider>().token);
+    _future = _setFuture();
     setState(() {});
     return _future;
   }

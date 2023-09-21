@@ -31,6 +31,8 @@ class CourseGroup {
   String? department;
   int? weekHour;
   double? credit;
+
+  @JsonKey(name: 'course_list')
   List<Course>? courseList;
 
   CourseGroup(this.id, this.name, this.code, this.department, this.weekHour,

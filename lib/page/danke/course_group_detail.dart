@@ -27,6 +27,7 @@ import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
+import 'package:dan_xi/page/danke/course_review_editor.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
@@ -60,9 +61,11 @@ import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
 import '../../util/stream_listener.dart';
 
+enum FilterType { TEACHER_FILTER, TIME_FILTER }
+
 class RefreshFilterEvent {
   // 0: Teacher filter, 1: Time filter
-  final int filterType;
+  final FilterType filterType;
   final String newFilter;
 
   RefreshFilterEvent(this.newFilter, this.filterType);
@@ -167,8 +170,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
           totalScore += rev.courseGrade!.overall;
         }
       }
-      averageOverallLevel =
-          CourseReviewWidget.translateScore(totalScore ~/ scoreCount);
+      averageOverallLevel = translateScore(totalScore ~/ scoreCount);
     }
 
     shouldScrollToEnd = widget.arguments!.containsKey('scroll_to_end') &&
@@ -178,17 +180,14 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
 
     _refreshSubscription.bindOnlyInvalid(
         Constant.eventBus.on<RefreshFilterEvent>().listen((event) {
-          setState(() {
-            switch (event.filterType) {
-              case 0:
-                teacherFilter = event.newFilter;
-                break;
-              case 1:
-                timeFilter = event.newFilter;
-                break;
-            }
-          });
-
+          switch (event.filterType) {
+            case FilterType.TEACHER_FILTER:
+              teacherFilter = event.newFilter;
+              break;
+            case FilterType.TIME_FILTER:
+              timeFilter = event.newFilter;
+              break;
+          }
           indicatorKey.currentState?.show();
         }),
         hashCode);
@@ -229,9 +228,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
       appBar: PlatformAppBarX(
         title: TopController(
           controller: PrimaryScrollController.of(context),
-          child: Text(_searchKeyword == null
-              ? "#${_courses.code}"
-              : S.of(context).search_result),
+          child: Text(_courses.code!),
         ),
         trailingActions: [
           if (_searchKeyword == null) ...[
@@ -241,13 +238,10 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                   ? const Icon(Icons.reply)
                   : const Icon(CupertinoIcons.arrowshape_turn_up_left),
               onPressed: () async {
-                /*
-                if (await OTEditor.createNewReply(
-                    context, _course.hole_id, null)) {
-                  refreshListView(scrollToEnd: true);
+                if (await CourseReviewEditor.createNewPost(
+                    context, _courses)) {
+                  refreshList();
                 }
-
-                 */
               },
             ),
             PlatformPopupMenuX(
@@ -274,7 +268,8 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
     Future<List<CourseReview>?> allDataReceiver = _loadContent();
     final pagedListView = PagedListView<CourseReview>(
       pagedController: _listViewController,
-      noneItem: CourseReview(null, null, null, null, null, null, null, null, null, null, null, null, null),
+      noneItem: CourseReview(null, null, null, null, null, null, null, null,
+          null, null, null, null, null),
       withScrollbar: true,
       scrollController: PrimaryScrollController.of(context),
       // If we need to scroll to the end, we should prefetch all the data beforehand.
@@ -320,9 +315,15 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   }
 
   Widget _buildHead(BuildContext context) {
-    var getColor = (bool selected) {
-      return selected ? Colors.pinkAccent : Colors.white70;
-    };
+    var wildCard = S.of(context).all;
+    var teacherList = [
+      FilterTag(wildCard, "*"),
+      ...teacherSet.map((e) => FilterTag(e, e))
+    ];
+    var timeList = [
+      FilterTag(wildCard, "*"),
+      ...timeSet.map((e) => FilterTag(e, e))
+    ];
 
     return Card(
         color: Theme.of(context).cardTheme.color?.withOpacity(0.8),
@@ -363,10 +364,9 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                       width: 6,
                     ),
                     Text(
-                      ReviewFooter.overallWord[averageOverallLevel],
+                      overallWord[averageOverallLevel],
                       style: TextStyle(
-                          color: ReviewFooter.wordColor[averageOverallLevel],
-                          fontSize: 15),
+                          color: wordColor[averageOverallLevel], fontSize: 15),
                     )
                   ],
                 ),
@@ -378,20 +378,14 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                     style: const TextStyle(fontWeight: FontWeight.bold)),
                 Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: Wrap(spacing: 4, runSpacing: 4, children: [
-                      FilterTagWidget(
-                          color: getColor(teacherFilter == "*"),
-                          text: "全部",
-                          onTap: () {
-                            RefreshFilterEvent("*", 0).fire();
-                          }),
-                      ...teacherSet.map((e) => FilterTagWidget(
-                          color: getColor(teacherFilter == e),
-                          text: e,
-                          onTap: () {
-                            RefreshFilterEvent(e, 0).fire();
-                          }))
-                    ])),
+                    child: FilterListWidget(
+                        filters: teacherList,
+                        onTap: (e) {
+                          RefreshFilterEvent(e, FilterType.TEACHER_FILTER)
+                              .fire();
+                        },
+                        defaultIndex: teacherList.indexWhere(
+                            (element) => element.filter == teacherFilter))),
                 const Divider(
                   height: 5,
                   thickness: 1,
@@ -400,22 +394,13 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                     style: const TextStyle(fontWeight: FontWeight.bold)),
                 Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: Wrap(spacing: 4, runSpacing: 4, children: [
-                      FilterTagWidget(
-                          color: getColor(timeFilter == "*"),
-                          text: "全部",
-                          onTap: () {
-                            RefreshFilterEvent("*", 1).fire();
-                          }),
-                      ...timeSet.map((e) {
-                        return FilterTagWidget(
-                            color: getColor(timeFilter == e),
-                            text: e,
-                            onTap: () {
-                              RefreshFilterEvent(e, 1).fire();
-                            });
-                      })
-                    ])),
+                    child: FilterListWidget(
+                        filters: timeList,
+                        onTap: (e) {
+                          RefreshFilterEvent(e, FilterType.TIME_FILTER).fire();
+                        },
+                        defaultIndex: timeList.indexWhere(
+                            (element) => element.filter == timeFilter))),
               ],
             )));
   }

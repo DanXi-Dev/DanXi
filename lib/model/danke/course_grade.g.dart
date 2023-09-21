@@ -6,14 +6,14 @@ part of 'course_grade.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Grade _$GradeFromJson(Map<String, dynamic> json) => Grade(
+CourseGrade _$GradeFromJson(Map<String, dynamic> json) => CourseGrade(
       json['overall'] as int,
       json['content'] as int,
       json['workload'] as int,
       json['assessment'] as int,
     );
 
-Map<String, dynamic> _$GradeToJson(Grade instance) => <String, dynamic>{
+Map<String, dynamic> _$GradeToJson(CourseGrade instance) => <String, dynamic>{
       'overall': instance.overall,
       'content': instance.style,
       'workload': instance.workload,

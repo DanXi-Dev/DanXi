@@ -53,20 +53,6 @@ class CourseReviewWidget extends StatelessWidget {
         child: _buildCard(context));
   }
 
-  static int translateScore(int score) {
-    if (score < 20) {
-      return 4;
-    } else if (score < 40) {
-      return 3;
-    } else if (score < 60) {
-      return 2;
-    } else if (score < 80) {
-      return 1;
-    } else {
-      return 0;
-    }
-  }
-
   Widget _buildCard(BuildContext context) {
     // style of the card
     final TextStyle infoStyle =
@@ -301,7 +287,7 @@ class ReviewHeader extends StatelessWidget {
           // )
         ],
       ),
-      
+      const SizedBox(height: 4),
       SizedBox(
         width: double.infinity,
         child: Wrap(
@@ -328,17 +314,6 @@ class ReviewFooter extends StatelessWidget {
       required this.workloadLevel,
       required this.assessmentLevel})
       : super(key: key);
-  static const List<String> overallWord = ["特别好评", "好评", "中等", "差评", "特别差评"];
-  static const List<String> styleWord = ["非常容易", "容易", "中等", "较难", "硬核"];
-  static const List<String> workloadWord = ["非常小", "较小", "中等", "较大", "非常大"];
-  static const List<String> assessmentWord = ["非常宽松", "宽松", "中等", "严格", "非常严格"];
-  static const List<Color> wordColor = [
-    Colors.green,
-    Colors.lightGreen,
-    Colors.yellow,
-    Colors.orange,
-    Colors.red
-  ];
 
   final int overallLevel;
   final int styleLevel;

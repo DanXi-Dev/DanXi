@@ -18,10 +18,8 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course.dart';
 import 'package:dan_xi/page/danke/course_group_detail.dart';
-import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
-import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/human_duration.dart';
@@ -52,21 +50,31 @@ Color? getDefaultCardBackgroundColor(
         ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
         : null;
 
-String totalRatingCalc(double score) {
-  String rating = "暂无评分";
-  if (score >= 90) {
-    rating = "优秀";
-  } else if (score >= 80) {
-    rating = "良好";
-  } else if (score >= 70) {
-    rating = "中等";
-  } else if (score >= 60) {
-    rating = "及格";
-  } else if (score >= 0) {
-    rating = "不及格";
+int translateScore(int score) {
+  if (score < 20) {
+    return 0;
+  } else if (score < 40) {
+    return 1;
+  } else if (score < 60) {
+    return 2;
+  } else if (score < 80) {
+    return 3;
+  } else {
+    return 4;
   }
-  return rating;
 }
+
+const List<String> overallWord = ["特别差评", "差评", "中等", "好评", "特别好评"];
+const List<String> styleWord = ["硬核", "较难", "中等", "容易", "非常容易"];
+const List<String> workloadWord = ["非常大", "较大", "中等", "较小", "非常小"];
+const List<String> assessmentWord = ["非常严格", "严格", "中等", "宽松", "非常宽松"];
+const List<Color> wordColor = [
+  Colors.red,
+  Colors.orange,
+  Colors.yellow,
+  Colors.lightGreen,
+  Colors.green
+];
 
 class CourseGroupCardWidget extends StatelessWidget {
   // changeable style of the card
@@ -182,7 +190,6 @@ class CourseGroupCardWidget extends StatelessWidget {
         ),
       ]),
     );
-    throw UnimplementedError();
   }
 }
 
@@ -206,4 +213,55 @@ class FilterTagWidget extends StatelessWidget {
               color: color,
             ),
           ]);
+}
+
+class FilterTag<T> {
+  FilterTag(this.displayName, this.filter);
+
+  String displayName;
+  T filter;
+}
+
+class FilterListWidget<T> extends StatefulWidget {
+  FilterListWidget(
+      {super.key,
+      required this.filters,
+      required this.onTap,
+      required this.defaultIndex});
+
+  @override
+  FilterListWidgetState<T> createState() => FilterListWidgetState<T>();
+
+  final void Function(T) onTap;
+  final List<FilterTag<T>> filters;
+  final int defaultIndex;
+}
+
+class FilterListWidgetState<T> extends State<FilterListWidget<T>> {
+  FilterTag<T>? selectedTag;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedTag = widget.filters[widget.defaultIndex];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(spacing: 4, runSpacing: 4, children: [
+      ...widget.filters.map(
+        (e) => FilterTagWidget(
+            color: e.filter == selectedTag!.filter
+                ? Colors.pinkAccent
+                : Colors.white70,
+            text: e.displayName,
+            onTap: () {
+              setState(() {
+                selectedTag = e;
+                widget.onTap(e.filter);
+              });
+            }),
+      )
+    ]);
+  }
 }

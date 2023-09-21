@@ -15,7 +15,7 @@ CourseReview _$CourseReviewFromJson(Map<String, dynamic> json) => CourseReview(
       json['timeUpdated'] as String?,
       json['course_grade'] == null
           ? null
-          : Grade.fromJson(json['course_grade'] as Map<String, dynamic>),
+          : CourseGrade.fromJson(json['course_grade'] as Map<String, dynamic>),
       json['like'] as int?,
       json['liked'] as int?,
       json['is_me'] as bool?,

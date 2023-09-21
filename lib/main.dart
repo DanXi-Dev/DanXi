@@ -22,6 +22,7 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/page/danke/course_group_detail.dart';
+import 'package:dan_xi/page/danke/course_review_editor.dart';
 import 'package:dan_xi/page/dashboard/aao_notices.dart';
 import 'package:dan_xi/page/dashboard/announcement_notices.dart';
 import 'package:dan_xi/page/dashboard/bus.dart';
@@ -191,7 +192,9 @@ class DanxiApp extends StatelessWidget {
     '/bbs/messages': (context, {arguments}) =>
         OTMessagesPage(arguments: arguments),
     '/bbs/search': (context, {arguments}) => OTSearchPage(arguments: arguments),
-    '/danke/courseDetail': (context, {arguments}) => CourseGroupDetail(arguments: arguments)
+    '/danke/courseDetail': (context, {arguments}) => CourseGroupDetail(arguments: arguments),
+    '/danke/fullScreenEditor':(context, {arguments}) =>
+        CourseReviewEditorPage(arguments: arguments)
   };
 
   const DanxiApp({Key? key}) : super(key: key);

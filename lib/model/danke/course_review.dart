@@ -51,7 +51,7 @@ class CourseReview {
   String? content;
   String? timeCreated;
   String? timeUpdated;
-  Grade? courseGrade;
+  CourseGrade? courseGrade;
   int? like;
   int? liked;
   bool? isMe;
@@ -74,7 +74,7 @@ class CourseReview {
       "关注嘉然天天天天天天解馋",
       "dummy",
       "dummy",
-      Grade.dummy(),
+      CourseGrade.dummy(),
       100,
       1,
       true,
