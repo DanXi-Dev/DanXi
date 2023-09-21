@@ -22,16 +22,16 @@ part 'course_grade.g.dart';
 
 @JsonSerializable()
 class Grade {
-  int? overall;
-  int? content;
-  int? workload;
-  int? assessment;
+  int overall;
+  int style;
+  int workload;
+  int assessment;
 
-  Grade(this.overall, this.content, this.workload, this.assessment);
+  Grade(this.overall, this.style, this.workload, this.assessment);
 
   factory Grade.fromJson(Map<String, dynamic> json) => _$GradeFromJson(json);
 
   Map<String, dynamic> toJson() => _$GradeToJson(this);
 
-  factory Grade.dummy() => Grade(11, 4, 5, 14);
+  factory Grade.dummy() => Grade(99, 19, 45, 81);
 }

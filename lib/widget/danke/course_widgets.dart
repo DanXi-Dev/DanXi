@@ -17,13 +17,7 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course.dart';
-import 'package:dan_xi/model/opentreehole/floor.dart';
-import 'package:dan_xi/model/opentreehole/hole.dart';
-import 'package:dan_xi/model/opentreehole/message.dart';
-import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/page/danke/course_group_detail.dart';
-import 'package:dan_xi/page/opentreehole/hole_detail.dart';
-import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
@@ -193,34 +187,23 @@ class CourseGroupCardWidget extends StatelessWidget {
 }
 
 class FilterTagWidget extends StatelessWidget {
-  final bool selected;
+  final Color color;
   final String text;
-  final String filter;
-  final int filterType;
+  final void Function() onTap;
 
   const FilterTagWidget(
-      {Key? key,
-      required this.selected,
-      required this.text,
-      required this.filter,
-      required this.filterType})
+      {Key? key, required this.color, required this.text, required this.onTap})
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: Flex(
+  Widget build(BuildContext context) => Flex(
           direction: Axis.horizontal,
           mainAxisSize: MainAxisSize.min,
           children: [
             RoundChip(
-              onTap: () {
-                if (!selected) {
-                  RefreshFilterEvent(filter, filterType).fire();
-                }
-              },
+              onTap: onTap,
               label: text,
-              color: selected ? Colors.pinkAccent : Colors.white70,
+              color: color,
             ),
-          ]));
+          ]);
 }

@@ -20,6 +20,7 @@ import 'package:dan_xi/model/danke/review_extra.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'course.dart';
 import 'course_grade.dart';
 
 part 'course_review.g.dart';
@@ -29,10 +30,10 @@ part 'course_review.g.dart';
 ///
 /// [reviewer_id] is
 /// [liked] is used to show whether the user have up vote or down vote the review, 1 for up vote, -1 for down vote, 0 for no vote.
-/// [is_me] is used to show whether the review is written by the user.
+/// [isMe] is used to show whether the review is written by the user.
 /// [modified] is used to show whether the review is modified.
 /// [deleted] is used to show whether the review is deleted, regardless of being deleted by the user or by the administrator.
-/// [review_extra] is used to store the extra information of the review, such as the achievements of the reviewer.
+/// [reviewExtra] is used to store the extra information of the review, such as the achievements of the reviewer.
 /// For now, extra only contains the achievements of the reviewer, e.g. badges.
 
 @JsonSerializable()
@@ -50,13 +51,14 @@ class CourseReview {
   String? content;
   String? timeCreated;
   String? timeUpdated;
-  Grade? course_grade;
+  Grade? courseGrade;
   int? like;
   int? liked;
-  bool? is_me;
+  bool? isMe;
   int? modified;
   bool? deleted;
-  ReviewExtra? review_extra;
+  ReviewExtra? reviewExtra;
+  Course? parent;
 
   /// [fromJson] and [toJson] are used to convert between JSON and [CourseReview] object.
   factory CourseReview.fromJson(Map<String, dynamic> json) =>
@@ -92,21 +94,25 @@ class CourseReview {
       this.content,
       this.timeCreated,
       this.timeUpdated,
-      this.course_grade,
+      this.courseGrade,
       this.like,
       this.liked,
-      this.is_me,
+      this.isMe,
       this.modified,
       this.deleted,
-      this.review_extra);
+      this.reviewExtra);
 
   String? get deleteReason => deleted == true ? content : null;
 
   @override
   String toString() {
-    return 'CourseReview{review_id: $review_id, reviewer_id: $reviewer_id, title: $title, content: $content, timeCreated: $timeCreated, timeUpdated: $timeUpdated, course_grade: $course_grade, like: $like, liked: $liked, is_me: $is_me, modified: $modified, deleted: $deleted, extra: $review_extra}';
+    return 'CourseReview{review_id: $review_id, reviewer_id: $reviewer_id, title: $title, content: $content, timeCreated: $timeCreated, timeUpdated: $timeUpdated, course_grade: $courseGrade, like: $like, liked: $liked, is_me: $isMe, modified: $modified, deleted: $deleted, extra: $reviewExtra}';
   }
 
   @override
   int get hashCode => review_id ?? timeCreated.hashCode;
+
+  void linkCourse(Course c) {
+    parent = c;
+  }
 }

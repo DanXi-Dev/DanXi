@@ -42,24 +42,24 @@ class Course {
   double? rating;
   List<CourseReview>? reviewList;
 
-  Course(
-      this.subId,
-      this.teachers,
-      this.maxStudent,
-      this.year,
-      this.semester,
-      this.rating,
-      this.reviewList);
+  Course(this.subId, this.teachers, this.maxStudent, this.year, this.semester,
+      this.rating, this.reviewList);
 
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseToJson(this);
 
-  factory Course.dummy() => Course(1, "嘉然", 1145, 1919, 1, 4.9, [CourseReview.dummy()]);
+  factory Course.dummy() =>
+      Course(1, "嘉然", 1145, 1919, 1, 4.9, [CourseReview.dummy()]);
+
   @override
-  bool operator ==(Object other) =>
-      (other is Course) && subId == other.subId;
+  bool operator ==(Object other) => (other is Course) && subId == other.subId;
 
   @override
   int get hashCode => subId ?? subId.hashCode;
+
+  String formatTime() {
+    // Todo: add support for other semesters
+    return "$year学年-${semester == 1 ? "秋季" : "春季"}";
+  }
 }

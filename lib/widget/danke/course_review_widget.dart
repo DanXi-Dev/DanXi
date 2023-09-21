@@ -19,7 +19,6 @@ import 'dart:ui';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -52,10 +51,23 @@ class CourseReviewWidget extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: _buildCard(context));
-    throw UnimplementedError();
   }
 
-  _buildCard(BuildContext context) {
+  static int translateScore(int score) {
+    if (score < 20) {
+      return 4;
+    } else if (score < 40) {
+      return 3;
+    } else if (score < 60) {
+      return 2;
+    } else if (score < 80) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  Widget _buildCard(BuildContext context) {
     // style of the card
     final TextStyle infoStyle =
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
@@ -94,8 +106,11 @@ class CourseReviewWidget extends StatelessWidget {
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 10, vertical: 2),
-                                  child: ReviewerHeader(
-                                      userId: review.reviewer_id!),
+                                  child: ReviewHeader(
+                                    userId: review.reviewer_id!,
+                                    teacher: review.parent!.teachers!,
+                                    time: review.parent!.formatTime(),
+                                  ),
                                 ),
                                 const Divider(),
                                 Padding(
@@ -109,6 +124,21 @@ class CourseReviewWidget extends StatelessWidget {
                                             .bodyLarge
                                             ?.color,
                                         fontSize: 15),
+                                  ),
+                                ),
+                                const Divider(),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 2),
+                                  child: ReviewFooter(
+                                    overallLevel: translateScore(
+                                        review.courseGrade!.overall),
+                                    styleLevel: translateScore(
+                                        review.courseGrade!.style),
+                                    workloadLevel: translateScore(
+                                        review.courseGrade!.workload),
+                                    assessmentLevel: translateScore(
+                                        review.courseGrade!.assessment),
                                   ),
                                 ),
                               ],
@@ -126,6 +156,8 @@ class CourseReviewWidget extends StatelessWidget {
   }
 }
 
+// HydrogenC: Don't know what this widget is for
+/*
 class ReviewOperationBar extends StatefulWidget {
   final CourseReview review;
 
@@ -151,7 +183,7 @@ class _ReviewOperationBarState extends State<ReviewOperationBar> {
             Text(
               like.toString(),
               style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyText1?.color,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                   fontSize: 12),
             ),
           ],
@@ -171,7 +203,7 @@ class _ReviewOperationBarState extends State<ReviewOperationBar> {
             Text(
               "0",
               style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyText1?.color,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                   fontSize: 12),
             ),
           ],
@@ -194,56 +226,193 @@ class _ReviewOperationBarState extends State<ReviewOperationBar> {
     );
   }
 }
+*/
 
-class ReviewerHeader extends StatelessWidget {
+class ReviewHeader extends StatelessWidget {
   final int userId;
+  final String teacher;
+  final String time;
 
   // final String reviewContent;
 
-  const ReviewerHeader({Key? key, required this.userId}) : super(key: key);
+  const ReviewHeader(
+      {Key? key,
+      required this.userId,
+      required this.teacher,
+      required this.time})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // user
-        Text(
-          "| user $userId",
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-        ),
-        const Wrap(
+    return Column(children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const ColoredBox(
+              // Todo: remove hardcoded colors
+              color: Colors.deepOrange,
+              child: SizedBox(width: 2, height: 12)),
+          const SizedBox(width: 8),
+          // user
+          Text(
+            "User $userId",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Expanded(
+              child: GestureDetector(
+            onTap: () {},
+            child: const Wrap(
+              // todo this is the badge list of the user
+              spacing: 3,
+              alignment: WrapAlignment.end,
+              children: [
+                // rating
+                Icon(
+                  Icons.circle,
+                  color: Colors.yellow,
+                  size: 12,
+                ),
+                Icon(
+                  Icons.circle,
+                  color: Colors.red,
+                  size: 12,
+                ),
+                Icon(
+                  Icons.circle,
+                  color: Colors.blue,
+                  size: 12,
+                ),
+              ],
+            ),
+          )),
+
+          /*
+        
+        */
+          // review content
+          // Padding(
+          //   padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          //   child: Text(
+          //     reviewContent,
+          //     style: TextStyle(
+          //         color: Theme.of(context).textTheme.bodyText1?.color,
+          //         fontSize: 12),
+          //   ),
+          // )
+        ],
+      ),
+      
+      SizedBox(
+        width: double.infinity,
+        child: Wrap(
           // todo this is the badge list of the user
-          spacing: 3,
+          spacing: 4,
+          alignment: WrapAlignment.start,
           children: [
             // rating
-            Icon(
-              Icons.circle,
-              color: Colors.yellow,
-              size: 12,
-            ),
-            Icon(
-              Icons.circle,
-              color: Colors.red,
-              size: 12,
-            ),
-            Icon(
-              Icons.circle,
-              color: Colors.blue,
-              size: 12,
-            ),
+            FilterTagWidget(
+                color: Colors.deepPurpleAccent, text: teacher, onTap: () {}),
+            FilterTagWidget(color: Colors.green, text: time, onTap: () {})
           ],
         ),
-        // review content
-        // Padding(
-        //   padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-        //   child: Text(
-        //     reviewContent,
-        //     style: TextStyle(
-        //         color: Theme.of(context).textTheme.bodyText1?.color,
-        //         fontSize: 12),
-        //   ),
-        // )
+      ),
+    ]);
+  }
+}
+
+class ReviewFooter extends StatelessWidget {
+  const ReviewFooter(
+      {Key? key,
+      required this.overallLevel,
+      required this.styleLevel,
+      required this.workloadLevel,
+      required this.assessmentLevel})
+      : super(key: key);
+  static const List<String> overallWord = ["特别好评", "好评", "中等", "差评", "特别差评"];
+  static const List<String> styleWord = ["非常容易", "容易", "中等", "较难", "硬核"];
+  static const List<String> workloadWord = ["非常小", "较小", "中等", "较大", "非常大"];
+  static const List<String> assessmentWord = ["非常宽松", "宽松", "中等", "严格", "非常严格"];
+  static const List<Color> wordColor = [
+    Colors.green,
+    Colors.lightGreen,
+    Colors.yellow,
+    Colors.orange,
+    Colors.red
+  ];
+
+  final int overallLevel;
+  final int styleLevel;
+  final int workloadLevel;
+  final int assessmentLevel;
+
+  @override
+  Widget build(BuildContext context) {
+    const labelStyle = TextStyle(color: Colors.grey, fontSize: 12);
+
+    return Column(
+      children: [
+        Wrap(
+          spacing: 20,
+          runSpacing: 6,
+          alignment: WrapAlignment.spaceBetween,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('总体评分', style: labelStyle),
+                const SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  overallWord[overallLevel],
+                  style:
+                      TextStyle(color: wordColor[overallLevel], fontSize: 12),
+                )
+              ],
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('课程风格', style: labelStyle),
+                const SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  styleWord[styleLevel],
+                  style: TextStyle(color: wordColor[styleLevel], fontSize: 12),
+                )
+              ],
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('工作量', style: labelStyle),
+                const SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  workloadWord[workloadLevel],
+                  style:
+                      TextStyle(color: wordColor[workloadLevel], fontSize: 12),
+                )
+              ],
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('考核要求', style: labelStyle),
+                const SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  assessmentWord[assessmentLevel],
+                  style: TextStyle(
+                      color: wordColor[assessmentLevel], fontSize: 12),
+                )
+              ],
+            )
+          ],
+        ),
       ],
     );
   }

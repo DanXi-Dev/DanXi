@@ -22,15 +22,12 @@ import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course.dart';
+import 'package:dan_xi/model/danke/course_grade.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
-import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
-import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
-import 'package:dan_xi/model/pair.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
-import 'package:dan_xi/page/opentreehole/image_viewer.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -61,10 +58,7 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:linkify/linkify.dart';
 import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
-
-import '../../model/opentreehole/history.dart';
 import '../../util/stream_listener.dart';
-import '../../widget/libraries/round_chip.dart';
 
 class RefreshFilterEvent {
   // 0: Teacher filter, 1: Time filter
@@ -87,10 +81,11 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   /// Unrelated to the state.
   /// These fields should only be initialized once when created.
   late CourseGroup _courses;
+  late int averageOverallLevel;
   String? _searchKeyword;
   FileImage? _backgroundImage;
   Set<String> teacherSet = {};
-  Set<Pair<int, int>> timeSet = {};
+  Set<String> timeSet = {};
 
   /// Fields related to the display states.
   bool shouldScrollToEnd = false;
@@ -115,7 +110,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
    */
 
   /// Reload/load the (new) content and set the [_content] future.
-  Future<List<CourseReview>?> _loadContent(int page) async {
+  Future<List<CourseReview>?> _loadContent() async {
     /*
     if (_searchKeyword != null) {
       var result = await OpenTreeHoleRepository.getInstance().loadSearchResults(
@@ -128,9 +123,20 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
     }
 
      */
-    List<CourseReview> result = [CourseReview.dummy()];
+    List<CourseReview> result = [];
     for (var elem in _courses.courseList!) {
-      result += elem.reviewList!;
+      result += elem.reviewList!.filter((element) {
+        if (teacherFilter != "*" &&
+            element.parent!.teachers! != teacherFilter) {
+          return false;
+        }
+
+        if (timeFilter != "*" && element.parent!.formatTime() != timeFilter) {
+          return false;
+        }
+
+        return true;
+      });
     }
 
     return result;
@@ -150,11 +156,21 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
 
        */
 
+      int totalScore = 0, scoreCount = 0;
       for (var elem in _courses.courseList!) {
         teacherSet.add(elem.teachers!);
-        timeSet.add(Pair(elem.year!, elem.semester!));
+        timeSet.add(elem.formatTime());
+        scoreCount += elem.reviewList!.length;
+
+        for (var rev in elem.reviewList!) {
+          rev.linkCourse(elem);
+          totalScore += rev.courseGrade!.overall;
+        }
       }
+      averageOverallLevel =
+          CourseReviewWidget.translateScore(totalScore ~/ scoreCount);
     }
+
     shouldScrollToEnd = widget.arguments!.containsKey('scroll_to_end') &&
         widget.arguments!['scroll_to_end'] == true;
 
@@ -181,6 +197,8 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   /// Refresh the whole list.
   Future<void> refreshList() async {
     await refreshSelf();
+    return _listViewController.notifyUpdate(
+        useInitialData: true, queueDataClear: true);
   }
 
   @override
@@ -253,13 +271,12 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   }
 
   Widget _buildBody(BuildContext context) {
-    Future<List<CourseReview>>? allDataReceiver;
+    Future<List<CourseReview>?> allDataReceiver = _loadContent();
     final pagedListView = PagedListView<CourseReview>(
       pagedController: _listViewController,
-      noneItem: CourseReview.dummy(),
+      noneItem: CourseReview(null, null, null, null, null, null, null, null, null, null, null, null, null),
       withScrollbar: true,
       scrollController: PrimaryScrollController.of(context),
-      dataReceiver: _loadContent,
       // If we need to scroll to the end, we should prefetch all the data beforehand.
       // See also [prefetchAllFloors] in [TreeHoleSubpageState].
       allDataReceiver: allDataReceiver,
@@ -302,74 +319,106 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
     );
   }
 
-  Widget _buildHead(BuildContext context) => Card(
-      color: Theme.of(context).cardTheme.color?.withOpacity(0.8),
-      child: ListTile(
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 5, horizontal: 3),
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(_courses.getFullName(),
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(_courses.code!,
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: SizedBox(
-                    width: 56,
-                    child: OTLeadingTag(
-                      color: Colors.orange,
-                      text: "${_courses.credit!.toStringAsFixed(1)} 学分",
+  Widget _buildHead(BuildContext context) {
+    var getColor = (bool selected) {
+      return selected ? Colors.pinkAccent : Colors.white70;
+    };
+
+    return Card(
+        color: Theme.of(context).cardTheme.color?.withOpacity(0.8),
+        child: ListTile(
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 5, horizontal: 3),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(_courses.getFullName(),
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(_courses.code!,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey)),
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        SizedBox(
+                            width: 56,
+                            child: OTLeadingTag(
+                              color: Colors.orange,
+                              text: "${_courses.credit!.toStringAsFixed(1)} 学分",
+                            )),
+                      ],
                     )),
-              ),
-              const Divider(
-                height: 5,
-                thickness: 1,
-              ),
-              Text(S.of(context).course_teacher_name,
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
-              Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: Wrap(children: [
-                    FilterTagWidget(
-                        selected: teacherFilter == "*",
-                        text: "全部",
-                        filter: "*",
-                        filterType: 0),
-                    ...teacherSet.map((e) => FilterTagWidget(
-                        selected: teacherFilter == e,
-                        text: e,
-                        filter: e,
-                        filterType: 0))
-                  ])),
-              const Divider(
-                height: 5,
-                thickness: 1,
-              ),
-              Text(S.of(context).course_schedule,
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
-              Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: Wrap(children: [
-                    FilterTagWidget(
-                      selected: timeFilter == "*",
-                      text: "全部",
-                      filter: "*",
-                      filterType: 1,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('评价',
+                        style: TextStyle(color: Colors.grey, fontSize: 15)),
+                    const SizedBox(
+                      width: 6,
                     ),
-                    ...timeSet.map((e) {
-                      String filter = "${e.first} ${e.second}";
-                      return FilterTagWidget(
-                        selected: timeFilter == filter,
-                        text: "${e.first}学年-${e.second == 1 ? "秋季" : "春季"}",
-                        filter: filter,
-                        filterType: 1,
-                      );
-                    })
-                  ])),
-            ],
-          )));
+                    Text(
+                      ReviewFooter.overallWord[averageOverallLevel],
+                      style: TextStyle(
+                          color: ReviewFooter.wordColor[averageOverallLevel],
+                          fontSize: 15),
+                    )
+                  ],
+                ),
+                const Divider(
+                  height: 5,
+                  thickness: 1,
+                ),
+                Text(S.of(context).course_teacher_name,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Wrap(spacing: 4, runSpacing: 4, children: [
+                      FilterTagWidget(
+                          color: getColor(teacherFilter == "*"),
+                          text: "全部",
+                          onTap: () {
+                            RefreshFilterEvent("*", 0).fire();
+                          }),
+                      ...teacherSet.map((e) => FilterTagWidget(
+                          color: getColor(teacherFilter == e),
+                          text: e,
+                          onTap: () {
+                            RefreshFilterEvent(e, 0).fire();
+                          }))
+                    ])),
+                const Divider(
+                  height: 5,
+                  thickness: 1,
+                ),
+                Text(S.of(context).course_schedule,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Wrap(spacing: 4, runSpacing: 4, children: [
+                      FilterTagWidget(
+                          color: getColor(timeFilter == "*"),
+                          text: "全部",
+                          onTap: () {
+                            RefreshFilterEvent("*", 1).fire();
+                          }),
+                      ...timeSet.map((e) {
+                        return FilterTagWidget(
+                            color: getColor(timeFilter == e),
+                            text: e,
+                            onTap: () {
+                              RefreshFilterEvent(e, 1).fire();
+                            });
+                      })
+                    ])),
+              ],
+            )));
+  }
 
   Future<void> _onTapScrollToEnd(_) async {
     /*
@@ -391,9 +440,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
 
      */
   }
-
-  List<OTTag> deepCopyTagList(List<OTTag> list) =>
-      list.map((e) => OTTag.fromJson(jsonDecode(jsonEncode(e)))).toList();
 
   List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {
     List<Widget> menu = [

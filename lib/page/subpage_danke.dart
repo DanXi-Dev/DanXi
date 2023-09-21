@@ -236,6 +236,7 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
         searchBarPositionBoxHeight = idle ? 180 : 0;
       },
     );
+
     // search from course list
   }
 

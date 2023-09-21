@@ -55,7 +55,7 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
             data: {
               'title': newReview.title,
               'content': newReview.content,
-              'rank': newReview.course_grade,
+              'rank': newReview.courseGrade,
               'remark': newReview.like
             },
             options: Options(headers: _tokenHeader(fduHoleToken)));
@@ -75,7 +75,7 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
         data: {
           'title': updatedReview.title,
           'content': updatedReview.content,
-          'rank': updatedReview.course_grade,
+          'rank': updatedReview.courseGrade,
           'remark': updatedReview.like
         },
         options: Options(headers: _tokenHeader(fduHoleToken)));
