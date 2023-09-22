@@ -93,9 +93,9 @@ class CourseReviewWidget extends StatelessWidget {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 10, vertical: 2),
                                   child: ReviewHeader(
-                                    userId: review.reviewer_id!,
-                                    teacher: review.parent!.teachers!,
-                                    time: review.parent!.formatTime(),
+                                    userId: review.reviewerId!,
+                                    teacher: review.course!.teachers!,
+                                    time: review.course!.formatTime(),
                                   ),
                                 ),
                                 const Divider(),

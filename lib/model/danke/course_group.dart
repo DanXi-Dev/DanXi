@@ -29,6 +29,8 @@ class CourseGroup {
   String? name;
   String? code;
   String? department;
+
+  @JsonKey(name: 'week_hour')
   int? weekHour;
   double? credit;
 

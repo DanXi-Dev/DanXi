@@ -130,11 +130,11 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
     for (var elem in _courses.courseList!) {
       result += elem.reviewList!.filter((element) {
         if (teacherFilter != "*" &&
-            element.parent!.teachers! != teacherFilter) {
+            element.course!.teachers! != teacherFilter) {
           return false;
         }
 
-        if (timeFilter != "*" && element.parent!.formatTime() != timeFilter) {
+        if (timeFilter != "*" && element.course!.formatTime() != timeFilter) {
           return false;
         }
 

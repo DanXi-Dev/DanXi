@@ -22,11 +22,18 @@ part 'course.g.dart';
 
 @JsonSerializable()
 class Course {
-  @JsonKey(name: 'id')
-  int? subId;
+  int? id;
+  String? name;
+  String? code;
+  @JsonKey(name: 'code_id')
+  String? codeId;
+  double? credit;
+  String? department;
   String? teachers;
   @JsonKey(name: 'max_student')
   int? maxStudent;
+  @JsonKey(name: 'week_hour')
+  int? weekHour;
 
   /// (Copied from docs)
   /// 学年。如果是非秋季学期，则年数为（实际日期年数 - 1）。
@@ -39,11 +46,12 @@ class Course {
   //     3：（第二年的）春季学期；
   //     4：（第二年的）暑假
   int? semester;
-  double? rating;
+  @JsonKey(name: 'coursegroup_id')
+  int? courseGroupId;
   List<CourseReview>? reviewList;
 
-  Course(this.subId, this.teachers, this.maxStudent, this.year, this.semester,
-      this.rating, this.reviewList);
+  Course(this.id, this.teachers, this.maxStudent, this.year, this.semester,
+      this.credit, this.reviewList);
 
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);
 
@@ -53,10 +61,10 @@ class Course {
       Course(1, "嘉然", 1145, 1919, 1, 4.9, [CourseReview.dummy()]);
 
   @override
-  bool operator ==(Object other) => (other is Course) && subId == other.subId;
+  bool operator ==(Object other) => (other is Course) && id == other.id;
 
   @override
-  int get hashCode => subId ?? subId.hashCode;
+  int get hashCode => id ?? id.hashCode;
 
   String formatTime() {
     // Todo: add support for other semesters

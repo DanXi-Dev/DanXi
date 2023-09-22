@@ -28,7 +28,7 @@ part 'course_review.g.dart';
 /// [CourseReview] is the model class for course review.
 /// It is used to store the data of a course review analogous to the [OTFloor].
 ///
-/// [reviewer_id] is
+/// [reviewerId] is
 /// [liked] is used to show whether the user have up vote or down vote the review, 1 for up vote, -1 for down vote, 0 for no vote.
 /// [isMe] is used to show whether the review is written by the user.
 /// [modified] is used to show whether the review is modified.
@@ -39,10 +39,12 @@ part 'course_review.g.dart';
 @JsonSerializable()
 class CourseReview {
   /// The unique id of a review, based on which the review is compared.
-  int? review_id;
+  @JsonKey(name: 'review_id')
+  int? reviewId;
 
   /// The user id of the reviewer.
-  int? reviewer_id;
+  @JsonKey(name: 'reviewer_id')
+  int? reviewerId;
 
   /// The title of the review.
   String? title;
@@ -58,7 +60,7 @@ class CourseReview {
   int? modified;
   bool? deleted;
   ReviewExtra? reviewExtra;
-  Course? parent;
+  Course? course;
 
   /// [fromJson] and [toJson] are used to convert between JSON and [CourseReview] object.
   factory CourseReview.fromJson(Map<String, dynamic> json) =>
@@ -85,11 +87,11 @@ class CourseReview {
   /// override == and hashCode to compare two [CourseReview] objects.
   @override
   bool operator ==(Object other) =>
-      (other is CourseReview) && review_id == other.review_id;
+      (other is CourseReview) && reviewId == other.reviewId;
 
   CourseReview(
-      this.review_id,
-      this.reviewer_id,
+      this.reviewId,
+      this.reviewerId,
       this.title,
       this.content,
       this.timeCreated,
@@ -106,13 +108,13 @@ class CourseReview {
 
   @override
   String toString() {
-    return 'CourseReview{review_id: $review_id, reviewer_id: $reviewer_id, title: $title, content: $content, timeCreated: $timeCreated, timeUpdated: $timeUpdated, course_grade: $courseGrade, like: $like, liked: $liked, is_me: $isMe, modified: $modified, deleted: $deleted, extra: $reviewExtra}';
+    return 'CourseReview{review_id: $reviewId, reviewer_id: $reviewerId, title: $title, content: $content, timeCreated: $timeCreated, timeUpdated: $timeUpdated, course_grade: $courseGrade, like: $like, liked: $liked, is_me: $isMe, modified: $modified, deleted: $deleted, extra: $reviewExtra}';
   }
 
   @override
-  int get hashCode => review_id ?? timeCreated.hashCode;
+  int get hashCode => reviewId ?? timeCreated.hashCode;
 
   void linkCourse(Course c) {
-    parent = c;
+    course = c;
   }
 }

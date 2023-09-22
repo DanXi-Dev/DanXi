@@ -30,61 +30,57 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 
 class CurriculumBoardRepository extends BaseRepositoryWithDio {
-  static const String _BASE_URL = "https://auth.fduhole.com/api";
-  static const String _BASE_AUTH_URL = "https://danke.fduhole.com/api";
+  static const String _BASE_URL = "https://danke.fduhole.com/api";
+  static const String _BASE_AUTH_URL = "https://auth.fduhole.com/api";
 
   JWToken? _token;
 
-  CurriculumBoardRepository._(){
+  CurriculumBoardRepository._() {
     dio.interceptors.add(JWTInterceptor(
         "$_BASE_AUTH_URL/refresh",
         () => _token,
-        (token) => _token =
-            SettingsProvider.getInstance().fduholeToken = token));
+        (token) =>
+            _token = SettingsProvider.getInstance().fduholeToken = token));
     dio.interceptors.add(
         UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
   }
+
+  Map<String, String> get _tokenHeader =>
+      OpenTreeHoleRepository.getInstance().tokenHeader;
 
   static final _instance = CurriculumBoardRepository._();
 
   factory CurriculumBoardRepository.getInstance() => _instance;
 
-  Map<String, String> _tokenHeader() {
-    if (_token == null || !_token!.isValid) {
-      throw NotLoginError("Null Token");
-    }
-    return {"Authorization": "Bearer ${_token!.access!}"};
-  }
-
   Future<List<CourseGroup>?> getCourseGroups() async {
     Response<List<dynamic>> response = await dio.get("$_BASE_URL/courses",
-        options: Options(headers: _tokenHeader()));
+        options: Options(headers: _tokenHeader));
     return response.data?.map((e) => CourseGroup.fromJson(e)).toList();
   }
 
   Future<Course?> getCourse(String courseId) async {
     Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_URL/courses/$courseId",
-        options: Options(headers: _tokenHeader()));
+        options: Options(headers: _tokenHeader));
     return Course.fromJson(response.data!);
   }
 
   Future<CourseReview?> addReview(
       int courseId, CourseReviewEditorText review) async {
-    Response<Map<String, dynamic>> response =
-        await dio.post("$_BASE_URL/courses/$courseId/reviews",
-            data: {
-              'title': review.title,
-              'content': review.content,
-              'rank': review.ratings.grade
-            },
-            options: Options(headers: _tokenHeader()));
+    Response<Map<String, dynamic>> response = await dio.post(
+        "$_BASE_URL/courses/$courseId/reviews",
+        data: {
+          'title': review.title,
+          'content': review.content,
+          'rank': review.ratings.grade
+        },
+        options: Options(headers: _tokenHeader));
     return CourseReview.fromJson(response.data!);
   }
 
   Future<int?> removeReview(String reviewId, CourseReview newReview) async {
     Response<String> response = await dio.delete("$_BASE_URL/reviews/$reviewId",
-        options: Options(headers: _tokenHeader()));
+        options: Options(headers: _tokenHeader));
     return response.statusCode;
   }
 
@@ -95,23 +91,23 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
           'content': updatedReview.content,
           'rank': updatedReview.courseGrade
         },
-        options: Options(headers: _tokenHeader()));
+        options: Options(headers: _tokenHeader));
     return response.statusCode;
   }
 
   Future<List<CourseReview>?> getReviews(String courseId) async {
     Response<List<dynamic>> response = await dio.get(
         "$_BASE_URL/courses/$courseId/reviews",
-        options: Options(headers: _tokenHeader()));
+        options: Options(headers: _tokenHeader));
     return response.data?.map((e) => CourseReview.fromJson(e)).toList();
   }
 
-  Future<String> getRandomReview() async {
-    debugPrint(SettingsProvider.getInstance().fduholeToken!.access!);
-    Response<List<dynamic>> response = await dio.get(
+  Future<CourseReview?> getRandomReview() async {
+    // debugPrint(SettingsProvider.getInstance().fduholeToken!.access!);
+    Response<dynamic> response = await dio.get(
         "$_BASE_URL/reviews/random",
-        options: Options(headers: _tokenHeader()));
-    return response.data!.first.toString();
+        options: Options(headers: _tokenHeader));
+    return CourseReview.fromJson(response.data??"");
   }
 
   @override

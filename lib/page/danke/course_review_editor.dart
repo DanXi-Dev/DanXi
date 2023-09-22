@@ -337,7 +337,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                               hintText: "请选择时间",
                               labelText: "上课时间",
                               onChanged: (e) {
-                                widget.ratings.classId = e!.subId!;
+                                widget.ratings.classId = e!.id!;
                                 widget.ratings.notifyChanges();
                               },
                               itemBuilder: (e) => DropdownMenuItem(

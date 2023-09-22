@@ -13,7 +13,7 @@ CourseGroup _$CourseGroupFromJson(Map<String, dynamic> json) => CourseGroup(
       json['department'] as String?,
       json['weekHour'] as int?,
       (json['credit'] as num?)?.toDouble(),
-      (json['courseList'] as List<dynamic>?)
+      (json['course_list'] as List<dynamic>?)
           ?.map((e) => Course.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -26,5 +26,5 @@ Map<String, dynamic> _$CourseGroupToJson(CourseGroup instance) =>
       'department': instance.department,
       'weekHour': instance.weekHour,
       'credit': instance.credit,
-      'courseList': instance.courseList,
+      'course_list': instance.courseList,
     };

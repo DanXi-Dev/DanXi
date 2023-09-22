@@ -19,7 +19,10 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
+import 'package:dan_xi/page/home_page.dart';
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/widget/danke/course_search_bar.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -162,38 +165,48 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
   }
 
   Future<Widget> _loadContent() async {
-    var courses =
-        await CurriculumBoardRepository.getInstance().getCourseGroups();
-    return Column(children: [
-      ...courses!
-          .filter((element) => element.name!.contains(searchText))
-          .map((e) => CourseGroupCardWidget(courses: e))
-    ]);
-  }
+    if (!context.read<FDUHoleProvider>().isUserInitialized) {
+      await OpenTreeHoleRepository.getInstance().initializeRepo();
+      context.read<FDUHoleProvider>().currentDivision =
+          OpenTreeHoleRepository.getInstance().getDivisions().firstOrNull;
+      settingsPageKey.currentState?.setState(() {});
+    }
 
-  Future<Widget> _loadRandomReview() async {
-    var json = await CurriculumBoardRepository.getInstance().getRandomReview();
-    debugPrint(json);
-    return const RandomReviewWidgets(
-      departmentName: "A-soul",
-      courseName: "嘉然今天吃什么",
-      courseCode: "TSHE114514",
-      userId: "1919810",
-      reviewContent:
-          "关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋关注嘉然，天天解馋",
-    );
+    try {
+      if (idle) {
+        var review =
+            await CurriculumBoardRepository.getInstance().getRandomReview();
+        return RandomReviewWidgets(
+          departmentName: review!.course!.department!,
+          courseName: review.course!.name!,
+          courseCode: review.course!.code!,
+          credit: review.course!.credit!,
+          reviewContent: review.content!,
+        );
+      } else {
+        var courses =
+            await CurriculumBoardRepository.getInstance().getCourseGroups();
+        return Expanded(
+            child: Column(children: [
+          ...courses!
+              .filter((element) => element.name!.contains(searchText))
+              .map((e) => CourseGroupCardWidget(courses: e))
+        ]));
+      }
+    } catch (e) {
+      return Text(e.toString());
+    }
   }
 
   Widget _buildPageContent(BuildContext context) {
-    return Expanded(
-        child: FutureBuilder(
-            future: idle ? _loadRandomReview() : _loadContent(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return snapshot.data as Widget;
-              } else {
-                return Center(child: PlatformCircularProgressIndicator());
-              }
-            }));
+    return FutureBuilder(
+        future: _loadContent(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return snapshot.data as Widget;
+          } else {
+            return Center(child: PlatformCircularProgressIndicator());
+          }
+        });
   }
 }

@@ -63,7 +63,7 @@ class RandomReviewWidgets extends StatelessWidget {
   final String courseName;
 
   // review information
-  final String userId;
+  final double credit;
   final String courseCode;
   final String reviewContent;
 
@@ -72,7 +72,7 @@ class RandomReviewWidgets extends StatelessWidget {
       this.departmentName = "未知院系",
       this.courseName = "未知课程",
       this.courseCode = "PTSD114514",
-      this.userId = "未知用户",
+      this.credit = 0,
       this.reviewContent = "未知评论",
       this.translucent = false})
       : super(key: key);
@@ -124,7 +124,7 @@ class RandomReviewWidgets extends StatelessWidget {
                               // todo add card information style
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 2),
+                                    horizontal: 12, vertical: 2),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -134,16 +134,43 @@ class RandomReviewWidgets extends StatelessWidget {
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                       softWrap: true,
-                                    ),
-                                    const Text(
-                                      "好评如潮",
-                                      style: TextStyle(
-                                          color: Colors.green, fontSize: 12),
                                     )
                                   ],
                                 ),
                               ),
-                              const Divider(),
+                              Padding(
+                                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      OTLeadingTag(
+                                        color: Colors.orange,
+                                        text: "${credit.toStringAsFixed(1)} 学分",
+                                      ),
+                                      Wrap(
+                                        crossAxisAlignment:
+                                            WrapCrossAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.thumb_up_outlined,
+                                            size: infoStyle.fontSize,
+                                            color: infoStyle.color,
+                                          ),
+                                          const SizedBox(
+                                            width: 3,
+                                          ),
+                                          const Text(
+                                            '2',
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.grey),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  )),
                               ListTile(
                                   dense: true,
                                   minLeadingWidth: 16,
@@ -159,55 +186,10 @@ class RandomReviewWidgets extends StatelessWidget {
                                   ),
                                   title: Column(
                                     children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Wrap(
-                                            crossAxisAlignment:
-                                                WrapCrossAlignment.center,
-                                            children: [
-                                              Icon(
-                                                  // fixme PlatformX.isMaterial(context) treehole_widgets.dart: 234
-                                                  CupertinoIcons.person,
-                                                  size: infoStyle.fontSize,
-                                                  color: infoStyle.color),
-                                              Text(
-                                                userId,
-                                                textAlign: TextAlign.left,
-                                                style: const TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.grey),
-                                              ),
-                                            ],
-                                          ),
-                                          Wrap(
-                                            crossAxisAlignment:
-                                                WrapCrossAlignment.center,
-                                            children: [
-                                              Icon(
-                                                Icons.thumb_up_outlined,
-                                                size: infoStyle.fontSize,
-                                                color: infoStyle.color,
-                                              ),
-                                              const SizedBox(
-                                                width: 3,
-                                              ),
-                                              const Text(
-                                                '2',
-                                                textAlign: TextAlign.left,
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.grey),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
                                       const SizedBox(height: 5),
                                       Text(
                                         reviewContent,
-                                        maxLines: 2,
+                                        maxLines: 4,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(fontSize: 12),
                                       ),
