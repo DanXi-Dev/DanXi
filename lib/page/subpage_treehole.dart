@@ -482,7 +482,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           if (event.newDivision.name ==
               Constant.SPECIAL_DIVISION_FOR_CURRICULUM) {
             setState(() {
-              _delegate = CourseListDelegate();
+              // _delegate = CourseListDelegate();
               // _postsType = PostsType.EXTERNAL_VIEW;
             });
           } else {
@@ -777,16 +777,4 @@ abstract class ListDelegate {
   /// Call when a refresh is triggered by user or by code.
   /// You should do some time-consuming refresh work here.
   Future<void> triggerRefresh();
-}
-
-class CourseListDelegate extends ListDelegate {
-  final GlobalKey<CourseListWidgetState> _key = GlobalKey();
-
-  @override
-  Widget build(BuildContext context) => CourseListWidget(key: _key);
-
-  @override
-  Future<void> triggerRefresh() async {
-    await _key.currentState?.refresh();
-  }
 }

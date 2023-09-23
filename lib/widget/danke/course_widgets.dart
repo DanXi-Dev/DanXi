@@ -142,7 +142,7 @@ class CourseGroupCardWidget extends StatelessWidget {
                           children: <Widget>[
                             OTLeadingTag(
                               color: Colors.orange,
-                              text: "${courses.credit!.toStringAsFixed(1)} 学分",
+                              text: "${courses.courseList!.first.credit!.toStringAsFixed(1)} 学分",
                             ),
                           ],
                         ),
@@ -152,7 +152,7 @@ class CourseGroupCardWidget extends StatelessWidget {
                 ),
               ]),
           onTap: () => smartNavigatorPush(context, "/danke/courseDetail",
-              arguments: {"group": courses}),
+              arguments: {"group": courses.id}),
         ),
         const Divider(
           height: 5,
@@ -180,7 +180,8 @@ class CourseGroupCardWidget extends StatelessWidget {
                     width: 3,
                   ),
                   Text(
-                    courses.getTotalReviewCount().toString(),
+                    /*courses.getTotalReviewCount().toString(),*/
+                    "0",
                     style: infoStyle,
                   )
                 ],

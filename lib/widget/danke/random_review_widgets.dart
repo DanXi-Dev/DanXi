@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
@@ -59,21 +60,11 @@ class RandomReviewWidgets extends StatelessWidget {
   // changeable style of the card
   final bool translucent;
 
-  final String departmentName;
-  final String courseName;
-
-  // review information
-  final double credit;
-  final String courseCode;
-  final String reviewContent;
+  final CourseReview review;
 
   const RandomReviewWidgets(
       {Key? key,
-      this.departmentName = "未知院系",
-      this.courseName = "未知课程",
-      this.courseCode = "PTSD114514",
-      this.credit = 0,
-      this.reviewContent = "未知评论",
+      required this.review,
       this.translucent = false})
       : super(key: key);
 
@@ -82,7 +73,6 @@ class RandomReviewWidgets extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: _buildCard(context));
-    throw UnimplementedError();
   }
 
   _buildCard(BuildContext context) {
@@ -110,7 +100,7 @@ class RandomReviewWidgets extends StatelessWidget {
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 2),
-                        child: Text(courseCode,
+                        child: Text(review.course!.code!,
                             style: const TextStyle(color: Colors.white24))),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -130,7 +120,7 @@ class RandomReviewWidgets extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      "$departmentName / $courseName",
+                                      "${review.course?.department} / ${review.course?.name}",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                       softWrap: true,
@@ -146,7 +136,7 @@ class RandomReviewWidgets extends StatelessWidget {
                                     children: [
                                       OTLeadingTag(
                                         color: Colors.orange,
-                                        text: "${credit.toStringAsFixed(1)} 学分",
+                                        text: "${review.course!.credit!.toStringAsFixed(1)} 学分",
                                       ),
                                       Wrap(
                                         crossAxisAlignment:
@@ -188,7 +178,7 @@ class RandomReviewWidgets extends StatelessWidget {
                                     children: [
                                       const SizedBox(height: 5),
                                       Text(
-                                        reviewContent,
+                                        review.content!,
                                         maxLines: 4,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(fontSize: 12),

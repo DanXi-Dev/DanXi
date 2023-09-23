@@ -80,6 +80,7 @@
   "current_connection_failed": "获取 WiFi 名称失败，请授予精确定位权限",
   "current_connection_no_wifi": "没有连接到 WLAN",
   "current_date": "当前日期：",
+  "curriculum_first_load": "首次加载耗时较长，请稍等",
   "danke": "评教",
   "danke_search_hint": "课程名称 或 课程代码",
   "dashboard": "首页",

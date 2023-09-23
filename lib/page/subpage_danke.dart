@@ -15,32 +15,25 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/danke/course.dart';
+import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
+import 'package:dan_xi/page/danke/course_list_widget.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dan_xi/widget/danke/course_search_bar.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
-import 'package:dan_xi/widget/danke/review_vote_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
-import '../model/danke/course_group.dart';
-import '../widget/danke/course_review_widget.dart';
 import '../widget/danke/random_review_widgets.dart';
 
 class DankeSubPage extends PlatformSubpage<DankeSubPage> {
@@ -114,17 +107,6 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
 
   FileImage? _backgroundImage;
 
-  void _searchCourse(String text) {
-    // todo change page layout
-    setState(
-      () {
-        idle = text.isEmpty;
-        searchBarPositionBoxHeight = idle ? 180 : 0;
-        searchText = text;
-      },
-    );
-  }
-
   @override
   Widget buildPage(BuildContext context) {
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
@@ -146,7 +128,13 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
             ),
             CourseSearchBar(
               onSearch: (String text) {
-                _searchCourse(text);
+                setState(
+                  () {
+                    idle = text.isEmpty;
+                    searchBarPositionBoxHeight = idle ? 180 : 0;
+                    searchText = text;
+                  },
+                );
               },
             ),
             /*
@@ -164,49 +152,26 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
         ));
   }
 
-  Future<Widget> _loadContent() async {
+  Future<CourseReview?> _loadRandomReview() async {
     if (!context.read<FDUHoleProvider>().isUserInitialized) {
       await OpenTreeHoleRepository.getInstance().initializeRepo();
-      context.read<FDUHoleProvider>().currentDivision =
-          OpenTreeHoleRepository.getInstance().getDivisions().firstOrNull;
       settingsPageKey.currentState?.setState(() {});
     }
 
-    try {
-      if (idle) {
-        var review =
-            await CurriculumBoardRepository.getInstance().getRandomReview();
-        return RandomReviewWidgets(
-          departmentName: review!.course!.department!,
-          courseName: review.course!.name!,
-          courseCode: review.course!.code!,
-          credit: review.course!.credit!,
-          reviewContent: review.content!,
-        );
-      } else {
-        var courses =
-            await CurriculumBoardRepository.getInstance().getCourseGroups();
-        return Expanded(
-            child: Column(children: [
-          ...courses!
-              .filter((element) => element.name!.contains(searchText))
-              .map((e) => CourseGroupCardWidget(courses: e))
-        ]));
-      }
-    } catch (e) {
-      return Text(e.toString());
-    }
+    return CurriculumBoardRepository.getInstance().getRandomReview();
   }
 
   Widget _buildPageContent(BuildContext context) {
-    return FutureBuilder(
-        future: _loadContent(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return snapshot.data as Widget;
-          } else {
-            return Center(child: PlatformCircularProgressIndicator());
-          }
-        });
+    return idle
+        ? FutureBuilder(
+            future: _loadRandomReview(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return RandomReviewWidgets(review: snapshot.data!);
+              } else {
+                return Center(child: PlatformCircularProgressIndicator());
+              }
+            })
+        : CourseListWidget(searchKeyword: searchText);
   }
 }

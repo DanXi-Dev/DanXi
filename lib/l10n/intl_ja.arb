@@ -80,6 +80,7 @@
   "current_connection_failed": "WiFi名の取得に失敗しました、位置情報を許可して下さい",
   "current_connection_no_wifi": "WLANに接続していない",
   "current_date": "現在の日付：",
+  "curriculum_first_load": "初めのロードは遅くなる可能性があるので、ちょっと待ってください",
   "danke": "授業評価",
   "danke_search_hint": "授業名称・授業番号",
   "dashboard": "ホーム",

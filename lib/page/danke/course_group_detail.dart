@@ -33,6 +33,7 @@ import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -83,7 +84,8 @@ class CourseGroupDetail extends StatefulWidget {
 class CourseGroupDetailState extends State<CourseGroupDetail> {
   /// Unrelated to the state.
   /// These fields should only be initialized once when created.
-  late CourseGroup _courses;
+  late int groupId;
+  CourseGroup? _courses;
   late int averageOverallLevel;
   String? _searchKeyword;
   FileImage? _backgroundImage;
@@ -127,7 +129,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
 
      */
     List<CourseReview> result = [];
-    for (var elem in _courses.courseList!) {
+    for (var elem in _courses!.courseList!) {
       result += elem.reviewList!.filter((element) {
         if (teacherFilter != "*" &&
             element.course!.teachers! != teacherFilter) {
@@ -149,7 +151,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   void initState() {
     super.initState();
     if (widget.arguments!.containsKey('group')) {
-      _courses = widget.arguments!['group'];
+      groupId = widget.arguments!['group'];
       /*
       // Cache preloaded floor only when user views the Hole
       for (var floor
@@ -158,19 +160,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
       }
 
        */
-
-      int totalScore = 0, scoreCount = 0;
-      for (var elem in _courses.courseList!) {
-        teacherSet.add(elem.teachers!);
-        timeSet.add(elem.formatTime());
-        scoreCount += elem.reviewList!.length;
-
-        for (var rev in elem.reviewList!) {
-          rev.linkCourse(elem);
-          totalScore += rev.courseGrade!.overall;
-        }
-      }
-      averageOverallLevel = translateScore(totalScore ~/ scoreCount);
     }
 
     shouldScrollToEnd = widget.arguments!.containsKey('scroll_to_end') &&
@@ -193,11 +182,37 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
         hashCode);
   }
 
-  /// Refresh the whole list.
+  /// Refresh the whole list (excluding the head)
   Future<void> refreshList() async {
+    _courses =
+        await CurriculumBoardRepository.getInstance().getCourseGroup(groupId);
+
     await refreshSelf();
+
     return _listViewController.notifyUpdate(
         useInitialData: true, queueDataClear: true);
+  }
+
+  Future<void> _fetchCourseGroup() async {
+    try {
+      _courses ??=
+          await CurriculumBoardRepository.getInstance().getCourseGroup(groupId);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+
+    int totalScore = 0, scoreCount = 0;
+    for (var elem in _courses!.courseList!) {
+      teacherSet.add(elem.teachers!);
+      timeSet.add(elem.formatTime());
+      scoreCount += elem.reviewList!.length;
+
+      for (var rev in elem.reviewList!) {
+        rev.linkCourse(elem);
+        totalScore += rev.courseGrade!.overall;
+      }
+    }
+    averageOverallLevel = translateScore(totalScore ~/ scoreCount);
   }
 
   @override
@@ -228,7 +243,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
       appBar: PlatformAppBarX(
         title: TopController(
           controller: PrimaryScrollController.of(context),
-          child: Text(_courses.code!),
+          child: const Text("课程详情"),
         ),
         trailingActions: [
           if (_searchKeyword == null) ...[
@@ -239,7 +254,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                   : const Icon(CupertinoIcons.arrowshape_turn_up_left),
               onPressed: () async {
                 if (await CourseReviewEditor.createNewPost(
-                    context, _courses)) {
+                    context, _courses!)) {
                   refreshList();
                 }
               },
@@ -266,29 +281,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
 
   Widget _buildBody(BuildContext context) {
     Future<List<CourseReview>?> allDataReceiver = _loadContent();
-    final pagedListView = PagedListView<CourseReview>(
-      pagedController: _listViewController,
-      noneItem: CourseReview(null, null, null, null, null, null, null, null,
-          null, null, null, null, null),
-      withScrollbar: true,
-      scrollController: PrimaryScrollController.of(context),
-      // If we need to scroll to the end, we should prefetch all the data beforehand.
-      // See also [prefetchAllFloors] in [TreeHoleSubpageState].
-      allDataReceiver: allDataReceiver,
-      shouldScrollToEnd: shouldScrollToEnd,
-      builder: _getListItems,
-      headBuilder: (ctx) => _buildHead(ctx),
-      loadingBuilder: (BuildContext context) => Container(
-        padding: const EdgeInsets.all(8),
-        child: Center(child: PlatformCircularProgressIndicator()),
-      ),
-      endBuilder: (context) => Center(
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Text(S.of(context).end_reached),
-        ),
-      ),
-    );
 
     return Builder(
       // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
@@ -308,7 +300,38 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
             // Refresh the list...
             await refreshList();
           },
-          child: pagedListView,
+          child: FutureBuilder(
+            future: _fetchCourseGroup(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return PagedListView<CourseReview>(
+                  pagedController: _listViewController,
+                  noneItem: CourseReview(null, null, null, null, null, null,
+                      null, null, null, null, null, null, null),
+                  withScrollbar: true,
+                  scrollController: PrimaryScrollController.of(context),
+                  // If we need to scroll to the end, we should prefetch all the data beforehand.
+                  // See also [prefetchAllFloors] in [TreeHoleSubpageState].
+                  allDataReceiver: allDataReceiver,
+                  shouldScrollToEnd: shouldScrollToEnd,
+                  builder: _getListItems,
+                  headBuilder: (ctx) => _buildHead(ctx),
+                  loadingBuilder: (BuildContext context) => Container(
+                    padding: const EdgeInsets.all(8),
+                    child: Center(child: PlatformCircularProgressIndicator()),
+                  ),
+                  endBuilder: (context) => Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Text(S.of(context).end_reached),
+                    ),
+                  ),
+                );
+              } else {
+                return Center(child: PlatformCircularProgressIndicator());
+              }
+            },
+          ),
         ),
       ),
     );
@@ -333,14 +356,14 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(_courses.getFullName(),
+                Text(_courses!.getFullName(),
                     style: const TextStyle(fontWeight: FontWeight.bold)),
                 Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(_courses.code!,
+                        Text(_courses!.code!,
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.grey)),
@@ -351,7 +374,8 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                             width: 56,
                             child: OTLeadingTag(
                               color: Colors.orange,
-                              text: "${_courses.credit!.toStringAsFixed(1)} 学分",
+                              text:
+                                  "${_courses!.credit!.toStringAsFixed(1)} 学分",
                             )),
                       ],
                     )),

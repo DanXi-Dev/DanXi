@@ -27,7 +27,6 @@ import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/opentreehole/jwt_interceptor.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 
 class CurriculumBoardRepository extends BaseRepositoryWithDio {
   static const String _BASE_URL = "https://danke.fduhole.com/api";
@@ -43,6 +42,13 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
             _token = SettingsProvider.getInstance().fduholeToken = token));
     dio.interceptors.add(
         UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
+
+    // First fetch of the course list is VERY SLOW
+    dio.options = BaseOptions(
+          receiveDataWhenStatusError: true,
+          connectTimeout: 30000,
+          receiveTimeout: 30000,
+          sendTimeout: 10000);
   }
 
   Map<String, String> get _tokenHeader =>
@@ -52,17 +58,18 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
 
   factory CurriculumBoardRepository.getInstance() => _instance;
 
-  Future<List<CourseGroup>?> getCourseGroups() async {
-    Response<List<dynamic>> response = await dio.get("$_BASE_URL/courses",
+  // Return raw json string
+  Future<String?> getCourseGroups() async {
+    Response<String> response = await dio.get("$_BASE_URL/courses",
         options: Options(headers: _tokenHeader));
-    return response.data?.map((e) => CourseGroup.fromJson(e)).toList();
+    return response.data;
   }
 
-  Future<Course?> getCourse(String courseId) async {
+  Future<CourseGroup?> getCourseGroup(int groupId) async {
     Response<Map<String, dynamic>> response = await dio.get(
-        "$_BASE_URL/courses/$courseId",
+        "$_BASE_URL/group/$groupId",
         options: Options(headers: _tokenHeader));
-    return Course.fromJson(response.data!);
+    return CourseGroup.fromJson(response.data!);
   }
 
   Future<CourseReview?> addReview(
@@ -111,5 +118,5 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => '127.0.0.1:8000';
+  String get linkHost => 'danke.fduhole.com';
 }
