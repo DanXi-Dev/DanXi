@@ -17,36 +17,9 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
-import 'package:dan_xi/model/opentreehole/floor.dart';
-import 'package:dan_xi/model/opentreehole/hole.dart';
-import 'package:dan_xi/model/opentreehole/message.dart';
-import 'package:dan_xi/model/opentreehole/report.dart';
-import 'package:dan_xi/page/opentreehole/hole_detail.dart';
-import 'package:dan_xi/page/opentreehole/hole_editor.dart';
-import 'package:dan_xi/page/subpage_treehole.dart';
-import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
-import 'package:dan_xi/util/browser_util.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
-import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/opentreehole/human_duration.dart';
-import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/viewport_utils.dart';
-import 'package:dan_xi/widget/libraries/future_widget.dart';
-import 'package:dan_xi/widget/libraries/linkify_x.dart';
-import 'package:dan_xi/widget/libraries/material_x.dart';
-import 'package:dan_xi/widget/libraries/paged_listview.dart';
-import 'package:dan_xi/widget/libraries/round_chip.dart';
-import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:nil/nil.dart';
-import 'package:provider/provider.dart';
 
 import '../opentreehole/treehole_widgets.dart';
 
@@ -59,13 +32,12 @@ Color? getDefaultCardBackgroundColor(
 class RandomReviewWidgets extends StatelessWidget {
   // changeable style of the card
   final bool translucent;
+  final void Function()? onTap;
 
   final CourseReview review;
 
   const RandomReviewWidgets(
-      {Key? key,
-      required this.review,
-      this.translucent = false})
+      {Key? key, required this.review, this.translucent = false, this.onTap})
       : super(key: key);
 
   @override
@@ -88,6 +60,7 @@ class RandomReviewWidgets extends StatelessWidget {
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         ListTile(
           contentPadding: const EdgeInsets.fromLTRB(0, 3, 0, 2),
+          onTap: onTap ?? () {},
           title: Wrap(
               crossAxisAlignment: WrapCrossAlignment.center,
               alignment: WrapAlignment.spaceBetween,
@@ -129,14 +102,16 @@ class RandomReviewWidgets extends StatelessWidget {
                                 ),
                               ),
                               Padding(
-                                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(12, 4, 12, 0),
                                   child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       OTLeadingTag(
                                         color: Colors.orange,
-                                        text: "${review.course!.credit!.toStringAsFixed(1)} 学分",
+                                        text:
+                                            "${review.course!.credit!.toStringAsFixed(1)} ${S.of(context).credits}",
                                       ),
                                       Wrap(
                                         crossAxisAlignment:
@@ -179,7 +154,7 @@ class RandomReviewWidgets extends StatelessWidget {
                                       const SizedBox(height: 5),
                                       Text(
                                         review.content!,
-                                        maxLines: 4,
+                                        maxLines: 6,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(fontSize: 12),
                                       ),

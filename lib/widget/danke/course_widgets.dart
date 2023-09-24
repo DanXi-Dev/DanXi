@@ -16,33 +16,12 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/danke/course.dart';
-import 'package:dan_xi/page/danke/course_group_detail.dart';
-import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
-import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/opentreehole/human_duration.dart';
-import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
-import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/viewport_utils.dart';
-import 'package:dan_xi/widget/libraries/future_widget.dart';
-import 'package:dan_xi/widget/libraries/linkify_x.dart';
-import 'package:dan_xi/widget/libraries/material_x.dart';
-import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
-import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
+import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:nil/nil.dart';
-import 'package:provider/provider.dart';
-
-import '../../model/danke/course_group.dart';
-import '../opentreehole/treehole_widgets.dart';
 
 Color? getDefaultCardBackgroundColor(
         BuildContext context, bool hasBackgroundImage) =>
@@ -65,7 +44,7 @@ int translateScore(int score) {
 }
 
 const List<String> overallWord = ["特别差评", "差评", "中等", "好评", "特别好评"];
-const List<String> styleWord = ["硬核", "较难", "中等", "容易", "非常容易"];
+const List<String> contentWord = ["硬核", "较难", "中等", "容易", "非常容易"];
 const List<String> workloadWord = ["非常大", "较大", "中等", "较小", "非常小"];
 const List<String> assessmentWord = ["非常严格", "严格", "中等", "宽松", "非常宽松"];
 const List<Color> wordColor = [
@@ -142,7 +121,7 @@ class CourseGroupCardWidget extends StatelessWidget {
                           children: <Widget>[
                             OTLeadingTag(
                               color: Colors.orange,
-                              text: "${courses.courseList!.first.credit!.toStringAsFixed(1)} 学分",
+                              text: "${courses.courseList!.first.credit!.toStringAsFixed(1)} ${S.of(context).credits}",
                             ),
                           ],
                         ),
@@ -165,7 +144,7 @@ class CourseGroupCardWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Text(
-                // fixme add backend support instead of hardcoding
+                // TODO: waiting for upstream support
                 "3",
                 style: infoStyle,
               ),
@@ -180,7 +159,7 @@ class CourseGroupCardWidget extends StatelessWidget {
                     width: 3,
                   ),
                   Text(
-                    /*courses.getTotalReviewCount().toString(),*/
+                    // TODO: waiting for upstream support
                     "0",
                     style: infoStyle,
                   )

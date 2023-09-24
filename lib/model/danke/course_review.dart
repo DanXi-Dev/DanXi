@@ -53,13 +53,22 @@ class CourseReview {
   String? content;
   String? timeCreated;
   String? timeUpdated;
-  CourseGrade? courseGrade;
-  int? like;
-  int? liked;
+  CourseGrade? rank;
+  int? remark;
+  int? vote;
+
+  @JsonKey(name: 'is_me')
   bool? isMe;
+
   int? modified;
   bool? deleted;
-  ReviewExtra? reviewExtra;
+
+  ReviewExtra? extra;
+
+  // Info about its parent course for display
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  late CourseSummary courseInfo;
+  // This field is only used when deserializing random reviews !!!
   Course? course;
 
   /// [fromJson] and [toJson] are used to convert between JSON and [CourseReview] object.
@@ -78,7 +87,6 @@ class CourseReview {
       "dummy",
       CourseGrade.dummy(),
       100,
-      1,
       true,
       0,
       false,
@@ -96,25 +104,31 @@ class CourseReview {
       this.content,
       this.timeCreated,
       this.timeUpdated,
-      this.courseGrade,
-      this.like,
-      this.liked,
+      this.rank,
+      this.vote,
       this.isMe,
       this.modified,
       this.deleted,
-      this.reviewExtra);
+      this.extra);
 
   String? get deleteReason => deleted == true ? content : null;
 
   @override
   String toString() {
-    return 'CourseReview{review_id: $reviewId, reviewer_id: $reviewerId, title: $title, content: $content, timeCreated: $timeCreated, timeUpdated: $timeUpdated, course_grade: $courseGrade, like: $like, liked: $liked, is_me: $isMe, modified: $modified, deleted: $deleted, extra: $reviewExtra}';
+    return 'CourseReview{review_id: $reviewId, reviewer_id: $reviewerId, title: $title, content: $content, timeCreated: $timeCreated, timeUpdated: $timeUpdated, rank: $rank, vote: $vote, is_me: $isMe, modified: $modified, deleted: $deleted, extra: $extra}';
   }
 
   @override
   int get hashCode => reviewId ?? timeCreated.hashCode;
 
-  void linkCourse(Course c) {
-    course = c;
+  // Fetch some info about its parent course for display
+  void linkCourse(CourseSummary cs) {
+    courseInfo = cs;
   }
+}
+
+class CourseSummary {
+  String teachers, time;
+
+  CourseSummary(this.teachers, this.time);
 }

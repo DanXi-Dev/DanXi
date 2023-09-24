@@ -13,20 +13,21 @@ CourseReview _$CourseReviewFromJson(Map<String, dynamic> json) => CourseReview(
       json['content'] as String?,
       json['timeCreated'] as String?,
       json['timeUpdated'] as String?,
-      json['courseGrade'] == null
+      json['rank'] == null
           ? null
-          : CourseGrade.fromJson(json['courseGrade'] as Map<String, dynamic>),
-      json['like'] as int?,
-      json['liked'] as int?,
-      json['isMe'] as bool?,
+          : CourseGrade.fromJson(json['rank'] as Map<String, dynamic>),
+      json['vote'] as int?,
+      json['is_me'] as bool?,
       json['modified'] as int?,
       json['deleted'] as bool?,
-      json['reviewExtra'] == null
+      json['extra'] == null
           ? null
-          : ReviewExtra.fromJson(json['reviewExtra'] as Map<String, dynamic>),
-    )..course = json['course'] == null
-        ? null
-        : Course.fromJson(json['course'] as Map<String, dynamic>);
+          : ReviewExtra.fromJson(json['extra'] as Map<String, dynamic>),
+    )
+      ..remark = json['remark'] as int?
+      ..course = json['course'] == null
+          ? null
+          : Course.fromJson(json['course'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$CourseReviewToJson(CourseReview instance) =>
     <String, dynamic>{
@@ -36,12 +37,12 @@ Map<String, dynamic> _$CourseReviewToJson(CourseReview instance) =>
       'content': instance.content,
       'timeCreated': instance.timeCreated,
       'timeUpdated': instance.timeUpdated,
-      'courseGrade': instance.courseGrade,
-      'like': instance.like,
-      'liked': instance.liked,
-      'isMe': instance.isMe,
+      'rank': instance.rank,
+      'remark': instance.remark,
+      'vote': instance.vote,
+      'is_me': instance.isMe,
       'modified': instance.modified,
       'deleted': instance.deleted,
-      'reviewExtra': instance.reviewExtra,
+      'extra': instance.extra,
       'course': instance.course,
     };

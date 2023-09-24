@@ -16,7 +16,6 @@
  */
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/model/danke/course.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
@@ -96,7 +95,7 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
         data: {
           'title': updatedReview.title,
           'content': updatedReview.content,
-          'rank': updatedReview.courseGrade
+          'rank': updatedReview.rank
         },
         options: Options(headers: _tokenHeader));
     return response.statusCode;

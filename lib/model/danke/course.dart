@@ -46,8 +46,12 @@ class Course {
   //     3：（第二年的）春季学期；
   //     4：（第二年的）暑假
   int? semester;
+
+  // This is only meant to be used in random reviews
   @JsonKey(name: 'coursegroup_id')
   int? courseGroupId;
+
+  @JsonKey(name: 'review_list')
   List<CourseReview>? reviewList;
 
   Course(this.id, this.teachers, this.maxStudent, this.year, this.semester,
@@ -69,5 +73,9 @@ class Course {
   String formatTime() {
     // Todo: add support for other semesters
     return "$year学年-${semester == 1 ? "秋季" : "春季"}";
+  }
+
+  CourseSummary getSummary() {
+    return CourseSummary(teachers!, formatTime());
   }
 }

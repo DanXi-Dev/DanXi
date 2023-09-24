@@ -16,28 +16,21 @@
  */
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/danke/course.dart';
-import 'package:dan_xi/model/danke/course_grade.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
-import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/page/danke/course_review_editor.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/danke/course_review_widget.dart';
@@ -47,19 +40,11 @@ import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
-import 'package:dan_xi/widget/opentreehole/ottag_selector.dart';
-import 'package:dan_xi/widget/opentreehole/post_render.dart';
-import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
-import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:linkify/linkify.dart';
-import 'package:nil/nil.dart';
-import 'package:provider/provider.dart';
 import '../../util/stream_listener.dart';
 
 enum FilterType { TEACHER_FILTER, TIME_FILTER }
@@ -116,27 +101,15 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<CourseReview>?> _loadContent() async {
-    /*
-    if (_searchKeyword != null) {
-      var result = await OpenTreeHoleRepository.getInstance().loadSearchResults(
-          _searchKeyword,
-          startFloor: _listViewController.length());
-      return result;
-    } else {
-      return await OpenTreeHoleRepository.getInstance()
-          .loadFloors(_course, startFloor: page * Constant.POST_COUNT_PER_PAGE);
-    }
-
-     */
     List<CourseReview> result = [];
     for (var elem in _courses!.courseList!) {
       result += elem.reviewList!.filter((element) {
         if (teacherFilter != "*" &&
-            element.course!.teachers! != teacherFilter) {
+            element.courseInfo.teachers != teacherFilter) {
           return false;
         }
 
-        if (timeFilter != "*" && element.course!.formatTime() != timeFilter) {
+        if (timeFilter != "*" && element.courseInfo.time != timeFilter) {
           return false;
         }
 
@@ -184,22 +157,21 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
 
   /// Refresh the whole list (excluding the head)
   Future<void> refreshList() async {
-    _courses =
-        await CurriculumBoardRepository.getInstance().getCourseGroup(groupId);
-
     await refreshSelf();
 
     return _listViewController.notifyUpdate(
         useInitialData: true, queueDataClear: true);
   }
 
-  Future<void> _fetchCourseGroup() async {
+  Future<CourseGroup?> _fetchCourseGroup() async {
     try {
       _courses ??=
           await CurriculumBoardRepository.getInstance().getCourseGroup(groupId);
     } catch (e) {
       debugPrint(e.toString());
     }
+
+    _courses!.credit ??= _courses!.courseList!.first.credit;
 
     int totalScore = 0, scoreCount = 0;
     for (var elem in _courses!.courseList!) {
@@ -208,11 +180,13 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
       scoreCount += elem.reviewList!.length;
 
       for (var rev in elem.reviewList!) {
-        rev.linkCourse(elem);
-        totalScore += rev.courseGrade!.overall;
+        rev.linkCourse(elem.getSummary());
+        totalScore += rev.rank!.overall!;
       }
     }
-    averageOverallLevel = translateScore(totalScore ~/ scoreCount);
+    averageOverallLevel = (scoreCount > 0 ? (totalScore ~/ scoreCount) : 0) - 1;
+
+    return _courses;
   }
 
   @override
@@ -243,7 +217,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
       appBar: PlatformAppBarX(
         title: TopController(
           controller: PrimaryScrollController.of(context),
-          child: const Text("课程详情"),
+          child: Text(S.of(context).curriculum_details),
         ),
         trailingActions: [
           if (_searchKeyword == null) ...[
@@ -280,8 +254,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   }
 
   Widget _buildBody(BuildContext context) {
-    Future<List<CourseReview>?> allDataReceiver = _loadContent();
-
     return Builder(
       // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
       builder: (context) => Container(
@@ -300,14 +272,12 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
             // Refresh the list...
             await refreshList();
           },
-          child: FutureBuilder(
-            future: _fetchCourseGroup(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
+          child: FutureWidget<CourseGroup?>(
+              future: _fetchCourseGroup(),
+              successBuilder: (context, snapshot) {
+                Future<List<CourseReview>?> allDataReceiver = _loadContent();
                 return PagedListView<CourseReview>(
                   pagedController: _listViewController,
-                  noneItem: CourseReview(null, null, null, null, null, null,
-                      null, null, null, null, null, null, null),
                   withScrollbar: true,
                   scrollController: PrimaryScrollController.of(context),
                   // If we need to scroll to the end, we should prefetch all the data beforehand.
@@ -327,11 +297,12 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                     ),
                   ),
                 );
-              } else {
-                return Center(child: PlatformCircularProgressIndicator());
-              }
-            },
-          ),
+              },
+              errorBuilder: (BuildContext context,
+                      AsyncSnapshot<CourseGroup?> snapshot) =>
+                  errorCard(snapshot, () => setState(() {})),
+              loadingBuilder:
+                  Center(child: PlatformCircularProgressIndicator())),
         ),
       ),
     );
@@ -370,28 +341,32 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                         const SizedBox(
                           width: 8,
                         ),
-                        SizedBox(
-                            width: 56,
+                        ConstrainedBox(
+                            constraints: const BoxConstraints(minWidth: 56),
                             child: OTLeadingTag(
                               color: Colors.orange,
                               text:
-                                  "${_courses!.credit!.toStringAsFixed(1)} 学分",
+                                  "${_courses!.credit!.toStringAsFixed(1)} ${S.of(context).credits}",
                             )),
                       ],
                     )),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('评价',
-                        style: TextStyle(color: Colors.grey, fontSize: 15)),
+                    Text(S.of(context).curriculum_average_rating,
+                        style: const TextStyle(color: Colors.grey, fontSize: 15)),
                     const SizedBox(
                       width: 6,
                     ),
-                    Text(
-                      overallWord[averageOverallLevel],
-                      style: TextStyle(
-                          color: wordColor[averageOverallLevel], fontSize: 15),
-                    )
+                    averageOverallLevel >= 0
+                        ? Text(
+                            overallWord[averageOverallLevel],
+                            style: TextStyle(
+                                color: wordColor[averageOverallLevel],
+                                fontSize: 15),
+                          )
+                        : Text(S.of(context).curriculum_unknown_rating,
+                            style: const TextStyle(color: Colors.grey, fontSize: 15))
                   ],
                 ),
                 const Divider(

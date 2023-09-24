@@ -22,12 +22,12 @@ part 'course_grade.g.dart';
 
 @JsonSerializable()
 class CourseGrade {
-  int overall;
-  int style;
-  int workload;
-  int assessment;
+  int? overall;
+  int? content;
+  int? workload;
+  int? assessment;
 
-  CourseGrade(this.overall, this.style, this.workload, this.assessment);
+  CourseGrade(this.overall, this.content, this.workload, this.assessment);
 
   factory CourseGrade.fromJson(Map<String, dynamic> json) => _$CourseGradeFromJson(json);
 

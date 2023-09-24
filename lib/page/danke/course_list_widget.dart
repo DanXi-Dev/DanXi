@@ -19,18 +19,12 @@ import 'dart:convert';
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
-import 'package:dan_xi/model/opentreehole/jwt.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
-import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
-import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:provider/provider.dart';
 
 /// A list of courses.
 ///
@@ -45,7 +39,7 @@ class CourseListWidget extends StatefulWidget {
 }
 
 class CourseListWidgetState extends State<CourseListWidget> {
-  List<CourseGroup>? _groups;
+  static List<CourseGroup>? _groups;
   List<CourseGroup>? _displayedGroups;
   String? searchKeyword;
 
@@ -76,7 +70,7 @@ class CourseListWidgetState extends State<CourseListWidget> {
     _groups ??= await _fetchMegaList();
 
     return searchKeyword == null
-        ? _groups
+        ? _groups!.take(20).toList()
         : _groups.filter((element) => element.name!.contains(searchKeyword!));
   }
 
@@ -107,17 +101,10 @@ class CourseListWidgetState extends State<CourseListWidget> {
             },
             errorBuilder: (BuildContext context,
                     AsyncSnapshot<List<CourseGroup>?> snapshot) =>
-                ErrorPageWidget(
-                  errorMessage: ErrorPageWidget.generateUserFriendlyDescription(
-                      S.of(context), snapshot.error),
-                  error: snapshot.error,
-                  trace: snapshot.stackTrace,
-                  onTap: () => setState(() {}),
-                  buttonText: S.of(context).retry,
-                ),
+                errorCard(snapshot, () => setState(() {})),
             loadingBuilder: Center(
               child: Column(children: [
-                PlatformCircularProgressIndicator(),
+                const SizedBox(height: 6),
                 Text(S.of(context).curriculum_first_load)
               ]),
             )));

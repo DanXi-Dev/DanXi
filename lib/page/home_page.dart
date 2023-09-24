@@ -689,7 +689,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   icon: PlatformX.isMaterial(context)
                       ? const Icon(Icons.egg_alt)
                       : const Icon(CupertinoIcons.book),
-                  label: S.of(context).danke,
+                  label: S.of(context).curriculum,
                 ),
                 // Don't show Timetable in visitor mode
                 if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)

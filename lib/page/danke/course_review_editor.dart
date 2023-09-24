@@ -16,8 +16,6 @@
  */
 
 import 'dart:async';
-import 'dart:ffi';
-import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/icon_fonts.dart';
@@ -25,32 +23,21 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course.dart';
 import 'package:dan_xi/model/danke/course_grade.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
-import 'package:dan_xi/model/opentreehole/tag.dart';
-import 'package:dan_xi/page/home_page.dart';
-import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
-import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/danxi_care.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/opentreehole/editor_object.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:dan_xi/widget/dialogs/care_dialog.dart';
-import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/libraries/round_chip.dart';
-import 'package:dan_xi/widget/libraries/scale_transform.dart';
-import 'package:dan_xi/widget/opentreehole/post_render.dart';
-import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
@@ -291,9 +278,11 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
       autofocus: true,
       textAlignVertical: TextAlignVertical.top,
     );
+
     if (widget.fullscreen) {
       return textField;
     }
+
     return SingleChildScrollView(
       child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -315,8 +304,8 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                           .map((e) => e.teachers!)
                           .toSet()
                           .toList(),
-                      hintText: "请选择教师",
-                      labelText: "教师",
+                      hintText: S.of(context).curriculum_select_teacher,
+                      labelText: S.of(context).course_teacher_name,
                       onChanged: (e) {
                         teacherFilterNotifier.value =
                             _teacherSelectorKey.currentState!.selectedItem!;
@@ -334,8 +323,8 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                                   ? []
                                   : widget.courseGroup.courseList!
                                       .filter((e) => e.teachers == value),
-                              hintText: "请选择时间",
-                              labelText: "上课时间",
+                              hintText: S.of(context).curriculum_select_time,
+                              labelText: S.of(context).course_schedule,
                               onChanged: (e) {
                                 widget.ratings.classId = e!.id!;
                                 widget.ratings.notifyChanges();
@@ -347,14 +336,14 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
               ]),
             ),
             PlatformTextField(
-              hintText: "请输入标题",
+              hintText: S.of(context).curriculum_enter_title,
               material: (_, __) => MaterialTextFieldData(
                   decoration: const InputDecoration(
                       border: OutlineInputBorder(gapPadding: 2.0))),
               controller: widget.titleController,
               keyboardType: TextInputType.multiline,
-              maxLines: widget.fullscreen ? null : 5,
-              expands: widget.fullscreen,
+              maxLines: 1,
+              expands: false,
               autofocus: true,
               textAlignVertical: TextAlignVertical.top,
             ),
@@ -381,7 +370,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
             textField,
             const Divider(),
             CourseRatingWidget(
-              label: "总体评价",
+              label: S.of(context).curriculum_ratings_overall,
               words: overallWord,
               onRate: (e) {
                 widget.ratings.grade.overall = e;
@@ -389,14 +378,14 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
               },
             ),
             CourseRatingWidget(
-                label: "课程风格",
-                words: styleWord,
+                label: S.of(context).curriculum_ratings_content,
+                words: contentWord,
                 onRate: (e) {
-                  widget.ratings.grade.style = e;
+                  widget.ratings.grade.content = e;
                   widget.ratings.notifyChanges();
                 }),
             CourseRatingWidget(
-              label: "工作量",
+              label: S.of(context).curriculum_ratings_workload,
               words: workloadWord,
               onRate: (e) {
                 widget.ratings.grade.workload = e;
@@ -404,7 +393,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
               },
             ),
             CourseRatingWidget(
-              label: "考核要求",
+              label: S.of(context).curriculum_ratings_assessment,
               words: assessmentWord,
               onRate: (e) {
                 widget.ratings.grade.assessment = e;

@@ -15,8 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:flex_color_picker/flex_color_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // widget for voting on a review
@@ -84,7 +82,7 @@ class _ReviewVoteWidgetState extends State<ReviewVoteWidget> {
               color: _reviewVote < 0
                   // set its color
                   ? Colors.red
-                  : Theme.of(context).textTheme.bodyText1!.color,
+                  : Theme.of(context).textTheme.bodyLarge!.color,
             ),
             onPressed: () {
               if (_reviewVote != 0) return;

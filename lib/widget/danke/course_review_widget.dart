@@ -15,26 +15,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:ui';
-
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/stream_listener.dart';
+import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:dan_xi/widget/danke/review_vote_widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:provider/provider.dart';
 
-import 'package:dan_xi/model/danke/course.dart';
-import 'package:dan_xi/model/danke/course_grade.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
 
 class CourseReviewWidget extends StatelessWidget {
@@ -47,6 +33,7 @@ class CourseReviewWidget extends StatelessWidget {
       {Key? key, required this.review, this.translucent = false})
       : super(key: key);
 
+  @override
   Widget build(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -54,10 +41,6 @@ class CourseReviewWidget extends StatelessWidget {
   }
 
   Widget _buildCard(BuildContext context) {
-    // style of the card
-    final TextStyle infoStyle =
-        TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
-
     return Card(
       color: translucent
           ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
@@ -67,7 +50,7 @@ class CourseReviewWidget extends StatelessWidget {
       ),
       // credits group
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const ReviewVoteWidget(reviewVote: 0, reviewTotalVote: 10),
+        ReviewVoteWidget(reviewVote: 0, reviewTotalVote: review.remark!),
         Expanded(
           child: ListTile(
             contentPadding: EdgeInsets.zero,
@@ -94,37 +77,27 @@ class CourseReviewWidget extends StatelessWidget {
                                       horizontal: 10, vertical: 2),
                                   child: ReviewHeader(
                                     userId: review.reviewerId!,
-                                    teacher: review.course!.teachers!,
-                                    time: review.course!.formatTime(),
+                                    teacher: review.courseInfo.teachers,
+                                    time: review.courseInfo.time,
                                   ),
                                 ),
                                 const Divider(),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 10, vertical: 2),
-                                  child: Text(
-                                    review.content!,
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge
-                                            ?.color,
-                                        fontSize: 15),
-                                  ),
+                                  child: smartRender(context, review.content!,
+                                      null, null, translucent),
                                 ),
                                 const Divider(),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 10, vertical: 2),
                                   child: ReviewFooter(
-                                    overallLevel: translateScore(
-                                        review.courseGrade!.overall),
-                                    styleLevel: translateScore(
-                                        review.courseGrade!.style),
-                                    workloadLevel: translateScore(
-                                        review.courseGrade!.workload),
-                                    assessmentLevel: translateScore(
-                                        review.courseGrade!.assessment),
+                                    overallLevel: review.rank!.overall! - 1,
+                                    styleLevel: review.rank!.content! - 1,
+                                    workloadLevel: review.rank!.workload! - 1,
+                                    assessmentLevel:
+                                        review.rank!.assessment! - 1,
                                   ),
                                 ),
                               ],
@@ -141,78 +114,6 @@ class CourseReviewWidget extends StatelessWidget {
     );
   }
 }
-
-// HydrogenC: Don't know what this widget is for
-/*
-class ReviewOperationBar extends StatefulWidget {
-  final CourseReview review;
-
-  const ReviewOperationBar({Key? key, required this.review}) : super(key: key);
-
-  @override
-  _ReviewOperationBarState createState() => _ReviewOperationBarState();
-}
-
-class _ReviewOperationBarState extends State<ReviewOperationBar> {
-  int _liked = 0;
-  int like = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // like button
-        Row(
-          children: [
-            ReviewVoteWidget(reviewVote: 1, reviewTotalVote: 10),
-            Text(
-              like.toString(),
-              style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
-                  fontSize: 12),
-            ),
-          ],
-        ),
-        // comment button
-        Row(
-          children: [
-            IconButton(
-              icon: Icon(
-                Icons.comment,
-                color: Theme.of(context).hintColor,
-              ),
-              onPressed: () {
-                // todo comment
-              },
-            ),
-            Text(
-              "0",
-              style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
-                  fontSize: 12),
-            ),
-          ],
-        ),
-        // report button
-        Row(
-          children: [
-            IconButton(
-              icon: Icon(
-                Icons.flag,
-                color: Theme.of(context).hintColor,
-              ),
-              onPressed: () {
-                // todo report
-              },
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-*/
 
 class ReviewHeader extends StatelessWidget {
   final int userId;
@@ -334,7 +235,8 @@ class ReviewFooter extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('总体评分', style: labelStyle),
+                Text(S.of(context).curriculum_ratings_overall,
+                    style: labelStyle),
                 const SizedBox(
                   width: 6,
                 ),
@@ -348,12 +250,13 @@ class ReviewFooter extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('课程风格', style: labelStyle),
+                Text(S.of(context).curriculum_ratings_content,
+                    style: labelStyle),
                 const SizedBox(
                   width: 6,
                 ),
                 Text(
-                  styleWord[styleLevel],
+                  contentWord[styleLevel],
                   style: TextStyle(color: wordColor[styleLevel], fontSize: 12),
                 )
               ],
@@ -361,7 +264,8 @@ class ReviewFooter extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('工作量', style: labelStyle),
+                Text(S.of(context).curriculum_ratings_workload,
+                    style: labelStyle),
                 const SizedBox(
                   width: 6,
                 ),
@@ -375,7 +279,8 @@ class ReviewFooter extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('考核要求', style: labelStyle),
+                Text(S.of(context).curriculum_ratings_assessment,
+                    style: labelStyle),
                 const SizedBox(
                   width: 6,
                 ),

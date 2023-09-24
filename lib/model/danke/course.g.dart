@@ -13,7 +13,7 @@ Course _$CourseFromJson(Map<String, dynamic> json) => Course(
       json['year'] as int?,
       json['semester'] as int?,
       (json['credit'] as num?)?.toDouble(),
-      (json['reviewList'] as List<dynamic>?)
+      (json['review_list'] as List<dynamic>?)
           ?.map((e) => CourseReview.fromJson(e as Map<String, dynamic>))
           .toList(),
     )
@@ -37,5 +37,5 @@ Map<String, dynamic> _$CourseToJson(Course instance) => <String, dynamic>{
       'year': instance.year,
       'semester': instance.semester,
       'coursegroup_id': instance.courseGroupId,
-      'reviewList': instance.reviewList,
+      'review_list': instance.reviewList,
     };

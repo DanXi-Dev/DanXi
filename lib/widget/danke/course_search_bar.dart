@@ -15,23 +15,10 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:ui';
 
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/time_table.dart';
-import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/stream_listener.dart';
-import 'package:dan_xi/widget/danke/course_widgets.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:provider/provider.dart';
 
 class CourseSearchBar extends StatefulWidget {
   final Function(String) onSearch;
@@ -87,7 +74,7 @@ class _CourseSearchBarState extends State<CourseSearchBar> {
                 textInputAction: TextInputAction.search,
                 controller: _controller,
                 // todo placeholder language
-                hintText: S.of(context).danke_search_hint,
+                hintText: S.of(context).curriculum_search_hint,
                 // increase text size and hint text size
                 style: const TextStyle(fontSize: 16),
                 /*
