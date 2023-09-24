@@ -45,6 +45,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import '../../util/stream_listener.dart';
 
 enum FilterType { TEACHER_FILTER, TIME_FILTER }
@@ -405,24 +406,17 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   }
 
   Future<void> _onTapScrollToEnd(_) async {
-    /*
     ProgressFuture dialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
     try {
-      // If we haven't loaded before, we need to load all floors.
-      if (!shouldScrollToEnd) _course = await prefetchAllFloors(_course);
 
       _listViewController.queueScrollToEnd();
-      _listViewController.replaceDataWith((_course.floors?.prefetch)!);
-      setState(() {});
       shouldScrollToEnd = true;
     } catch (error, st) {
       Noticing.showErrorDialog(context, error, trace: st);
     } finally {
       dialog.dismiss(showAnim: false);
     }
-
-     */
   }
 
   List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {

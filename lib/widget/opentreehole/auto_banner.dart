@@ -39,6 +39,8 @@ class AutoBanner extends StatefulWidget {
 }
 
 class _AutoBannerState extends State<AutoBanner> {
+  bool _displayAll = false;
+
   void onTapAction(String action) {
     try {
       if (action.startsWith("##")) {
@@ -57,6 +59,69 @@ class _AutoBannerState extends State<AutoBanner> {
     }
   }
 
+  Widget _buildAllList(List<BannerExtra?> list) {
+    return ListView.builder(
+      scrollDirection: Axis.vertical,
+      shrinkWrap: true,
+      itemCount: list.length,
+      itemBuilder: (context, index) {
+        var bannerExtra = list[index];
+        var elem = SizedByChildBuilder(
+            child: (context, key) => SlimMaterialBanner(
+                  key: key,
+                  icon: PlatformX.isMaterial(context)
+                      ? const Icon(Icons.campaign)
+                      : const Icon(CupertinoIcons.bell_circle),
+                  title: "",
+                  actionName: "",
+                ),
+            builder: (context, size) => ConstrainedBox(
+                constraints: BoxConstraints.loose(Size.fromHeight(size.height)),
+                child: bannerExtra == null
+                    ? Container()
+                    : SlimMaterialBanner(
+                        icon: PlatformX.isMaterial(context)
+                            ? const Icon(Icons.campaign)
+                            : const Icon(CupertinoIcons.bell_circle),
+                        title: bannerExtra.title,
+                        actionName: bannerExtra.actionName,
+                        onTapAction: () => onTapAction(bannerExtra.action))));
+
+        return elem;
+      },
+    );
+  }
+
+  Widget _buildSingleItem(List<BannerExtra?> list) {
+    return SizedByChildBuilder(
+        child: (context, key) => SlimMaterialBanner(
+              key: key,
+              icon: PlatformX.isMaterial(context)
+                  ? const Icon(Icons.campaign)
+                  : const Icon(CupertinoIcons.bell_circle),
+              title: "",
+              actionName: "",
+            ),
+        builder: (context, size) => ConstrainedBox(
+            constraints: BoxConstraints.loose(Size.fromHeight(size.height)),
+            child: Swiper(
+              itemBuilder: (BuildContext context, int index) {
+                final bannerExtra = list[index];
+                if (bannerExtra == null) return Container();
+                return SlimMaterialBanner(
+                    icon: PlatformX.isMaterial(context)
+                        ? const Icon(Icons.campaign)
+                        : const Icon(CupertinoIcons.bell_circle),
+                    title: bannerExtra.title,
+                    actionName: bannerExtra.actionName,
+                    onTapAction: () => onTapAction(bannerExtra.action));
+              },
+              itemCount: list.length,
+              autoplay: true,
+              autoplayDelay: widget.refreshDuration.inMilliseconds,
+            )));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Selector<SettingsProvider, bool>(
@@ -70,34 +135,22 @@ class _AutoBannerState extends State<AutoBanner> {
           // Since the banner is not a fixed size, we need to use [SizedByChildBuilder]
           // to get the height of the banner. Otherwise, [Swiper] will have infinite
           // height bound and throw an exception during build.
-          return SizedByChildBuilder(
-              child: (context, key) => SlimMaterialBanner(
-                    key: key,
-                    icon: PlatformX.isMaterial(context)
-                        ? const Icon(Icons.campaign)
-                        : const Icon(CupertinoIcons.bell_circle),
-                    title: "",
-                    actionName: "",
-                  ),
-              builder: (context, size) => ConstrainedBox(
-                  constraints:
-                      BoxConstraints.loose(Size.fromHeight(size.height)),
-                  child: Swiper(
-                    itemBuilder: (BuildContext context, int index) {
-                      final bannerExtra = list[index];
-                      if (bannerExtra == null) return Container();
-                      return SlimMaterialBanner(
-                          icon: PlatformX.isMaterial(context)
-                              ? const Icon(Icons.campaign)
-                              : const Icon(CupertinoIcons.bell_circle),
-                          title: bannerExtra.title,
-                          actionName: bannerExtra.actionName,
-                          onTapAction: () => onTapAction(bannerExtra.action));
-                    },
-                    itemCount: list.length,
-                    autoplay: true,
-                    autoplayDelay: widget.refreshDuration.inMilliseconds,
-                  )));
+          return Column(
+            children: [
+              _displayAll ? _buildAllList(list) : _buildSingleItem(list),
+              SizedBox(
+                  height: 20,
+                  width: double.infinity,
+                  child:  InkWell(
+                    onTap: () => setState(() {
+                      _displayAll = !_displayAll;
+                    }),
+                    child: Icon(_displayAll
+                        ? Icons.arrow_drop_up
+                        : Icons.arrow_drop_down),
+                  ))
+            ],
+          );
         },
         selector: (_, model) => model.isBannerEnabled);
   }

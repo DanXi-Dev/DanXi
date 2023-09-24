@@ -39,7 +39,7 @@ part 'course_review.g.dart';
 @JsonSerializable()
 class CourseReview {
   /// The unique id of a review, based on which the review is compared.
-  @JsonKey(name: 'review_id')
+  @JsonKey(name: 'id')
   int? reviewId;
 
   /// The user id of the reviewer.

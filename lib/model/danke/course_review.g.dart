@@ -7,7 +7,7 @@ part of 'course_review.dart';
 // **************************************************************************
 
 CourseReview _$CourseReviewFromJson(Map<String, dynamic> json) => CourseReview(
-      json['review_id'] as int?,
+      json['id'] as int?,
       json['reviewer_id'] as int?,
       json['title'] as String?,
       json['content'] as String?,
@@ -31,7 +31,7 @@ CourseReview _$CourseReviewFromJson(Map<String, dynamic> json) => CourseReview(
 
 Map<String, dynamic> _$CourseReviewToJson(CourseReview instance) =>
     <String, dynamic>{
-      'review_id': instance.reviewId,
+      'id': instance.reviewId,
       'reviewer_id': instance.reviewerId,
       'title': instance.title,
       'content': instance.content,

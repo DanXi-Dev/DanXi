@@ -101,6 +101,15 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
     return response.statusCode;
   }
 
+  Future<CourseReview> voteReview(int reviewId, bool upVote) async {
+    Response<dynamic> response = await dio.patch("$_BASE_URL/reviews/$reviewId",
+        data: {
+          'upvote': upVote,
+        },
+        options: Options(headers: _tokenHeader));
+    return CourseReview.fromJson(response.data??"");
+  }
+
   Future<List<CourseReview>?> getReviews(String courseId) async {
     Response<List<dynamic>> response = await dio.get(
         "$_BASE_URL/courses/$courseId/reviews",

@@ -15,17 +15,22 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:flutter/material.dart';
 
 // widget for voting on a review
 
 class ReviewVoteWidget extends StatefulWidget {
   const ReviewVoteWidget(
-      {Key? key, required this.reviewVote, required this.reviewTotalVote})
+      {Key? key,
+      required this.myVote,
+      required this.reviewVote,
+      required this.reviewId})
       : super(key: key);
 
-  final int reviewTotalVote;
   final int reviewVote;
+  final int myVote;
+  final int reviewId;
 
   @override
   // pass reviewTotalVote to _ReviewVoteWidgetState
@@ -33,14 +38,27 @@ class ReviewVoteWidget extends StatefulWidget {
 }
 
 class _ReviewVoteWidgetState extends State<ReviewVoteWidget> {
-  late int _reviewTotalVote;
+  // HydrogenC: Why is this field called remark on the server?
   late int _reviewVote;
+
+  late int _myVote;
+  late int _reviewId;
 
   @override
   void initState() {
     super.initState();
-    _reviewTotalVote = widget.reviewTotalVote;
     _reviewVote = widget.reviewVote;
+    _myVote = widget.myVote;
+    _reviewId = widget.reviewId;
+  }
+
+  Future<void> vote(bool upVote) async {
+    var newReview = await CurriculumBoardRepository.getInstance()
+        .voteReview(_reviewId, upVote);
+    setState(() {
+      _reviewVote = newReview.remark!;
+      _myVote = newReview.vote!;
+    });
   }
 
   @override
@@ -56,21 +74,21 @@ class _ReviewVoteWidgetState extends State<ReviewVoteWidget> {
             alignment: Alignment.bottomCenter,
             icon: Icon(
               Icons.keyboard_arrow_up,
-              color: _reviewVote > 0
+              color: _myVote > 0
                   ? Colors.blue
                   : Theme.of(context).textTheme.bodyLarge!.color,
             ),
             onPressed: () {
-              if (_reviewVote != 0) return;
-              setState(() {
-                // todo http request
-                _reviewTotalVote += 1;
-                _reviewVote = 1;
-              });
+              if (_myVote < 0) {
+                //If already downvoted, then cancel the downvote
+                vote(false);
+              } else {
+                vote(true);
+              }
             },
           ),
           Text(
-            _reviewTotalVote.toString(),
+            _reviewVote.toString(),
             style: const TextStyle(fontSize: 20),
           ),
           IconButton(
@@ -79,18 +97,20 @@ class _ReviewVoteWidgetState extends State<ReviewVoteWidget> {
             alignment: Alignment.topCenter,
             icon: Icon(
               Icons.keyboard_arrow_down,
-              color: _reviewVote < 0
+              color: _myVote < 0
                   // set its color
                   ? Colors.red
                   : Theme.of(context).textTheme.bodyLarge!.color,
             ),
             onPressed: () {
-              if (_reviewVote != 0) return;
-              setState(() {
-                // todo http request
-                _reviewTotalVote -= 1;
-                _reviewVote = -1;
-              });
+              // HydrogenC: Why prevent user from modifying his/her vote?
+              // if (_myVote != 0) return;
+              if (_myVote > 0) {
+                // If already upvoted, then cancel the upvote
+                vote(true);
+              } else {
+                vote(false);
+              }
             },
           ),
         ],

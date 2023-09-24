@@ -38,63 +38,10 @@ class DankeSubPage extends PlatformSubpage<DankeSubPage> {
   @override
   DankeSubPageState createState() => DankeSubPageState();
 
-  /// leading button
-  // @override
-  // Create<List<AppBarButtonItem>> get leading => (cxt) => [
-  //   AppBarButtonItem(
-  //     S.of(cxt).messages,
-  //     Icon(PlatformX.isMaterial(cxt)
-  //         ? Icons.notifications
-  //         : CupertinoIcons.bell),
-  //         () {
-  //       // if (cxt.read<FDUHoleProvider>().isUserInitialized) {
-  //       //   smartNavigatorPush(cxt, '/bbs/messages',
-  //       //       forcePushOnMainNavigator: true);
-  //       // }
-  //     },
-  //   )
-  // ];
-
   const DankeSubPage({Key? key}) : super(key: key);
 
   @override
   Create<Widget> get title => (cxt) => Text(S.of(cxt).curriculum);
-
-// @override
-// Create<List<AppBarButtonItem>> get trailing => (cxt) => [
-//   AppBarButtonItem(
-//     S.of(cxt).add_courses,
-//     Icon(PlatformX.isMaterial(cxt)
-//         ? Icons.add
-//         : CupertinoIcons.add_circled),
-//         () => ManuallyAddCourseEvent().fire(),
-//   ),
-//   AppBarButtonItem(
-//     S.of(cxt).share,
-//     Icon(PlatformX.isMaterial(cxt)
-//         ? Icons.share
-//         : CupertinoIcons.square_arrow_up),
-//         () => ShareTimetableEvent().fire(),
-//   ),
-// ];
-
-  /// trailing buttons
-// @override
-// Create<List<AppBarButtonItem>> get trailing {
-//   return (cxt) => [
-//         AppBarButtonItem(S.of(cxt).refresh, Icon(PlatformIcons(cxt).refresh),
-//             () {
-//           // RefreshPageEvent().fire();
-//         }),
-//         AppBarButtonItem(
-//             S.of(cxt).reset,
-//             Icon(PlatformX.isMaterial(cxt)
-//                 ? Icons.medical_services_outlined
-//                 : CupertinoIcons.rays), () {
-//           // ResetWebViewEvent().fire();
-//         }),
-//       ];
-// }
 }
 
 class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {

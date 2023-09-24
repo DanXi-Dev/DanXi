@@ -50,7 +50,10 @@ class CourseReviewWidget extends StatelessWidget {
       ),
       // credits group
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        ReviewVoteWidget(reviewVote: 0, reviewTotalVote: review.remark!),
+        ReviewVoteWidget(
+            myVote: review.vote!,
+            reviewVote: review.remark!,
+            reviewId: review.reviewId!),
         Expanded(
           child: ListTile(
             contentPadding: EdgeInsets.zero,
