@@ -123,7 +123,7 @@ class EhallEmptyClassroomRepository extends BaseRepositoryWithDio {
   ///
   /// Request [PersonInfo] for logging in, if necessary.
   Future<List<RoomInfo>?> getBuildingRoomInfo(PersonInfo? info, String areaName,
-          String? buildingName, DateTime? date) async =>
+          String? buildingName, DateTime? date) =>
       UISLoginTool.tryAsyncWithAuth(dio, LOGIN_URL, cookieJar!, info,
           () => _getBuildingRoomInfo(areaName, buildingName, date!));
 
