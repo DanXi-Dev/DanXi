@@ -360,7 +360,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                     ),
                     averageOverallLevel >= 0
                         ? Text(
-                            overallWord[averageOverallLevel],
+                            overallWord![averageOverallLevel],
                             style: TextStyle(
                                 color: wordColor[averageOverallLevel],
                                 fontSize: 15),

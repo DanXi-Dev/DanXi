@@ -69,9 +69,17 @@ class CourseListWidgetState extends State<CourseListWidget> {
   Future<List<CourseGroup>?> _fetchList() async {
     _groups ??= await _fetchMegaList();
 
-    return searchKeyword == null
-        ? _groups!.take(20).toList()
-        : _groups.filter((element) => element.name!.contains(searchKeyword!));
+    if (searchKeyword != null) {
+      var searchPattern = searchKeyword!.startsWith('#')
+          ? searchKeyword!.substring(1)
+          : searchKeyword!;
+      return searchKeyword!.startsWith('#')
+          ? _groups.filter((element) => element.code!.contains(searchPattern))
+          : _groups.filter((element) => element.name!.contains(searchPattern));
+    } else {
+// This shall not happen
+      return _groups!.take(20).toList();
+    }
   }
 
   @override

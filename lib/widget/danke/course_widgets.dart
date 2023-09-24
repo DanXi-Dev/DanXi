@@ -43,10 +43,7 @@ int translateScore(int score) {
   }
 }
 
-const List<String> overallWord = ["特别差评", "差评", "中等", "好评", "特别好评"];
-const List<String> contentWord = ["硬核", "较难", "中等", "容易", "非常容易"];
-const List<String> workloadWord = ["非常大", "较大", "中等", "较小", "非常小"];
-const List<String> assessmentWord = ["非常严格", "严格", "中等", "宽松", "非常宽松"];
+List<String>? overallWord, contentWord, workloadWord, assessmentWord;
 const List<Color> wordColor = [
   Colors.red,
   Colors.orange,
@@ -106,7 +103,8 @@ class CourseGroupCardWidget extends StatelessWidget {
                               Text(
                                 courses.code!,
                                 textAlign: TextAlign.left,
-                                style: const TextStyle(fontSize: 12),
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.grey),
                               ),
                             ],
                           ),
@@ -121,7 +119,8 @@ class CourseGroupCardWidget extends StatelessWidget {
                           children: <Widget>[
                             OTLeadingTag(
                               color: Colors.orange,
-                              text: "${courses.courseList!.first.credit!.toStringAsFixed(1)} ${S.of(context).credits}",
+                              text:
+                                  "${courses.courseList!.first.credit!.toStringAsFixed(1)} ${S.of(context).credits}",
                             ),
                           ],
                         ),
@@ -233,7 +232,7 @@ class FilterListWidgetState<T> extends State<FilterListWidget<T>> {
         (e) => FilterTagWidget(
             color: e.filter == selectedTag!.filter
                 ? Colors.pinkAccent
-                : Colors.white70,
+                : Colors.grey,
             text: e.displayName,
             onTap: () {
               setState(() {

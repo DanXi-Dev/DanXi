@@ -291,7 +291,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
             Text(widget.courseGroup.code!,
                 style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Colors.white70,
+                    color: Colors.grey,
                     fontSize: 20)),
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -371,7 +371,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
             const Divider(),
             CourseRatingWidget(
               label: S.of(context).curriculum_ratings_overall,
-              words: overallWord,
+              words: overallWord!,
               onRate: (e) {
                 widget.ratings.grade.overall = e;
                 widget.ratings.notifyChanges();
@@ -379,14 +379,14 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
             ),
             CourseRatingWidget(
                 label: S.of(context).curriculum_ratings_content,
-                words: contentWord,
+                words: contentWord!,
                 onRate: (e) {
                   widget.ratings.grade.content = e;
                   widget.ratings.notifyChanges();
                 }),
             CourseRatingWidget(
               label: S.of(context).curriculum_ratings_workload,
-              words: workloadWord,
+              words: workloadWord!,
               onRate: (e) {
                 widget.ratings.grade.workload = e;
                 widget.ratings.notifyChanges();
@@ -394,7 +394,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
             ),
             CourseRatingWidget(
               label: S.of(context).curriculum_ratings_assessment,
-              words: assessmentWord,
+              words: assessmentWord!,
               onRate: (e) {
                 widget.ratings.grade.assessment = e;
                 widget.ratings.notifyChanges();

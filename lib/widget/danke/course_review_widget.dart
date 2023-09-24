@@ -241,7 +241,7 @@ class ReviewFooter extends StatelessWidget {
                   width: 6,
                 ),
                 Text(
-                  overallWord[overallLevel],
+                  overallWord![overallLevel],
                   style:
                       TextStyle(color: wordColor[overallLevel], fontSize: 12),
                 )
@@ -256,7 +256,7 @@ class ReviewFooter extends StatelessWidget {
                   width: 6,
                 ),
                 Text(
-                  contentWord[styleLevel],
+                  contentWord![styleLevel],
                   style: TextStyle(color: wordColor[styleLevel], fontSize: 12),
                 )
               ],
@@ -270,7 +270,7 @@ class ReviewFooter extends StatelessWidget {
                   width: 6,
                 ),
                 Text(
-                  workloadWord[workloadLevel],
+                  workloadWord![workloadLevel],
                   style:
                       TextStyle(color: wordColor[workloadLevel], fontSize: 12),
                 )
@@ -285,7 +285,7 @@ class ReviewFooter extends StatelessWidget {
                   width: 6,
                 ),
                 Text(
-                  assessmentWord[assessmentLevel],
+                  assessmentWord![assessmentLevel],
                   style: TextStyle(
                       color: wordColor[assessmentLevel], fontSize: 12),
                 )
