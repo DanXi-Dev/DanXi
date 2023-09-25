@@ -79,7 +79,11 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_THEME_TYPE = "theme_type";
   static const String KEY_MARKDOWN_ENABLED = "markdown_rendering_enabled";
   static const String KEY_VISITED_TIMETABLE = "visited_timetable";
+  static const String KEY_BASE_URL = "https://jwc.fudan.edu.cn";
+  static const String KEY_BASE_AUTH_URL = "https://auth.fduhole.com/api";
+  static const String KEY_IMAGE_BASE_URL = "https://image.fduhole.com";
 
+  // todo change all usage
   SettingsProvider._();
 
   /// Get a global instance of [SettingsProvider].
@@ -126,6 +130,49 @@ class SettingsProvider with ChangeNotifier {
       return FileImage(image);
     } catch (ignored) {
       return null;
+    }
+  }
+
+  /// Set and get _BASE_URL, _BASE_AUTH_URL, _IMAGE_BASE_URL for debug
+  String? get baseUrl {
+    if (preferences!.containsKey(KEY_BASE_URL)) {
+      return preferences!.getString(KEY_BASE_URL)!;
+    }
+    return null;
+  }
+
+  set baseUrl(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_BASE_URL, value);
+      notifyListeners();
+    }
+  }
+
+  String? get baseAuthUrl {
+    if (preferences!.containsKey(KEY_BASE_AUTH_URL)) {
+      return preferences!.getString(KEY_BASE_AUTH_URL)!;
+    }
+    return null;
+  }
+
+  set baseAuthUrl(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_BASE_AUTH_URL, value);
+      notifyListeners();
+    }
+  }
+
+  String? get imageBaseUrl {
+    if (preferences!.containsKey(KEY_IMAGE_BASE_URL)) {
+      return preferences!.getString(KEY_IMAGE_BASE_URL)!;
+    }
+    return null;
+  }
+
+  set imageBaseUrl(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_IMAGE_BASE_URL, value);
+      notifyListeners();
     }
   }
 

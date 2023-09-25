@@ -135,6 +135,45 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     }
   }
 
+  Future<void> changeBaseUrl() async {
+    String originalBaseUrl = "https://jwc.fudan.edu.cn";
+    String? baseUrl = await Noticing.showInputDialog(context,
+        "Input new base url (leave empty to reset to $originalBaseUrl))");
+    if (baseUrl == null || !mounted) return;
+    if (baseUrl.isEmpty) {
+      SettingsProvider.getInstance().baseUrl = originalBaseUrl;
+    } else {
+      SettingsProvider.getInstance().baseUrl = baseUrl;
+    }
+    // Noticing.showNotice(context, "Restart app to take effects");
+  }
+
+  Future<void> changeBaseAuthUrl() async {
+    String originalBaseAuthUrl = "https://auth.fduhole.com/api";
+    String? baseAuthUrl = await Noticing.showInputDialog(context,
+        "Input new base auth url (leave empty to reset to $originalBaseAuthUrl))");
+    if (baseAuthUrl == null || !mounted) return;
+    if (baseAuthUrl.isEmpty) {
+      SettingsProvider.getInstance().baseUrl = originalBaseAuthUrl;
+    } else {
+      SettingsProvider.getInstance().baseUrl = baseAuthUrl;
+    }
+    // Noticing.showNotice(context, "Restart app to take effects");
+  }
+
+  Future<void> changeImageBaseUrl() async {
+    String originalImageBaseUrl = "https://image.fduhole.com";
+    String? imageBaseUrl = await Noticing.showInputDialog(context,
+        "Input new image base url (leave empty to reset to $originalImageBaseUrl))");
+    if (imageBaseUrl == null || !mounted) return;
+    if (imageBaseUrl.isEmpty) {
+      SettingsProvider.getInstance().baseUrl = originalImageBaseUrl;
+    } else {
+      SettingsProvider.getInstance().baseUrl = imageBaseUrl;
+    }
+    // Noticing.showNotice(context, "Restart app to take effects");
+  }
+
   Future<void> sendMessage() async {
     if (!OpenTreeHoleRepository.getInstance().isAdmin) return;
     String? message = await Noticing.showInputDialog(context, "Input Message");
@@ -218,6 +257,24 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
                   child: const Text("Clear Cookies"),
                   onPressed: () async {
                     await BaseRepositoryWithDio.clearAllCookies();
+                  },
+                ),
+                PlatformElevatedButton(
+                  child: const Text("Set _BASE_URL"),
+                  onPressed: () async {
+                    await changeBaseUrl();
+                  },
+                ),
+                PlatformElevatedButton(
+                  child: const Text("Set  _BASE_AUTH_URL"),
+                  onPressed: () async {
+                    await changeBaseAuthUrl();
+                  },
+                ),
+                PlatformElevatedButton(
+                  child: const Text("Set _IMAGE_BASE_URL"),
+                  onPressed: () async {
+                    await changeImageBaseUrl();
                   },
                 ),
                 ChangeNotifierProvider.value(
