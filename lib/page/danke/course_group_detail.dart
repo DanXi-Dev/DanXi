@@ -78,9 +78,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   Set<String> teacherSet = {};
   Set<String> timeSet = {};
 
-  /// Fields related to the display states.
-  bool shouldScrollToEnd = false;
-
   String teacherFilter = "*";
   String timeFilter = "*";
 
@@ -136,9 +133,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
        */
     }
 
-    shouldScrollToEnd = widget.arguments!.containsKey('scroll_to_end') &&
-        widget.arguments!['scroll_to_end'] == true;
-
     StateProvider.needScreenshotWarning = true;
 
     _refreshSubscription.bindOnlyInvalid(
@@ -157,17 +151,23 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   }
 
   /// Refresh the whole list (excluding the head)
-  Future<void> refreshList() async {
+  Future<void> refreshList({bool scrollToEnd = false}) async {
+    await _fetchCourseGroup(forceRefetch: true);
     await refreshSelf();
-
+    if (scrollToEnd) _listViewController.queueScrollToEnd();
     return _listViewController.notifyUpdate(
-        useInitialData: true, queueDataClear: true);
+        useInitialData: false, queueDataClear: true);
   }
 
-  Future<CourseGroup?> _fetchCourseGroup() async {
+  Future<CourseGroup?> _fetchCourseGroup({bool forceRefetch = false}) async {
     try {
-      _courses ??=
-          await CurriculumBoardRepository.getInstance().getCourseGroup(groupId);
+      if (forceRefetch) {
+        _courses = await CurriculumBoardRepository.getInstance()
+            .getCourseGroup(groupId);
+      } else {
+        _courses ??= await CurriculumBoardRepository.getInstance()
+            .getCourseGroup(groupId);
+      }
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -230,7 +230,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
               onPressed: () async {
                 if (await CourseReviewEditor.createNewPost(
                     context, _courses!)) {
-                  refreshList();
+                  refreshList(scrollToEnd: true);
                 }
               },
             ),
@@ -284,7 +284,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                   // If we need to scroll to the end, we should prefetch all the data beforehand.
                   // See also [prefetchAllFloors] in [TreeHoleSubpageState].
                   allDataReceiver: allDataReceiver,
-                  shouldScrollToEnd: shouldScrollToEnd,
                   builder: _getListItems,
                   headBuilder: (ctx) => _buildHead(ctx),
                   loadingBuilder: (BuildContext context) => Container(
@@ -355,7 +354,8 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(S.of(context).curriculum_average_rating,
-                        style: const TextStyle(color: Colors.grey, fontSize: 15)),
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 15)),
                     const SizedBox(
                       width: 6,
                     ),
@@ -367,7 +367,8 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                                 fontSize: 15),
                           )
                         : Text(S.of(context).curriculum_unknown_rating,
-                            style: const TextStyle(color: Colors.grey, fontSize: 15))
+                            style: const TextStyle(
+                                color: Colors.grey, fontSize: 15))
                   ],
                 ),
                 const Divider(
@@ -409,9 +410,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
     ProgressFuture dialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
     try {
-
       _listViewController.queueScrollToEnd();
-      shouldScrollToEnd = true;
     } catch (error, st) {
       Noticing.showErrorDialog(context, error, trace: st);
     } finally {

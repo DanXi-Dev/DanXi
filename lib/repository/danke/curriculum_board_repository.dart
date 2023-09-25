@@ -44,10 +44,10 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
 
     // First fetch of the course list is VERY SLOW
     dio.options = BaseOptions(
-          receiveDataWhenStatusError: true,
-          connectTimeout: 30000,
-          receiveTimeout: 30000,
-          sendTimeout: 10000);
+        receiveDataWhenStatusError: true,
+        connectTimeout: 30000,
+        receiveTimeout: 30000,
+        sendTimeout: 10000);
   }
 
   Map<String, String> get _tokenHeader =>
@@ -71,10 +71,9 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
     return CourseGroup.fromJson(response.data!);
   }
 
-  Future<CourseReview?> addReview(
-      int courseId, CourseReviewEditorText review) async {
+  Future<CourseReview?> addReview(CourseReviewEditorText review) async {
     Response<Map<String, dynamic>> response = await dio.post(
-        "$_BASE_URL/courses/$courseId/reviews",
+        "$_BASE_URL/courses/${review.ratings.courseId}/reviews",
         data: {
           'title': review.title,
           'content': review.content,
@@ -107,7 +106,7 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
           'upvote': upVote,
         },
         options: Options(headers: _tokenHeader));
-    return CourseReview.fromJson(response.data??"");
+    return CourseReview.fromJson(response.data ?? "");
   }
 
   Future<List<CourseReview>?> getReviews(String courseId) async {
@@ -119,10 +118,9 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
 
   Future<CourseReview?> getRandomReview() async {
     // debugPrint(SettingsProvider.getInstance().fduholeToken!.access!);
-    Response<dynamic> response = await dio.get(
-        "$_BASE_URL/reviews/random",
+    Response<dynamic> response = await dio.get("$_BASE_URL/reviews/random",
         options: Options(headers: _tokenHeader));
-    return CourseReview.fromJson(response.data??"");
+    return CourseReview.fromJson(response.data ?? "");
   }
 
   @override

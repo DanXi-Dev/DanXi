@@ -23,6 +23,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course.dart';
 import 'package:dan_xi/model/danke/course_grade.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
+import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
@@ -75,20 +76,32 @@ final PostInterceptor _kStopWordInterceptor = (context, text) async {
   return true;
 };
 
-class ClassRatings with ChangeNotifier {
-  int classId;
+class ReviewDetails with ChangeNotifier {
+  int courseId;
   CourseGrade grade;
 
-  ClassRatings(this.classId, this.grade);
+  ReviewDetails(this.courseId, this.grade);
 
-  void copyValuesFrom(ClassRatings other) {
-    classId = other.classId;
-    grade=other.grade;
+  void copyValuesFrom(ReviewDetails other) {
+    courseId = other.courseId;
+    grade = other.grade;
     notifyListeners();
   }
 
   void notifyChanges() {
     notifyListeners();
+  }
+
+  bool isValid() {
+    return courseId >= 0 &&
+        _inRange(grade.overall ?? 0) &&
+        _inRange(grade.content ?? 0) &&
+        _inRange(grade.workload ?? 0) &&
+        _inRange(grade.assessment ?? 0);
+  }
+
+  static bool _inRange(int val, [int min = 1, int max = 5]) {
+    return val >= min && val <= max;
   }
 }
 
@@ -96,19 +109,19 @@ class CourseReviewEditor {
   static Future<bool> createNewPost(
       BuildContext context, CourseGroup courseGroup,
       {PostInterceptor? interceptor}) async {
-    final CourseReviewEditorText? content = await _showEditor(
+    final CourseReviewEditorText? post = await _showEditor(
         context, S.of(context).new_post,
         interceptor: _kStopWordInterceptor.mergeWith(interceptor),
         courseGroup: courseGroup);
 
-    if (content?.content == null) return false;
+    if (post?.content == null) {
+      return false;
+    }
 
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
     try {
-      await CurriculumBoardRepository.getInstance().addReview(
-        courseGroup.id!, content!
-      );
+      await CurriculumBoardRepository.getInstance().addReview(post!);
     } catch (e, st) {
       Noticing.showErrorDialog(context, e, trace: st);
       return false;
@@ -194,16 +207,14 @@ class CourseReviewEditor {
 
 class CourseReviewEditorWidget extends StatefulWidget {
   final TextEditingController contentController, titleController;
-  final String? courseCode;
   final bool fullscreen;
   final String? tip;
-  final ClassRatings ratings;
+  final ReviewDetails ratings;
 
   const CourseReviewEditorWidget(
       {Key? key,
       required this.titleController,
       required this.contentController,
-      this.courseCode,
       this.fullscreen = false,
       this.tip,
       required this.courseGroup,
@@ -218,9 +229,18 @@ class CourseReviewEditorWidget extends StatefulWidget {
 }
 
 class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
+  late ReviewDetails ratings;
+
   @override
   void initState() {
     super.initState();
+    ratings = widget.ratings;
+  }
+
+  @override
+  void didUpdateWidget(covariant CourseReviewEditorWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    ratings = widget.ratings;
   }
 
   final GlobalKey<DropdownListWidgetState<Course>> _timeSelectorKey =
@@ -283,6 +303,11 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
       return textField;
     }
 
+    int index = widget.courseGroup.courseList!
+        .indexWhere((element) => element.id == ratings.courseId);
+    Course? selectedCourse =
+        index >= 0 ? widget.courseGroup.courseList![index] : null;
+
     return SingleChildScrollView(
       child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -300,6 +325,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                     flex: 1,
                     child: DropdownListWidget(
                       key: _teacherSelectorKey,
+                      initialSelection: selectedCourse?.teachers,
                       items: widget.courseGroup.courseList!
                           .map((e) => e.teachers!)
                           .toSet()
@@ -319,6 +345,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                       builder: (context, value, child) =>
                           DropdownListWidget<Course>(
                               key: _timeSelectorKey,
+                              initialSelection: selectedCourse,
                               items: value == "*"
                                   ? []
                                   : widget.courseGroup.courseList!
@@ -326,8 +353,8 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                               hintText: S.of(context).curriculum_select_time,
                               labelText: S.of(context).course_schedule,
                               onChanged: (e) {
-                                widget.ratings.classId = e!.id!;
-                                widget.ratings.notifyChanges();
+                                ratings.courseId = e!.id!;
+                                ratings.notifyChanges();
                               },
                               itemBuilder: (e) => DropdownMenuItem(
                                   value: e, child: Text(e.formatTime()))),
@@ -372,33 +399,49 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
             CourseRatingWidget(
               label: S.of(context).curriculum_ratings_overall,
               words: overallWord!,
+              initialRating: ratings.grade.overall,
               onRate: (e) {
-                widget.ratings.grade.overall = e;
-                widget.ratings.notifyChanges();
+                ratings.grade.overall = e;
+                ratings.notifyChanges();
               },
             ),
             CourseRatingWidget(
                 label: S.of(context).curriculum_ratings_content,
                 words: contentWord!,
+                initialRating: ratings.grade.content,
                 onRate: (e) {
-                  widget.ratings.grade.content = e;
-                  widget.ratings.notifyChanges();
+                  ratings.grade.content = e;
+                  ratings.notifyChanges();
                 }),
             CourseRatingWidget(
               label: S.of(context).curriculum_ratings_workload,
               words: workloadWord!,
+              initialRating: ratings.grade.workload,
               onRate: (e) {
-                widget.ratings.grade.workload = e;
-                widget.ratings.notifyChanges();
+                ratings.grade.workload = e;
+                ratings.notifyChanges();
               },
             ),
             CourseRatingWidget(
               label: S.of(context).curriculum_ratings_assessment,
               words: assessmentWord!,
+              initialRating: ratings.grade.assessment,
               onRate: (e) {
-                widget.ratings.grade.assessment = e;
-                widget.ratings.notifyChanges();
+                ratings.grade.assessment = e;
+                ratings.notifyChanges();
               },
+            ),
+            const Divider(),
+            Text(S.of(context).preview,
+                style: TextStyle(color: Theme.of(context).hintColor)),
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: ValueListenableBuilder<TextEditingValue>(
+                builder: (context, value, child) => smartRender(
+                    context, value.text, null, null, false,
+                    preview: true),
+                valueListenable: widget.contentController,
+              ),
             ),
           ]),
     );
@@ -412,11 +455,13 @@ class DropdownListWidget<T> extends StatefulWidget {
       required this.hintText,
       required this.labelText,
       required this.itemBuilder,
-      required this.onChanged});
+      required this.onChanged,
+      this.initialSelection});
 
   final List<T> items;
   final String hintText;
   final String labelText;
+  final T? initialSelection;
   final DropdownMenuItem<T> Function(T) itemBuilder;
   final void Function(T?) onChanged;
 
@@ -451,9 +496,26 @@ class DropdownListWidgetState<T> extends State<DropdownListWidget<T>> {
   }
 
   @override
-  void didUpdateWidget(covariant DropdownListWidget<T> old) {
-    super.didUpdateWidget(old);
-    selectedItem = null;
+  void didUpdateWidget(covariant DropdownListWidget<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    setState(() {
+      _initializeSelection();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeSelection();
+  }
+
+  void _initializeSelection() {
+    if (widget.initialSelection != null) {
+      var index = widget.items.indexOf(widget.initialSelection!);
+      selectedItem = index >= 0 ? widget.items[index] : null;
+    } else {
+      selectedItem = null;
+    }
   }
 }
 
@@ -461,12 +523,14 @@ class CourseRatingWidget extends StatefulWidget {
   final void Function(int) onRate;
   final String label;
   final List<String> words;
+  final int? initialRating;
 
   const CourseRatingWidget(
       {super.key,
       required this.label,
       required this.onRate,
-      required this.words});
+      required this.words,
+      this.initialRating});
 
   @override
   CourseRatingWidgetState createState() => CourseRatingWidgetState();
@@ -474,6 +538,18 @@ class CourseRatingWidget extends StatefulWidget {
 
 class CourseRatingWidgetState extends State<CourseRatingWidget> {
   int rating = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    rating = widget.initialRating ?? 0;
+  }
+
+  @override
+  void didUpdateWidget(covariant CourseRatingWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    rating = widget.initialRating ?? rating;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -506,9 +582,9 @@ class CourseRatingWidgetState extends State<CourseRatingWidget> {
 
 class CourseReviewEditorText {
   String? content, title;
-  ClassRatings ratings = ClassRatings(-1, CourseGrade(0, 0, 0, 0));
+  ReviewDetails ratings = ReviewDetails(-1, CourseGrade(0, 0, 0, 0));
 
-  CourseReviewEditorText(this.content, this.ratings);
+  CourseReviewEditorText(this.content, this.title, this.ratings);
 
   CourseReviewEditorText.newInstance({withContent = '', withTitle = ''}) {
     content = withContent;
@@ -536,7 +612,7 @@ class CourseReviewEditorPage extends StatefulWidget {
 class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
   final _contentController = TextEditingController(),
       _titleController = TextEditingController();
-  final ClassRatings ratings = ClassRatings(-1, CourseGrade(0, 0, 0, 0));
+  final ReviewDetails ratings = ReviewDetails(-1, CourseGrade(0, 0, 0, 0));
 
   /// Whether the send button is enabled
   final bool _canSend = true;
@@ -599,11 +675,11 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
       _titleController.text = context
           .read<FDUHoleProvider>()
           .courseReviewEditorCache[_courseGroup.code]!
-          .content!;
+          .title!;
       _contentController.text = context
           .read<FDUHoleProvider>()
           .courseReviewEditorCache[_courseGroup.code]!
-          .title!;
+          .content!;
       ratings.copyValuesFrom(context
           .read<FDUHoleProvider>()
           .courseReviewEditorCache[_courseGroup.code]!
@@ -656,7 +732,7 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
                       _confirmCareWords = true;
                       return;
                     }
-                    _sendDocument(_courseGroup.code);
+                    _sendDocument();
                   }
                 : null,
           ),
@@ -669,7 +745,6 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
               child: CourseReviewEditorWidget(
                 contentController: _contentController,
                 titleController: _titleController,
-                courseCode: _courseGroup.code,
                 fullscreen: _isFullscreen,
                 tip: _tip,
                 courseGroup: _courseGroup,
@@ -678,10 +753,11 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
     );
   }
 
-  Future<void> _sendDocument(String? code) async {
+  Future<void> _sendDocument() async {
     String text = _contentController.text;
-    if (text.isEmpty) return;
-    final editorText = CourseReviewEditorText(text, ratings);
+    String title = _titleController.text;
+    if (text.isEmpty || title.isEmpty || !ratings.isValid()) return;
+    final editorText = CourseReviewEditorText(text, title, ratings);
 
     if ((await _interceptor?.call(context, editorText)) ?? true) {
       Navigator.pop<CourseReviewEditorText>(context, editorText);

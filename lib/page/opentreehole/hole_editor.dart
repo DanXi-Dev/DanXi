@@ -95,7 +95,9 @@ class OTEditor {
         object: object,
         interceptor: _kStopWordInterceptor.mergeWith(interceptor));
 
-    if (content?.text == null) return false;
+    if (content?.text == null) {
+      return false;
+    }
 
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
@@ -679,26 +681,26 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                   : const Icon(CupertinoIcons.photo),
               onPressed: () => OTEditor.uploadImage(context, _controller)),
           PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: PlatformX.isMaterial(context)
-                  ? const Icon(Icons.send)
-                  : const Icon(CupertinoIcons.paperplane),
-              onPressed: _canSend
-                  ? () async {
-                      bool isCareWordsDetected =
-                          await detectCareWords(_controller.text);
-                      // only show once
-                      if (context.mounted == true &&
-                          isCareWordsDetected == true &&
-                          _confirmCareWords == false) {
-                        await showPlatformDialog(
-                            context: context, builder: (_) => const CareDialog());
-                        _confirmCareWords = true;
-                        return;
-                      }
-                      _sendDocument(_object);
+            padding: EdgeInsets.zero,
+            icon: PlatformX.isMaterial(context)
+                ? const Icon(Icons.send)
+                : const Icon(CupertinoIcons.paperplane),
+            onPressed: _canSend
+                ? () async {
+                    bool isCareWordsDetected =
+                        await detectCareWords(_controller.text);
+                    // only show once
+                    if (context.mounted == true &&
+                        isCareWordsDetected == true &&
+                        _confirmCareWords == false) {
+                      await showPlatformDialog(
+                          context: context, builder: (_) => const CareDialog());
+                      _confirmCareWords = true;
+                      return;
                     }
-                  : null,
+                    _sendDocument(_object);
+                  }
+                : null,
           ),
         ],
       ),
