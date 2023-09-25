@@ -23,7 +23,6 @@ import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/material_banner.dart';
-import 'package:dan_xi/widget/libraries/sized_by_child_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_view/flutter_swiper_view.dart';
@@ -31,15 +30,50 @@ import 'package:provider/provider.dart';
 
 class AutoBanner extends StatefulWidget {
   final Duration refreshDuration;
+  final void Function(bool)? onExpand;
+  final int maxDisplay;
 
-  const AutoBanner({Key? key, required this.refreshDuration}) : super(key: key);
+  const AutoBanner(
+      {Key? key,
+      required this.refreshDuration,
+      this.onExpand,
+      this.maxDisplay = 5})
+      : super(key: key);
 
   @override
-  State<AutoBanner> createState() => _AutoBannerState();
+  State<AutoBanner> createState() => AutoBannerState();
 }
 
-class _AutoBannerState extends State<AutoBanner> {
+class AutoBannerState extends State<AutoBanner> {
+  // Only shuffle for once each load
   bool _displayAll = false;
+  List<int>? shufflePattern;
+  late int _maxDisplay;
+  void Function(bool)? onExpand;
+  List<BannerExtra?>? list;
+
+  // Hardcode the size for better performance and lower overhead
+  static const double bannerHeight = 40;
+
+  @override
+  void initState() {
+    super.initState();
+    onExpand = widget.onExpand;
+    _maxDisplay = widget.maxDisplay;
+  }
+
+  bool updateBannerList() {
+    var newList = AnnouncementRepository.getInstance().getBannerExtras();
+    if (newList == null || newList.isEmpty) {
+      return false;
+    }
+
+    setState(() {
+      list = newList;
+      list!.shuffle();
+    });
+    return true;
+  }
 
   void onTapAction(String action) {
     try {
@@ -59,67 +93,52 @@ class _AutoBannerState extends State<AutoBanner> {
     }
   }
 
-  Widget _buildAllList(List<BannerExtra?> list) {
-    return ListView.builder(
-      scrollDirection: Axis.vertical,
-      shrinkWrap: true,
-      itemCount: list.length,
-      itemBuilder: (context, index) {
-        var bannerExtra = list[index];
-        var elem = SizedByChildBuilder(
-            child: (context, key) => SlimMaterialBanner(
-                  key: key,
-                  icon: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.campaign)
-                      : const Icon(CupertinoIcons.bell_circle),
-                  title: "",
-                  actionName: "",
-                ),
-            builder: (context, size) => ConstrainedBox(
-                constraints: BoxConstraints.loose(Size.fromHeight(size.height)),
-                child: bannerExtra == null
-                    ? Container()
-                    : SlimMaterialBanner(
-                        icon: PlatformX.isMaterial(context)
-                            ? const Icon(Icons.campaign)
-                            : const Icon(CupertinoIcons.bell_circle),
-                        title: bannerExtra.title,
-                        actionName: bannerExtra.actionName,
-                        onTapAction: () => onTapAction(bannerExtra.action))));
-
-        return elem;
-      },
+  Widget _buildAllList() {
+    return ConstrainedBox(
+      constraints:
+          BoxConstraints.loose(Size.fromHeight(bannerHeight * _maxDisplay)),
+      child: ListView.builder(
+        scrollDirection: Axis.vertical,
+        shrinkWrap: true,
+        itemCount: list!.length,
+        itemBuilder: (context, index) {
+          var bannerExtra = list![index];
+          return ConstrainedBox(
+              constraints:
+                  BoxConstraints.loose(const Size.fromHeight(bannerHeight)),
+              child: bannerExtra == null
+                  ? Container()
+                  : SlimMaterialBanner(
+                      icon: PlatformX.isMaterial(context)
+                          ? const Icon(Icons.campaign)
+                          : const Icon(CupertinoIcons.bell_circle),
+                      title: bannerExtra.title,
+                      actionName: bannerExtra.actionName,
+                      onTapAction: () => onTapAction(bannerExtra.action)));
+        },
+      ),
     );
   }
 
-  Widget _buildSingleItem(List<BannerExtra?> list) {
-    return SizedByChildBuilder(
-        child: (context, key) => SlimMaterialBanner(
-              key: key,
-              icon: PlatformX.isMaterial(context)
-                  ? const Icon(Icons.campaign)
-                  : const Icon(CupertinoIcons.bell_circle),
-              title: "",
-              actionName: "",
-            ),
-        builder: (context, size) => ConstrainedBox(
-            constraints: BoxConstraints.loose(Size.fromHeight(size.height)),
-            child: Swiper(
-              itemBuilder: (BuildContext context, int index) {
-                final bannerExtra = list[index];
-                if (bannerExtra == null) return Container();
-                return SlimMaterialBanner(
-                    icon: PlatformX.isMaterial(context)
-                        ? const Icon(Icons.campaign)
-                        : const Icon(CupertinoIcons.bell_circle),
-                    title: bannerExtra.title,
-                    actionName: bannerExtra.actionName,
-                    onTapAction: () => onTapAction(bannerExtra.action));
-              },
-              itemCount: list.length,
-              autoplay: true,
-              autoplayDelay: widget.refreshDuration.inMilliseconds,
-            )));
+  Widget _buildSingleItem() {
+    return ConstrainedBox(
+        constraints: BoxConstraints.loose(const Size.fromHeight(bannerHeight)),
+        child: Swiper(
+          itemBuilder: (BuildContext context, int index) {
+            final bannerExtra = list![index];
+            if (bannerExtra == null) return Container();
+            return SlimMaterialBanner(
+                icon: PlatformX.isMaterial(context)
+                    ? const Icon(Icons.campaign)
+                    : const Icon(CupertinoIcons.bell_circle),
+                title: bannerExtra.title,
+                actionName: bannerExtra.actionName,
+                onTapAction: () => onTapAction(bannerExtra.action));
+          },
+          itemCount: list!.length,
+          autoplay: true,
+          autoplayDelay: widget.refreshDuration.inMilliseconds,
+        ));
   }
 
   @override
@@ -129,21 +148,27 @@ class _AutoBannerState extends State<AutoBanner> {
           if (!bannerEnabled) {
             return Container();
           }
-          List<BannerExtra?>? list =
-              AnnouncementRepository.getInstance().getBannerExtras();
-          if (list == null || list.isEmpty) return Container();
+          list ??= AnnouncementRepository.getInstance().getBannerExtras();
+          // Only update if list is null
+          if (list == null && !updateBannerList()) {
+            return Container();
+          }
+
           // Since the banner is not a fixed size, we need to use [SizedByChildBuilder]
           // to get the height of the banner. Otherwise, [Swiper] will have infinite
           // height bound and throw an exception during build.
           return Column(
             children: [
-              _displayAll ? _buildAllList(list) : _buildSingleItem(list),
+              _displayAll ? _buildAllList() : _buildSingleItem(),
               SizedBox(
                   height: 20,
                   width: double.infinity,
-                  child:  InkWell(
+                  child: InkWell(
                     onTap: () => setState(() {
                       _displayAll = !_displayAll;
+                      if (onExpand != null) {
+                        onExpand!(_displayAll);
+                      }
                     }),
                     child: Icon(_displayAll
                         ? Icons.arrow_drop_up

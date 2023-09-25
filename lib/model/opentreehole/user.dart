@@ -28,6 +28,7 @@ class OTUser {
   int? user_id;
   String? nickname;
   List<int>? favorites;
+  List<int>? subscriptions;
   OTUserPermission? permission;
   OTUserConfig? config;
   String? joined_time;
@@ -41,7 +42,7 @@ class OTUser {
   bool operator ==(Object other) =>
       (other is OTUser) && user_id == other.user_id;
 
-  OTUser(this.user_id, this.nickname, this.favorites, this.is_admin,
+  OTUser(this.user_id, this.nickname, this.favorites, this.subscriptions, this.is_admin,
       this.joined_time, this.config, this.permission);
 
   @override

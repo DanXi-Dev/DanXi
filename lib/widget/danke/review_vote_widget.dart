@@ -15,7 +15,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:flutter/material.dart';
 
 // widget for voting on a review
@@ -61,6 +63,11 @@ class _ReviewVoteWidgetState extends State<ReviewVoteWidget> {
     });
   }
 
+  void errorHandler(dynamic error, stackTrace) {
+    Noticing.showNotice(context, error.toString(),
+        title: S.of(context).operation_failed, useSnackBar: false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -80,10 +87,10 @@ class _ReviewVoteWidgetState extends State<ReviewVoteWidget> {
             ),
             onPressed: () {
               if (_myVote < 0) {
-                //If already downvoted, then cancel the downvote
-                vote(false);
+                // If already downvoted, then cancel the downvote
+                vote(false).onError(errorHandler);
               } else {
-                vote(true);
+                vote(true).onError(errorHandler);
               }
             },
           ),
@@ -107,9 +114,9 @@ class _ReviewVoteWidgetState extends State<ReviewVoteWidget> {
               // if (_myVote != 0) return;
               if (_myVote > 0) {
                 // If already upvoted, then cancel the upvote
-                vote(true);
+                vote(true).onError(errorHandler);
               } else {
-                vote(false);
+                vote(false).onError(errorHandler);
               }
             },
           ),
