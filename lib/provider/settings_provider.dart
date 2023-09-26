@@ -79,11 +79,10 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_THEME_TYPE = "theme_type";
   static const String KEY_MARKDOWN_ENABLED = "markdown_rendering_enabled";
   static const String KEY_VISITED_TIMETABLE = "visited_timetable";
-  static const String KEY_BASE_URL = "https://jwc.fudan.edu.cn";
+  static const String KEY_BASE_URL = "https://www.fduhole.com/api";
   static const String KEY_BASE_AUTH_URL = "https://auth.fduhole.com/api";
   static const String KEY_IMAGE_BASE_URL = "https://image.fduhole.com";
 
-  // todo change all usage
   SettingsProvider._();
 
   /// Get a global instance of [SettingsProvider].
@@ -134,46 +133,58 @@ class SettingsProvider with ChangeNotifier {
   }
 
   /// Set and get _BASE_URL, _BASE_AUTH_URL, _IMAGE_BASE_URL for debug
-  String? get baseUrl {
-    if (preferences!.containsKey(KEY_BASE_URL)) {
-      return preferences!.getString(KEY_BASE_URL)!;
+  String get baseUrl {
+    final String? baseUrl = preferences!.getString(KEY_BASE_URL);
+    if (baseUrl != null) {
+      return baseUrl;
+    } else {
+      return "https://www.fduhole.com/api";
     }
-    return null;
   }
 
   set baseUrl(String? value) {
     if (value != null) {
       preferences!.setString(KEY_BASE_URL, value);
-      notifyListeners();
+    } else {
+      preferences!.setString(KEY_BASE_URL, "https://www.fduhole.com/api");
     }
+    notifyListeners();
   }
 
-  String? get baseAuthUrl {
-    if (preferences!.containsKey(KEY_BASE_AUTH_URL)) {
-      return preferences!.getString(KEY_BASE_AUTH_URL)!;
+  String get baseAuthUrl {
+    final String? baseAuthUrl = preferences!.getString(KEY_BASE_AUTH_URL);
+    if (baseAuthUrl != null) {
+      return baseAuthUrl;
+    } else {
+      return "https://auth.fduhole.com/api";
     }
-    return null;
   }
 
   set baseAuthUrl(String? value) {
     if (value != null) {
       preferences!.setString(KEY_BASE_AUTH_URL, value);
-      notifyListeners();
+    } else {
+      preferences!.setString(KEY_BASE_AUTH_URL, "https://auth.fduhole.com/api");
     }
+    notifyListeners();
   }
 
-  String? get imageBaseUrl {
-    if (preferences!.containsKey(KEY_IMAGE_BASE_URL)) {
-      return preferences!.getString(KEY_IMAGE_BASE_URL)!;
+  String get imageBaseUrl {
+    final String? imageBaseUrl = preferences!.getString(KEY_IMAGE_BASE_URL);
+    if (imageBaseUrl != null) {
+      return imageBaseUrl;
+    } else {
+      return "https://image.fduhole.com";
     }
-    return null;
   }
 
   set imageBaseUrl(String? value) {
     if (value != null) {
       preferences!.setString(KEY_IMAGE_BASE_URL, value);
-      notifyListeners();
+    } else {
+      preferences!.setString(KEY_IMAGE_BASE_URL, "https://image.fduhole.com");
     }
+    notifyListeners();
   }
 
   String? get backgroundImagePath {

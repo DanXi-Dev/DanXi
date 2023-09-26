@@ -52,7 +52,12 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   @override
   void initState() {
     super.initState();
-    diagnoses = [diagnoseFDUHole, diagnoseGoogleAds, diagnoseDanXi];
+    diagnoses = [
+      diagnoseFDUHole,
+      diagnoseGoogleAds,
+      diagnoseDanXi,
+      diagnoseUrl
+    ];
     unawaited(diagnose());
   }
 
@@ -97,6 +102,14 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
 
   static const _IGNORE_KEYS = ["password"];
 
+  Future<void> diagnoseUrl() async {
+    _console.writeln("Base URL: ${SettingsProvider.getInstance().baseUrl}");
+    _console.writeln(
+        "Base Auth URL: ${SettingsProvider.getInstance().baseAuthUrl}");
+    _console.writeln(
+        "Image Base URL: ${SettingsProvider.getInstance().imageBaseUrl}");
+  }
+
   Future<void> diagnoseDanXi() async {
     _console.writeln(
         "User Agent used by DanXi for UIS: ${UserAgentInterceptor.defaultUsedUserAgent}");
@@ -136,7 +149,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   }
 
   Future<void> changeBaseUrl() async {
-    String originalBaseUrl = "https://jwc.fudan.edu.cn";
+    String originalBaseUrl = "https://www.fduhole.com/api";
     String? baseUrl = await Noticing.showInputDialog(context,
         "Input new base url (leave empty to reset to $originalBaseUrl))");
     if (baseUrl == null || !mounted) return;
@@ -145,20 +158,20 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     } else {
       SettingsProvider.getInstance().baseUrl = baseUrl;
     }
-    // Noticing.showNotice(context, "Restart app to take effects");
+    Noticing.showNotice(context, "Restart app to take effects");
   }
 
   Future<void> changeBaseAuthUrl() async {
     String originalBaseAuthUrl = "https://auth.fduhole.com/api";
     String? baseAuthUrl = await Noticing.showInputDialog(context,
-        "Input new base auth url (leave empty to reset to $originalBaseAuthUrl))");
+        "Input new base auth url (leave empty to reset to $originalBaseAuthUrl)");
     if (baseAuthUrl == null || !mounted) return;
     if (baseAuthUrl.isEmpty) {
-      SettingsProvider.getInstance().baseUrl = originalBaseAuthUrl;
+      SettingsProvider.getInstance().baseAuthUrl = originalBaseAuthUrl;
     } else {
-      SettingsProvider.getInstance().baseUrl = baseAuthUrl;
+      SettingsProvider.getInstance().baseAuthUrl = baseAuthUrl;
     }
-    // Noticing.showNotice(context, "Restart app to take effects");
+    Noticing.showNotice(context, "Restart app to take effects");
   }
 
   Future<void> changeImageBaseUrl() async {
@@ -167,11 +180,11 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
         "Input new image base url (leave empty to reset to $originalImageBaseUrl))");
     if (imageBaseUrl == null || !mounted) return;
     if (imageBaseUrl.isEmpty) {
-      SettingsProvider.getInstance().baseUrl = originalImageBaseUrl;
+      SettingsProvider.getInstance().imageBaseUrl = originalImageBaseUrl;
     } else {
-      SettingsProvider.getInstance().baseUrl = imageBaseUrl;
+      SettingsProvider.getInstance().imageBaseUrl = imageBaseUrl;
     }
-    // Noticing.showNotice(context, "Restart app to take effects");
+    Noticing.showNotice(context, "Restart app to take effects");
   }
 
   Future<void> sendMessage() async {
