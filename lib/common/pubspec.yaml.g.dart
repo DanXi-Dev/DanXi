@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'336'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1691072369;
+const int timestamp = 1695302774;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -117,7 +117,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'share_plus': r'^7.0.2',
   'path_provider': r'^2.0.9',
   'screen_brightness': r'^0.2.1',
-  'flutter_email_sender': r'^6.0.0',
+  'flutter_email_sender': r'^6.0.1',
   'auto_size_text': r'^3.0.0',
   'ical': <String, Object>{
     'git': <String, Object>{
@@ -199,6 +199,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter_secure_storage': r'^8.0.0',
   'encrypt_shared_preferences': r'^0.3.5',
   'device_identity': r'^1.0.0',
+  'tutorial_coach_mark': r'^1.2.9',
 };
 
 /// Developer dependencies
