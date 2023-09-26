@@ -151,7 +151,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   Future<void> changeBaseUrl() async {
     String originalBaseUrl = "https://www.fduhole.com/api";
     String? baseUrl = await Noticing.showInputDialog(context,
-        "Input new base url (leave empty to reset to $originalBaseUrl))");
+        "Input new base url (leave empty to reset to $originalBaseUrl)");
     if (baseUrl == null || !mounted) return;
     if (baseUrl.isEmpty) {
       SettingsProvider.getInstance().baseUrl = originalBaseUrl;
