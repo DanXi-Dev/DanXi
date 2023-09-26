@@ -18,7 +18,6 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
-import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/page/danke/course_review_editor.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
@@ -31,14 +30,12 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
   static const String _BASE_URL = "https://danke.fduhole.com/api";
   static const String _BASE_AUTH_URL = "https://auth.fduhole.com/api";
 
-  JWToken? _token;
-
   CurriculumBoardRepository._() {
     dio.interceptors.add(JWTInterceptor(
         "$_BASE_AUTH_URL/refresh",
-        () => _token,
-        (token) =>
-            _token = SettingsProvider.getInstance().fduholeToken = token));
+        () => SettingsProvider.getInstance().fduholeToken,
+        (token) => OpenTreeHoleRepository.getInstance().provider.token =
+            SettingsProvider.getInstance().fduholeToken = token));
     dio.interceptors.add(
         UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
 
@@ -73,28 +70,29 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
 
   Future<CourseReview?> addReview(CourseReviewEditorText review) async {
     Response<Map<String, dynamic>> response = await dio.post(
-        "$_BASE_URL/courses/${review.ratings.courseId}/reviews",
+        "$_BASE_URL/courses/${review.courseId}/reviews",
         data: {
           'title': review.title,
           'content': review.content,
-          'rank': review.ratings.grade
+          'rank': review.grade
         },
         options: Options(headers: _tokenHeader));
     return CourseReview.fromJson(response.data!);
   }
 
-  Future<int?> removeReview(String reviewId, CourseReview newReview) async {
+  Future<int?> removeReview(int reviewId) async {
     Response<String> response = await dio.delete("$_BASE_URL/reviews/$reviewId",
         options: Options(headers: _tokenHeader));
     return response.statusCode;
   }
 
-  Future<int?> modifyReview(String reviewId, CourseReview updatedReview) async {
+  Future<int?> modifyReview(
+      int reviewId, CourseReviewEditorText updatedReview) async {
     Response<String> response = await dio.put("$_BASE_URL/reviews/$reviewId",
         data: {
           'title': updatedReview.title,
           'content': updatedReview.content,
-          'rank': updatedReview.rank
+          'rank': updatedReview.grade
         },
         options: Options(headers: _tokenHeader));
     return response.statusCode;

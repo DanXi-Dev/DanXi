@@ -65,6 +65,9 @@ class Constant {
   static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL =
       "https://auth.fduhole.com/register?type=forget_password";
 
+  static const String OPEN_TREEHOLE_REGISTER_URL =
+      "https://auth.fduhole.com/register";
+
   /// The default start date of a semester.
   static final DEFAULT_SEMESTER_START_DATE = DateTime(2023, 2, 20);
 
@@ -113,7 +116,7 @@ class Constant {
 
   static Future<List<String>> _loadCareWords() async {
     String wordLines =
-    await rootBundle.loadString("assets/texts/care_words.dat");
+        await rootBundle.loadString("assets/texts/care_words.dat");
     return wordLines.split("\n");
   }
 
@@ -152,7 +155,7 @@ class Constant {
       list = AnnouncementRepository.getInstance().getCareWords();
     } catch (_) {}
 
-    if(list != null) {
+    if (list != null) {
       List<String> filterList = list
           .filter((e) => e != null && e.trim().isNotEmpty)
           .map((e) => e!)
@@ -162,7 +165,7 @@ class Constant {
       }
     }
 
-    if (_careWords.isEmpty) _careWords =  await _loadCareWords();
+    if (_careWords.isEmpty) _careWords = await _loadCareWords();
     return _careWords;
   }
 

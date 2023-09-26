@@ -358,6 +358,7 @@
   "recommended_tags_description": "WARNING: This is an experimental feature. Recommendations may be incorrect or inappropriate, and are for reference only. If you find the recommendations inappropriate, please report to dev@fduhole.com .\n\nAll data is processed locally and is not uploaded to our servers.\n\nModel Version: 0.1a (CoreML)\n\nAvailability: iOS 14.0 and higher",
   "refresh": "Refresh",
   "refresh_timetable_for_new_data": "Refresh the timetable to fetch new data",
+  "register_account": "Register new account",
   "registration_succeed": "Registration successful",
   "remove_favorite_hole_confirmation": "Are you sure to remove this favorite?",
   "remove_subscribed_hole_confirmation": "Are you sure to remove this subscription?",

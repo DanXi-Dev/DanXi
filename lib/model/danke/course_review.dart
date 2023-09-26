@@ -129,6 +129,7 @@ class CourseReview {
 
 class CourseSummary {
   String teachers, time;
+  int id;
 
-  CourseSummary(this.teachers, this.time);
+  CourseSummary(this.id, this.teachers, this.time);
 }

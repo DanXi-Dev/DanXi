@@ -76,6 +76,6 @@ class Course {
   }
 
   CourseSummary getSummary() {
-    return CourseSummary(teachers!, formatTime());
+    return CourseSummary(id!, teachers!, formatTime());
   }
 }

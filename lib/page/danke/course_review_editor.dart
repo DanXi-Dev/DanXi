@@ -23,6 +23,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course.dart';
 import 'package:dan_xi/model/danke/course_grade.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
+import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
@@ -76,24 +77,30 @@ final PostInterceptor _kStopWordInterceptor = (context, text) async {
   return true;
 };
 
-class ReviewDetails with ChangeNotifier {
-  int courseId;
-  CourseGrade grade;
+class CourseReviewEditorText with ChangeNotifier {
+  late int courseId;
+  late CourseGrade grade;
+  String? content, title;
 
-  ReviewDetails(this.courseId, this.grade);
+  CourseReviewEditorText(this.content, this.title, this.courseId, this.grade);
 
-  void copyValuesFrom(ReviewDetails other) {
+  void copyValuesFrom(CourseReviewEditorText other) {
     courseId = other.courseId;
     grade = other.grade;
+    content = other.content;
+    title = other.title;
     notifyListeners();
   }
 
+// Eliminite the warning for calling notifyListeners
   void notifyChanges() {
     notifyListeners();
   }
 
   bool isValid() {
-    return courseId >= 0 &&
+    return (content ?? "").isNotEmpty &&
+        (title ?? "").isNotEmpty &&
+        courseId >= 0 &&
         _inRange(grade.overall ?? 0) &&
         _inRange(grade.content ?? 0) &&
         _inRange(grade.workload ?? 0) &&
@@ -102,6 +109,13 @@ class ReviewDetails with ChangeNotifier {
 
   static bool _inRange(int val, [int min = 1, int max = 5]) {
     return val >= min && val <= max;
+  }
+
+  CourseReviewEditorText.newInstance({withContent = '', withTitle = ''}) {
+    content = withContent;
+    title = withTitle;
+    courseId = -1;
+    grade = CourseGrade(0, 0, 0, 0);
   }
 }
 
@@ -112,16 +126,17 @@ class CourseReviewEditor {
     final CourseReviewEditorText? post = await _showEditor(
         context, S.of(context).new_post,
         interceptor: _kStopWordInterceptor.mergeWith(interceptor),
-        courseGroup: courseGroup);
+        courseGroup: courseGroup,
+        isModify: false);
 
-    if (post?.content == null) {
+    if (post == null) {
       return false;
     }
 
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
     try {
-      await CurriculumBoardRepository.getInstance().addReview(post!);
+      await CurriculumBoardRepository.getInstance().addReview(post);
     } catch (e, st) {
       Noticing.showErrorDialog(context, e, trace: st);
       return false;
@@ -136,19 +151,25 @@ class CourseReviewEditor {
   }
 
   static Future<bool> modifyReply(BuildContext context, CourseGroup courseGroup,
-      int? floorId, String? originalContent,
+      CourseReview originalContent,
       {PostInterceptor? interceptor}) async {
-    final String? content = (await _showEditor(
-            context, S.of(context).modify_to("?"),
-            placeholder: originalContent ?? "",
-            interceptor: _kStopWordInterceptor.mergeWith(interceptor),
-            courseGroup: courseGroup))
-        ?.content;
-    if (content == null || content.trim().isEmpty) return false;
+    var placeholder = CourseReviewEditorText(
+        originalContent.content!,
+        originalContent.title!,
+        originalContent.courseInfo.id,
+        originalContent.rank!);
+    final CourseReviewEditorText? content = (await _showEditor(
+        context, S.of(context).modify_to(originalContent.reviewId!),
+        placeholder: placeholder,
+        interceptor: _kStopWordInterceptor.mergeWith(interceptor),
+        courseGroup: courseGroup,
+        isModify: true));
+    if (content == null) return false;
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
     try {
-      await OpenTreeHoleRepository.getInstance().modifyFloor(content, floorId);
+      await CurriculumBoardRepository.getInstance()
+          .modifyReview(originalContent.reviewId!, content);
     } catch (e, st) {
       Noticing.showErrorDialog(context, e,
           trace: st, title: S.of(context).reply_failed);
@@ -186,9 +207,9 @@ class CourseReviewEditor {
   static Future<CourseReviewEditorText?> _showEditor(
       BuildContext context, String title,
       {required CourseGroup courseGroup,
-      String placeholder = "",
-      bool hasTip = true,
-      PostInterceptor? interceptor}) async {
+      CourseReviewEditorText? placeholder,
+      PostInterceptor? interceptor,
+      bool isModify = false}) async {
     final String randomTip = await Constant.randomFDUHoleTip;
 
     // Receive the value with **dynamic** variable to prevent automatic type inference
@@ -199,26 +220,24 @@ class CourseReviewEditor {
           "course_group": courseGroup,
           'placeholder': placeholder,
           'tip': randomTip,
-          'interceptor': interceptor
+          'interceptor': interceptor,
+          'modify': isModify
         });
     return result;
   }
 }
 
 class CourseReviewEditorWidget extends StatefulWidget {
-  final TextEditingController contentController, titleController;
   final bool fullscreen;
   final String? tip;
-  final ReviewDetails ratings;
+  final CourseReviewEditorText review;
 
   const CourseReviewEditorWidget(
       {Key? key,
-      required this.titleController,
-      required this.contentController,
       this.fullscreen = false,
       this.tip,
       required this.courseGroup,
-      required this.ratings})
+      required this.review})
       : super(key: key);
 
   final CourseGroup courseGroup;
@@ -229,24 +248,26 @@ class CourseReviewEditorWidget extends StatefulWidget {
 }
 
 class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
-  late ReviewDetails ratings;
+  late CourseReviewEditorText review;
+  final GlobalKey<DropdownListWidgetState<Course>> _timeSelectorKey =
+      GlobalKey<DropdownListWidgetState<Course>>();
+  final GlobalKey<DropdownListWidgetState<String>> _teacherSelectorKey =
+      GlobalKey<DropdownListWidgetState<String>>();
+  late TextEditingController contentController, titleController;
 
   @override
   void initState() {
     super.initState();
-    ratings = widget.ratings;
+    review = widget.review;
+    contentController = TextEditingController(text: review.content);
+    titleController = TextEditingController(text: review.title);
   }
 
   @override
   void didUpdateWidget(covariant CourseReviewEditorWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    ratings = widget.ratings;
+    review = widget.review;
   }
-
-  final GlobalKey<DropdownListWidgetState<Course>> _timeSelectorKey =
-      GlobalKey<DropdownListWidgetState<Course>>();
-  final GlobalKey<DropdownListWidgetState<String>> _teacherSelectorKey =
-      GlobalKey<DropdownListWidgetState<String>>();
 
   ValueNotifier<String> teacherFilterNotifier = ValueNotifier("*");
   Course? currentCourse;
@@ -291,12 +312,16 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
               ? const InputDecoration(border: InputBorder.none)
               : const InputDecoration(
                   border: OutlineInputBorder(gapPadding: 2.0))),
-      controller: widget.contentController,
       keyboardType: TextInputType.multiline,
       maxLines: widget.fullscreen ? null : 5,
       expands: widget.fullscreen,
       autofocus: true,
       textAlignVertical: TextAlignVertical.top,
+      controller: contentController,
+      onChanged: (p0) {
+        review.content = p0;
+        review.notifyChanges();
+      },
     );
 
     if (widget.fullscreen) {
@@ -304,9 +329,12 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
     }
 
     int index = widget.courseGroup.courseList!
-        .indexWhere((element) => element.id == ratings.courseId);
+        .indexWhere((element) => element.id == review.courseId);
     Course? selectedCourse =
         index >= 0 ? widget.courseGroup.courseList![index] : null;
+    if (selectedCourse != null) {
+      teacherFilterNotifier.value = selectedCourse.teachers!;
+    }
 
     return SingleChildScrollView(
       child: Column(
@@ -353,8 +381,8 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                               hintText: S.of(context).curriculum_select_time,
                               labelText: S.of(context).course_schedule,
                               onChanged: (e) {
-                                ratings.courseId = e!.id!;
-                                ratings.notifyChanges();
+                                review.courseId = e!.id!;
+                                review.notifyChanges();
                               },
                               itemBuilder: (e) => DropdownMenuItem(
                                   value: e, child: Text(e.formatTime()))),
@@ -367,12 +395,16 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
               material: (_, __) => MaterialTextFieldData(
                   decoration: const InputDecoration(
                       border: OutlineInputBorder(gapPadding: 2.0))),
-              controller: widget.titleController,
               keyboardType: TextInputType.multiline,
               maxLines: 1,
               expands: false,
               autofocus: true,
               textAlignVertical: TextAlignVertical.top,
+              onChanged: (p0) {
+                review.title = p0;
+                review.notifyChanges();
+              },
+              controller: titleController,
             ),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -399,36 +431,36 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
             CourseRatingWidget(
               label: S.of(context).curriculum_ratings_overall,
               words: overallWord!,
-              initialRating: ratings.grade.overall,
+              initialRating: review.grade.overall,
               onRate: (e) {
-                ratings.grade.overall = e;
-                ratings.notifyChanges();
+                review.grade.overall = e;
+                review.notifyChanges();
               },
             ),
             CourseRatingWidget(
                 label: S.of(context).curriculum_ratings_content,
                 words: contentWord!,
-                initialRating: ratings.grade.content,
+                initialRating: review.grade.content,
                 onRate: (e) {
-                  ratings.grade.content = e;
-                  ratings.notifyChanges();
+                  review.grade.content = e;
+                  review.notifyChanges();
                 }),
             CourseRatingWidget(
               label: S.of(context).curriculum_ratings_workload,
               words: workloadWord!,
-              initialRating: ratings.grade.workload,
+              initialRating: review.grade.workload,
               onRate: (e) {
-                ratings.grade.workload = e;
-                ratings.notifyChanges();
+                review.grade.workload = e;
+                review.notifyChanges();
               },
             ),
             CourseRatingWidget(
               label: S.of(context).curriculum_ratings_assessment,
               words: assessmentWord!,
-              initialRating: ratings.grade.assessment,
+              initialRating: review.grade.assessment,
               onRate: (e) {
-                ratings.grade.assessment = e;
-                ratings.notifyChanges();
+                review.grade.assessment = e;
+                review.notifyChanges();
               },
             ),
             const Divider(),
@@ -440,7 +472,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                 builder: (context, value, child) => smartRender(
                     context, value.text, null, null, false,
                     preview: true),
-                valueListenable: widget.contentController,
+                valueListenable: contentController,
               ),
             ),
           ]),
@@ -580,18 +612,6 @@ class CourseRatingWidgetState extends State<CourseRatingWidget> {
   }
 }
 
-class CourseReviewEditorText {
-  String? content, title;
-  ReviewDetails ratings = ReviewDetails(-1, CourseGrade(0, 0, 0, 0));
-
-  CourseReviewEditorText(this.content, this.title, this.ratings);
-
-  CourseReviewEditorText.newInstance({withContent = '', withTitle = ''}) {
-    content = withContent;
-    title = withTitle;
-  }
-}
-
 /// An full-screen editor page.
 ///
 /// Arguments:
@@ -610,19 +630,17 @@ class CourseReviewEditorPage extends StatefulWidget {
 }
 
 class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
-  final _contentController = TextEditingController(),
-      _titleController = TextEditingController();
-  final ReviewDetails ratings = ReviewDetails(-1, CourseGrade(0, 0, 0, 0));
+  final CourseReviewEditorText review = CourseReviewEditorText.newInstance();
 
   /// Whether the send button is enabled
   final bool _canSend = true;
 
   bool _isFullscreen = false;
   bool _confirmCareWords = false;
+  bool _isModify = false;
 
   String? _tip;
   late String _title;
-  late String _placeholder;
   late CourseGroup _courseGroup;
 
   PostInterceptor? _interceptor;
@@ -630,34 +648,6 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
   @override
   void initState() {
     super.initState();
-
-    _contentController.addListener(() {
-      context
-          .read<FDUHoleProvider>()
-          .courseReviewEditorCache[_courseGroup.code]!
-          .content = _contentController.text;
-    });
-
-    _titleController.addListener(() {
-      context
-          .read<FDUHoleProvider>()
-          .courseReviewEditorCache[_courseGroup.code]!
-          .title = _titleController.text;
-    });
-
-    ratings.addListener(() {
-      context
-          .read<FDUHoleProvider>()
-          .courseReviewEditorCache[_courseGroup.code]!
-          .ratings
-          .copyValuesFrom(ratings);
-    });
-  }
-
-  @override
-  void dispose() {
-    _contentController.dispose();
-    super.dispose();
   }
 
   @override
@@ -667,30 +657,37 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
     _tip = widget.arguments!['tip'];
     _title =
         widget.arguments!['title'] ?? S.of(context).forum_post_enter_content;
-    _placeholder = widget.arguments!['placeholder'];
-    if (context
-        .read<FDUHoleProvider>()
-        .courseReviewEditorCache
-        .containsKey(_courseGroup.code)) {
-      _titleController.text = context
-          .read<FDUHoleProvider>()
-          .courseReviewEditorCache[_courseGroup.code]!
-          .title!;
-      _contentController.text = context
-          .read<FDUHoleProvider>()
-          .courseReviewEditorCache[_courseGroup.code]!
-          .content!;
-      ratings.copyValuesFrom(context
-          .read<FDUHoleProvider>()
-          .courseReviewEditorCache[_courseGroup.code]!
-          .ratings);
+    _isModify = widget.arguments!['modify'] ?? false;
+
+    // When modifying, do not copy
+    if (_isModify) {
+      if (widget.arguments!.containsKey('placeholder') &&
+          widget.arguments!['placeholder'] is CourseReviewEditorText) {
+        review.copyValuesFrom(
+            widget.arguments!['placeholder'] as CourseReviewEditorText);
+      }
     } else {
-      context
-              .read<FDUHoleProvider>()
-              .courseReviewEditorCache[_courseGroup.code] =
-          CourseReviewEditorText.newInstance(withContent: _placeholder);
-      _contentController.text = _placeholder;
+      review.addListener(() {
+        context
+            .read<FDUHoleProvider>()
+            .courseReviewEditorCache[_courseGroup.code]!
+            .copyValuesFrom(review);
+      });
+      if (context
+          .read<FDUHoleProvider>()
+          .courseReviewEditorCache
+          .containsKey(_courseGroup.code)) {
+        review.copyValuesFrom(context
+            .read<FDUHoleProvider>()
+            .courseReviewEditorCache[_courseGroup.code]!);
+      } else {
+        context
+                .read<FDUHoleProvider>()
+                .courseReviewEditorCache[_courseGroup.code] =
+            CourseReviewEditorText.newInstance();
+      }
     }
+
     super.didChangeDependencies();
   }
 
@@ -722,7 +719,7 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
             onPressed: _canSend
                 ? () async {
                     bool isCareWordsDetected =
-                        await detectCareWords(_contentController.text);
+                        await detectCareWords(review.content!);
                     // only show once
                     if (context.mounted == true &&
                         isCareWordsDetected == true &&
@@ -743,24 +740,18 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
           child: Padding(
               padding: const EdgeInsets.all(8),
               child: CourseReviewEditorWidget(
-                contentController: _contentController,
-                titleController: _titleController,
-                fullscreen: _isFullscreen,
-                tip: _tip,
-                courseGroup: _courseGroup,
-                ratings: ratings,
-              ))),
+                  fullscreen: _isFullscreen,
+                  tip: _tip,
+                  courseGroup: _courseGroup,
+                  review: review))),
     );
   }
 
   Future<void> _sendDocument() async {
-    String text = _contentController.text;
-    String title = _titleController.text;
-    if (text.isEmpty || title.isEmpty || !ratings.isValid()) return;
-    final editorText = CourseReviewEditorText(text, title, ratings);
+    if (!review.isValid()) return;
 
-    if ((await _interceptor?.call(context, editorText)) ?? true) {
-      Navigator.pop<CourseReviewEditorText>(context, editorText);
+    if ((await _interceptor?.call(context, review)) ?? true) {
+      Navigator.pop<CourseReviewEditorText>(context, review);
     }
   }
 }

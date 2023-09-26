@@ -16,21 +16,28 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/danke/course_group.dart';
+import 'package:dan_xi/page/danke/course_review_editor.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
+import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:dan_xi/widget/danke/review_vote_widget.dart';
+import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:dan_xi/model/danke/course_review.dart';
 
 class CourseReviewWidget extends StatelessWidget {
   final CourseReview review;
+  final CourseGroup courseGroup;
 
   // changeable style of the card
   final bool translucent;
 
   const CourseReviewWidget(
-      {Key? key, required this.review, this.translucent = false})
+      {Key? key, required this.review, required this.courseGroup, this.translucent = false})
       : super(key: key);
 
   @override
@@ -93,16 +100,24 @@ class CourseReviewWidget extends StatelessWidget {
                                 ),
                                 const Divider(),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 2),
-                                  child: ReviewFooter(
-                                    overallLevel: review.rank!.overall! - 1,
-                                    styleLevel: review.rank!.content! - 1,
-                                    workloadLevel: review.rank!.workload! - 1,
-                                    assessmentLevel:
-                                        review.rank!.assessment! - 1,
-                                  ),
-                                ),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 2),
+                                    child: Row(
+                                      children: [
+                                      Expanded(
+                                        child: ReviewFooter(
+                                          overallLevel:
+                                              review.rank!.overall! - 1,
+                                          styleLevel: review.rank!.content! - 1,
+                                          workloadLevel:
+                                              review.rank!.workload! - 1,
+                                          assessmentLevel:
+                                              review.rank!.assessment! - 1,
+                                        ),
+                                      ),
+                                      if (review.isMe!)
+                                        ModifyMenuWidget(originalReview: review, courseGroup: courseGroup,)
+                                    ])),
                               ],
                             ),
                           ),
@@ -228,12 +243,11 @@ class ReviewFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     const labelStyle = TextStyle(color: Colors.grey, fontSize: 12);
 
-    return Column(
-      children: [
+    return 
         Wrap(
           spacing: 20,
           runSpacing: 6,
-          alignment: WrapAlignment.spaceBetween,
+          alignment: WrapAlignment.start,
           children: [
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -295,6 +309,82 @@ class ReviewFooter extends StatelessWidget {
               ],
             )
           ],
+        );
+  }
+}
+
+class ModifyMenuWidget extends StatefulWidget {
+  const ModifyMenuWidget(
+      {super.key, required this.originalReview, required this.courseGroup});
+  final CourseReview originalReview;
+  final CourseGroup courseGroup;
+
+  @override
+  ModifyMenuWidgetState createState() => ModifyMenuWidgetState();
+}
+
+class ModifyMenuWidgetState extends State<ModifyMenuWidget> {
+  ActionItem? selectedActionItem;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<ActionItem>(
+      icon: Icon(
+        CupertinoIcons.ellipsis_circle,
+        color: Theme.of(context).primaryColor,
+        size: 16,
+      ),
+      initialValue: selectedActionItem,
+      // Callback that sets the selected popup menu item.
+      onSelected: (ActionItem item) async {
+        setState(() {
+          selectedActionItem = item;
+        });
+        if (item == ActionItem.Modify) {
+          if (await CourseReviewEditor.modifyReply(
+              context, widget.courseGroup, widget.originalReview)) {
+            if (!context.mounted) return;
+            Noticing.showMaterialNotice(context, S.of(context).request_success);
+          }
+        } else if (item == ActionItem.Delete) {
+          if (!context.mounted) return;
+          if (await Noticing.showConfirmationDialog(
+                  context, S.of(context).about_to_delete_floor("null"),
+                  title: S.of(context).are_you_sure,
+                  isConfirmDestructive: true) ==
+              true) {
+            try {
+              await CurriculumBoardRepository.getInstance()
+                  .removeReview(widget.originalReview.reviewId!);
+            } catch (e, st) {
+              if (!context.mounted) return;
+              Noticing.showErrorDialog(context, e, trace: st);
+            }
+          }
+        }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<ActionItem>>[
+        PopupMenuItem<ActionItem>(
+          value: ActionItem.Modify,
+          child: OTFloorWidgetBottomBarButton(
+            icon: Icon(
+              CupertinoIcons.pencil,
+              color: Theme.of(context).hintColor,
+              size: 12,
+            ),
+            text: S.of(context).modify,
+          ),
+        ),
+        PopupMenuItem<ActionItem>(
+          value: ActionItem.Delete,
+          child: OTFloorWidgetBottomBarButton(
+            text: S.of(context).delete,
+            icon: Icon(
+              CupertinoIcons.trash,
+              color: Theme.of(context).hintColor,
+              size: 12,
+            ),
+          ),
         ),
       ],
     );

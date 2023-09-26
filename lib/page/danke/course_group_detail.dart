@@ -472,6 +472,9 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   Widget _getListItems(BuildContext context,
       ListProvider<CourseReview> dataProvider, int index, CourseReview review,
       {bool isNested = false}) {
-    return CourseReviewWidget(review: review);
+    return CourseReviewWidget(
+      review: review,
+      courseGroup: _courses!,
+    );
   }
 }
