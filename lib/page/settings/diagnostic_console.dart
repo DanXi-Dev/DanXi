@@ -103,9 +103,10 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   static const _IGNORE_KEYS = ["password"];
 
   Future<void> diagnoseUrl() async {
-    _console.writeln("Base URL: ${SettingsProvider.getInstance().baseUrl}");
+    _console
+        .writeln("Base URL: ${SettingsProvider.getInstance().fduholeBaseUrl}");
     _console.writeln(
-        "Base Auth URL: ${SettingsProvider.getInstance().baseAuthUrl}");
+        "Base Auth URL: ${SettingsProvider.getInstance().authBaseUrl}");
     _console.writeln(
         "Image Base URL: ${SettingsProvider.getInstance().imageBaseUrl}");
   }
@@ -149,38 +150,35 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   }
 
   Future<void> changeBaseUrl() async {
-    String originalBaseUrl = "https://www.fduhole.com/api";
-    String? baseUrl = await Noticing.showInputDialog(context,
-        "Input new base url (leave empty to reset to $originalBaseUrl)");
-    if (baseUrl == null || !mounted) return;
-    if (baseUrl.isEmpty) {
-      SettingsProvider.getInstance().baseUrl = originalBaseUrl;
+    String? fduholeBaseUrl = await Noticing.showInputDialog(context,
+        "Input new base url (leave empty to reset to ${Constant.FDUHOLE_BASE_URL})");
+    if (fduholeBaseUrl == null || !mounted) return;
+    if (fduholeBaseUrl.isEmpty) {
+      SettingsProvider.getInstance().fduholeBaseUrl = Constant.FDUHOLE_BASE_URL;
     } else {
-      SettingsProvider.getInstance().baseUrl = baseUrl;
+      SettingsProvider.getInstance().fduholeBaseUrl = fduholeBaseUrl;
     }
     Noticing.showNotice(context, "Restart app to take effects");
   }
 
   Future<void> changeBaseAuthUrl() async {
-    String originalBaseAuthUrl = "https://auth.fduhole.com/api";
     String? baseAuthUrl = await Noticing.showInputDialog(context,
-        "Input new base auth url (leave empty to reset to $originalBaseAuthUrl)");
+        "Input new base auth url (leave empty to reset to ${Constant.AUTH_BASE_URL})");
     if (baseAuthUrl == null || !mounted) return;
     if (baseAuthUrl.isEmpty) {
-      SettingsProvider.getInstance().baseAuthUrl = originalBaseAuthUrl;
+      SettingsProvider.getInstance().authBaseUrl = Constant.AUTH_BASE_URL;
     } else {
-      SettingsProvider.getInstance().baseAuthUrl = baseAuthUrl;
+      SettingsProvider.getInstance().authBaseUrl = baseAuthUrl;
     }
     Noticing.showNotice(context, "Restart app to take effects");
   }
 
   Future<void> changeImageBaseUrl() async {
-    String originalImageBaseUrl = "https://image.fduhole.com";
     String? imageBaseUrl = await Noticing.showInputDialog(context,
-        "Input new image base url (leave empty to reset to $originalImageBaseUrl))");
+        "Input new image base url (leave empty to reset to ${Constant.IMAGE_BASE_URL}))");
     if (imageBaseUrl == null || !mounted) return;
     if (imageBaseUrl.isEmpty) {
-      SettingsProvider.getInstance().imageBaseUrl = originalImageBaseUrl;
+      SettingsProvider.getInstance().imageBaseUrl = Constant.IMAGE_BASE_URL;
     } else {
       SettingsProvider.getInstance().imageBaseUrl = imageBaseUrl;
     }
