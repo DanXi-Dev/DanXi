@@ -73,7 +73,7 @@ class Constant {
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
   static const String UIS_HOST = "uis.fudan.edu.cn";
 
-  /// The default urls of the OpenTreeHoleRepository
+  /// The default URLs of [OpenTreeHoleRepository].
   ///
   static const String FDUHOLE_BASE_URL = "https://www.fduhole.com/api";
   static const String AUTH_BASE_URL = "https://auth.fduhole.com/api";
