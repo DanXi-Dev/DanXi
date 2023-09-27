@@ -854,7 +854,7 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                   (floor.liked ?? false)
                       ? CupertinoIcons.hand_thumbsup_fill
                       : CupertinoIcons.hand_thumbsup,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).textTheme.bodyLarge!.color,
                   size: 16,
                 ),
               ),
@@ -879,14 +879,14 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                   (floor.disliked ?? false)
                       ? CupertinoIcons.hand_thumbsdown_fill
                       : CupertinoIcons.hand_thumbsdown,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).textTheme.bodyLarge!.color,
                   size: 16,
                 ),
               ),
               PopupMenuButton<ActionItem>(
                 icon: Icon(
                   CupertinoIcons.ellipsis_circle,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).textTheme.bodyLarge!.color,
                   size: 16,
                 ),
                 initialValue: selectedActionItem,

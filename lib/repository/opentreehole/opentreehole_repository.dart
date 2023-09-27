@@ -46,8 +46,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   factory OpenTreeHoleRepository.getInstance() => _instance;
 
-  static const String _BASE_URL = "https://www.fduhole.com/api";
-  static const String _BASE_AUTH_URL = "https://auth.fduhole.com/api";
+  static const String _BASE_URL = Constant.IS_PRODUCTION_SERVER
+      ? "https://www.fduhole.com/api"
+      : "https://www.fduhole.jingyijun.xyz:${Constant.DEV_PORT}/api";
+  static const String _BASE_AUTH_URL = Constant.IS_PRODUCTION_SERVER
+      ? "https://auth.fduhole.com/api"
+      : "https://auth.fduhole.jingyijun.xyz:${Constant.DEV_PORT}/api";
   static const String _IMAGE_BASE_URL = "https://image.fduhole.com";
 
   late FDUHoleProvider provider;

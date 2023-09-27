@@ -37,7 +37,10 @@ class CourseReviewWidget extends StatelessWidget {
   final bool translucent;
 
   const CourseReviewWidget(
-      {Key? key, required this.review, required this.courseGroup, this.translucent = false})
+      {Key? key,
+      required this.review,
+      required this.courseGroup,
+      this.translucent = false})
       : super(key: key);
 
   @override
@@ -102,8 +105,7 @@ class CourseReviewWidget extends StatelessWidget {
                                 Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 10, vertical: 2),
-                                    child: Row(
-                                      children: [
+                                    child: Row(children: [
                                       Expanded(
                                         child: ReviewFooter(
                                           overallLevel:
@@ -116,7 +118,10 @@ class CourseReviewWidget extends StatelessWidget {
                                         ),
                                       ),
                                       if (review.isMe!)
-                                        ModifyMenuWidget(originalReview: review, courseGroup: courseGroup,)
+                                        ModifyMenuWidget(
+                                          originalReview: review,
+                                          courseGroup: courseGroup,
+                                        )
                                     ])),
                               ],
                             ),
@@ -190,20 +195,6 @@ class ReviewHeader extends StatelessWidget {
               ],
             ),
           )),
-
-          /*
-        
-        */
-          // review content
-          // Padding(
-          //   padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-          //   child: Text(
-          //     reviewContent,
-          //     style: TextStyle(
-          //         color: Theme.of(context).textTheme.bodyText1?.color,
-          //         fontSize: 12),
-          //   ),
-          // )
         ],
       ),
       const SizedBox(height: 4),
@@ -243,73 +234,66 @@ class ReviewFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     const labelStyle = TextStyle(color: Colors.grey, fontSize: 12);
 
-    return 
-        Wrap(
-          spacing: 20,
-          runSpacing: 6,
-          alignment: WrapAlignment.start,
+    return Wrap(
+      spacing: 20,
+      runSpacing: 6,
+      alignment: WrapAlignment.start,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(S.of(context).curriculum_ratings_overall,
-                    style: labelStyle),
-                const SizedBox(
-                  width: 6,
-                ),
-                Text(
-                  overallWord![overallLevel],
-                  style:
-                      TextStyle(color: wordColor[overallLevel], fontSize: 12),
-                )
-              ],
+            Text(S.of(context).curriculum_ratings_overall, style: labelStyle),
+            const SizedBox(
+              width: 6,
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(S.of(context).curriculum_ratings_content,
-                    style: labelStyle),
-                const SizedBox(
-                  width: 6,
-                ),
-                Text(
-                  contentWord![styleLevel],
-                  style: TextStyle(color: wordColor[styleLevel], fontSize: 12),
-                )
-              ],
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(S.of(context).curriculum_ratings_workload,
-                    style: labelStyle),
-                const SizedBox(
-                  width: 6,
-                ),
-                Text(
-                  workloadWord![workloadLevel],
-                  style:
-                      TextStyle(color: wordColor[workloadLevel], fontSize: 12),
-                )
-              ],
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(S.of(context).curriculum_ratings_assessment,
-                    style: labelStyle),
-                const SizedBox(
-                  width: 6,
-                ),
-                Text(
-                  assessmentWord![assessmentLevel],
-                  style: TextStyle(
-                      color: wordColor[assessmentLevel], fontSize: 12),
-                )
-              ],
+            Text(
+              overallWord![overallLevel],
+              style: TextStyle(color: wordColor[overallLevel], fontSize: 12),
             )
           ],
-        );
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(S.of(context).curriculum_ratings_content, style: labelStyle),
+            const SizedBox(
+              width: 6,
+            ),
+            Text(
+              contentWord![styleLevel],
+              style: TextStyle(color: wordColor[styleLevel], fontSize: 12),
+            )
+          ],
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(S.of(context).curriculum_ratings_workload, style: labelStyle),
+            const SizedBox(
+              width: 6,
+            ),
+            Text(
+              workloadWord![workloadLevel],
+              style: TextStyle(color: wordColor[workloadLevel], fontSize: 12),
+            )
+          ],
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(S.of(context).curriculum_ratings_assessment,
+                style: labelStyle),
+            const SizedBox(
+              width: 6,
+            ),
+            Text(
+              assessmentWord![assessmentLevel],
+              style: TextStyle(color: wordColor[assessmentLevel], fontSize: 12),
+            )
+          ],
+        )
+      ],
+    );
   }
 }
 
@@ -331,7 +315,7 @@ class ModifyMenuWidgetState extends State<ModifyMenuWidget> {
     return PopupMenuButton<ActionItem>(
       icon: Icon(
         CupertinoIcons.ellipsis_circle,
-        color: Theme.of(context).primaryColor,
+        color: Theme.of(context).textTheme.bodyLarge!.color,
         size: 16,
       ),
       initialValue: selectedActionItem,

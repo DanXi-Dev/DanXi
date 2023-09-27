@@ -27,8 +27,12 @@ import 'package:dan_xi/util/opentreehole/jwt_interceptor.dart';
 import 'package:dio/dio.dart';
 
 class CurriculumBoardRepository extends BaseRepositoryWithDio {
-  static const String _BASE_URL = "https://danke.fduhole.com/api";
-  static const String _BASE_AUTH_URL = "https://auth.fduhole.com/api";
+  static const String _BASE_URL = Constant.IS_PRODUCTION_SERVER
+      ? "https://danke.fduhole.com/api"
+      : "https://danke.fduhole.jingyijun.xyz:${Constant.DEV_PORT}/api";
+  static const String _BASE_AUTH_URL = Constant.IS_PRODUCTION_SERVER
+      ? "https://auth.fduhole.com/api"
+      : "https://auth.fduhole.jingyijun.xyz:${Constant.DEV_PORT}/api";
 
   CurriculumBoardRepository._() {
     dio.interceptors.add(JWTInterceptor(

@@ -26,13 +26,12 @@ import 'package:dan_xi/widget/danke/course_search_bar.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
+import 'package:dan_xi/widget/danke/random_review_widgets.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
-
-import '../widget/danke/random_review_widgets.dart';
 
 class DankeSubPage extends PlatformSubpage<DankeSubPage> {
   @override

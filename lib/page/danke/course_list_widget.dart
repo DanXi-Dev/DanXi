@@ -45,16 +45,16 @@ class CourseListWidgetState extends State<CourseListWidget> {
 
   XSharedPreferences? pref;
 
-  Future<List<CourseGroup>?> _fetchMegaList() async {
+  Future<List<CourseGroup>?> _fetchMegaList({bool forceRefetch = false}) async {
     pref ??= await XSharedPreferences.getInstance();
 
     // List is LARGE, avoid deserializing for a second time
-    if (_groups != null) {
+    if (_groups != null && !forceRefetch) {
       return _groups;
     }
 
     String? coursesJson;
-    if (pref!.containsKey("course_groups")) {
+    if (pref!.containsKey("course_groups") && !forceRefetch) {
       coursesJson = pref!.getString("course_groups");
     } else {
       coursesJson =
@@ -77,7 +77,7 @@ class CourseListWidgetState extends State<CourseListWidget> {
           ? _groups.filter((element) => element.code!.contains(searchPattern))
           : _groups.filter((element) => element.name!.contains(searchPattern));
     } else {
-// This shall not happen
+      // This shall not happen
       return _groups!.take(20).toList();
     }
   }
@@ -85,9 +85,7 @@ class CourseListWidgetState extends State<CourseListWidget> {
   @override
   void initState() {
     super.initState();
-    setState(() {
-      searchKeyword = widget.searchKeyword;
-    });
+    searchKeyword = widget.searchKeyword;
   }
 
   @override

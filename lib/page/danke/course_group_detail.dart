@@ -101,18 +101,20 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   Future<List<CourseReview>?> _loadContent() async {
     List<CourseReview> result = [];
     for (var elem in _courses!.courseList!) {
-      result += elem.reviewList!.filter((element) {
-        if (teacherFilter != "*" &&
-            element.courseInfo.teachers != teacherFilter) {
-          return false;
-        }
+      if (elem.reviewList != null) {
+        result += elem.reviewList!.filter((element) {
+          if (teacherFilter != "*" &&
+              element.courseInfo.teachers != teacherFilter) {
+            return false;
+          }
 
-        if (timeFilter != "*" && element.courseInfo.time != timeFilter) {
-          return false;
-        }
+          if (timeFilter != "*" && element.courseInfo.time != timeFilter) {
+            return false;
+          }
 
-        return true;
-      });
+          return true;
+        });
+      }
     }
 
     return result;
@@ -178,11 +180,13 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
     for (var elem in _courses!.courseList!) {
       teacherSet.add(elem.teachers!);
       timeSet.add(elem.formatTime());
-      scoreCount += elem.reviewList!.length;
+      if (elem.reviewList != null) {
+        scoreCount += elem.reviewList!.length;
 
-      for (var rev in elem.reviewList!) {
-        rev.linkCourse(elem.getSummary());
-        totalScore += rev.rank!.overall!;
+        for (var rev in elem.reviewList!) {
+          rev.linkCourse(elem.getSummary());
+          totalScore += rev.rank!.overall!;
+        }
       }
     }
     averageOverallLevel = (scoreCount > 0 ? (totalScore ~/ scoreCount) : 0) - 1;

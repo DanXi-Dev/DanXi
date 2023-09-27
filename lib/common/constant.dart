@@ -56,17 +56,24 @@ class Constant {
   ///
   /// Note that this is not the same as the user agent used by the WebView, or the
   /// treehole's [Dio]. Those two are set by WebView and [OpenTreeHoleRepository].
-  static String get DEFAULT_USER_AGENT =>
+  static const String DEFAULT_USER_AGENT =
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36";
 
   static const String APPSTORE_APPID = '1568629997';
 
-  /// A link to the "forget password" page of FDUHole.
-  static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL =
-      "https://auth.fduhole.com/register?type=forget_password";
+  // For convenient switch from dev server to production server
+  static const bool IS_PRODUCTION_SERVER = true;
+  // TODO: Clear this before every commit
+  static const String DEV_PORT = "";
 
-  static const String OPEN_TREEHOLE_REGISTER_URL =
-      "https://auth.fduhole.com/register";
+  /// A link to the "forget password" page of FDUHole.
+  static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL = IS_PRODUCTION_SERVER
+      ? "https://auth.fduhole.com/register?type=forget_password"
+      : "https://auth.fduhole.jingyijun.xyz:$DEV_PORT/register?type=forget_password";
+
+  static const String OPEN_TREEHOLE_REGISTER_URL = IS_PRODUCTION_SERVER
+      ? "https://auth.fduhole.com/register"
+      : "https://auth.fduhole.jingyijun.xyz:$DEV_PORT/register";
 
   /// The default start date of a semester.
   static final DEFAULT_SEMESTER_START_DATE = DateTime(2023, 2, 20);
