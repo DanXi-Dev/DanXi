@@ -73,6 +73,12 @@ class Constant {
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
   static const String UIS_HOST = "uis.fudan.edu.cn";
 
+  /// The default urls of the OpenTreeHoleRepository
+  ///
+  static const String FDUHOLE_BASE_URL = "https://www.fduhole.com/api";
+  static const String AUTH_BASE_URL = "https://auth.fduhole.com/api";
+  static const String IMAGE_BASE_URL = "https://image.fduhole.com";
+
   static const LINKIFY_THEME =
       TextStyle(color: Colors.blue, decoration: TextDecoration.none);
 
@@ -113,7 +119,7 @@ class Constant {
 
   static Future<List<String>> _loadCareWords() async {
     String wordLines =
-    await rootBundle.loadString("assets/texts/care_words.dat");
+        await rootBundle.loadString("assets/texts/care_words.dat");
     return wordLines.split("\n");
   }
 
@@ -152,7 +158,7 @@ class Constant {
       list = AnnouncementRepository.getInstance().getCareWords();
     } catch (_) {}
 
-    if(list != null) {
+    if (list != null) {
       List<String> filterList = list
           .filter((e) => e != null && e.trim().isNotEmpty)
           .map((e) => e!)
@@ -162,7 +168,7 @@ class Constant {
       }
     }
 
-    if (_careWords.isEmpty) _careWords =  await _loadCareWords();
+    if (_careWords.isEmpty) _careWords = await _loadCareWords();
     return _careWords;
   }
 

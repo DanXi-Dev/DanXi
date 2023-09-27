@@ -46,9 +46,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   factory OpenTreeHoleRepository.getInstance() => _instance;
 
-  static final String _BASE_URL = SettingsProvider.getInstance().baseUrl;
+  static final String _BASE_URL = SettingsProvider.getInstance().fduholeBaseUrl;
   static final String _BASE_AUTH_URL =
-      SettingsProvider.getInstance().baseAuthUrl;
+      SettingsProvider.getInstance().fduholeBaseUrl;
   static final String _IMAGE_BASE_URL =
       SettingsProvider.getInstance().imageBaseUrl;
 
