@@ -320,7 +320,7 @@
   "project_page": "项目网页",
   "punishment_history_of": "##{name} 的封禁历史",
   "push_notification_reg_failed": "推送通知注册失败",
-  "push_notification_reg_failed_des": "您可能暂时无法收到推动通知\n错误：{error}",
+  "push_notification_reg_failed_des": "您可能暂时无法收到推送通知\n错误：{error}",
   "quote": "引用",
   "qr_code_terms_not_agreed": "需要接受条款",
   "rank": "排名",
@@ -494,5 +494,6 @@
   "manually_add_course":"手动添加课程:",
   "manually_add_course_message":"是否有课未收录在课表上，但你又想查看的呢，自己手动添加它吧。",
   "start_date_select": "学期开始日期查询:",
-  "start_date_select_message": "必须选择学期的开始日期才能查看你的课表。不选择将导致日期错误。\n提示:开始日期是第一周的周一。"
+  "start_date_select_message": "必须选择学期的开始日期才能查看你的课表。不选择将导致日期错误。\n提示:开始日期是第一周的周一。",
+  "empty_classroom_warning": "未连接到校园内网，教室使用情况可能不准确。\n请连接到校园内网以获取准确的信息。"
 }

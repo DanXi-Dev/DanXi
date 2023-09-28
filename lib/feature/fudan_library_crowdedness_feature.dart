@@ -30,12 +30,7 @@ class FudanLibraryCrowdednessFeature extends Feature {
   bool get loadOnTap => false;
 
   /// The numbers of each library visitors at the moment.
-  List<int?>? _libraryCrowdedness;
-
-  /// The library literate names.
-  ///
-  /// Its order should correspond with the order of [_libraryCrowdedness].
-  static const List<String> _LIBRARY_NAME = ["理图", "文图", "张江", "枫林", "江湾"];
+  Map<String,String>? _libraryCrowdedness;
 
   /// Status of the request.
   ConnectionStatus _status = ConnectionStatus.NONE;
@@ -68,11 +63,9 @@ class FudanLibraryCrowdednessFeature extends Feature {
 
   List<String> get _resultText {
     List<String> result = [];
-    for (int i = 0;
-        i < _libraryCrowdedness!.length && i < _LIBRARY_NAME.length;
-        i++) {
-      result.add("${_LIBRARY_NAME[i]}: ${_libraryCrowdedness![i]}");
-    }
+    _libraryCrowdedness!.forEach((key, value) {
+      result.add("$key: $value");
+    });
     return result;
   }
 

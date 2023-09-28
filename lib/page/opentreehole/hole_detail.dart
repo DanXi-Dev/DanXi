@@ -265,9 +265,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        // Replaced precached data with updated ones
-        _listViewController.replaceInitialData(
-            (await OpenTreeHoleRepository.getInstance().loadFloors(_hole))!);
+        // Replace precached data with updated ones
+        if (_hole.hole_id != -1) {
+          List<OTFloor>? newFloors = await OpenTreeHoleRepository.getInstance().loadFloors(_hole);
+          _listViewController.replaceInitialData(newFloors!);
+          _hole.floors!.prefetch = newFloors;
+        }
       } catch (_) {}
       if (locateFloor != null && mounted) {
         try {
@@ -1176,9 +1179,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               : length ~/ Constant.POST_COUNT_PER_PAGE
         });
       },
-      searchKeyWord: _renderMode == RenderMode.SEARCH_RESULT
-          ? _searchKeyword
-          : null,
+      searchKeyWord:
+          _renderMode == RenderMode.SEARCH_RESULT ? _searchKeyword : null,
     );
 
     if (_multiSelectMode && _selectedFloors.contains(floor.floor_id)) {
