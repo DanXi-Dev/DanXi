@@ -48,7 +48,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   static final String _BASE_URL = SettingsProvider.getInstance().fduholeBaseUrl;
   static final String _BASE_AUTH_URL =
-      SettingsProvider.getInstance().fduholeBaseUrl;
+      SettingsProvider.getInstance().authBaseUrl;
   static final String _IMAGE_BASE_URL =
       SettingsProvider.getInstance().imageBaseUrl;
 
@@ -149,8 +149,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<bool?> checkRegisterStatus(String email) async {
     final Response<Map<String, dynamic>> response = await secureDio.get(
         "$_BASE_AUTH_URL/verify/email",
-        queryParameters: {"email": email, "check": true});
-    return response.data!["registered"];
+        queryParameters: {"email": email, "check": true},
+        options: Options(
+            validateStatus: (status) => status != null && status <= 400));
+    if (response.data!.containsKey("registered")) {
+      return response.data!["registered"];
+    } else {
+      throw (response.data!["message"]);
+    }
   }
 
   Dio get secureDio {
