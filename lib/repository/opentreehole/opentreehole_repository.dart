@@ -147,17 +147,15 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<bool?> checkRegisterStatus(String email) async {
-    try {
-      final Response<Map<String, dynamic>> response = await secureDio.get(
-          "$_BASE_AUTH_URL/verify/email",
-          queryParameters: {"email": email, "check": true});
+    final Response<Map<String, dynamic>> response = await secureDio.get(
+        "$_BASE_AUTH_URL/verify/email",
+        queryParameters: {"email": email, "check": true},
+        options: Options(
+            validateStatus: (status) => status != null && status <= 400));
+    if (response.data!.containsKey("registered")) {
       return response.data!["registered"];
-    } catch (e) {
-      if (e is DioError && e.response!.data["registered"] != null) {
-        return e.response!.data["registered"];
-      } else {
-        rethrow;
-      }
+    } else {
+      throw (response.data!["message"]);
     }
   }
 
