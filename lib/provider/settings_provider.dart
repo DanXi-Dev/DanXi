@@ -82,6 +82,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_FDUHOLE_BASE_URL = "fduhole_base_url";
   static const String KEY_AUTH_BASE_URL = "auth_base_url";
   static const String KEY_IMAGE_BASE_URL = "image_base_url";
+  static const String KEY_DANKE_BASE_URL = "danke_base_url";
 
   SettingsProvider._();
 
@@ -132,7 +133,7 @@ class SettingsProvider with ChangeNotifier {
     }
   }
 
-  /// Set and get _BASE_URL, _BASE_AUTH_URL, _IMAGE_BASE_URL for debug
+  /// Set and get _BASE_URL, _BASE_AUTH_URL, _IMAGE_BASE_URL, _DANKE_BASE_URL for debug
   String get fduholeBaseUrl {
     if (preferences!.containsKey(KEY_FDUHOLE_BASE_URL)) {
       String? fduholeBaseUrl = preferences!.getString(KEY_FDUHOLE_BASE_URL);
@@ -186,6 +187,25 @@ class SettingsProvider with ChangeNotifier {
       preferences!.setString(KEY_IMAGE_BASE_URL, value);
     } else {
       preferences!.setString(KEY_IMAGE_BASE_URL, Constant.IMAGE_BASE_URL);
+    }
+    notifyListeners();
+  }
+
+  String get dankeBaseUrl {
+    if (preferences!.containsKey(KEY_DANKE_BASE_URL)) {
+      String? dankeBaseUrl = preferences!.getString(KEY_DANKE_BASE_URL);
+      if (dankeBaseUrl != null) {
+        return dankeBaseUrl;
+      }
+    }
+    return Constant.DANKE_BASE_URL;
+  }
+
+  set dankeBaseUrl(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_DANKE_BASE_URL, value);
+    } else {
+      preferences!.setString(KEY_DANKE_BASE_URL, Constant.DANKE_BASE_URL);
     }
     notifyListeners();
   }

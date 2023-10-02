@@ -61,19 +61,12 @@ class Constant {
 
   static const String APPSTORE_APPID = '1568629997';
 
-  // For convenient switch from dev server to production server
-  static const bool IS_PRODUCTION_SERVER = true;
-  // TODO: Clear this before every commit
-  static const String DEV_PORT = "";
-
   /// A link to the "forget password" page of FDUHole.
-  static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL = IS_PRODUCTION_SERVER
-      ? "https://auth.fduhole.com/register?type=forget_password"
-      : "https://auth.fduhole.jingyijun.xyz:$DEV_PORT/register?type=forget_password";
+  static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL =
+      "https://auth.fduhole.com/register?type=forget_password";
 
-  static const String OPEN_TREEHOLE_REGISTER_URL = IS_PRODUCTION_SERVER
-      ? "https://auth.fduhole.com/register"
-      : "https://auth.fduhole.jingyijun.xyz:$DEV_PORT/register";
+  static const String OPEN_TREEHOLE_REGISTER_URL =
+      "https://auth.fduhole.com/register";
 
   /// The default start date of a semester.
   static final DEFAULT_SEMESTER_START_DATE = DateTime(2023, 2, 20);
@@ -83,11 +76,12 @@ class Constant {
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
   static const String UIS_HOST = "uis.fudan.edu.cn";
 
-  /// The default URLs of [OpenTreeHoleRepository].
+  /// The default URLs of [OpenTreeHoleRepository] and [CurriculumBoardHoleRepository].
   ///
   static const String FDUHOLE_BASE_URL = "https://www.fduhole.com/api";
   static const String AUTH_BASE_URL = "https://auth.fduhole.com/api";
   static const String IMAGE_BASE_URL = "https://image.fduhole.com";
+  static const String DANKE_BASE_URL = "https://danke.fduhole.com/api";
 
   static const LINKIFY_THEME =
       TextStyle(color: Colors.blue, decoration: TextDecoration.none);
