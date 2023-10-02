@@ -120,7 +120,7 @@ class CourseReview {
   }
 
   @override
-  int get hashCode => reviewId ?? timeCreated.hashCode;
+  int get hashCode => reviewId ?? reviewId.hashCode;
 
   // Fetch some info about its parent course for display
   void linkCourse(CourseSummary cs) {
