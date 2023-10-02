@@ -79,6 +79,9 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_THEME_TYPE = "theme_type";
   static const String KEY_MARKDOWN_ENABLED = "markdown_rendering_enabled";
   static const String KEY_VISITED_TIMETABLE = "visited_timetable";
+  static const String KEY_FDUHOLE_BASE_URL = "fduhole_base_url";
+  static const String KEY_AUTH_BASE_URL = "auth_base_url";
+  static const String KEY_IMAGE_BASE_URL = "image_base_url";
 
   SettingsProvider._();
 
@@ -127,6 +130,64 @@ class SettingsProvider with ChangeNotifier {
     } catch (ignored) {
       return null;
     }
+  }
+
+  /// Set and get _BASE_URL, _BASE_AUTH_URL, _IMAGE_BASE_URL for debug
+  String get fduholeBaseUrl {
+    if (preferences!.containsKey(KEY_FDUHOLE_BASE_URL)) {
+      String? fduholeBaseUrl = preferences!.getString(KEY_FDUHOLE_BASE_URL);
+      if (fduholeBaseUrl != null) {
+        return fduholeBaseUrl;
+      }
+    }
+    return Constant.FDUHOLE_BASE_URL;
+  }
+
+  set fduholeBaseUrl(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_FDUHOLE_BASE_URL, value);
+    } else {
+      preferences!.setString(KEY_FDUHOLE_BASE_URL, Constant.FDUHOLE_BASE_URL);
+    }
+    notifyListeners();
+  }
+
+  String get authBaseUrl {
+    if (preferences!.containsKey(KEY_AUTH_BASE_URL)) {
+      String? authBaseUrl = preferences!.getString(KEY_AUTH_BASE_URL);
+      if (authBaseUrl != null) {
+        return authBaseUrl;
+      }
+    }
+    return Constant.AUTH_BASE_URL;
+  }
+
+  set authBaseUrl(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_AUTH_BASE_URL, value);
+    } else {
+      preferences!.setString(KEY_AUTH_BASE_URL, Constant.AUTH_BASE_URL);
+    }
+    notifyListeners();
+  }
+
+  String get imageBaseUrl {
+    if (preferences!.containsKey(KEY_IMAGE_BASE_URL)) {
+      String? imageBaseUrl = preferences!.getString(KEY_IMAGE_BASE_URL);
+      if (imageBaseUrl != null) {
+        return imageBaseUrl;
+      }
+    }
+    return Constant.IMAGE_BASE_URL;
+  }
+
+  set imageBaseUrl(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_IMAGE_BASE_URL, value);
+    } else {
+      preferences!.setString(KEY_IMAGE_BASE_URL, Constant.IMAGE_BASE_URL);
+    }
+    notifyListeners();
   }
 
   String? get backgroundImagePath {

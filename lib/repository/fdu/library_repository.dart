@@ -15,12 +15,14 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:convert';
+
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dio/dio.dart';
 
-/// This repository is also designed to check whether the app is connected to the school LAN.
 class FudanLibraryRepository extends BaseRepositoryWithDio {
-  static const String _INFO_URL = "http://10.55.101.62/book/show";
+  static const String _INFO_URL =
+      "https://mlibrary.fudan.edu.cn/api/common/h5/getspaceseat";
 
   FudanLibraryRepository._();
 
@@ -28,22 +30,18 @@ class FudanLibraryRepository extends BaseRepositoryWithDio {
 
   factory FudanLibraryRepository.getInstance() => _instance;
 
-  Future<bool> checkConnection() =>
-      getLibraryRawData().then((value) => true, onError: (e) => false);
-  /// Get current numbers of people in library.
-  ///
-  /// Return a list of 4, respectively referring to 文图，理图，张江，枫林,
-  /// but I do not know the order.
-  Future<List<int?>> getLibraryRawData() async {
-    RegExp dataMatcher = RegExp(r'(?<=当前在馆人数：)[0-9]+');
-    Response<String> r = await dio.get(_INFO_URL);
-    return dataMatcher
-        .allMatches(r.data!)
-        .map((e) => int.tryParse(e.group(0)!))
-        .toList();
+  Future<Map<String, String>> getLibraryRawData() async {
+    Response<String> r = await dio.post(_INFO_URL);
+    final jsonData = json.decode(r.data!);
+    final campusToInNum = <String, String>{};
+    for (final item in jsonData['data']) {
+      final campusName = item['campusName'];
+      final inNum = item['inNum'];
+      campusToInNum[campusName] = inNum;
+    }
+    return campusToInNum;
   }
-  @override
-  String get linkHost => "10.55.101.62";
-}
 
-class NotConnectedToLANError implements Exception {}
+  @override
+  String get linkHost => "mlibrary.fudan.edu.cn";
+}

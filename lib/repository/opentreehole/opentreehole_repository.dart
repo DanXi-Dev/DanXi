@@ -46,13 +46,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   factory OpenTreeHoleRepository.getInstance() => _instance;
 
-  static const String _BASE_URL = Constant.IS_PRODUCTION_SERVER
-      ? "https://www.fduhole.com/api"
-      : "https://www.fduhole.jingyijun.xyz:${Constant.DEV_PORT}/api";
-  static const String _BASE_AUTH_URL = Constant.IS_PRODUCTION_SERVER
-      ? "https://auth.fduhole.com/api"
-      : "https://auth.fduhole.jingyijun.xyz:${Constant.DEV_PORT}/api";
-  static const String _IMAGE_BASE_URL = "https://image.fduhole.com";
+  static final String _BASE_URL = SettingsProvider.getInstance().fduholeBaseUrl;
+  static final String _BASE_AUTH_URL =
+      SettingsProvider.getInstance().authBaseUrl;
+  static final String _IMAGE_BASE_URL =
+      SettingsProvider.getInstance().imageBaseUrl;
 
   late FDUHoleProvider provider;
 
@@ -151,8 +149,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<bool?> checkRegisterStatus(String email) async {
     final Response<Map<String, dynamic>> response = await secureDio.get(
         "$_BASE_AUTH_URL/verify/email",
-        queryParameters: {"email": email, "check": true});
-    return response.data!["registered"];
+        queryParameters: {"email": email, "check": true},
+        options: Options(
+            validateStatus: (status) => status != null && status <= 400));
+    if (response.data!.containsKey("registered")) {
+      return response.data!["registered"];
+    } else {
+      throw (response.data!["message"]);
+    }
   }
 
   Dio get secureDio {
