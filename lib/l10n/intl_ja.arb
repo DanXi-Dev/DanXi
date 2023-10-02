@@ -173,6 +173,7 @@
   "fudan_postgraduate_student": "復旦大学院生 UIS ログイン",
   "fudan_qr_code": "復旦ライフコード",
   "fudan_staff": "復旦教職員ログイン",
+  "fudan_uis_email_login": "UISメールログイン/登録",
   "function_not_implemented": "この機能はまだ開発中ですので、FDUHoleのバックエンドがフォローするのをお待ちください。",
   "get_started": "始める",
   "good_afternoon": "午後はレジャーですね",

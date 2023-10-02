@@ -25,6 +25,7 @@ import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,7 @@ class HoleLoginPageState extends State<HoleLoginPage> {
   void initState() {
     super.initState();
     info = widget.arguments!["info"];
-    _currentWidget = OTEmailPasswordLoginWidget(state: this);
+    _currentWidget = OTEmailSelectionWidget(state: this);
     _widgetStack.add(_currentWidget);
   }
 
@@ -175,6 +176,103 @@ abstract class SubStatelessWidget extends StatelessWidget {
   }
 }
 
+class OTEmailSelectionWidget extends SubStatelessWidget {
+  const OTEmailSelectionWidget({Key? key, required HoleLoginPageState state})
+      : super(key: key, state: state);
+
+  /// Check [email] usability.
+  ///
+  /// if [isRecommendedEmail], get the verify code straightly.
+  /// Otherwise request an email OTP code.
+  Future<void> checkEmailInfo(BuildContext context, String email) async {
+    var model = Provider.of<LoginInfoModel>(context, listen: false);
+    state.jumpTo(OTLoadingWidget(state: state), putInStack: false);
+    bool? registered =
+        await OpenTreeHoleRepository.getInstance().checkRegisterStatus(email);
+    if (registered!) {
+      state.jumpTo(OTEmailPasswordLoginWidget(state: state));
+    } else {
+      model.verifyCode = null;
+      state.jumpTo(OTSetPasswordWidget(state: state));
+    }
+  }
+
+  @override
+  Widget buildContent(BuildContext context) {
+    final EmailProvider provider = EmailProviderImpl();
+    final String? recommendedEmail =
+        provider.getRecommendedEmailList(state.info);
+    final List<String> optionalEmail =
+        provider.getOptionalEmailList(state.info);
+    List<String> suggestEmail = [
+      ...optionalEmail,
+      S.of(context).my_email_not_in_list
+    ];
+    if (recommendedEmail != null) suggestEmail.insert(0, recommendedEmail);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Text(
+          S.of(context).fudan_uis_email_login,
+          style: Theme.of(context).textTheme.titleLarge,
+          textAlign: TextAlign.center,
+        ),
+        Text(
+          S.of(context).choose_your_email_below,
+          style: Theme.of(context).textTheme.bodySmall,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(
+          height: 32,
+        ),
+        ...suggestEmail
+            .map<Widget>((e) => ListTile(
+                title: Text(e),
+                onTap: () async {
+                  String? email = e;
+                  if (e == S.of(context).my_email_not_in_list) {
+                    email = await showPlatformDialog<String?>(
+                        context: context,
+                        builder: (cxt) {
+                          TextEditingController controller =
+                              TextEditingController();
+                          return PlatformAlertDialog(
+                            title: Text(S.of(context).input_your_email),
+                            content: PlatformTextField(controller: controller),
+                            actions: [
+                              PlatformDialogAction(
+                                  child: Text(S.of(context).i_see),
+                                  onPressed: () {
+                                    if (controller.text.trim().isNotEmpty) {
+                                      Navigator.pop(
+                                          cxt, controller.text.trim());
+                                    }
+                                  }),
+                              PlatformDialogAction(
+                                child: Text(S.of(context).cancel),
+                                onPressed: () => Navigator.pop(cxt, null),
+                              )
+                            ],
+                          );
+                        });
+                  }
+                  Provider.of<LoginInfoModel>(context, listen: false)
+                      .selectedEmail = email;
+                  if (email != null) {
+                    checkEmailInfo(context, email).catchError((e, st) {
+                      state.jumpBackFromLoadingPage();
+                      Noticing.showErrorDialog(state.context, e, trace: st);
+                    });
+                  }
+                }))
+            .toList()
+            .joinElement(() => const Divider())!
+      ],
+    );
+  }
+}
+
 class OTEmailPasswordLoginWidget extends SubStatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -284,12 +382,6 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
                                   () => Clipboard.setData(const ClipboardData(
                                       text: Constant.SUPPORT_QQ_GROUP)))
                             ])),
-                PlatformTextButton(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Text(S.of(context).register_account),
-                  onPressed: () => BrowserUtil.openUrl(
-                      Constant.OPEN_TREEHOLE_REGISTER_URL, context),
-                ),
               ],
             )
           ],
