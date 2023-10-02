@@ -27,7 +27,6 @@ import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/danxi_care.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
@@ -181,26 +180,6 @@ class CourseReviewEditor {
         .read<FDUHoleProvider>()
         .courseReviewEditorCache
         .remove(courseGroup.code);
-    return true;
-  }
-
-  static Future<bool> reportPost(BuildContext context, int? floorId) async {
-    final String? content = (await Noticing.showInputDialog(
-        context, S.of(context).reason_report_post(floorId ?? "?"),
-        isConfirmDestructive: true));
-    if (content == null || content.trim() == "") return false;
-
-    ProgressFuture progressDialog =
-        showProgressDialog(loadingText: S.of(context).report, context: context);
-    try {
-      await OpenTreeHoleRepository.getInstance().reportPost(floorId, content);
-    } catch (error, st) {
-      Noticing.showErrorDialog(context, error,
-          trace: st, title: S.of(context).report_failed);
-      return false;
-    } finally {
-      progressDialog.dismiss(showAnim: false);
-    }
     return true;
   }
 

@@ -1,5 +1,5 @@
 /*
- *     Copyright (C) 2021  DanXi-Dev
+ *     Copyright (C) 2023  DanXi-Dev
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -28,20 +28,6 @@ Color? getDefaultCardBackgroundColor(
     hasBackgroundImage
         ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
         : null;
-
-int translateScore(int score) {
-  if (score < 20) {
-    return 0;
-  } else if (score < 40) {
-    return 1;
-  } else if (score < 60) {
-    return 2;
-  } else if (score < 80) {
-    return 3;
-  } else {
-    return 4;
-  }
-}
 
 List<String>? overallWord, contentWord, workloadWord, assessmentWord;
 const List<Color> wordColor = [
@@ -182,16 +168,11 @@ class FilterTagWidget extends StatelessWidget {
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Flex(
-          direction: Axis.horizontal,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RoundChip(
-              onTap: onTap,
-              label: text,
-              color: color,
-            ),
-          ]);
+  Widget build(BuildContext context) => RoundChip(
+        onTap: onTap,
+        label: text,
+        color: color,
+      );
 }
 
 class FilterTag<T> {
@@ -222,6 +203,12 @@ class FilterListWidgetState<T> extends State<FilterListWidget<T>> {
   @override
   void initState() {
     super.initState();
+    selectedTag = widget.filters[widget.defaultIndex];
+  }
+
+  @override
+  void didUpdateWidget(covariant FilterListWidget<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
     selectedTag = widget.filters[widget.defaultIndex];
   }
 

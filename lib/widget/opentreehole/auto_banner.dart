@@ -23,6 +23,7 @@ import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/material_banner.dart';
+import 'package:dan_xi/widget/libraries/sized_by_child_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_view/flutter_swiper_view.dart';
@@ -51,9 +52,6 @@ class AutoBannerState extends State<AutoBanner> {
   late int _maxDisplay;
   void Function(bool)? onExpand;
   List<BannerExtra?>? list;
-
-  // Hardcode the size for better performance and lower overhead
-  static const double bannerHeight = 40;
 
   @override
   void initState() {
@@ -93,7 +91,7 @@ class AutoBannerState extends State<AutoBanner> {
     }
   }
 
-  Widget _buildAllList() {
+  Widget _buildAllList(double bannerHeight) {
     return ConstrainedBox(
       constraints:
           BoxConstraints.loose(Size.fromHeight(bannerHeight * _maxDisplay)),
@@ -104,8 +102,7 @@ class AutoBannerState extends State<AutoBanner> {
         itemBuilder: (context, index) {
           var bannerExtra = list![index];
           return ConstrainedBox(
-              constraints:
-                  BoxConstraints.loose(const Size.fromHeight(bannerHeight)),
+              constraints: BoxConstraints.loose(Size.fromHeight(bannerHeight)),
               child: bannerExtra == null
                   ? Container()
                   : SlimMaterialBanner(
@@ -120,9 +117,9 @@ class AutoBannerState extends State<AutoBanner> {
     );
   }
 
-  Widget _buildSingleItem() {
+  Widget _buildSingleItem(double bannerHeight) {
     return ConstrainedBox(
-        constraints: BoxConstraints.loose(const Size.fromHeight(bannerHeight)),
+        constraints: BoxConstraints.loose(Size.fromHeight(bannerHeight)),
         child: Swiper(
           itemBuilder: (BuildContext context, int index) {
             final bannerExtra = list![index];
@@ -157,25 +154,36 @@ class AutoBannerState extends State<AutoBanner> {
           // Since the banner is not a fixed size, we need to use [SizedByChildBuilder]
           // to get the height of the banner. Otherwise, [Swiper] will have infinite
           // height bound and throw an exception during build.
-          return Column(
-            children: [
-              _displayAll ? _buildAllList() : _buildSingleItem(),
-              SizedBox(
-                  height: 20,
-                  width: double.infinity,
-                  child: InkWell(
-                    onTap: () => setState(() {
-                      _displayAll = !_displayAll;
-                      if (onExpand != null) {
-                        onExpand!(_displayAll);
-                      }
-                    }),
-                    child: Icon(_displayAll
-                        ? Icons.arrow_drop_up
-                        : Icons.arrow_drop_down),
-                  ))
-            ],
-          );
+          return SizedByChildBuilder(
+              child: (context, key) => SlimMaterialBanner(
+                    key: key,
+                    icon: PlatformX.isMaterial(context)
+                        ? const Icon(Icons.campaign)
+                        : const Icon(CupertinoIcons.bell_circle),
+                    title: "",
+                    actionName: "",
+                  ),
+              builder: (context, size) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _displayAll
+                          ? _buildAllList(size.height)
+                          : _buildSingleItem(size.height),
+                      SizedBox(
+                          height: 20,
+                          child: InkWell(
+                            onTap: () => setState(() {
+                              _displayAll = !_displayAll;
+                              if (onExpand != null) {
+                                onExpand!(_displayAll);
+                              }
+                            }),
+                            child: Icon(_displayAll
+                                ? Icons.arrow_drop_up
+                                : Icons.arrow_drop_down),
+                          ))
+                    ],
+                  ));
         },
         selector: (_, model) => model.isBannerEnabled);
   }

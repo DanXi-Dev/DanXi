@@ -657,8 +657,15 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
               AutoBanner(
                   key: bannerKey,
                   refreshDuration: const Duration(seconds: 10),
-                  onExpand: (expanded) {
-                    listViewController.scrollToTop();
+                  onExpand: (expanded) async {
+                    if (!expanded) {
+                      try {
+                        await PrimaryScrollController.of(context).animateTo(0,
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.ease);
+                        // It is not important if [listViewController] is not attached to a ListView.
+                      } catch (_) {}
+                    }
                   }),
               _autoPinnedPosts(),
             ]

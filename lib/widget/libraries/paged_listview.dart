@@ -476,10 +476,6 @@ class PagedListViewState<T> extends State<PagedListView<T>>
     }
   }
 
-  Future<void> scrollToTop(
-          [Duration duration = kDuration, Curve curve = kCurve]) =>
-      currentController!.animateTo(0, duration: duration, curve: curve);
-
   Future<void> scrollDelta(double pixels,
           [Duration duration = kDuration, Curve curve = kCurve]) =>
       currentController!.animateTo(currentController!.offset + pixels,
@@ -552,11 +548,6 @@ class PagedListViewController<T> implements ListProvider<T> {
   Future<void> scrollDelta(double pixels,
       [Duration duration = kDuration, Curve curve = kCurve]) async {
     await _state.scrollDelta(pixels, duration, curve);
-  }
-
-  Future<void> scrollToTop(
-      [Duration duration = kDuration, Curve curve = kCurve]) async {
-    await _state.scrollToTop(duration, curve);
   }
 
   ScrollController? getScrollController() => _state.getScrollController();

@@ -203,16 +203,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      /*
-      try {
-        // Replaced precached data with updated ones
-        _listViewController.replaceInitialData(
-            (await OpenTreeHoleRepository.getInstance().loadFloors(_course))!);
-      } catch (_) {}
-
-       */
-    });
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
 
     return PlatformScaffold(

@@ -28,13 +28,14 @@ part 'course_review.g.dart';
 /// [CourseReview] is the model class for course review.
 /// It is used to store the data of a course review analogous to the [OTFloor].
 ///
-/// [reviewerId] is
-/// [liked] is used to show whether the user have up vote or down vote the review, 1 for up vote, -1 for down vote, 0 for no vote.
+/// [reviewerId] is the id of the author of the review
+/// [vote] is used to show whether the user have up vote or down vote the review, 1 for up vote, -1 for down vote, 0 for no vote.
 /// [isMe] is used to show whether the review is written by the user.
 /// [modified] is used to show whether the review is modified.
 /// [deleted] is used to show whether the review is deleted, regardless of being deleted by the user or by the administrator.
-/// [reviewExtra] is used to store the extra information of the review, such as the achievements of the reviewer.
+/// [extra] is used to store the extra information of the review, such as the achievements of the reviewer.
 /// For now, extra only contains the achievements of the reviewer, e.g. badges.
+/// TODO: Implement badge showing
 
 @JsonSerializable()
 class CourseReview {
