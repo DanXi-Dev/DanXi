@@ -63,36 +63,40 @@ class CourseListWidgetState extends State<CourseListWidget> {
   @override
   void didUpdateWidget(covariant CourseListWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    setState(() {
-      searchKeyword = widget.searchKeyword;
-    });
+    searchKeyword = widget.searchKeyword;
+    _listViewController.notifyUpdate(
+        useInitialData: false, queueDataClear: false);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-        child: PagedListView<CourseGroup>(
-      pagedController: _listViewController,
-      withScrollbar: true,
-      scrollController: PrimaryScrollController.of(context),
-      // If we need to scroll to the end, we should prefetch all the data beforehand.
-      // See also [prefetchAllFloors] in [TreeHoleSubpageState].
-      dataReceiver: _loadContent,
-      builder: _getListItems,
-      loadingBuilder: (BuildContext context) => Container(
-        padding: const EdgeInsets.all(8),
-        child: Center(child: PlatformCircularProgressIndicator()),
-      ),
-      fatalErrorBuilder: (BuildContext context, dynamic snapshot) =>
-          ErrorPageWidget.buildWidget(context, snapshot.error,
-              stackTrace: snapshot.stackTrace, onTap: () => setState(() {})),
-      endBuilder: (context) => Center(
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Text(S.of(context).end_reached),
-        ),
-      ),
-    ));
+    return PagedListView<CourseGroup>(
+        pagedController: _listViewController,
+        withScrollbar: true,
+        scrollController: PrimaryScrollController.of(context),
+        // If we need to scroll to the end, we should prefetch all the data beforehand.
+        // See also [prefetchAllFloors] in [TreeHoleSubpageState].
+        dataReceiver: _loadContent,
+        builder: _getListItems,
+        loadingBuilder: (BuildContext context) => Container(
+              padding: const EdgeInsets.all(8),
+              child: Center(child: PlatformCircularProgressIndicator()),
+            ),
+        fatalErrorBuilder: (context, error) => ErrorPageWidget.buildWidget(
+            context, error,
+            onTap: () => setState(() {})),
+        endBuilder: (context) => Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(S.of(context).end_reached),
+              ),
+            ),
+        emptyBuilder: (context) => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(S.of(context).no_data),
+              ),
+            ));
   }
 
   Widget _getListItems(BuildContext context,

@@ -38,6 +38,4 @@ class CourseGrade {
       _$CourseGradeFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseGradeToJson(this);
-
-  factory CourseGrade.dummy() => CourseGrade(99, 19, 45, 81);
 }

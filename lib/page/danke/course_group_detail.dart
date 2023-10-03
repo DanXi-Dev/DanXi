@@ -17,19 +17,14 @@
 
 import 'dart:async';
 
-import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
-import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/page/danke/course_review_editor.dart';
-import 'package:dan_xi/page/opentreehole/hole_editor.dart';
-import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
@@ -46,7 +41,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import '../../util/stream_listener.dart';
 
 enum FilterType { TEACHER_FILTER, TIME_FILTER }
@@ -72,7 +66,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   /// Unrelated to the state.
   /// These fields should only be initialized once when created.
   late int groupId;
-  CourseGroup? _courses;
+  CourseGroup? _courseGroup;
   late int averageOverallLevel;
   String? _searchKeyword;
   FileImage? _backgroundImage;
@@ -91,17 +85,12 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
-  /*
-  bool get hasPrefetchedAllData =>
-      shouldScrollToEnd ||
-          (_course.floors?.prefetch?.length ?? -1) > Constant.POST_COUNT_PER_PAGE;
+  CourseReview? locateReview;
 
-   */
-
-  /// Reload/load the (new) content and set the [_content] future.
-  Future<List<CourseReview>?> _loadContent() async {
+  /// Reload/load the (new) content
+  List<CourseReview>? _loadContent(BuildContext contxt) {
     List<CourseReview> result = [];
-    for (var elem in _courses!.courseList!) {
+    for (var elem in _courseGroup!.courseList!) {
       if (elem.reviewList != null) {
         result += elem.reviewList!.filter((element) {
           if (teacherFilter != "*" &&
@@ -118,14 +107,29 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
       }
     }
 
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (locateReview != null && mounted) {
+        try {
+          // Scroll to the specific item
+          await _listViewController.scrollToItem(locateReview!);
+          locateReview = null;
+        } catch (e) {
+          debugPrint(e.toString());
+        }
+      }
+    });
+
     return result;
   }
 
   @override
   void initState() {
     super.initState();
-    if (widget.arguments!.containsKey('group')) {
-      groupId = widget.arguments!['group'];
+    if (widget.arguments!.containsKey('group_id')) {
+      groupId = widget.arguments!['group_id'];
+    }
+    if (widget.arguments!.containsKey('locate')) {
+      locateReview = widget.arguments!['locate'];
     }
 
     StateProvider.needScreenshotWarning = true;
@@ -155,25 +159,21 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   }
 
   Future<CourseGroup?> _fetchCourseGroup({bool forceRefetch = false}) async {
-    try {
-      if (forceRefetch) {
-        _courses = await CurriculumBoardRepository.getInstance()
-            .getCourseGroup(groupId);
-      } else {
-        _courses ??= await CurriculumBoardRepository.getInstance()
-            .getCourseGroup(groupId);
-      }
-    } catch (e) {
-      debugPrint(e.toString());
+    if (forceRefetch) {
+      _courseGroup =
+          await CurriculumBoardRepository.getInstance().getCourseGroup(groupId);
+    } else {
+      _courseGroup ??=
+          await CurriculumBoardRepository.getInstance().getCourseGroup(groupId);
     }
 
     // The old api doesn't return a credit list in the course group
     // So we have to generate it here
-    _courses!.credits ??=
-        _courses!.courseList!.map((e) => e.credit!).toSet().toList();
+    _courseGroup!.credits ??=
+        _courseGroup!.courseList!.map((e) => e.credit!).toSet().toList();
 
     int totalScore = 0, scoreCount = 0;
-    for (var elem in _courses!.courseList!) {
+    for (var elem in _courseGroup!.courseList!) {
       teacherSet.add(elem.teachers!);
       timeSet.add(elem.formatTime());
       if (elem.reviewList != null) {
@@ -187,7 +187,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
     }
     averageOverallLevel = (scoreCount > 0 ? (totalScore ~/ scoreCount) : 0) - 1;
 
-    return _courses;
+    return _courseGroup;
   }
 
   @override
@@ -219,7 +219,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                   : const Icon(CupertinoIcons.arrowshape_turn_up_left),
               onPressed: () async {
                 if (await CourseReviewEditor.createNewPost(
-                    context, _courses!)) {
+                    context, _courseGroup!)) {
                   refreshList(scrollToEnd: true);
                 }
               },
@@ -266,26 +266,29 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
           child: FutureWidget<CourseGroup?>(
               future: _fetchCourseGroup(),
               successBuilder: (context, snapshot) {
-                Future<List<CourseReview>?> allDataReceiver = _loadContent();
                 return PagedListView<CourseReview>(
                   pagedController: _listViewController,
                   withScrollbar: true,
                   scrollController: PrimaryScrollController.of(context),
-                  // If we need to scroll to the end, we should prefetch all the data beforehand.
-                  // See also [prefetchAllFloors] in [TreeHoleSubpageState].
-                  allDataReceiver: allDataReceiver,
+
+                  /// [_loadContent] does no internet request so it shall be quick
+                  allDataReceiver: Future.value(_loadContent(context)),
                   builder: _getListItems,
                   headBuilder: (ctx) => _buildHead(ctx),
                   loadingBuilder: (BuildContext context) => Container(
                     padding: const EdgeInsets.all(8),
                     child: Center(child: PlatformCircularProgressIndicator()),
                   ),
-                  endBuilder: (context) => Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Text(S.of(context).end_reached),
-                    ),
-                  ),
+                  emptyBuilder: (context) =>
+                      Center(child: Text(S.of(context).no_course_review)),
+                  endBuilder: (context) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Text(S.of(context).end_reached),
+                      ),
+                    );
+                  },
                 );
               },
               errorBuilder: (BuildContext context,
@@ -319,18 +322,18 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(_courses!.getFullName(),
+                Text(_courseGroup!.getFullName(),
                     style: const TextStyle(fontWeight: FontWeight.bold)),
                 Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(_courses!.code!,
+                        Text(_courseGroup!.code!,
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.grey)),
-                        ..._courses!.credits!.map((e) => Padding(
+                        ..._courseGroup!.credits!.map((e) => Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 4),
                             child: OTLeadingTag(
                               color: Colors.orange,
@@ -396,74 +399,20 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   }
 
   Future<void> _onTapScrollToEnd(_) async {
-    ProgressFuture dialog = showProgressDialog(
-        loadingText: S.of(context).loading, context: context);
     try {
       _listViewController.queueScrollToEnd();
+      _listViewController.notifyUpdate(
+          useInitialData: false, queueDataClear: false);
     } catch (error, st) {
       Noticing.showErrorDialog(context, error, trace: st);
-    } finally {
-      dialog.dismiss(showAnim: false);
     }
   }
 
-  List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {
-    List<Widget> menu = [
-      if (e.is_me == true && e.deleted == false)
-        PlatformContextMenuItem(
-          menuContext: menuContext,
-          onPressed: () async {
-            if (await OTEditor.modifyReply(
-                context, e.hole_id, e.floor_id, e.content)) {
-              Noticing.showMaterialNotice(
-                  context, S.of(context).request_success);
-            }
-            // await refreshListView();
-            // // Set duration to 0 to execute [jumpTo] to the top.
-            // await _listViewController.scrollToIndex(0, const Duration());
-            // await scrollDownToFloor(e);
-          },
-          child: Text(S.of(context).modify),
-        ),
-
-      // Standard Operations
-      PlatformContextMenuItem(
-        menuContext: menuContext,
-        onPressed: () => smartNavigatorPush(context, "/text/detail",
-            arguments: {"text": e.filteredContent}),
-        child: Text(S.of(menuContext).free_select),
-      ),
-      PlatformContextMenuItem(
-          menuContext: menuContext,
-          child: Text(S.of(menuContext).copy),
-          onPressed: () async {
-            await FlutterClipboard.copy(renderText(e.filteredContent!, '', ''));
-            if (mounted) {
-              Noticing.showMaterialNotice(
-                  context, S.of(menuContext).copy_success);
-            }
-          }),
-      PlatformContextMenuItem(
-        menuContext: menuContext,
-        isDestructive: true,
-        onPressed: () async {
-          if (await OTEditor.reportPost(context, e.floor_id)) {
-            Noticing.showMaterialNotice(context, S.of(context).report_success);
-          }
-        },
-        child: Text(S.of(menuContext).report),
-      )
-    ];
-
-    return menu;
-  }
-
   Widget _getListItems(BuildContext context,
-      ListProvider<CourseReview> dataProvider, int index, CourseReview review,
-      {bool isNested = false}) {
+      ListProvider<CourseReview> dataProvider, int index, CourseReview review) {
     return CourseReviewWidget(
       review: review,
-      courseGroup: _courses!,
+      courseGroup: _courseGroup!,
     );
   }
 }

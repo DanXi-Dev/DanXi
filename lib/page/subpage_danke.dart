@@ -17,11 +17,13 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
-import 'package:dan_xi/page/danke/course_list_widget.dart';
+import 'package:dan_xi/widget/danke/course_list_widget.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/widget/danke/course_search_bar.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -119,15 +121,41 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
         ? FutureWidget<CourseReview?>(
             future: _loadRandomReview(),
             successBuilder: (context, snapshot) => RandomReviewWidgets(
-                review: snapshot.data!, onTap: () => setState(() {})),
+                review: snapshot.data!,
+                onTap: () => smartNavigatorPush(context, "/danke/courseDetail",
+                        arguments: {
+                          "group_id": snapshot.data!.groupId,
+                          "locate": snapshot.data
+                        })),
             errorBuilder:
-                (BuildContext context, AsyncSnapshot<CourseReview?> snapshot) =>
-                    ErrorPageWidget.buildWidget(context, snapshot.error,
-                      stackTrace: snapshot.stackTrace,
-                      onTap: () => setState(() { })),
+                (BuildContext context, AsyncSnapshot<CourseReview?> snapshot) {
+              if (snapshot.error is NotLoginError) {
+                return Column(children: [
+                  Text(S.of(context).require_login),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: PlatformElevatedButton(
+                      onPressed: () async {
+                        await smartNavigatorPush(context, "/bbs/login",
+                            arguments: {
+                              "info": StateProvider.personInfo.value!
+                            });
+                        setState(() {});
+                      },
+                      child: Text(S.of(context).login),
+                    ),
+                  ),
+                ]);
+              } else {
+                return ErrorPageWidget.buildWidget(context, snapshot.error,
+                    stackTrace: snapshot.stackTrace,
+                    onTap: () => setState(() {}));
+              }
+            },
             loadingBuilder: Center(
               child: PlatformCircularProgressIndicator(),
             ))
-        : CourseListWidget(searchKeyword: searchText);
+        // A maximized result list
+        : Expanded(child: CourseListWidget(searchKeyword: searchText));
   }
 }

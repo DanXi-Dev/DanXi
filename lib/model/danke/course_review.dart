@@ -69,8 +69,11 @@ class CourseReview {
   // Info about its parent course for display
   @JsonKey(includeFromJson: false, includeToJson: false)
   late CourseSummary courseInfo;
-  // This field is only used when deserializing random reviews !!!
+
+  /// These fields is only used when deserializing random reviews !!!
   Course? course;
+  @JsonKey(name: 'group_id')
+  int? groupId;
 
   /// [fromJson] and [toJson] are used to convert between JSON and [CourseReview] object.
   factory CourseReview.fromJson(Map<String, dynamic> json) =>
@@ -78,28 +81,13 @@ class CourseReview {
 
   Map<String, dynamic> toJson() => _$CourseReviewToJson(this);
 
-  /// [dummy] is used to generate a dummy [CourseReview] object for testing.
-  factory CourseReview.dummy() => CourseReview(
-      114514,
-      114514,
-      "作为嘉然小姐的狗的测评",
-      "关注嘉然天天天天天天解馋",
-      "dummy",
-      "dummy",
-      CourseGrade.dummy(),
-      100,
-      true,
-      0,
-      false,
-      ReviewExtra.dummy());
-
   /// override == and hashCode to compare two [CourseReview] objects.
   @override
   bool operator ==(Object other) =>
       (other is CourseReview) && reviewId == other.reviewId;
 
   CourseReview(
-      this.reviewId,
+      {this.reviewId,
       this.reviewerId,
       this.title,
       this.content,
@@ -110,7 +98,7 @@ class CourseReview {
       this.isMe,
       this.modified,
       this.deleted,
-      this.extra);
+      this.extra});
 
   String? get deleteReason => deleted == true ? content : null;
 

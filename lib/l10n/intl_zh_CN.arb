@@ -300,6 +300,7 @@
   "no_data_error": "数据为空",
   "no_favorites": "收藏列表为空",
   "no_matching_bus": "您所在的校区没有可乘坐的校车",
+  "no_course_review": "该课程还没有评论",
   "no_summary": "[无法显示此类型的消息]",
   "no_subscriptions": "订阅列表为空",
   "not_fudan_student": "非复旦学生暂不支持课表功能。",

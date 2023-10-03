@@ -18,8 +18,6 @@
 import 'package:dan_xi/model/danke/course.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import 'course_review.dart';
-
 part 'course_group.g.dart';
 
 @JsonSerializable()
@@ -44,8 +42,8 @@ class CourseGroup {
   @JsonKey(name: 'review_count')
   int? reviewCount;
 
-  CourseGroup(this.id, this.name, this.code, this.department, this.weekHour,
-      this.credits, this.courseList);
+  CourseGroup({this.id, this.name, this.code, this.department, this.weekHour,
+      this.credits, this.courseList});
 
   @override
   String toString() {
@@ -68,14 +66,6 @@ class CourseGroup {
       _$CourseGroupFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseGroupToJson(this);
-
-  factory CourseGroup.dummy() =>
-      CourseGroup(-1, "Asoul虚拟偶像", "OP114514", "计算机科学与技术系", 4, [
-        4.0
-      ], [
-        Course.dummy(),
-        Course(1, "贝拉", 1145, 1451, 2, 4.9, [CourseReview.dummy()])
-      ]);
 
   @override
   bool operator ==(Object other) => (other is CourseGroup) && id == other.id;

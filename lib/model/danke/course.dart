@@ -54,15 +54,12 @@ class Course {
   @JsonKey(name: 'review_list')
   List<CourseReview>? reviewList;
 
-  Course(this.id, this.teachers, this.maxStudent, this.year, this.semester,
-      this.credit, this.reviewList);
+  Course({this.id, this.teachers, this.maxStudent, this.year, this.semester,
+      this.credit, this.reviewList});
 
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseToJson(this);
-
-  factory Course.dummy() =>
-      Course(1, "嘉然", 1145, 1919, 1, 4.9, [CourseReview.dummy()]);
 
   @override
   bool operator ==(Object other) => (other is Course) && id == other.id;

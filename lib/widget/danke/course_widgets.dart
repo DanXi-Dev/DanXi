@@ -20,14 +20,7 @@ import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/widget/libraries/round_chip.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-Color? getDefaultCardBackgroundColor(
-        BuildContext context, bool hasBackgroundImage) =>
-    hasBackgroundImage
-        ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
-        : null;
 
 List<String>? overallWord, contentWord, workloadWord, assessmentWord;
 const List<Color> wordColor = [
@@ -116,7 +109,7 @@ class CourseGroupCardWidget extends StatelessWidget {
                 ),
               ]),
           onTap: () => smartNavigatorPush(context, "/danke/courseDetail",
-              arguments: {"group": courseGroup.id}),
+              arguments: {"group_id": courseGroup.id}),
         ),
         const Divider(
           height: 5,
@@ -130,10 +123,8 @@ class CourseGroupCardWidget extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(
-                      Icons.file_copy,
-                      size: infoStyle.fontSize,
-                      color: infoStyle.color),
+                  Icon(Icons.file_copy,
+                      size: infoStyle.fontSize, color: infoStyle.color),
                   const SizedBox(
                     width: 3,
                   ),

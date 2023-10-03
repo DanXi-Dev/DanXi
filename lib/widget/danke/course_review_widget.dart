@@ -92,6 +92,7 @@ class CourseReviewWidget extends StatelessWidget {
                                     userId: review.reviewerId!,
                                     teacher: review.courseInfo.teachers,
                                     time: review.courseInfo.time,
+                                    title: review.title!,
                                   ),
                                 ),
                                 const Divider(),
@@ -141,6 +142,7 @@ class CourseReviewWidget extends StatelessWidget {
 class ReviewHeader extends StatelessWidget {
   final int userId;
   final String teacher;
+  final String title;
   final String time;
 
   // final String reviewContent;
@@ -149,12 +151,13 @@ class ReviewHeader extends StatelessWidget {
       {Key? key,
       required this.userId,
       required this.teacher,
-      required this.time})
+      required this.time,
+      required this.title})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -197,9 +200,8 @@ class ReviewHeader extends StatelessWidget {
           )),
         ],
       ),
-      const SizedBox(height: 4),
-      SizedBox(
-        width: double.infinity,
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
         child: Wrap(
           // todo this is the badge list of the user
           spacing: 4,
@@ -212,6 +214,8 @@ class ReviewHeader extends StatelessWidget {
           ],
         ),
       ),
+      Text(title,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18))
     ]);
   }
 }

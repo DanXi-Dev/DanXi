@@ -7,15 +7,15 @@ part of 'course_group.dart';
 // **************************************************************************
 
 CourseGroup _$CourseGroupFromJson(Map<String, dynamic> json) => CourseGroup(
-      json['id'] as int?,
-      json['name'] as String?,
-      json['code'] as String?,
-      json['department'] as String?,
-      json['week_hour'] as int?,
-      (json['credits'] as List<dynamic>?)
+      id: json['id'] as int?,
+      name: json['name'] as String?,
+      code: json['code'] as String?,
+      department: json['department'] as String?,
+      weekHour: json['week_hour'] as int?,
+      credits: (json['credits'] as List<dynamic>?)
           ?.map((e) => (e as num).toDouble())
           .toList(),
-      (json['course_list'] as List<dynamic>?)
+      courseList: (json['course_list'] as List<dynamic>?)
           ?.map((e) => Course.fromJson(e as Map<String, dynamic>))
           .toList(),
     )

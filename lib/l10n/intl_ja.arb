@@ -300,6 +300,7 @@
   "no_data_error": "データなし",
   "no_favorites": "お気に入りなし",
   "no_matching_bus": "あなたのキャンパスにはスクールバスがありません。",
+  "no_course_review": "この授業は評価がありません",
   "no_summary": "[このタイプのメッセージは表示できません]",
   "no_subscriptions": "購読なし",
   "not_fudan_student": "復旦大学以外の学生は、スケジュール機能をサポートしていません。",

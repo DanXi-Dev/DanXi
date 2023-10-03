@@ -7,27 +7,28 @@ part of 'course_review.dart';
 // **************************************************************************
 
 CourseReview _$CourseReviewFromJson(Map<String, dynamic> json) => CourseReview(
-      json['id'] as int?,
-      json['reviewer_id'] as int?,
-      json['title'] as String?,
-      json['content'] as String?,
-      json['timeCreated'] as String?,
-      json['timeUpdated'] as String?,
-      json['rank'] == null
+      reviewId: json['id'] as int?,
+      reviewerId: json['reviewer_id'] as int?,
+      title: json['title'] as String?,
+      content: json['content'] as String?,
+      timeCreated: json['timeCreated'] as String?,
+      timeUpdated: json['timeUpdated'] as String?,
+      rank: json['rank'] == null
           ? null
           : CourseGrade.fromJson(json['rank'] as Map<String, dynamic>),
-      json['vote'] as int?,
-      json['is_me'] as bool?,
-      json['modified'] as int?,
-      json['deleted'] as bool?,
-      json['extra'] == null
+      vote: json['vote'] as int?,
+      isMe: json['is_me'] as bool?,
+      modified: json['modified'] as int?,
+      deleted: json['deleted'] as bool?,
+      extra: json['extra'] == null
           ? null
           : ReviewExtra.fromJson(json['extra'] as Map<String, dynamic>),
     )
       ..remark = json['remark'] as int?
       ..course = json['course'] == null
           ? null
-          : Course.fromJson(json['course'] as Map<String, dynamic>);
+          : Course.fromJson(json['course'] as Map<String, dynamic>)
+      ..groupId = json['group_id'] as int?;
 
 Map<String, dynamic> _$CourseReviewToJson(CourseReview instance) =>
     <String, dynamic>{
@@ -45,4 +46,5 @@ Map<String, dynamic> _$CourseReviewToJson(CourseReview instance) =>
       'deleted': instance.deleted,
       'extra': instance.extra,
       'course': instance.course,
+      'group_id': instance.groupId,
     };

@@ -22,12 +22,6 @@ import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-Color? getDefaultCardBackgroundColor(
-        BuildContext context, bool hasBackgroundImage) =>
-    hasBackgroundImage
-        ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
-        : null;
-
 class RandomReviewWidgets extends StatelessWidget {
   // changeable style of the card
   final bool translucent;
@@ -58,116 +52,82 @@ class RandomReviewWidgets extends StatelessWidget {
       // credits group
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         ListTile(
-          contentPadding: const EdgeInsets.fromLTRB(0, 3, 0, 2),
-          onTap: onTap ?? () {},
-          title: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              alignment: WrapAlignment.spaceBetween,
-              runSpacing: 4,
-              children: [
-                Column(
-                  children: [
-                    // course name, department name, course code and credits
-                    Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 2),
-                        child: Text(review.course!.code!,
-                            style: const TextStyle(color: Colors.white24))),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // use Expanded wrap the text to avoid overflow
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+            contentPadding: const EdgeInsets.fromLTRB(0, 3, 0, 2),
+            onTap: onTap ?? () {},
+            title: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Text(review.course!.code!,
+                          style: const TextStyle(color: Colors.grey))),
+                  Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Text(
+                        "${review.course?.department} / ${review.course?.name}",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        softWrap: true,
+                      )),
+                  Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          OTLeadingTag(
+                            color: Colors.orange,
+                            text:
+                                "${review.course!.credit!.toStringAsFixed(1)} ${S.of(context).credits}",
+                          ),
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
-                              // todo add card information style
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 2),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "${review.course?.department} / ${review.course?.name}",
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                      softWrap: true,
-                                    )
-                                  ],
-                                ),
+                              Icon(
+                                Icons.thumb_up_outlined,
+                                size: infoStyle.fontSize,
+                                color: infoStyle.color,
                               ),
-                              Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(12, 4, 12, 0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      OTLeadingTag(
-                                        color: Colors.orange,
-                                        text:
-                                            "${review.course!.credit!.toStringAsFixed(1)} ${S.of(context).credits}",
-                                      ),
-                                      Wrap(
-                                        crossAxisAlignment:
-                                            WrapCrossAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.thumb_up_outlined,
-                                            size: infoStyle.fontSize,
-                                            color: infoStyle.color,
-                                          ),
-                                          const SizedBox(
-                                            width: 3,
-                                          ),
-                                          const Text(
-                                            '2',
-                                            textAlign: TextAlign.left,
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.grey),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  )),
-                              ListTile(
-                                  dense: true,
-                                  minLeadingWidth: 16,
-                                  leading: Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                    child: Icon(
-                                      PlatformX.isMaterial(context)
-                                          ? Icons.sms_outlined
-                                          : CupertinoIcons.quote_bubble,
-                                      color: Theme.of(context).hintColor,
-                                    ),
-                                  ),
-                                  title: Column(
-                                    children: [
-                                      const SizedBox(height: 5),
-                                      Text(
-                                        review.content!,
-                                        maxLines: 6,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ))
+                              const SizedBox(
+                                width: 3,
+                              ),
+                               Text(
+                                "${review.remark}",
+                                textAlign: TextAlign.left,
+                                style:
+                                   const TextStyle(fontSize: 10, color: Colors.grey),
+                              ),
                             ],
                           ),
+                        ],
+                      )),
+                  ListTile(
+                      dense: true,
+                      minLeadingWidth: 16,
+                      leading: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
+                        child: Icon(
+                          PlatformX.isMaterial(context)
+                              ? Icons.sms_outlined
+                              : CupertinoIcons.quote_bubble,
+                          color: Theme.of(context).hintColor,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-              ]),
-        ),
+                      ),
+                      title: Column(
+                        children: [
+                          const SizedBox(height: 5),
+                          Text(
+                            review.content!,
+                            maxLines: 6,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ))
+                ],
+              ),
+            )),
         // rating and comment count
       ]),
     );

@@ -306,6 +306,7 @@
   "no_data_error": "No data",
   "no_favorites": "You have no favorites",
   "no_matching_bus": "There is no scheduled bus for your campus",
+  "no_course_review": "The course has no reviews yet",
   "no_summary": "[Unable to display content of this type.]",
   "no_subscriptions": "You have no subscriptions",
   "not_fudan_student": "Agenda is unavailable for students not in Fudan.",

@@ -7,13 +7,13 @@ part of 'course.dart';
 // **************************************************************************
 
 Course _$CourseFromJson(Map<String, dynamic> json) => Course(
-      json['id'] as int?,
-      json['teachers'] as String?,
-      json['max_student'] as int?,
-      json['year'] as int?,
-      json['semester'] as int?,
-      (json['credit'] as num?)?.toDouble(),
-      (json['review_list'] as List<dynamic>?)
+      id: json['id'] as int?,
+      teachers: json['teachers'] as String?,
+      maxStudent: json['max_student'] as int?,
+      year: json['year'] as int?,
+      semester: json['semester'] as int?,
+      credit: (json['credit'] as num?)?.toDouble(),
+      reviewList: (json['review_list'] as List<dynamic>?)
           ?.map((e) => CourseReview.fromJson(e as Map<String, dynamic>))
           .toList(),
     )
