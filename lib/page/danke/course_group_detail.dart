@@ -26,6 +26,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/danke/course_review_widget.dart';
@@ -88,7 +89,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   CourseReview? locateReview;
 
   /// Reload/load the (new) content
-  List<CourseReview>? _loadContent(BuildContext contxt) {
+  List<CourseReview>? _loadContent() {
     List<CourseReview> result = [];
     for (var elem in _courseGroup!.courseList!) {
       if (elem.reviewList != null) {
@@ -106,18 +107,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
         });
       }
     }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (locateReview != null && mounted) {
-        try {
-          // Scroll to the specific item
-          await _listViewController.scrollToItem(locateReview!);
-          locateReview = null;
-        } catch (e) {
-          debugPrint(e.toString());
-        }
-      }
-    });
 
     return result;
   }
@@ -167,6 +156,11 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
           await CurriculumBoardRepository.getInstance().getCourseGroup(groupId);
     }
 
+    _processCourseGroup();
+    return _courseGroup;
+  }
+
+  void _processCourseGroup() {
     // The old api doesn't return a credit list in the course group
     // So we have to generate it here
     _courseGroup!.credits ??=
@@ -186,8 +180,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
       }
     }
     averageOverallLevel = (scoreCount > 0 ? (totalScore ~/ scoreCount) : 0) - 1;
-
-    return _courseGroup;
   }
 
   @override
@@ -270,9 +262,23 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                   pagedController: _listViewController,
                   withScrollbar: true,
                   scrollController: PrimaryScrollController.of(context),
+                  // [_loadContent] does no internet request so it shall be quick
+                  allDataReceiver:
+                      Future.value(_loadContent()).then((value) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) async {
+                      if (locateReview != null && mounted) {
+                        // Scroll to the specific floor
+                        await PagedListViewHelper.scrollToItem(
+                            context,
+                            _listViewController,
+                            locateReview,
+                            ScrollDirection.DOWN);
+                        locateReview = null;
+                      }
+                    });
 
-                  /// [_loadContent] does no internet request so it shall be quick
-                  allDataReceiver: Future.value(_loadContent(context)),
+                    return value;
+                  }),
                   builder: _getListItems,
                   headBuilder: (ctx) => _buildHead(ctx),
                   loadingBuilder: (BuildContext context) => Container(

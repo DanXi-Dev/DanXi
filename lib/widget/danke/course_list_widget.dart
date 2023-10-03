@@ -39,7 +39,6 @@ class CourseListWidget extends StatefulWidget {
 
 class CourseListWidgetState extends State<CourseListWidget> {
   String? searchKeyword;
-  bool hasFetchedAllData = false;
 
   final PagedListViewController<CourseGroup> _listViewController =
       PagedListViewController<CourseGroup>();

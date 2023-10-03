@@ -92,12 +92,15 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
                       ),
                       CourseSearchBar(
                         onSearch: (String text) {
-                          setState(
-                            () {
-                              idle = text.isEmpty;
-                              searchText = text;
-                            },
-                          );
+                          // Avoid unnecessary rebuilding
+                          if (text.isEmpty != idle) {
+                            setState(
+                              () {
+                                idle = text.isEmpty;
+                                searchText = text;
+                              },
+                            );
+                          }
                         },
                       ),
                       _buildPageContent(context)
@@ -122,11 +125,11 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
             future: _loadRandomReview(),
             successBuilder: (context, snapshot) => RandomReviewWidgets(
                 review: snapshot.data!,
-                onTap: () => smartNavigatorPush(context, "/danke/courseDetail",
-                        arguments: {
-                          "group_id": snapshot.data!.groupId,
-                          "locate": snapshot.data
-                        })),
+                onTap: () async => await smartNavigatorPush(
+                        context, "/danke/courseDetail", arguments: {
+                      "group_id": snapshot.data!.groupId,
+                      "locate": snapshot.data
+                    })),
             errorBuilder:
                 (BuildContext context, AsyncSnapshot<CourseReview?> snapshot) {
               if (snapshot.error is NotLoginError) {
