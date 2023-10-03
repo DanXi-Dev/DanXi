@@ -18,6 +18,7 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
+import 'package:dan_xi/model/danke/search_results.dart';
 import 'package:dan_xi/page/danke/course_review_editor.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -63,10 +64,16 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
   factory CurriculumBoardRepository.getInstance() => _instance;
 
   // Return raw json string
-  Future<String?> getCourseGroups() async {
-    Response<String> response = await dio.get("$_BASE_URL/courses",
+  Future<CourseSearchResults?> searchCourseGroups(String keyword) async {
+    Response<Map<String, dynamic>> response = await dio.get(
+      "$_BASE_URL/v3/course_groups/search",
+      queryParameters: {
+          'query': keyword,
+          'page': 1,
+          'page_size': 10
+        },
         options: Options(headers: _tokenHeader));
-    return response.data;
+    return CourseSearchResults.fromJson(response.data!);
   }
 
   Future<CourseGroup?> getCourseGroup(int groupId) async {

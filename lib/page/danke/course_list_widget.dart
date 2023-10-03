@@ -19,6 +19,7 @@ import 'dart:convert';
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
+import 'package:dan_xi/model/danke/search_results.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
@@ -26,6 +27,7 @@ import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// A list of courses.
 ///
@@ -40,47 +42,17 @@ class CourseListWidget extends StatefulWidget {
 }
 
 class CourseListWidgetState extends State<CourseListWidget> {
-  static List<CourseGroup>? _groups;
-  List<CourseGroup>? _displayedGroups;
+  List<CourseGroup> _searchResults = [];
   String? searchKeyword;
 
-  XSharedPreferences? pref;
-
-  Future<List<CourseGroup>?> _fetchMegaList({bool forceRefetch = false}) async {
-    pref ??= await XSharedPreferences.getInstance();
-
-    // List is LARGE, avoid deserializing for a second time
-    if (_groups != null && !forceRefetch) {
-      return _groups;
+  Future<List<CourseGroup>?> _fetchResults() async {
+    CourseSearchResults? result = await CurriculumBoardRepository.getInstance()
+        .searchCourseGroups(searchKeyword!);
+    if (result == null || result.items == null) {
+      return [];
     }
 
-    String? coursesJson;
-    if (pref!.containsKey("course_groups") && !forceRefetch) {
-      coursesJson = pref!.getString("course_groups");
-    } else {
-      coursesJson =
-          await CurriculumBoardRepository.getInstance().getCourseGroups();
-      pref!.setString("course_groups", coursesJson);
-    }
-
-    List<dynamic> jsonArray = jsonDecode(coursesJson!);
-    return jsonArray.map((e) => CourseGroup.fromJson(e)).toList();
-  }
-
-  Future<List<CourseGroup>?> _fetchList() async {
-    _groups ??= await _fetchMegaList();
-
-    if (searchKeyword != null) {
-      var searchPattern = searchKeyword!.startsWith('#')
-          ? searchKeyword!.substring(1)
-          : searchKeyword!;
-      return searchKeyword!.startsWith('#')
-          ? _groups.filter((element) => element.code!.contains(searchPattern))
-          : _groups.filter((element) => element.name!.contains(searchPattern));
-    } else {
-      // This shall not happen
-      return _groups!.take(20).toList();
-    }
+    return result.items!;
   }
 
   @override
@@ -101,30 +73,27 @@ class CourseListWidgetState extends State<CourseListWidget> {
   Widget build(BuildContext context) {
     return Expanded(
         child: FutureWidget<List<CourseGroup>?>(
-            future: _fetchList(),
+            future: _fetchResults(),
             successBuilder: (context, snapshot) {
-              _displayedGroups = snapshot.data;
+              _searchResults = snapshot.data!;
               return _buildPageBody(context);
             },
             errorBuilder: (BuildContext context,
                     AsyncSnapshot<List<CourseGroup>?> snapshot) =>
                 ErrorPageWidget.buildWidget(context, snapshot.error,
-                      stackTrace: snapshot.stackTrace,
-                      onTap: () => setState(() { })),
+                    stackTrace: snapshot.stackTrace,
+                    onTap: () => setState(() {})),
             loadingBuilder: Center(
-              child: Column(children: [
-                const SizedBox(height: 6),
-                Text(S.of(context).curriculum_first_load)
-              ]),
+              child: PlatformCircularProgressIndicator(),
             )));
   }
 
   Widget _buildPageBody(BuildContext context) {
     return ListView.builder(
       itemBuilder: (context, index) {
-        return CourseGroupCardWidget(courses: _displayedGroups![index]);
+        return CourseGroupCardWidget(courses: _searchResults[index]);
       },
-      itemCount: _displayedGroups!.length,
+      itemCount: _searchResults.length,
       scrollDirection: Axis.vertical,
     );
   }
