@@ -339,7 +339,7 @@ class ModifyMenuWidgetState extends State<ModifyMenuWidget> {
                   context,
                   S
                       .of(context)
-                      .about_to_delete_floor(widget.originalReview.reviewId!),
+                      .about_to_delete_review(widget.originalReview.reviewId!),
                   title: S.of(context).are_you_sure,
                   isConfirmDestructive: true) ==
               true) {

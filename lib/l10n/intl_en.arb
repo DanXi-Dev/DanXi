@@ -5,6 +5,7 @@
   "abnormal_entry_permission": "No rights",
   "about": "About This App",
   "about_to_delete_floor": "You are about to delete floor #{floor}",
+  "about_to_delete_review": "You are about to delete review #{review}",
   "accessibility_coloring": "Accessibility: High Contrast Color",
   "account": "Account",
   "account_is_set": "Your account is all set",

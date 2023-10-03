@@ -5,6 +5,7 @@
   "abnormal_entry_permission": "进校权限异常",
   "about": "关于本应用",
   "about_to_delete_floor": "您即将删除树洞 #{floor}",
+  "about_to_delete_review": "您即将删除帖子 #{review}",
   "accessibility_coloring": "辅助功能：高对比度颜色",
   "account": "账户",
   "account_is_set": "账户已设置完成",

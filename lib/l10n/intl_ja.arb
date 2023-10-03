@@ -5,6 +5,7 @@
   "abnormal_entry_permission": "校内へ立入禁止",
   "about": "このアプリについて",
   "about_to_delete_floor": "#{floor}を削除しようとしている",
+  "about_to_delete_review": "#{review}を削除しようとしている",
   "accessibility_coloring": "補助機能：ハイコントラスト色",
   "account": "アカウント",
   "account_is_set": "アカウント設定完了",
