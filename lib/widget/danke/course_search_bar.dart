@@ -23,7 +23,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 class CourseSearchBar extends StatefulWidget {
   final Function(String) onSearch;
 
-  CourseSearchBar({Key? key, required this.onSearch}) : super(key: key);
+  const CourseSearchBar({Key? key, required this.onSearch}) : super(key: key);
 
   @override
   _CourseSearchBarState createState() => _CourseSearchBarState();

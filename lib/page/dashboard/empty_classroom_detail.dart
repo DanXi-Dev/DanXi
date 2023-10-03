@@ -105,18 +105,16 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
 
   Future<List<RoomInfo>?> _getRoomInfo(PersonInfo? info, String areaName,
       String? buildingName, DateTime date) async {
-    var repository;
-    await EmptyClassroomRepository.getInstance()
-        .checkConnection()
-        .then((connected) {
-      if (connected) {
-        useEhall = false;
-        repository = EmptyClassroomRepository.getInstance();
-      } else {
-        useEhall = true;
-        repository = EhallEmptyClassroomRepository.getInstance();
-      }
-    });
+    dynamic repository;
+    bool connected =
+        await EmptyClassroomRepository.getInstance().checkConnection();
+    if (connected) {
+      useEhall = false;
+      repository = EmptyClassroomRepository.getInstance();
+    } else {
+      useEhall = true;
+      repository = EhallEmptyClassroomRepository.getInstance();
+    }
     return repository.getBuildingRoomInfo(info, areaName, buildingName, date);
   }
 

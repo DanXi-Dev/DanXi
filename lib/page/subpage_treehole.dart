@@ -72,6 +72,26 @@ bool isHtml(String content) {
   return htmlMatcher.hasMatch(content);
 }
 
+/// Should be called when user logged in DanXi account;
+/// it refreshes every page that cares about login status.
+/// (except the setting page, since it is refreshed when initializing token.)
+///
+/// FIXME: this is an ugly implementation that requires manual calling every time.
+void onLogin() {
+  treeholePageKey.currentState?.refreshList();
+  dankePageKey.currentState?.setState(() {});
+}
+
+/// Should be called when user logged out DanXi account;
+/// it refreshes every page that cares about login status.
+/// (except setting page, since it is refreshed when initializing token.)
+///
+/// FIXME: this is an ugly implementation that requires manual calling every time.
+void onLogout() {
+  treeholePageKey.currentState?.setState(() {});
+  dankePageKey.currentState?.setState(() {});
+}
+
 final RegExp latexRegExp = RegExp(r"<(tex|texLine)>.*?</(tex|texLine)>",
     multiLine: true, dotAll: true);
 final RegExp mentionRegExp =
@@ -694,7 +714,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             return OTWelcomeWidget(loginCallback: () async {
               await smartNavigatorPush(context, "/bbs/login",
                   arguments: {"info": StateProvider.personInfo.value!});
-              refreshList();
+              onLogin();
             });
           }
           return ErrorPageWidget.buildWidget(context, error,
