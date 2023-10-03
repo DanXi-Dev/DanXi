@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
+import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/page/danke/course_review_editor.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
@@ -26,8 +27,6 @@ import 'package:dan_xi/widget/danke/review_vote_widget.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'package:dan_xi/model/danke/course_review.dart';
 
 class CourseReviewWidget extends StatelessWidget {
   final CourseReview review;
@@ -337,7 +336,10 @@ class ModifyMenuWidgetState extends State<ModifyMenuWidget> {
         } else if (item == ActionItem.Delete) {
           if (!context.mounted) return;
           if (await Noticing.showConfirmationDialog(
-                  context, S.of(context).about_to_delete_floor("null"),
+                  context,
+                  S
+                      .of(context)
+                      .about_to_delete_floor(widget.originalReview.reviewId!),
                   title: S.of(context).are_you_sure,
                   isConfirmDestructive: true) ==
               true) {
