@@ -526,7 +526,7 @@ class DropdownListWidgetState<T> extends State<DropdownListWidget<T>> {
 
   void _initializeSelection() {
     if (widget.initialSelection != null) {
-      var index = widget.items.indexOf(widget.initialSelection!);
+      var index = widget.items.indexOf(widget.initialSelection as T);
       selectedItem = index >= 0 ? widget.items[index] : null;
     } else {
       selectedItem = null;

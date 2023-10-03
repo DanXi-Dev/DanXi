@@ -36,7 +36,7 @@ class CourseGroupCardWidget extends StatelessWidget {
   final bool translucent;
   final CourseGroup courseGroup;
 
-  CourseGroupCardWidget(
+  const CourseGroupCardWidget(
       {Key? key, required this.courseGroup, this.translucent = false})
       : super(key: key);
 
@@ -184,7 +184,7 @@ class FilterTag<T> {
 }
 
 class FilterListWidget<T> extends StatefulWidget {
-  FilterListWidget(
+  const FilterListWidget(
       {super.key,
       required this.filters,
       required this.onTap,
