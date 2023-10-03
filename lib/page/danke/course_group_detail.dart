@@ -126,14 +126,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
     super.initState();
     if (widget.arguments!.containsKey('group')) {
       groupId = widget.arguments!['group'];
-      /*
-      // Cache preloaded floor only when user views the Hole
-      for (var floor
-      in _course.floors?.prefetch ?? List<OTFloor>.empty(growable: false)) {
-        OpenTreeHoleRepository.getInstance().cacheFloor(floor);
-      }
-
-       */
     }
 
     StateProvider.needScreenshotWarning = true;
@@ -175,7 +167,10 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
       debugPrint(e.toString());
     }
 
-    _courses!.credit ??= _courses!.courseList!.first.credit;
+    // The old api doesn't return a credit list in the course group
+    // So we have to generate it here
+    _courses!.credits ??=
+        _courses!.courseList!.map((e) => e.credit!).toSet().toList();
 
     int totalScore = 0, scoreCount = 0;
     for (var elem in _courses!.courseList!) {
@@ -297,7 +292,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                       AsyncSnapshot<CourseGroup?> snapshot) =>
                   ErrorPageWidget.buildWidget(context, snapshot.error,
                       stackTrace: snapshot.stackTrace,
-                      onTap: () => setState(() { })),
+                      onTap: () => setState(() {})),
               loadingBuilder:
                   Center(child: PlatformCircularProgressIndicator())),
         ),
@@ -335,16 +330,13 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.grey)),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        ConstrainedBox(
-                            constraints: const BoxConstraints(minWidth: 56),
+                        ..._courses!.credits!.map((e) => Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
                             child: OTLeadingTag(
                               color: Colors.orange,
                               text:
-                                  "${_courses!.credit!.toStringAsFixed(1)} ${S.of(context).credits}",
-                            )),
+                                  "${e.toStringAsFixed(1)} ${S.of(context).credits}",
+                            )))
                       ],
                     )),
                 Row(

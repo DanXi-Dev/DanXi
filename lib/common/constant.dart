@@ -39,6 +39,8 @@ import 'package:flutter/services.dart';
 class Constant {
   /// The number of posts on each pages returned from the server of FDUHole.
   static const POST_COUNT_PER_PAGE = 10;
+  /// The number of serach results on each pages returned from the server of Danke.
+  static const SEARCH_COUNT_PER_PAGE=10;
 
   static const SUPPORT_QQ_GROUP = "941342818";
 

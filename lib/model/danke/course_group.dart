@@ -32,17 +32,24 @@ class CourseGroup {
 
   @JsonKey(name: 'week_hour')
   int? weekHour;
-  double? credit;
+  List<double>? credits;
 
   @JsonKey(name: 'course_list')
   List<Course>? courseList;
 
+  /// These two fields are only valid when retrieving from the v3 Danke api
+  /// Currently only the searching api has a v3 version
+  @JsonKey(name: 'course_count')
+  int? courseCount;
+  @JsonKey(name: 'review_count')
+  int? reviewCount;
+
   CourseGroup(this.id, this.name, this.code, this.department, this.weekHour,
-      this.credit, this.courseList);
+      this.credits, this.courseList);
 
   @override
   String toString() {
-    return 'CourseGroup{id: $id, name: $name, code: $code, department: $department, weekHour: $weekHour, credit: $credit, course_list: $courseList}';
+    return 'CourseGroup{id: $id, name: $name, code: $code, department: $department, weekHour: $weekHour, credits: $credits, course_list: $courseList}';
   }
 
   int getTotalReviewCount() {
@@ -63,7 +70,9 @@ class CourseGroup {
   Map<String, dynamic> toJson() => _$CourseGroupToJson(this);
 
   factory CourseGroup.dummy() =>
-      CourseGroup(-1, "Asoul虚拟偶像", "OP114514", "计算机科学与技术系", 4, 4.0, [
+      CourseGroup(-1, "Asoul虚拟偶像", "OP114514", "计算机科学与技术系", 4, [
+        4.0
+      ], [
         Course.dummy(),
         Course(1, "贝拉", 1145, 1451, 2, 4.9, [CourseReview.dummy()])
       ]);

@@ -41,10 +41,10 @@ const List<Color> wordColor = [
 class CourseGroupCardWidget extends StatelessWidget {
   // changeable style of the card
   final bool translucent;
-  final CourseGroup courses;
+  final CourseGroup courseGroup;
 
   CourseGroupCardWidget(
-      {Key? key, required this.courses, this.translucent = false})
+      {Key? key, required this.courseGroup, this.translucent = false})
       : super(key: key);
 
   @override
@@ -80,14 +80,14 @@ class CourseGroupCardWidget extends StatelessWidget {
                             children: [
                               // todo add course information style
                               Text(
-                                courses.getFullName(),
+                                courseGroup.getFullName(),
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold),
                                 softWrap: true,
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                courses.code!,
+                                courseGroup.code!,
                                 textAlign: TextAlign.left,
                                 style: const TextStyle(
                                     fontSize: 12, color: Colors.grey),
@@ -103,11 +103,11 @@ class CourseGroupCardWidget extends StatelessWidget {
                           spacing: 5,
                           // for each credit in credits create a text
                           children: <Widget>[
-                            OTLeadingTag(
-                              color: Colors.orange,
-                              text:
-                                  "${courses.courseList!.first.credit!.toStringAsFixed(1)} ${S.of(context).credits}",
-                            ),
+                            ...courseGroup.credits!.map((e) => OTLeadingTag(
+                                  color: Colors.orange,
+                                  text:
+                                      "${e.toStringAsFixed(1)} ${S.of(context).credits}",
+                                )),
                           ],
                         ),
                       ],
@@ -116,7 +116,7 @@ class CourseGroupCardWidget extends StatelessWidget {
                 ),
               ]),
           onTap: () => smartNavigatorPush(context, "/danke/courseDetail",
-              arguments: {"group": courses.id}),
+              arguments: {"group": courseGroup.id}),
         ),
         const Divider(
           height: 5,
@@ -128,16 +128,10 @@ class CourseGroupCardWidget extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Text(
-                // TODO: waiting for upstream support
-                "3",
-                style: infoStyle,
-              ),
               Row(
                 children: [
                   Icon(
-                      // fixme PlatformX.isMaterial(context) treehole_widgets.dart: 234
-                      CupertinoIcons.ellipses_bubble,
+                      Icons.file_copy,
                       size: infoStyle.fontSize,
                       color: infoStyle.color),
                   const SizedBox(
@@ -145,7 +139,23 @@ class CourseGroupCardWidget extends StatelessWidget {
                   ),
                   Text(
                     // TODO: waiting for upstream support
-                    "0",
+                    "${courseGroup.courseCount}",
+                    style: infoStyle,
+                  )
+                ],
+              ),
+              Row(
+                children: [
+                  Icon(
+                      // fixme PlatformX.isMaterial(context) treehole_widgets.dart: 234
+                      Icons.comment,
+                      size: infoStyle.fontSize,
+                      color: infoStyle.color),
+                  const SizedBox(
+                    width: 3,
+                  ),
+                  Text(
+                    "${courseGroup.reviewCount}",
                     style: infoStyle,
                   )
                 ],

@@ -64,13 +64,14 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
   factory CurriculumBoardRepository.getInstance() => _instance;
 
   // Return raw json string
-  Future<CourseSearchResults?> searchCourseGroups(String keyword) async {
+  Future<CourseSearchResults?> searchCourseGroups(String keyword,
+      {int? page, int pageLength = Constant.SEARCH_COUNT_PER_PAGE}) async {
     Response<Map<String, dynamic>> response = await dio.get(
-      "$_BASE_URL/v3/course_groups/search",
-      queryParameters: {
+        "$_BASE_URL/v3/course_groups/search",
+        queryParameters: {
           'query': keyword,
-          'page': 1,
-          'page_size': 10
+          'page': page ?? 1,
+          'page_size': pageLength
         },
         options: Options(headers: _tokenHeader));
     return CourseSearchResults.fromJson(response.data!);

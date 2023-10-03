@@ -15,17 +15,13 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
-
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/search_results.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
-import 'package:dan_xi/widget/libraries/future_widget.dart';
+import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -42,12 +38,15 @@ class CourseListWidget extends StatefulWidget {
 }
 
 class CourseListWidgetState extends State<CourseListWidget> {
-  List<CourseGroup> _searchResults = [];
   String? searchKeyword;
+  bool hasFetchedAllData = false;
 
-  Future<List<CourseGroup>?> _fetchResults() async {
+  final PagedListViewController<CourseGroup> _listViewController =
+      PagedListViewController<CourseGroup>();
+
+  Future<List<CourseGroup>?> _loadContent(int page) async {
     CourseSearchResults? result = await CurriculumBoardRepository.getInstance()
-        .searchCourseGroups(searchKeyword!);
+        .searchCourseGroups(searchKeyword!, page: page);
     if (result == null || result.items == null) {
       return [];
     }
@@ -72,29 +71,32 @@ class CourseListWidgetState extends State<CourseListWidget> {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-        child: FutureWidget<List<CourseGroup>?>(
-            future: _fetchResults(),
-            successBuilder: (context, snapshot) {
-              _searchResults = snapshot.data!;
-              return _buildPageBody(context);
-            },
-            errorBuilder: (BuildContext context,
-                    AsyncSnapshot<List<CourseGroup>?> snapshot) =>
-                ErrorPageWidget.buildWidget(context, snapshot.error,
-                    stackTrace: snapshot.stackTrace,
-                    onTap: () => setState(() {})),
-            loadingBuilder: Center(
-              child: PlatformCircularProgressIndicator(),
-            )));
+        child: PagedListView<CourseGroup>(
+      pagedController: _listViewController,
+      withScrollbar: true,
+      scrollController: PrimaryScrollController.of(context),
+      // If we need to scroll to the end, we should prefetch all the data beforehand.
+      // See also [prefetchAllFloors] in [TreeHoleSubpageState].
+      dataReceiver: _loadContent,
+      builder: _getListItems,
+      loadingBuilder: (BuildContext context) => Container(
+        padding: const EdgeInsets.all(8),
+        child: Center(child: PlatformCircularProgressIndicator()),
+      ),
+      fatalErrorBuilder: (BuildContext context, dynamic snapshot) =>
+          ErrorPageWidget.buildWidget(context, snapshot.error,
+              stackTrace: snapshot.stackTrace, onTap: () => setState(() {})),
+      endBuilder: (context) => Center(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Text(S.of(context).end_reached),
+        ),
+      ),
+    ));
   }
 
-  Widget _buildPageBody(BuildContext context) {
-    return ListView.builder(
-      itemBuilder: (context, index) {
-        return CourseGroupCardWidget(courses: _searchResults[index]);
-      },
-      itemCount: _searchResults.length,
-      scrollDirection: Axis.vertical,
-    );
+  Widget _getListItems(BuildContext context,
+      ListProvider<CourseGroup> dataProvider, int index, CourseGroup group) {
+    return CourseGroupCardWidget(courseGroup: group);
   }
 }
