@@ -93,7 +93,7 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
                       CourseSearchBar(
                         onSearch: (String text) {
                           // Avoid unnecessary rebuilding
-                          if (text.isEmpty != idle) {
+                          if (text != searchText) {
                             setState(
                               () {
                                 idle = text.isEmpty;
