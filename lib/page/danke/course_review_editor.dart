@@ -354,8 +354,9 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                       onChanged: (e) {
                         teacherFilterNotifier.value = e!;
                       },
-                      itemBuilder: (e) =>
-                          DropdownMenuItem(value: e, child: Text(e)),
+                      itemBuilder: (e) => DropdownMenuItem(
+                          value: e,
+                          child: Text(e, overflow: TextOverflow.ellipsis)),
                     )),
                 Expanded(
                     flex: 1,
@@ -373,7 +374,9 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                                 review.courseId = e!.id!;
                               },
                               itemBuilder: (e) => DropdownMenuItem(
-                                  value: e, child: Text(e.formatTime()))),
+                                  value: e,
+                                  child: Text(e.formatTime(),
+                                      overflow: TextOverflow.ellipsis))),
                       valueListenable: teacherFilterNotifier,
                     )),
               ]),
@@ -495,6 +498,7 @@ class DropdownListWidgetState<T> extends State<DropdownListWidget<T>> {
             Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Text(widget.labelText),
           DropdownButton<T>(
+            isExpanded: true,
             value: selectedItem,
             hint: Text(widget.hintText),
             icon: const Icon(Icons.arrow_drop_down),
