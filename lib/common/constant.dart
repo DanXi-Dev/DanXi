@@ -276,9 +276,11 @@ class Constant {
             "JingYiJun",
             "assets/graphics/JingYiJun.jpg",
             "https://github.com/JingYiJun",
-            S.of(context).boreas618_description),
+            S.of(context).jingyijun_description),
         Developer("fsy2001", "assets/graphics/fsy2001.jpg",
-            "https://github.com/fsy2001", S.of(context).boreas618_description),
+            "https://github.com/fsy2001", S.of(context).fsy2001_description),
+        Developer("HydrogenC", "assets/graphics/HydrogenC.jpg",
+            "https://github.com/HydrogenC", S.of(context).hydrogenc_description),
       ];
 
   /// Add a Chinese symbol(￥) at the end of [num].
