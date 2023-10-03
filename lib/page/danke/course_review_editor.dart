@@ -77,33 +77,53 @@ final PostInterceptor _kStopWordInterceptor = (context, text) async {
 };
 
 class CourseReviewEditorText with ChangeNotifier {
-  late int courseId;
-  late CourseGrade grade;
-  String? content, title;
+  int _courseId = -1;
+  CourseGrade _grade = CourseGrade(0, 0, 0, 0);
+  String? _content, _title;
 
-  CourseReviewEditorText(this.content, this.title, this.courseId, this.grade);
-
-  void copyValuesFrom(CourseReviewEditorText other) {
-    courseId = other.courseId;
-    grade = other.grade;
-    content = other.content;
-    title = other.title;
+  int get courseId => _courseId;
+  set courseId(int val) {
+    _courseId = val;
     notifyListeners();
   }
 
-// Eliminite the warning for calling notifyListeners
-  void notifyChanges() {
+  CourseGrade get grade => _grade;
+  set grade(CourseGrade val) {
+    _grade = val;
+    notifyListeners();
+  }
+
+  String? get content => _content;
+  set content(String? val) {
+    _content = val;
+    notifyListeners();
+  }
+
+  String? get title => _title;
+  set title(String? val) {
+    _title = val;
+    notifyListeners();
+  }
+
+  CourseReviewEditorText(
+      this._content, this._title, this._courseId, this._grade);
+
+  void copyValuesFrom(CourseReviewEditorText other) {
+    _courseId = other._courseId;
+    _grade = other._grade;
+    _content = other._content;
+    _title = other._title;
     notifyListeners();
   }
 
   bool isValid() {
-    return (content ?? "").isNotEmpty &&
-        (title ?? "").isNotEmpty &&
-        courseId >= 0 &&
-        _inRange(grade.overall ?? 0) &&
-        _inRange(grade.content ?? 0) &&
-        _inRange(grade.workload ?? 0) &&
-        _inRange(grade.assessment ?? 0);
+    return (_content ?? "").isNotEmpty &&
+        (_title ?? "").isNotEmpty &&
+        _courseId >= 0 &&
+        _inRange(_grade.overall ?? 0) &&
+        _inRange(_grade.content ?? 0) &&
+        _inRange(_grade.workload ?? 0) &&
+        _inRange(_grade.assessment ?? 0);
   }
 
   static bool _inRange(int val, [int min = 1, int max = 5]) {
@@ -111,10 +131,8 @@ class CourseReviewEditorText with ChangeNotifier {
   }
 
   CourseReviewEditorText.newInstance({withContent = '', withTitle = ''}) {
-    content = withContent;
-    title = withTitle;
-    courseId = -1;
-    grade = CourseGrade(0, 0, 0, 0);
+    _content = withContent;
+    _title = withTitle;
   }
 }
 
@@ -297,9 +315,8 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
       autofocus: true,
       textAlignVertical: TextAlignVertical.top,
       controller: contentController,
-      onChanged: (p0) {
-        review.content = p0;
-        review.notifyChanges();
+      onChanged: (text) {
+        review.content = text;
       },
     );
 
@@ -361,7 +378,6 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                               labelText: S.of(context).course_schedule,
                               onChanged: (e) {
                                 review.courseId = e!.id!;
-                                review.notifyChanges();
                               },
                               itemBuilder: (e) => DropdownMenuItem(
                                   value: e, child: Text(e.formatTime()))),
@@ -379,9 +395,8 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
               expands: false,
               autofocus: true,
               textAlignVertical: TextAlignVertical.top,
-              onChanged: (p0) {
-                review.title = p0;
-                review.notifyChanges();
+              onChanged: (text) {
+                review.title = text;
               },
               controller: titleController,
             ),
@@ -412,8 +427,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
               words: overallWord!,
               initialRating: review.grade.overall,
               onRate: (e) {
-                review.grade.overall = e;
-                review.notifyChanges();
+                review.grade = review.grade.withFields(overall: e);
               },
             ),
             CourseRatingWidget(
@@ -421,16 +435,14 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                 words: contentWord!,
                 initialRating: review.grade.content,
                 onRate: (e) {
-                  review.grade.content = e;
-                  review.notifyChanges();
+                  review.grade = review.grade.withFields(content: e);
                 }),
             CourseRatingWidget(
               label: S.of(context).curriculum_ratings_workload,
               words: workloadWord!,
               initialRating: review.grade.workload,
               onRate: (e) {
-                review.grade.workload = e;
-                review.notifyChanges();
+                review.grade = review.grade.withFields(workload: e);
               },
             ),
             CourseRatingWidget(
@@ -438,8 +450,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
               words: assessmentWord!,
               initialRating: review.grade.assessment,
               onRate: (e) {
-                review.grade.assessment = e;
-                review.notifyChanges();
+                review.grade = review.grade.withFields(assessment: e);
               },
             ),
             const Divider(),

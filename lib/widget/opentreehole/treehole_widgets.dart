@@ -105,18 +105,13 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
   List<Widget> tags = [];
   for (var element in e.tags!) {
     if (element.name == KEY_NO_TAG) continue;
-    tags.add(Flex(
-        direction: Axis.horizontal,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          RoundChip(
-            onTap: () => onTap(element.name),
-            label: Constant.withZwb(element.name),
-            color: useAccessibilityColoring
-                ? Theme.of(context).textTheme.bodyLarge!.color
-                : element.color,
-          ),
-        ]));
+    tags.add(RoundChip(
+      onTap: () => onTap(element.name),
+      label: Constant.withZwb(element.name),
+      color: useAccessibilityColoring
+          ? Theme.of(context).textTheme.bodyLarge!.color
+          : element.color,
+    ));
   }
   return Wrap(
     direction: Axis.horizontal,

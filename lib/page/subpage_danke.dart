@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/page/danke/course_list_widget.dart';
@@ -28,6 +29,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:dan_xi/widget/danke/random_review_widgets.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
+import 'package:dan_xi/widget/libraries/sized_by_child_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -62,36 +64,44 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
 
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     return Container(
-        // padding top
-        decoration: _backgroundImage == null
-            ? null
-            : BoxDecoration(
-                image: DecorationImage(
-                    image: _backgroundImage!, fit: BoxFit.cover)),
-        child: LayoutBuilder(
-            builder: (context, constraints) => Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    // animated sized box
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      // Golden ratio minus the height of the title bar
-                      height: idle ? constraints.maxHeight * 0.382 - 56 : 0,
-                    ),
-                    CourseSearchBar(
-                      onSearch: (String text) {
-                        setState(
-                          () {
-                            idle = text.isEmpty;
-                            searchText = text;
-                          },
-                        );
-                      },
-                    ),
-                    _buildPageContent(context)
-                  ],
-                  // button
-                )));
+      // padding top
+      decoration: _backgroundImage == null
+          ? null
+          : BoxDecoration(
+              image:
+                  DecorationImage(image: _backgroundImage!, fit: BoxFit.cover)),
+      child: LayoutBuilder(
+          builder: (context, constraints) => SizedByChildBuilder(
+              child: (context, key) => CourseSearchBar(
+                    onSearch: (text) {},
+                  ),
+              builder: (context, size) => Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      // animated sized box
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        // Golden ratio minus the height of the title bar
+                        height: idle
+                            ? (constraints.maxHeight * 0.382 - size.height)
+                                .clamp(0, constraints.maxHeight - size.height)
+                            : 0,
+                      ),
+                      CourseSearchBar(
+                        onSearch: (String text) {
+                          setState(
+                            () {
+                              idle = text.isEmpty;
+                              searchText = text;
+                            },
+                          );
+                        },
+                      ),
+                      _buildPageContent(context)
+                    ],
+                    // button
+                  ))),
+    );
   }
 
   Future<CourseReview?> _loadRandomReview() async {

@@ -29,7 +29,13 @@ class CourseGrade {
 
   CourseGrade(this.overall, this.content, this.workload, this.assessment);
 
-  factory CourseGrade.fromJson(Map<String, dynamic> json) => _$CourseGradeFromJson(json);
+  CourseGrade withFields(
+          {int? overall, int? content, int? workload, int? assessment}) =>
+      CourseGrade(overall ?? this.overall, content ?? this.content,
+          workload ?? this.workload, assessment ?? this.assessment);
+
+  factory CourseGrade.fromJson(Map<String, dynamic> json) =>
+      _$CourseGradeFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseGradeToJson(this);
 
