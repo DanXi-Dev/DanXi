@@ -23,6 +23,7 @@ import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -107,7 +108,9 @@ class CourseListWidgetState extends State<CourseListWidget> {
             },
             errorBuilder: (BuildContext context,
                     AsyncSnapshot<List<CourseGroup>?> snapshot) =>
-                errorCard(snapshot, () => setState(() {})),
+                ErrorPageWidget.buildWidget(context, snapshot.error,
+                      stackTrace: snapshot.stackTrace,
+                      onTap: () => setState(() { })),
             loadingBuilder: Center(
               child: Column(children: [
                 const SizedBox(height: 6),

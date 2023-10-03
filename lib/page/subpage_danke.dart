@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/page/danke/course_list_widget.dart';
@@ -28,6 +27,7 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:dan_xi/widget/danke/random_review_widgets.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/sized_by_child_builder.dart';
 import 'package:flutter/cupertino.dart';
@@ -73,6 +73,7 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
       child: LayoutBuilder(
           builder: (context, constraints) => SizedByChildBuilder(
               child: (context, key) => CourseSearchBar(
+                    key: key,
                     onSearch: (text) {},
                   ),
               builder: (context, size) => Column(
@@ -121,7 +122,9 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
                 review: snapshot.data!, onTap: () => setState(() {})),
             errorBuilder:
                 (BuildContext context, AsyncSnapshot<CourseReview?> snapshot) =>
-                    errorCard(snapshot, () => setState(() {})),
+                    ErrorPageWidget.buildWidget(context, snapshot.error,
+                      stackTrace: snapshot.stackTrace,
+                      onTap: () => setState(() { })),
             loadingBuilder: Center(
               child: PlatformCircularProgressIndicator(),
             ))

@@ -52,8 +52,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   static final String _IMAGE_BASE_URL =
       SettingsProvider.getInstance().imageBaseUrl;
 
-  late FDUHoleProvider provider;
-
   /// Cached floors, used by [mentions]
   final Map<int, OTFloor> _floorCache = {};
 
@@ -65,9 +63,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   String? lastUploadToken;
 
-  static void init(FDUHoleProvider injectProvider) {
-    OpenTreeHoleRepository.getInstance().provider = injectProvider;
-  }
+  /// Short name for the provider singleton
+  FDUHoleProvider get provider => FDUHoleProvider.getInstance();
 
   Future<void> logout() async {
     if (!provider.isUserInitialized) {
@@ -216,7 +213,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         JWToken.fromJsonWithVerification(response.data!);
   }
 
-  Map<String, String> get tokenHeader {
+  Map<String, String> get _tokenHeader {
     if (provider.token == null || !provider.token!.isValid) {
       throw NotLoginError("Null Token");
     }
@@ -228,7 +225,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       return provider.divisionCache;
     }
     final Response<List<dynamic>> response = await dio
-        .get("$_BASE_URL/divisions", options: Options(headers: tokenHeader));
+        .get("$_BASE_URL/divisions", options: Options(headers: _tokenHeader));
     provider.divisionCache =
         response.data?.map((e) => OTDivision.fromJson(e)).toList() ?? [];
     return provider.divisionCache;
@@ -260,7 +257,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_URL/divisions/$divisionId",
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     final newDivision = OTDivision.fromJson(response.data!);
     var newList = provider.divisionCache.toList();
     newList.removeWhere((element) => element.division_id == divisionId);
@@ -284,7 +281,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           "tag": tag,
           "order": sortOrder.getInternalString()
         },
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
@@ -298,14 +295,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
               "size": length,
               "order": sortOrder.getInternalString()
             },
-            options: Options(headers: tokenHeader));
+            options: Options(headers: _tokenHeader));
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
   Future<OTHole?> loadSpecificHole(int holeId) async {
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_URL/holes/$holeId",
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     final hole = OTHole.fromJson(response.data!);
     for (var floor in hole.floors!.prefetch!) {
       cacheFloor(floor);
@@ -324,7 +321,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_URL/floors/$floorId",
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     final floor = OTFloor.fromJson(response.data!);
     cacheFloor(floor);
     return floor;
@@ -338,7 +335,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           "hole_id": post.hole_id,
           "length": length
         },
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     final floors = response.data?.map((e) => OTFloor.fromJson(e)).toList();
     for (var element in floors!) {
       cacheFloor(element);
@@ -358,7 +355,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           "s": searchString,
           "length": length,
         },
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     return response.data?.map((e) => OTFloor.fromJson(e)).toList();
   }
 
@@ -367,7 +364,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       return _tagCache;
     }
     final Response<List<dynamic>> response = await dio.get("$_BASE_URL/tags",
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     return _tagCache = response.data!.map((e) => OTTag.fromJson(e)).toList();
   }
 
@@ -382,7 +379,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           "content": content,
           "tags": tags,
         },
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     return response.statusCode;
   }
 
@@ -400,7 +397,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
               "auth_token": token!,
               "source": await MultipartFile.fromFile(path, filename: fileName)
             }),
-            options: Options(headers: tokenHeader));
+            options: Options(headers: _tokenHeader));
     return response.data!['image']['display_url'];
   }
 
@@ -418,7 +415,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           "hole_id": discussionId,
           //"mention": findMention(content)
         },
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     return response.statusCode;
   }
 
@@ -432,7 +429,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<OTFloor?> likeFloor(int floorId, int like) async {
     final Response<Map<String, dynamic>> response = await dio.post(
         "$_BASE_URL/floors/$floorId/like/$like",
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     return OTFloor.fromJson(response.data!);
   }
 
@@ -440,7 +437,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     // Suppose user is logged in. He should be.
     final Response<dynamic> response = await dio.post("$_BASE_URL/reports",
         data: {"floor_id": postId, "reason": reason},
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     return response.statusCode;
   }
 
@@ -454,7 +451,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<OTUser?> getUserProfile({bool forceUpdate = false}) async {
     if (provider.userInfo == null || forceUpdate) {
       final Response<Map<String, dynamic>> response = await dio
-          .get("$_BASE_URL/users", options: Options(headers: tokenHeader));
+          .get("$_BASE_URL/users", options: Options(headers: _tokenHeader));
       provider.userInfo = OTUser.fromJson(response.data!);
       provider.userInfo?.favorites = null;
       provider.userInfo?.subscriptions = null;
@@ -466,7 +463,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     final Response<Map<String, dynamic>> response = await dio.put(
         "$_BASE_URL/users/${provider.userInfo!.user_id}",
         data: provider.userInfo!.toJson(),
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     provider.userInfo = OTUser.fromJson(response.data!);
     provider.userInfo?.favorites = null;
     provider.userInfo?.subscriptions = null;
@@ -475,7 +472,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<void> updateHoleViewCount(int holeId) async {
     await dio.patch("$_BASE_URL/holes/$holeId",
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
   }
 
   Future<List<OTMessage>?> loadMessages(
@@ -486,7 +483,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
               "not_read": unreadOnly,
               "start_time": startTime?.toUtc().toIso8601String(),
             },
-            options: Options(headers: tokenHeader));
+            options: Options(headers: _tokenHeader));
     return response.data?.map((e) => OTMessage.fromJson(e)).toList();
   }
 
@@ -495,7 +492,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         data: {
           "has_read": message.has_read,
         },
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
   }
 
   Future<void> clearMessages() async {
@@ -503,7 +500,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         data: {
           "clear_all": true,
         },
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
   }
 
   Future<bool?> isUserAdmin() async {
@@ -528,7 +525,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_URL/user/favorites",
         queryParameters: {"plain": true},
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     provider.userInfo?.favorites = response.data?['data']?.cast<int>();
     return provider.userInfo?.favorites;
   }
@@ -540,7 +537,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_URL/users/subscriptions",
         queryParameters: {"plain": true},
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     provider.userInfo?.subscriptions = response.data?['data']?.cast<int>();
     return provider.userInfo?.subscriptions;
   }
@@ -552,7 +549,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     final Response<List<dynamic>> response = await dio.get(
         "$_BASE_URL/user/favorites",
         queryParameters: {"length": length, "prefetch_length": prefetchLength},
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
@@ -563,7 +560,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     final Response<List<dynamic>> response = await dio.get(
         "$_BASE_URL/users/subscriptions",
         queryParameters: {"length": length, "prefetch_length": prefetchLength},
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
@@ -572,11 +569,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     switch (mode) {
       case SetStatusMode.ADD:
         response = await dio.post("$_BASE_URL/user/favorites",
-            data: {'hole_id': holeId}, options: Options(headers: tokenHeader));
+            data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
         break;
       case SetStatusMode.DELETE:
         response = await dio.delete("$_BASE_URL/user/favorites",
-            data: {'hole_id': holeId}, options: Options(headers: tokenHeader));
+            data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
         break;
     }
     final Map<String, dynamic> result = response.data;
@@ -588,11 +585,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     switch (mode) {
       case SetStatusMode.ADD:
         response = await dio.post("$_BASE_URL/users/subscriptions",
-            data: {'hole_id': holeId}, options: Options(headers: tokenHeader));
+            data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
         break;
       case SetStatusMode.DELETE:
         response = await dio.delete("$_BASE_URL/users/subscription",
-            data: {'hole_id': holeId}, options: Options(headers: tokenHeader));
+            data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
         break;
     }
     final Map<String, dynamic> result = response.data;
@@ -606,14 +603,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
               "content": content,
               //"mention": findMention(content),
             },
-            options: Options(headers: tokenHeader)))
+            options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
   /// Delete a floor
   Future<int?> deleteFloor(int? floorId) async {
     return (await dio.delete("$_BASE_URL/floors/$floorId",
-            options: Options(headers: tokenHeader)))
+            options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
@@ -621,7 +618,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<List<OTPunishment>?> getPunishmentHistory() async {
     final Response<List<dynamic>> response = await dio.get(
         "$_BASE_URL/users/me/punishments",
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     return response.data?.map((e) => OTPunishment.fromJson(e)).toList();
   }
 
@@ -630,7 +627,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       [int length = 10]) async {
     final response = await dio.get("$_BASE_URL/reports",
         queryParameters: {"offset": startReport, "size": length},
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     final result = response.data;
     return result.map<OTReport>((e) => OTReport.fromJson(e)).toList();
   }
@@ -641,32 +638,32 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
               if (deleteReason?.isNotEmpty == true)
                 "delete_reason": deleteReason ?? ""
             },
-            options: Options(headers: tokenHeader)))
+            options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
   Future<List<OTHistory>?> getHistory(int? floorId) async {
     final Response<List<dynamic>> response = await dio.get(
         "$_BASE_URL/floors/$floorId/history",
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     return response.data?.map((e) => OTHistory.fromJson(e)).toList();
   }
 
   Future<int?> adminDeleteHole(int? holeId) async {
     return (await dio.delete("$_BASE_URL/holes/$holeId",
-            options: Options(headers: tokenHeader)))
+            options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
   Future<int?> adminLockHole(int? holeId, bool lock) async {
     return (await dio.put("$_BASE_URL/holes/$holeId",
-            data: {"lock": lock}, options: Options(headers: tokenHeader)))
+            data: {"lock": lock}, options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
   Future<int?> adminUndeleteHole(int? holeId) async {
     return (await dio.put("$_BASE_URL/holes/$holeId",
-            data: {"unhidden": true}, options: Options(headers: tokenHeader)))
+            data: {"unhidden": true}, options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
@@ -674,14 +671,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   Future<int?> adminAddPenalty(int? floorId, int penaltyLevel) async {
     return (await dio.post("$_BASE_URL/penalty/$floorId",
             data: jsonEncode({"penalty_level": penaltyLevel}),
-            options: Options(headers: tokenHeader)))
+            options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
   Future<int?> adminAddPenaltyDays(int? floorId, int penaltyDays) async {
     return (await dio.post("$_BASE_URL/penalty/$floorId",
             data: jsonEncode({"days": penaltyDays}),
-            options: Options(headers: tokenHeader)))
+            options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
@@ -693,7 +690,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
               if (description != null) "description": description,
               if (pinned != null) "pinned": pinned,
             }),
-            options: Options(headers: tokenHeader)))
+            options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
@@ -702,7 +699,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
             data: {
               "special_tag": tag,
             },
-            options: Options(headers: tokenHeader)))
+            options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
@@ -710,40 +707,40 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       List<OTTag> tag, int? holeId, int? divisionId) async {
     return (await dio.put("$_BASE_URL/holes/$holeId",
             data: {"tags": tag, "division_id": divisionId},
-            options: Options(headers: tokenHeader)))
+            options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
   Future<int?> adminFoldFloor(List<String> fold, int? floorId) async {
     return (await dio.put("$_BASE_URL/floors/$floorId",
-            data: {"fold": fold}, options: Options(headers: tokenHeader)))
+            data: {"fold": fold}, options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
   Future<int?> adminChangePassword(String email, String password) async {
     return (await dio.patch("$_BASE_URL/register",
             data: {"email": email, "password": password},
-            options: Options(headers: tokenHeader)))
+            options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
   Future<int?> adminSendMessage(String message, List<int> ids) async {
     return (await dio.post("$_BASE_URL/messages",
             data: {"description": message, "recipients": ids},
-            options: Options(headers: tokenHeader)))
+            options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
   Future<int?> adminSetReportDealt(int reportId) async {
     return (await dio.delete("$_BASE_URL/reports/$reportId",
-            options: Options(headers: tokenHeader)))
+            options: Options(headers: _tokenHeader)))
         .statusCode;
   }
 
   Future<List<String>?> adminGetPunishmentHistory(int floorId) async {
     final Response<List<dynamic>> response = await dio.get(
         "$_BASE_URL/floors/$floorId/punishment",
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     return response.data?.map((e) => e as String).toList();
   }
 
@@ -758,7 +755,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
             "device_id": id,
             "token": token,
           },
-          options: Options(headers: tokenHeader));
+          options: Options(headers: _tokenHeader));
     } else {
       _pushNotificationRegData = PushNotificationRegData(id, token, service);
     }
@@ -766,12 +763,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<void> deletePushNotificationToken(String deviceId) async {
     await dio.delete("$_BASE_URL/users/push-tokens",
-        data: {"device_id": deviceId}, options: Options(headers: tokenHeader));
+        data: {"device_id": deviceId}, options: Options(headers: _tokenHeader));
   }
 
   Future<int?> deleteAllPushNotificationToken() async {
     final resp = await dio.delete("$_BASE_URL/users/push-tokens/_all",
-        options: Options(headers: tokenHeader));
+        options: Options(headers: _tokenHeader));
     return resp.statusCode;
   }
 

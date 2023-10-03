@@ -29,6 +29,16 @@ import 'package:flutter/foundation.dart';
 /// Also see:
 /// * [StateProvider]
 class FDUHoleProvider with ChangeNotifier {
+  static late FDUHoleProvider _instance;
+
+  factory FDUHoleProvider.getInstance() => _instance;
+
+  static void init(FDUHoleProvider injectProvider) {
+    _instance = injectProvider;
+  }
+
+  FDUHoleProvider();
+
   /// Caches of [OTEditor].
   final Map<EditorObject?, PostEditorText> editorCache = {};
 

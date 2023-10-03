@@ -18,7 +18,6 @@
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/smart_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 /// [FutureWidget] is a variation of [FutureBuilder],
 /// which will build different widgets depending on different states: See [ConnectionState.values].
@@ -143,13 +142,3 @@ class _FutureWidgetState<T> extends State<FutureWidget<T>> {
     _activeCallbackIdentity = null;
   }
 }
-
-Widget errorCard<T>(AsyncSnapshot<T> snapshot, void Function() onTap) => Card(
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text("${snapshot.error}\n${snapshot.stackTrace}", maxLines: 10,),
-        ),
-      ),
-    );

@@ -35,6 +35,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/danke/course_review_widget.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -294,7 +295,9 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
               },
               errorBuilder: (BuildContext context,
                       AsyncSnapshot<CourseGroup?> snapshot) =>
-                  errorCard(snapshot, () => setState(() {})),
+                  ErrorPageWidget.buildWidget(context, snapshot.error,
+                      stackTrace: snapshot.stackTrace,
+                      onTap: () => setState(() { })),
               loadingBuilder:
                   Center(child: PlatformCircularProgressIndicator())),
         ),

@@ -19,6 +19,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/page/danke/course_review_editor.dart';
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
@@ -33,8 +34,8 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
   CurriculumBoardRepository._() {
     dio.interceptors.add(JWTInterceptor(
         "$_BASE_AUTH_URL/refresh",
-        () => SettingsProvider.getInstance().fduholeToken,
-        (token) => OpenTreeHoleRepository.getInstance().provider.token =
+        () => provider.token,
+        (token) => provider.token =
             SettingsProvider.getInstance().fduholeToken = token));
     dio.interceptors.add(
         UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
@@ -47,8 +48,15 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
         sendTimeout: 10000);
   }
 
-  Map<String, String> get _tokenHeader =>
-      OpenTreeHoleRepository.getInstance().tokenHeader;
+  /// Short name for the provider singleton
+  FDUHoleProvider get provider => FDUHoleProvider.getInstance();
+
+  Map<String, String> get _tokenHeader {
+    if (provider.token == null || !provider.token!.isValid) {
+      throw NotLoginError("Null Token");
+    }
+    return {"Authorization": "Bearer ${provider.token!.access!}"};
+  }
 
   static final _instance = CurriculumBoardRepository._();
 

@@ -51,7 +51,6 @@ import 'package:dan_xi/provider/language_manager.dart';
 import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -313,7 +312,7 @@ class DanxiApp extends StatelessWidget {
     var fduHoleProvider = FDUHoleProvider();
     // Init OpenTreeHoleRepository with the provider. This is the api implementations
     // of OpenTreeHole.
-    OpenTreeHoleRepository.init(fduHoleProvider);
+    FDUHoleProvider.init(fduHoleProvider);
 
     // Wrap the whole app with [Phoenix] to enable fast reload. When user
     // logouts the Fudan UIS account, the whole app will be reloaded.

@@ -67,8 +67,8 @@ final PostInterceptor _kStopWordInterceptor = (context, text) async {
     var checkedStopWord = stopWordList.firstWhere((element) =>
         element.isNotEmpty && (regularText?.contains(element) ?? false));
     return await Noticing.showConfirmationDialog(
-            context, S.of(context).post_has_stop_words(checkedStopWord.trim()),
-            title: S.of(context).post_has_stop_words_title,
+            context, S.of(context).has_stop_words(checkedStopWord.trim()),
+            title: S.of(context).has_stop_words_title,
             confirmText: S.of(context).continue_sending,
             isConfirmDestructive: true) ??
         false;
@@ -246,10 +246,6 @@ class CourseReviewEditorWidget extends StatefulWidget {
 
 class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
   late CourseReviewEditorText review;
-  final GlobalKey<DropdownListWidgetState<Course>> _timeSelectorKey =
-      GlobalKey<DropdownListWidgetState<Course>>();
-  final GlobalKey<DropdownListWidgetState<String>> _teacherSelectorKey =
-      GlobalKey<DropdownListWidgetState<String>>();
   late TextEditingController contentController, titleController;
 
   @override
@@ -348,7 +344,6 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                 Expanded(
                     flex: 1,
                     child: DropdownListWidget(
-                      key: _teacherSelectorKey,
                       initialSelection: selectedCourse?.teachers,
                       items: widget.courseGroup.courseList!
                           .map((e) => e.teachers!)
@@ -357,8 +352,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                       hintText: S.of(context).curriculum_select_teacher,
                       labelText: S.of(context).course_teacher_name,
                       onChanged: (e) {
-                        teacherFilterNotifier.value =
-                            _teacherSelectorKey.currentState!.selectedItem!;
+                        teacherFilterNotifier.value = e!;
                       },
                       itemBuilder: (e) =>
                           DropdownMenuItem(value: e, child: Text(e)),
@@ -368,7 +362,6 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                     child: ValueListenableBuilder(
                       builder: (context, value, child) =>
                           DropdownListWidget<Course>(
-                              key: _timeSelectorKey,
                               initialSelection: selectedCourse,
                               items: value == "*"
                                   ? []

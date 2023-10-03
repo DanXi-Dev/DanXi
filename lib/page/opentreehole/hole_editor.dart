@@ -75,8 +75,8 @@ final PostInterceptor _kStopWordInterceptor = (context, text) async {
     var checkedStopWord = stopWordList.firstWhere((element) =>
         element.isNotEmpty && (regularText?.contains(element) ?? false));
     return await Noticing.showConfirmationDialog(
-            context, S.of(context).post_has_stop_words(checkedStopWord.trim()),
-            title: S.of(context).post_has_stop_words_title,
+            context, S.of(context).has_stop_words(checkedStopWord.trim()),
+            title: S.of(context).has_stop_words_title,
             confirmText: S.of(context).continue_sending,
             isConfirmDestructive: true) ??
         false;
