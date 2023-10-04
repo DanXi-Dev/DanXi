@@ -161,11 +161,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   }
 
   void _processCourseGroup() {
-    // The old api doesn't return a credit list in the course group
-    // So we have to generate it here
-    _courseGroup!.credits ??=
-        _courseGroup!.courseList!.map((e) => e.credit!).toSet().toList();
-
     int totalScore = 0, scoreCount = 0;
     for (var elem in _courseGroup!.courseList!) {
       teacherSet.add(elem.teachers!);

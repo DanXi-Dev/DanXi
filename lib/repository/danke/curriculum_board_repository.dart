@@ -79,7 +79,7 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
 
   Future<CourseGroup?> getCourseGroup(int groupId) async {
     Response<Map<String, dynamic>> response = await dio.get(
-        "$_BASE_URL/group/$groupId",
+        "$_BASE_URL/v3/course_groups/$groupId",
         options: Options(headers: _tokenHeader));
     return CourseGroup.fromJson(response.data!);
   }
