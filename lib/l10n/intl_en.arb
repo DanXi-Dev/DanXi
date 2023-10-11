@@ -88,6 +88,7 @@
   "curriculum": "Course",
   "curriculum_average_rating": "Average rating",
   "curriculum_details": "Course details",
+  "curriculum_enter_content": "Please enter content",
   "curriculum_enter_title": "Please enter your title",
   "curriculum_first_load": "Loading for the first time might be slow, please wait",
   "curriculum_ratings_overall": "Overall rating",

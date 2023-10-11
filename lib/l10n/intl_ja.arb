@@ -84,6 +84,7 @@
   "curriculum": "授業評価",
   "curriculum_average_rating": "平均した評価",
   "curriculum_details": "授業明細",
+  "curriculum_enter_content": "評価内容を入力してください",
   "curriculum_enter_title": "タイトルを入力してください",
   "curriculum_first_load": "初めのロードは遅くなる可能性があるので、ちょっと待ってください",
   "curriculum_ratings_overall": "全体的な評価",

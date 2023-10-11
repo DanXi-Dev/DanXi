@@ -170,14 +170,14 @@ class CourseReviewEditor {
   static Future<bool> modifyReply(BuildContext context, CourseGroup courseGroup,
       CourseReview originalContent,
       {PostInterceptor? interceptor}) async {
-    var placeholder = CourseReviewEditorText(
+    var initialContent = CourseReviewEditorText(
         originalContent.content!,
         originalContent.title!,
         originalContent.courseInfo.id,
         originalContent.rank!);
     final CourseReviewEditorText? content = (await _showEditor(
         context, S.of(context).modify_to(originalContent.reviewId!),
-        placeholder: placeholder,
+        initialContent: initialContent,
         interceptor: _kStopWordInterceptor.mergeWith(interceptor),
         courseGroup: courseGroup,
         isModify: true));
@@ -204,19 +204,16 @@ class CourseReviewEditor {
   static Future<CourseReviewEditorText?> _showEditor(
       BuildContext context, String title,
       {required CourseGroup courseGroup,
-      CourseReviewEditorText? placeholder,
+      CourseReviewEditorText? initialContent,
       PostInterceptor? interceptor,
       bool isModify = false}) async {
-    final String randomTip = await Constant.randomFDUHoleTip;
-
     // Receive the value with **dynamic** variable to prevent automatic type inference
     final dynamic result = await smartNavigatorPush(
         context, '/danke/fullScreenEditor',
         arguments: {
           "title": title,
           "course_group": courseGroup,
-          'placeholder': placeholder,
-          'tip': randomTip,
+          'initial_content': initialContent,
           'interceptor': interceptor,
           'modify': isModify
         });
@@ -226,15 +223,15 @@ class CourseReviewEditor {
 
 class CourseReviewEditorWidget extends StatefulWidget {
   final bool fullscreen;
-  final String? tip;
+  final bool focusContent;
   final CourseReviewEditorText review;
 
   const CourseReviewEditorWidget(
       {Key? key,
       this.fullscreen = false,
-      this.tip,
       required this.courseGroup,
-      required this.review})
+      required this.review,
+      this.focusContent = false})
       : super(key: key);
 
   final CourseGroup courseGroup;
@@ -299,7 +296,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
   @override
   Widget build(BuildContext context) {
     final Widget textField = PlatformTextField(
-      hintText: widget.tip,
+      hintText: S.of(context).curriculum_enter_content,
       material: (_, __) => MaterialTextFieldData(
           decoration: widget.fullscreen
               ? const InputDecoration(border: InputBorder.none)
@@ -308,7 +305,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
       keyboardType: TextInputType.multiline,
       maxLines: widget.fullscreen ? null : 5,
       expands: widget.fullscreen,
-      autofocus: true,
+      autofocus: widget.focusContent || widget.fullscreen,
       textAlignVertical: TextAlignVertical.top,
       controller: contentController,
       onChanged: (text) {
@@ -389,7 +386,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
               keyboardType: TextInputType.multiline,
               maxLines: 1,
               expands: false,
-              autofocus: true,
+              autofocus: !widget.focusContent,
               textAlignVertical: TextAlignVertical.top,
               onChanged: (text) {
                 review.title = text;
@@ -572,7 +569,9 @@ class CourseRatingWidgetState extends State<CourseRatingWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var mainColor = rating > 0 ? wordColor[rating - 1] : Colors.white70;
+    var mainColor = rating > 0
+        ? wordColor[rating - 1]
+        : Theme.of(context).textTheme.bodyLarge!.color;
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(children: [
@@ -625,8 +624,8 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
   bool _isFullscreen = false;
   bool _confirmCareWords = false;
   bool _isModify = false;
+  bool _justExitedFullscreen = false;
 
-  String? _tip;
   late String _title;
   late CourseGroup _courseGroup;
 
@@ -641,17 +640,16 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
   void didChangeDependencies() {
     _interceptor = widget.arguments?['interceptor'];
     _courseGroup = widget.arguments!['course_group'];
-    _tip = widget.arguments!['tip'];
     _title =
         widget.arguments!['title'] ?? S.of(context).forum_post_enter_content;
     _isModify = widget.arguments!['modify'] ?? false;
 
     // When modifying, do not copy
     if (_isModify) {
-      if (widget.arguments!.containsKey('placeholder') &&
-          widget.arguments!['placeholder'] is CourseReviewEditorText) {
+      if (widget.arguments!.containsKey('initial_content') &&
+          widget.arguments!['initial_content'] is CourseReviewEditorText) {
         review.copyValuesFrom(
-            widget.arguments!['placeholder'] as CourseReviewEditorText);
+            widget.arguments!['initial_content'] as CourseReviewEditorText);
       }
     } else {
       review.addListener(() {
@@ -687,6 +685,12 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
         : (PlatformX.isMaterial(context)
             ? const Icon(Icons.fullscreen)
             : const Icon(CupertinoIcons.fullscreen));
+
+    bool focusContentFlag=false;
+    if(_justExitedFullscreen){
+      _justExitedFullscreen=false;
+      focusContentFlag=true;
+    }
     return PlatformScaffold(
       iosContentBottomPadding: false,
       iosContentPadding: false,
@@ -697,7 +701,13 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
           PlatformIconButton(
               padding: EdgeInsets.zero,
               icon: fullScreenIcon,
-              onPressed: () => setState(() => _isFullscreen = !_isFullscreen)),
+              onPressed: () => setState(() {
+                    _isFullscreen = !_isFullscreen;
+                    if (!_isFullscreen) {
+                      // Set flag to auto focus the content instead of the title
+                      _justExitedFullscreen = true;
+                    }
+                  })),
           PlatformIconButton(
             padding: EdgeInsets.zero,
             icon: PlatformX.isMaterial(context)
@@ -728,7 +738,7 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
               padding: const EdgeInsets.all(8),
               child: CourseReviewEditorWidget(
                   fullscreen: _isFullscreen,
-                  tip: _tip,
+                  focusContent: focusContentFlag,
                   courseGroup: _courseGroup,
                   review: review))),
     );
