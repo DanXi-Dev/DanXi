@@ -686,10 +686,10 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
             ? const Icon(Icons.fullscreen)
             : const Icon(CupertinoIcons.fullscreen));
 
-    bool focusContentFlag=false;
-    if(_justExitedFullscreen){
-      _justExitedFullscreen=false;
-      focusContentFlag=true;
+    bool focusContentFlag = false;
+    if (_justExitedFullscreen) {
+      _justExitedFullscreen = false;
+      focusContentFlag = true;
     }
     return PlatformScaffold(
       iosContentBottomPadding: false,
