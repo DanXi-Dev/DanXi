@@ -77,7 +77,7 @@ class _ReviewVoteWidgetState extends State<ReviewVoteWidget> {
         children: [
           IconButton(
             iconSize: 20,
-            splashColor: Colors.transparent,
+            splashRadius: 16,
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
             alignment: Alignment.bottomCenter,
             icon: Icon(
@@ -101,7 +101,7 @@ class _ReviewVoteWidgetState extends State<ReviewVoteWidget> {
           ),
           IconButton(
             iconSize: 20,
-            splashColor: Colors.transparent,
+            splashRadius: 16,
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
             alignment: Alignment.topCenter,
             icon: Icon(
