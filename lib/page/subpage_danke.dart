@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:math';
+
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/page/home_page.dart';
@@ -88,7 +90,8 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
                         // Golden ratio minus the height of the title bar
                         height: idle
                             ? (constraints.maxHeight * 0.382 - size.height)
-                                .clamp(0, constraints.maxHeight - size.height)
+                                .clamp(0,
+                                    max(constraints.maxHeight - size.height, 0))
                             : 0,
                       ),
                       CourseSearchBar(
