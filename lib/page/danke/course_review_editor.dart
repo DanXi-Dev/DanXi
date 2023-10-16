@@ -28,13 +28,11 @@ import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
-import 'package:dan_xi/util/danxi_care.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
-import 'package:dan_xi/widget/dialogs/care_dialog.dart';
 import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:flutter/cupertino.dart';
@@ -622,7 +620,6 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
   final bool _canSend = true;
 
   bool _isFullscreen = false;
-  bool _confirmCareWords = false;
   bool _isModify = false;
   bool _justExitedFullscreen = false;
 
@@ -713,22 +710,7 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
             icon: PlatformX.isMaterial(context)
                 ? const Icon(Icons.send)
                 : const Icon(CupertinoIcons.paperplane),
-            onPressed: _canSend
-                ? () async {
-                    bool isCareWordsDetected =
-                        await detectCareWords(review.content!);
-                    // only show once
-                    if (context.mounted == true &&
-                        isCareWordsDetected == true &&
-                        _confirmCareWords == false) {
-                      await showPlatformDialog(
-                          context: context, builder: (_) => const CareDialog());
-                      _confirmCareWords = true;
-                      return;
-                    }
-                    _sendDocument();
-                  }
-                : null,
+            onPressed: _canSend ? () async => _sendDocument() : null,
           ),
         ],
       ),

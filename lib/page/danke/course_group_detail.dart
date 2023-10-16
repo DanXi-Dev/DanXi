@@ -42,7 +42,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import '../../util/stream_listener.dart';
+import 'package:dan_xi/util/stream_listener.dart';
 
 enum FilterType { TEACHER_FILTER, TIME_FILTER }
 
