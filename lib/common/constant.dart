@@ -281,6 +281,8 @@ class Constant {
             S.of(context).jingyijun_description),
         Developer("fsy2001", "assets/graphics/fsy2001.jpg",
             "https://github.com/fsy2001", S.of(context).fsy2001_description),
+        Developer("koowz", "assets/graphics/koowz.jpg",
+            "https://github.com/koowz", S.of(context).koowz_description),
         Developer("HydrogenC", "assets/graphics/HydrogenC.jpg",
             "https://github.com/HydrogenC", S.of(context).hydrogenc_description),
       ];
