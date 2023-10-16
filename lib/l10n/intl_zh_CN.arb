@@ -199,6 +199,7 @@
   "japanese_languae": "日语",
   "jiangwan_campus": "江湾校区",
   "jump_to_hole": "定位",
+  "koowz_description": "旦夕开发者",
   "lan_connection_issue_1": "未能连接到校园内网",
   "lan_connection_issue_1_action": "校园 VPN",
   "lan_connection_issue_1_description": "无法连接到复旦内部网络，部分功能不可用。您是否在校外或使用了移动数据链接？\n\n您可以使用校园 VPN(Easy Connect) 或链接 Eduroam 热点以访问内网资源。",
