@@ -275,6 +275,8 @@ class Constant {
             S.of(context).boreas618_description),
         Developer("fsy2001", "assets/graphics/fsy2001.jpg",
             "https://github.com/fsy2001", S.of(context).boreas618_description),
+        Developer("koowz", "assets/graphics/koowz.jpg",
+            "https://github.com/koowz", S.of(context).koowz_description),
       ];
 
   /// Add a Chinese symbol(￥) at the end of [num].

@@ -204,6 +204,7 @@
   "japanese_languae": "Japanese",
   "jiangwan_campus": "Jiangwan",
   "jump_to_hole": "Locate",
+  "koowz_description": "DanXi Developer",
   "lan_connection_issue_1": "Failed to connect to the Campus Intranet",
   "lan_connection_issue_1_action": "Campus VPN",
   "lan_connection_issue_1_description": "Unable to connect to the Fudan Campus Intranet, some features will not be available.\n\nYou can use the campus VPN (Easy Connect) to access the Campus Intranet.",
