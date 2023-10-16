@@ -181,7 +181,7 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
             leading: leadingButton,
             trailingActions: trailingButtons,
           ),
-          body: Builder(builder: buildPage)),
+          body: SafeArea(child: Builder(builder: buildPage))),
     );
   }
 }

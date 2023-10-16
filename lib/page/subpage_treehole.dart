@@ -27,13 +27,13 @@ import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/page/curriculum/course_list_widget.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -70,6 +70,26 @@ const kCompatibleUserGroup = [
 bool isHtml(String content) {
   var htmlMatcher = RegExp(r'<.+>.*</.+>', dotAll: true);
   return htmlMatcher.hasMatch(content);
+}
+
+/// Should be called when user logged in DanXi account;
+/// it refreshes every page that cares about login status.
+/// (except the setting page, since it is refreshed when initializing token.)
+///
+/// FIXME: this is an ugly implementation that requires manual calling every time.
+void onLogin() {
+  treeholePageKey.currentState?.refreshList();
+  dankePageKey.currentState?.setState(() {});
+}
+
+/// Should be called when user logged out DanXi account;
+/// it refreshes every page that cares about login status.
+/// (except setting page, since it is refreshed when initializing token.)
+///
+/// FIXME: this is an ugly implementation that requires manual calling every time.
+void onLogout() {
+  treeholePageKey.currentState?.setState(() {});
+  dankePageKey.currentState?.setState(() {});
 }
 
 final RegExp latexRegExp = RegExp(r"<(tex|texLine)>.*?</(tex|texLine)>",
@@ -230,6 +250,17 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
               null,
               useCustomWidget: true),
           AppBarButtonItem(
+              S.of(cxt).subscriptions,
+              Icon(PlatformX.isMaterial(cxt)
+                  ? Icons.visibility
+                  : CupertinoIcons.eye), () {
+            if (cxt.read<FDUHoleProvider>().isUserInitialized) {
+              smartNavigatorPush(cxt, '/bbs/discussions',
+                  arguments: {'showSubscribedDiscussion': true},
+                  forcePushOnMainNavigator: true);
+            }
+          }),
+          AppBarButtonItem(
               S.of(cxt).favorites,
               Icon(PlatformX.isMaterial(cxt)
                   ? Icons.star_outline
@@ -265,6 +296,7 @@ class ChangeDivisionEvent {
 
 enum PostsType {
   FAVORED_DISCUSSION,
+  SUBSCRIBED_DISCUSSION,
   FILTER_BY_TAG,
   FILTER_BY_ME,
   NORMAL_POSTS,
@@ -276,6 +308,8 @@ enum PostsType {
 /// Arguments:
 /// [bool] showFavoredDiscussion: if [showFavoredDiscussion] is not null,
 /// it means this page is showing user's favored posts (whether it is false or true).
+/// [bool] showSubscribedDiscussion: if [showSubscribedDiscussion] is not null,
+/// it means this page is showing user's subscribed posts (whether it is false or true).
 /// [bool] showFilterByMe: if [showFilterByMe] is not null, it means this page is showing
 /// the posts which is created by the user (whether it is false or true).
 /// [String] tagFilter: if [tagFilter] is not null, it means this page is showing
@@ -292,7 +326,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       StateStreamListener();
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
-  final GlobalKey bannerKey = GlobalKey();
+  final GlobalKey<AutoBannerState> bannerKey = GlobalKey<AutoBannerState>();
 
   String? _tagFilter;
   PostsType _postsType = PostsType.NORMAL_POSTS;
@@ -336,6 +370,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         // Favored discussion has only one page.
         if (page > 1) return [];
         return await OpenTreeHoleRepository.getInstance().getFavoriteHoles();
+      case PostsType.SUBSCRIBED_DISCUSSION:
+        if (page > 1) return [];
+        return await OpenTreeHoleRepository.getInstance().getSubscribedHoles();
       case PostsType.FILTER_BY_ME:
         List<OTHole>? loadedPost = await adaptLayer
             .generateReceiver(listViewController, (lastElement) {
@@ -395,6 +432,8 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     try {
       if (_postsType == PostsType.FAVORED_DISCUSSION) {
         await OpenTreeHoleRepository.getInstance().getFavoriteHoleId();
+      } else if (_postsType == PostsType.SUBSCRIBED_DISCUSSION) {
+        await OpenTreeHoleRepository.getInstance().getSubscribedHoleId();
       } else if (context.read<FDUHoleProvider>().isUserInitialized) {
         await OpenTreeHoleRepository.getInstance()
             .loadDivisions(useCache: false);
@@ -482,7 +521,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           if (event.newDivision.name ==
               Constant.SPECIAL_DIVISION_FOR_CURRICULUM) {
             setState(() {
-              _delegate = CourseListDelegate();
+              // _delegate = CourseListDelegate();
               // _postsType = PostsType.EXTERNAL_VIEW;
             });
           } else {
@@ -509,6 +548,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       }
       if (_tagFilter != null) {
         _postsType = PostsType.FILTER_BY_TAG;
+      } else if (widget.arguments?.containsKey('showSubscribedDiscussion') ??
+          false) {
+        _postsType = PostsType.SUBSCRIBED_DISCUSSION;
       } else if (widget.arguments?.containsKey('showFavoredDiscussion') ??
           false) {
         _postsType = PostsType.FAVORED_DISCUSSION;
@@ -532,12 +574,17 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   Widget buildPage(BuildContext context) {
     switch (_postsType) {
       case PostsType.FAVORED_DISCUSSION:
+      case PostsType.SUBSCRIBED_DISCUSSION:
         return PlatformScaffold(
           iosContentPadding: false,
           iosContentBottomPadding: false,
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: PlatformAppBarX(
-            title: Text(S.of(context).favorites),
+            title: Text(switch (_postsType) {
+              PostsType.FAVORED_DISCUSSION => S.of(context).favorites,
+              PostsType.SUBSCRIBED_DISCUSSION => S.of(context).subscriptions,
+              _ => throw Exception("Unreachable"),
+            }),
           ),
           body: Builder(
             // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
@@ -588,6 +635,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           HapticFeedback.mediumImpact();
           // Refresh the list...
           await refreshList();
+          // Update the banner list
+          await AnnouncementRepository.getInstance().loadAnnouncements();
+          bannerKey.currentState?.updateBannerList();
           // ... and scroll it to the top.
           if (!mounted) return;
           try {
@@ -624,7 +674,19 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             if (_postsType == PostsType.NORMAL_POSTS) ...[
               buildForumTopBar(),
               _autoSilenceNotice(),
-              const AutoBanner(refreshDuration: Duration(seconds: 10)),
+              AutoBanner(
+                  key: bannerKey,
+                  refreshDuration: const Duration(seconds: 10),
+                  onExpand: (expanded) async {
+                    if (!expanded) {
+                      try {
+                        await PrimaryScrollController.of(context).animateTo(0,
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.ease);
+                        // It is not important if [listViewController] is not attached to a ListView.
+                      } catch (_) {}
+                    }
+                  }),
               _autoPinnedPosts(),
             ]
           ],
@@ -638,52 +700,74 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           child: Text(S.of(context).end_reached),
         )),
         emptyBuilder: (context) => Container(
-          padding: const EdgeInsets.all(8),
-          child: Center(
-              child: Text(_postsType == PostsType.FAVORED_DISCUSSION
-                  ? S.of(context).no_favorites
-                  : S.of(context).no_data)),
-        ),
+            padding: const EdgeInsets.all(8),
+            child: Center(
+              child: Text(switch (_postsType) {
+                PostsType.FAVORED_DISCUSSION => S.of(context).no_favorites,
+                PostsType.SUBSCRIBED_DISCUSSION =>
+                  S.of(context).no_subscriptions,
+                _ => S.of(context).no_data
+              }),
+            )),
         fatalErrorBuilder: (_, error) {
           if (error is NotLoginError) {
             return OTWelcomeWidget(loginCallback: () async {
               await smartNavigatorPush(context, "/bbs/login",
                   arguments: {"info": StateProvider.personInfo.value!});
-              refreshList();
+              onLogin();
             });
           }
           return ErrorPageWidget.buildWidget(context, error,
               onTap: refreshSelf);
         },
         dataReceiver: _loadContent,
-        onDismissItem: _postsType == PostsType.FAVORED_DISCUSSION
-            ? (context, index, item) async {
-                await OpenTreeHoleRepository.getInstance()
-                    .setFavorite(SetFavoriteMode.DELETE, item.hole_id)
-                    .onError((error, stackTrace) {
-                  Noticing.showNotice(context, error.toString(),
-                      title: S.of(context).operation_failed,
-                      useSnackBar: false);
-                  return null;
-                });
-              }
-            : null,
-        onConfirmDismissItem: _postsType == PostsType.FAVORED_DISCUSSION
-            ? (context, index, item) {
-                return Noticing.showConfirmationDialog(
-                    context, S.of(context).remove_favorite_hole_confirmation,
-                    isConfirmDestructive: true);
-              }
-            : null,
+        onDismissItem: switch (_postsType) {
+          PostsType.FAVORED_DISCUSSION => (context, index, item) async {
+              await OpenTreeHoleRepository.getInstance()
+                  .setFavorite(SetStatusMode.DELETE, item.hole_id)
+                  .onError((error, stackTrace) {
+                Noticing.showNotice(context, error.toString(),
+                    title: S.of(context).operation_failed, useSnackBar: false);
+                return null;
+              });
+            },
+          PostsType.SUBSCRIBED_DISCUSSION => (context, index, item) async {
+              await OpenTreeHoleRepository.getInstance()
+                  .setSubscription(SetStatusMode.DELETE, item.hole_id)
+                  .onError((error, stackTrace) {
+                Noticing.showNotice(context, error.toString(),
+                    title: S.of(context).operation_failed, useSnackBar: false);
+                return null;
+              });
+            },
+          _ => null
+        },
+        onConfirmDismissItem: switch (_postsType) {
+          PostsType.FAVORED_DISCUSSION => (context, index, item) {
+              return Noticing.showConfirmationDialog(
+                  context, S.of(context).remove_favorite_hole_confirmation,
+                  isConfirmDestructive: true);
+            },
+          PostsType.SUBSCRIBED_DISCUSSION => (context, index, item) {
+              return Noticing.showConfirmationDialog(
+                  context, S.of(context).remove_subscribed_hole_confirmation,
+                  isConfirmDestructive: true);
+            },
+          _ => null
+        },
       );
 
   Widget _buildListItem(BuildContext context, ListProvider<OTHole>? _, int? __,
       OTHole postElement,
       {bool isPinned = false}) {
+    // Avoid excluding pinned posts from favorite and subscription list
+    bool isSpecialView = _postsType == PostsType.FAVORED_DISCUSSION ||
+        _postsType == PostsType.SUBSCRIBED_DISCUSSION;
     if (postElement.floors?.first_floor == null ||
         postElement.floors?.last_floor == null ||
         (foldBehavior == FoldBehavior.HIDE && postElement.is_folded) ||
         (!isPinned &&
+            !isSpecialView &&
             OpenTreeHoleRepository.getInstance()
                 .getPinned(getDivisionId(context))
                 .contains(postElement))) return const SizedBox();
@@ -777,16 +861,4 @@ abstract class ListDelegate {
   /// Call when a refresh is triggered by user or by code.
   /// You should do some time-consuming refresh work here.
   Future<void> triggerRefresh();
-}
-
-class CourseListDelegate extends ListDelegate {
-  final GlobalKey<CourseListWidgetState> _key = GlobalKey();
-
-  @override
-  Widget build(BuildContext context) => CourseListWidget(key: _key);
-
-  @override
-  Future<void> triggerRefresh() async {
-    await _key.currentState?.refresh();
-  }
 }

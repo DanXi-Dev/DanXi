@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/model/curriculum/review.dart';
+import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'course.g.dart';
@@ -25,16 +25,19 @@ class Course {
   int? id;
   String? name;
   String? code;
-  String? code_id;
+  @JsonKey(name: 'code_id')
+  String? codeId;
   double? credit;
   String? department;
   String? teachers;
-  int? max_student;
-  int? week_hour;
+  @JsonKey(name: 'max_student')
+  int? maxStudent;
+  @JsonKey(name: 'week_hour')
+  int? weekHour;
 
   /// (Copied from docs)
   /// 学年。如果是非秋季学期，则年数为（实际日期年数 - 1）。
-  String? year;
+  int? year;
 
   /// (Copied from docs)
   /// 学期。
@@ -43,21 +46,16 @@ class Course {
   //     3：（第二年的）春季学期；
   //     4：（第二年的）暑假
   int? semester;
-  List<Review>? review_list;
 
-  Course(
-      this.id,
-      this.name,
-      this.code,
-      this.code_id,
-      this.credit,
-      this.department,
-      this.teachers,
-      this.max_student,
-      this.week_hour,
-      this.year,
-      this.semester,
-      this.review_list);
+  // This is only meant to be used in random reviews
+  @JsonKey(name: 'coursegroup_id')
+  int? courseGroupId;
+
+  @JsonKey(name: 'review_list')
+  List<CourseReview>? reviewList;
+
+  Course({this.id, this.teachers, this.maxStudent, this.year, this.semester,
+      this.credit, this.reviewList});
 
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);
 
@@ -67,5 +65,14 @@ class Course {
   bool operator ==(Object other) => (other is Course) && id == other.id;
 
   @override
-  int get hashCode => id ?? name.hashCode;
+  int get hashCode => id ?? id.hashCode;
+
+  String formatTime() {
+    // Todo: add support for other semesters
+    return "$year学年-${semester == 1 ? "秋季" : "春季"}";
+  }
+
+  CourseSummary getSummary() {
+    return CourseSummary(id!, teachers!, formatTime());
+  }
 }

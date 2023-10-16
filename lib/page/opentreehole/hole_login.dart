@@ -214,7 +214,7 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Text(
-          S.of(context).fudan_uis_quick_login,
+          S.of(context).fudan_uis_email_login,
           style: Theme.of(context).textTheme.titleLarge,
           textAlign: TextAlign.center,
         ),

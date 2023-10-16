@@ -39,6 +39,8 @@ import 'package:flutter/services.dart';
 class Constant {
   /// The number of posts on each pages returned from the server of FDUHole.
   static const POST_COUNT_PER_PAGE = 10;
+  /// The number of serach results on each pages returned from the server of Danke.
+  static const SEARCH_COUNT_PER_PAGE=10;
 
   static const SUPPORT_QQ_GROUP = "941342818";
 
@@ -56,7 +58,7 @@ class Constant {
   ///
   /// Note that this is not the same as the user agent used by the WebView, or the
   /// treehole's [Dio]. Those two are set by WebView and [OpenTreeHoleRepository].
-  static String get DEFAULT_USER_AGENT =>
+  static const String DEFAULT_USER_AGENT =
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36";
 
   static const String APPSTORE_APPID = '1568629997';
@@ -64,6 +66,9 @@ class Constant {
   /// A link to the "forget password" page of FDUHole.
   static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL =
       "https://auth.fduhole.com/register?type=forget_password";
+
+  static const String OPEN_TREEHOLE_REGISTER_URL =
+      "https://auth.fduhole.com/register";
 
   /// The default start date of a semester.
   static final DEFAULT_SEMESTER_START_DATE = DateTime(2023, 2, 20);
@@ -73,11 +78,12 @@ class Constant {
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
   static const String UIS_HOST = "uis.fudan.edu.cn";
 
-  /// The default URLs of [OpenTreeHoleRepository].
+  /// The default URLs of [OpenTreeHoleRepository] and [CurriculumBoardHoleRepository].
   ///
   static const String FDUHOLE_BASE_URL = "https://www.fduhole.com/api";
   static const String AUTH_BASE_URL = "https://auth.fduhole.com/api";
   static const String IMAGE_BASE_URL = "https://image.fduhole.com";
+  static const String DANKE_BASE_URL = "https://danke.fduhole.com/api";
 
   static const LINKIFY_THEME =
       TextStyle(color: Colors.blue, decoration: TextDecoration.none);
@@ -272,11 +278,13 @@ class Constant {
             "JingYiJun",
             "assets/graphics/JingYiJun.jpg",
             "https://github.com/JingYiJun",
-            S.of(context).boreas618_description),
+            S.of(context).jingyijun_description),
         Developer("fsy2001", "assets/graphics/fsy2001.jpg",
-            "https://github.com/fsy2001", S.of(context).boreas618_description),
+            "https://github.com/fsy2001", S.of(context).fsy2001_description),
         Developer("koowz", "assets/graphics/koowz.jpg",
             "https://github.com/koowz", S.of(context).koowz_description),
+        Developer("HydrogenC", "assets/graphics/HydrogenC.jpg",
+            "https://github.com/HydrogenC", S.of(context).hydrogenc_description),
       ];
 
   /// Add a Chinese symbol(￥) at the end of [num].

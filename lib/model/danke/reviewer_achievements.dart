@@ -14,29 +14,22 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import 'dart:core';
+
 import 'package:json_annotation/json_annotation.dart';
 
-part 'review.g.dart';
+part 'reviewer_achievements.g.dart';
 
 @JsonSerializable()
-class Review {
-  int? id;
-  String? title;
-  String? content;
-  String? time_created;
-  String? rank;
-  int? remark;
+class ReviewerAchievement {
+  String? name;
 
-  Review(this.id, this.title, this.content, this.time_created, this.rank,
-      this.remark);
+  ReviewerAchievement(this.name);
 
-  factory Review.fromJson(Map<String, dynamic> json) => _$ReviewFromJson(json);
+  factory ReviewerAchievement.fromJson(Map<String, dynamic> json) =>
+      _$ReviewerAchievementFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ReviewToJson(this);
+  Map<String, dynamic> toJson() => _$ReviewerAchievementToJson(this);
 
-  @override
-  bool operator ==(Object other) => (other is Review) && id == other.id;
-
-  @override
-  int get hashCode => id ?? time_created.hashCode;
+  factory ReviewerAchievement.dummy() => ReviewerAchievement("狗勋章");
 }

@@ -15,17 +15,28 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/common/constant.dart';
+import 'dart:math';
+
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/danke/course_review.dart';
+import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
+import 'package:dan_xi/page/subpage_treehole.dart';
+import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/stream_listener.dart';
+import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
+import 'package:dan_xi/widget/danke/course_list_widget.dart';
+import 'package:dan_xi/widget/danke/course_search_bar.dart';
+import 'package:dan_xi/widget/danke/course_widgets.dart';
+import 'package:dan_xi/widget/danke/random_review_widgets.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
+import 'package:dan_xi/widget/libraries/future_widget.dart';
+import 'package:dan_xi/widget/libraries/sized_by_child_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -36,114 +47,122 @@ class DankeSubPage extends PlatformSubpage<DankeSubPage> {
   const DankeSubPage({Key? key}) : super(key: key);
 
   @override
-  Create<Widget> get title => (cxt) => Text(S.of(cxt).danke);
-
-  @override
-  Create<List<AppBarButtonItem>> get trailing {
-    return (cxt) => [
-          AppBarButtonItem(S.of(cxt).refresh, Icon(PlatformIcons(cxt).refresh),
-              () {
-            RefreshPageEvent().fire();
-          }),
-          AppBarButtonItem(
-              S.of(cxt).reset,
-              Icon(PlatformX.isMaterial(cxt)
-                  ? Icons.medical_services_outlined
-                  : CupertinoIcons.rays), () {
-            ResetWebViewEvent().fire();
-          }),
-        ];
-  }
+  Create<Widget> get title => (cxt) => Text(S.of(cxt).curriculum);
 }
 
-class RefreshPageEvent {}
-
-class ResetWebViewEvent {}
-
 class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
-  InAppWebViewController? webViewController;
-  static final StateStreamListener<RefreshPageEvent> _refreshSubscription =
-      StateStreamListener();
-  static final StateStreamListener<ResetWebViewEvent> _resetSubscription =
-      StateStreamListener();
+  // When searching is idle, show random reviews
+  bool idle = true;
+  String searchText = '';
 
-  URLRequest get urlRequest => URLRequest(
-          url: Uri.https('danke.fduhole.com', '/jump', {
-        'access': SettingsProvider.getInstance().fduholeToken?.access,
-        'refresh': SettingsProvider.getInstance().fduholeToken?.refresh,
-      }));
-
-  @override
-  void initState() {
-    super.initState();
-    _refreshSubscription.bindOnlyInvalid(
-        Constant.eventBus
-            .on<RefreshPageEvent>()
-            .listen((event) => webViewController?.reload()),
-        hashCode);
-    _resetSubscription.bindOnlyInvalid(
-        Constant.eventBus.on<ResetWebViewEvent>().listen((event) async {
-          if (!mounted) return;
-          bool? confirmed = await Noticing.showConfirmationDialog(
-              context, S.of(context).fix_danke_description,
-              title: S.of(context).fix);
-          if (confirmed == true) {
-            await webViewController?.clearCache();
-
-            if (PlatformX.isAndroid) {
-              await WebStorageManager.instance().android.deleteAllData();
-            }
-            if (PlatformX.isIOS) {
-              final manager = WebStorageManager.instance().ios;
-              var records = await manager.fetchDataRecords(
-                  dataTypes: IOSWKWebsiteDataType.values);
-              await manager.removeDataFor(
-                  dataTypes: IOSWKWebsiteDataType.values,
-                  dataRecords: records.filter((element) =>
-                      element.displayName?.contains("fduhole.com") ?? false));
-            }
-
-            await HttpAuthCredentialDatabase.instance()
-                .clearAllAuthCredentials();
-
-            await CookieManager.instance().deleteAllCookies();
-
-            await webViewController?.loadUrl(urlRequest: urlRequest);
-          }
-        }),
-        hashCode);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _refreshSubscription.cancel();
-    _resetSubscription.cancel();
-  }
+  FileImage? _backgroundImage;
 
   @override
   Widget buildPage(BuildContext context) {
-    InAppWebViewOptions settings =
-        InAppWebViewOptions(userAgent: Constant.version);
+    if (overallWord == null) {
+      overallWord = S.of(context).curriculum_ratings_overall_words.split(';');
+      contentWord = S.of(context).curriculum_ratings_content_words.split(';');
+      workloadWord = S.of(context).curriculum_ratings_workload_words.split(';');
+      assessmentWord =
+          S.of(context).curriculum_ratings_assessment_words.split(';');
+    }
 
-    return SafeArea(
-      child: WillPopScope(
-        onWillPop: () async {
-          if (webViewController != null &&
-              await webViewController!.canGoBack()) {
-            await webViewController!.goBack();
-            return false;
-          }
-          return true;
-        },
-        child: InAppWebView(
-          initialOptions: InAppWebViewGroupOptions(crossPlatform: settings),
-          initialUrlRequest: urlRequest,
-          onWebViewCreated: (InAppWebViewController controller) {
-            webViewController = controller;
-          },
-        ),
-      ),
+    _backgroundImage = SettingsProvider.getInstance().backgroundImage;
+    return Container(
+      // padding top
+      decoration: _backgroundImage == null
+          ? null
+          : BoxDecoration(
+              image:
+                  DecorationImage(image: _backgroundImage!, fit: BoxFit.cover)),
+      child: LayoutBuilder(
+          builder: (context, constraints) => SizedByChildBuilder(
+              child: (context, key) => CourseSearchBar(
+                    key: key,
+                    onSearch: (text) {},
+                  ),
+              builder: (context, size) => Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      // animated sized box
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        // Golden ratio minus the height of the title bar
+                        height: idle
+                            ? (constraints.maxHeight * 0.382 - size.height)
+                                .clamp(0,
+                                    max(constraints.maxHeight - size.height, 0))
+                            : 0,
+                      ),
+                      CourseSearchBar(
+                        onSearch: (String text) {
+                          // Avoid unnecessary rebuilding
+                          if (text != searchText) {
+                            setState(
+                              () {
+                                idle = text.isEmpty;
+                                searchText = text;
+                              },
+                            );
+                          }
+                        },
+                      ),
+                      _buildPageContent(context)
+                    ],
+                    // button
+                  ))),
     );
+  }
+
+  Future<CourseReview?> _loadRandomReview() async {
+    if (!context.read<FDUHoleProvider>().isUserInitialized) {
+      await OpenTreeHoleRepository.getInstance().initializeRepo();
+      settingsPageKey.currentState?.setState(() {});
+    }
+
+    return CurriculumBoardRepository.getInstance().getRandomReview();
+  }
+
+  Widget _buildPageContent(BuildContext context) {
+    return idle
+        ? FutureWidget<CourseReview?>(
+            future: _loadRandomReview(),
+            successBuilder: (context, snapshot) => RandomReviewWidgets(
+                review: snapshot.data!,
+                onTap: () async => await smartNavigatorPush(
+                        context, "/danke/courseDetail", arguments: {
+                      "group_id": snapshot.data!.groupId,
+                      "locate": snapshot.data
+                    })),
+            errorBuilder:
+                (BuildContext context, AsyncSnapshot<CourseReview?> snapshot) {
+              if (snapshot.error is NotLoginError) {
+                return Column(children: [
+                  Text(S.of(context).require_login),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: PlatformElevatedButton(
+                      onPressed: () async {
+                        await smartNavigatorPush(context, "/bbs/login",
+                            arguments: {
+                              "info": StateProvider.personInfo.value!
+                            });
+                        onLogin();
+                      },
+                      child: Text(S.of(context).login),
+                    ),
+                  ),
+                ]);
+              } else {
+                return ErrorPageWidget.buildWidget(context, snapshot.error,
+                    stackTrace: snapshot.stackTrace,
+                    onTap: () => setState(() {}));
+              }
+            },
+            loadingBuilder: Center(
+              child: PlatformCircularProgressIndicator(),
+            ))
+        // A maximized result list
+        : Expanded(child: CourseListWidget(searchKeyword: searchText));
   }
 }

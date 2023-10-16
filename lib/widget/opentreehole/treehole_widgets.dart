@@ -105,18 +105,13 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
   List<Widget> tags = [];
   for (var element in e.tags!) {
     if (element.name == KEY_NO_TAG) continue;
-    tags.add(Flex(
-        direction: Axis.horizontal,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          RoundChip(
-            onTap: () => onTap(element.name),
-            label: Constant.withZwb(element.name),
-            color: useAccessibilityColoring
-                ? Theme.of(context).textTheme.bodyLarge!.color
-                : element.color,
-          ),
-        ]));
+    tags.add(RoundChip(
+      onTap: () => onTap(element.name),
+      label: Constant.withZwb(element.name),
+      color: useAccessibilityColoring
+          ? Theme.of(context).textTheme.bodyLarge!.color
+          : element.color,
+    ));
   }
   return Wrap(
     direction: Axis.horizontal,
@@ -854,7 +849,7 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                   (floor.liked ?? false)
                       ? CupertinoIcons.hand_thumbsup_fill
                       : CupertinoIcons.hand_thumbsup,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).textTheme.bodyLarge!.color,
                   size: 16,
                 ),
               ),
@@ -879,14 +874,14 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                   (floor.disliked ?? false)
                       ? CupertinoIcons.hand_thumbsdown_fill
                       : CupertinoIcons.hand_thumbsdown,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).textTheme.bodyLarge!.color,
                   size: 16,
                 ),
               ),
               PopupMenuButton<ActionItem>(
                 icon: Icon(
                   CupertinoIcons.ellipsis_circle,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).textTheme.bodyLarge!.color,
                   size: 16,
                 ),
                 initialValue: selectedActionItem,
@@ -942,15 +937,6 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                           size: 12,
                         ),
                         text: S.of(context).modify,
-                        onTap: () async {
-                          Navigator.of(context).pop();
-                          if (await OTEditor.modifyReply(context, floor.hole_id,
-                              floor.floor_id, floor.content)) {
-                            if (!context.mounted) return;
-                            Noticing.showMaterialNotice(
-                                context, S.of(context).request_success);
-                          }
-                        },
                       ),
                     ),
                   if (floor.is_me == true && floor.deleted == false)
@@ -963,23 +949,6 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                           color: Theme.of(context).hintColor,
                           size: 12,
                         ),
-                        onTap: () async {
-                          Navigator.of(context).pop();
-                          if (await Noticing.showConfirmationDialog(
-                                  context,
-                                  S.of(context).about_to_delete_floor(
-                                      floor.floor_id ?? "null"),
-                                  title: S.of(context).are_you_sure,
-                                  isConfirmDestructive: true) ==
-                              true) {
-                            try {
-                              await OpenTreeHoleRepository.getInstance()
-                                  .deleteFloor(floor.floor_id!);
-                            } catch (e, st) {
-                              Noticing.showErrorDialog(context, e, trace: st);
-                            }
-                          }
-                        },
                       ),
                     ),
                   if (floor.is_me != true)
@@ -992,15 +961,6 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                           color: Theme.of(context).hintColor,
                           size: 12,
                         ),
-                        onTap: () async {
-                          Navigator.of(context).pop();
-                          if (await OTEditor.reportPost(
-                              context, floor.floor_id)) {
-                            if (!context.mounted) return;
-                            Noticing.showMaterialNotice(
-                                context, S.of(context).report_success);
-                          }
-                        },
                       ),
                     ),
                 ],

@@ -18,6 +18,7 @@
 import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
+import 'package:dan_xi/page/danke/course_review_editor.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/util/opentreehole/editor_object.dart';
@@ -28,8 +29,20 @@ import 'package:flutter/foundation.dart';
 /// Also see:
 /// * [StateProvider]
 class FDUHoleProvider with ChangeNotifier {
+  static late FDUHoleProvider _instance;
+
+  factory FDUHoleProvider.getInstance() => _instance;
+
+  static void init(FDUHoleProvider injectProvider) {
+    _instance = injectProvider;
+  }
+
+  FDUHoleProvider();
+
   /// Caches of [OTEditor].
   final Map<EditorObject?, PostEditorText> editorCache = {};
+
+  final Map<String?, CourseReviewEditorText> courseReviewEditorCache = {};
 
   /// The current division.
   OTDivision? _currentDivision;

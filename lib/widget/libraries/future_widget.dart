@@ -17,7 +17,7 @@
 
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/smart_widget.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 /// [FutureWidget] is a variation of [FutureBuilder],
 /// which will build different widgets depending on different states: See [ConnectionState.values].
@@ -61,7 +61,8 @@ class _FutureWidgetState<T> extends State<FutureWidget<T>> {
     super.initState();
     _snapshot = widget.initialData == null
         ? AsyncSnapshot<T>.nothing()
-        : AsyncSnapshot<T>.withData(ConnectionState.none, widget.initialData as T);
+        : AsyncSnapshot<T>.withData(
+            ConnectionState.none, widget.initialData as T);
     _subscribe();
   }
 
@@ -83,7 +84,7 @@ class _FutureWidgetState<T> extends State<FutureWidget<T>> {
       case ConnectionState.none:
       case ConnectionState.waiting:
       case ConnectionState.active:
-      return SmartWidget.toWidget<T>(widget.loadingBuilder, context,
+        return SmartWidget.toWidget<T>(widget.loadingBuilder, context,
             snapshot: _snapshot);
       case ConnectionState.done:
         if (_snapshot!.hasError || (!_snapshot!.hasData && !widget.nullable)) {

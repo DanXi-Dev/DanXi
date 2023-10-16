@@ -76,6 +76,7 @@ void sendFduholeTokenToWatch(String? token) {
 GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
 GlobalKey<State<SettingsSubpage>> settingsPageKey = GlobalKey();
 GlobalKey<TreeHoleSubpageState> treeholePageKey = GlobalKey();
+GlobalKey<DankeSubPageState> dankePageKey = GlobalKey();
 GlobalKey<HomeSubpageState> dashboardPageKey = GlobalKey();
 GlobalKey<TimetableSubPageState> timetablePageKey = GlobalKey();
 const QuickActions quickActions = QuickActions();
@@ -138,7 +139,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (!SettingsProvider.getInstance().hideHole)
         TreeHoleSubpage(key: treeholePageKey),
       // Don't show Timetable in visitor mode
-      const DankeSubPage(),
+      DankeSubPage(key: dankePageKey),
       if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
         TimetableSubPage(key: timetablePageKey),
       SettingsSubpage(key: settingsPageKey),
@@ -689,7 +690,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   icon: PlatformX.isMaterial(context)
                       ? const Icon(Icons.egg_alt)
                       : const Icon(CupertinoIcons.book),
-                  label: S.of(context).danke,
+                  label: S.of(context).curriculum,
                 ),
                 // Don't show Timetable in visitor mode
                 if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)

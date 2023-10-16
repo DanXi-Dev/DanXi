@@ -52,8 +52,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   static final String _IMAGE_BASE_URL =
       SettingsProvider.getInstance().imageBaseUrl;
 
-  late FDUHoleProvider provider;
-
   /// Cached floors, used by [mentions]
   final Map<int, OTFloor> _floorCache = {};
 
@@ -65,9 +63,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   String? lastUploadToken;
 
-  static void init(FDUHoleProvider injectProvider) {
-    OpenTreeHoleRepository.getInstance().provider = injectProvider;
-  }
+  /// Short name for the provider singleton
+  FDUHoleProvider get provider => FDUHoleProvider.getInstance();
 
   Future<void> logout() async {
     if (!provider.isUserInitialized) {
@@ -457,6 +454,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           .get("$_BASE_URL/users", options: Options(headers: _tokenHeader));
       provider.userInfo = OTUser.fromJson(response.data!);
       provider.userInfo?.favorites = null;
+      provider.userInfo?.subscriptions = null;
     }
     return provider.userInfo;
   }
@@ -468,6 +466,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         options: Options(headers: _tokenHeader));
     provider.userInfo = OTUser.fromJson(response.data!);
     provider.userInfo?.favorites = null;
+    provider.userInfo?.subscriptions = null;
     return provider.userInfo;
   }
 
@@ -531,6 +530,18 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return provider.userInfo?.favorites;
   }
 
+  Future<List<int>?> getSubscribedHoleId() async {
+    if (provider.userInfo?.subscriptions != null) {
+      return provider.userInfo?.subscriptions;
+    }
+    final Response<Map<String, dynamic>> response = await dio.get(
+        "$_BASE_URL/users/subscriptions",
+        queryParameters: {"plain": true},
+        options: Options(headers: _tokenHeader));
+    provider.userInfo?.subscriptions = response.data?['data']?.cast<int>();
+    return provider.userInfo?.subscriptions;
+  }
+
   Future<List<OTHole>?> getFavoriteHoles({
     int length = Constant.POST_COUNT_PER_PAGE,
     int prefetchLength = Constant.POST_COUNT_PER_PAGE,
@@ -542,20 +553,47 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
-  Future<void> setFavorite(SetFavoriteMode mode, int? holeId) async {
+  Future<List<OTHole>?> getSubscribedHoles({
+    int length = Constant.POST_COUNT_PER_PAGE,
+    int prefetchLength = Constant.POST_COUNT_PER_PAGE,
+  }) async {
+    final Response<List<dynamic>> response = await dio.get(
+        "$_BASE_URL/users/subscriptions",
+        queryParameters: {"length": length, "prefetch_length": prefetchLength},
+        options: Options(headers: _tokenHeader));
+    return response.data?.map((e) => OTHole.fromJson(e)).toList();
+  }
+
+  Future<void> setFavorite(SetStatusMode mode, int? holeId) async {
     Response<dynamic> response;
     switch (mode) {
-      case SetFavoriteMode.ADD:
+      case SetStatusMode.ADD:
         response = await dio.post("$_BASE_URL/user/favorites",
             data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
         break;
-      case SetFavoriteMode.DELETE:
+      case SetStatusMode.DELETE:
         response = await dio.delete("$_BASE_URL/user/favorites",
             data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
         break;
     }
     final Map<String, dynamic> result = response.data;
     provider.userInfo?.favorites = result["data"]?.cast<int>();
+  }
+
+  Future<void> setSubscription(SetStatusMode mode, int? holeId) async {
+    Response<dynamic> response;
+    switch (mode) {
+      case SetStatusMode.ADD:
+        response = await dio.post("$_BASE_URL/users/subscriptions",
+            data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
+        break;
+      case SetStatusMode.DELETE:
+        response = await dio.delete("$_BASE_URL/users/subscription",
+            data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
+        break;
+    }
+    final Map<String, dynamic> result = response.data;
+    provider.userInfo?.subscriptions = result["data"]?.cast<int>();
   }
 
   /// Modify a floor
@@ -753,7 +791,7 @@ extension StringRepresentation on PushNotificationServiceType? {
   }
 }
 
-enum SetFavoriteMode { ADD, DELETE }
+enum SetStatusMode { ADD, DELETE }
 
 class NotLoginError implements FatalException {
   final String errorMessage;
