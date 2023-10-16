@@ -27,12 +27,21 @@ class CourseGrade {
   int? workload;
   int? assessment;
 
-  CourseGrade(this.overall, this.content, this.workload, this.assessment);
+  // Indicates the format of the grade,
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  bool isClientFormat = false;
+
+  CourseGrade(this.overall, this.content, this.workload, this.assessment,{this.isClientFormat=false});
 
   CourseGrade withFields(
           {int? overall, int? content, int? workload, int? assessment}) =>
       CourseGrade(overall ?? this.overall, content ?? this.content,
           workload ?? this.workload, assessment ?? this.assessment);
+
+  CourseGrade convertFormat() {
+    // Reverse the content and workload score
+    return CourseGrade(overall, 6 - content!, 6 - workload!, assessment, isClientFormat: !isClientFormat);
+  }
 
   factory CourseGrade.fromJson(Map<String, dynamic> json) =>
       _$CourseGradeFromJson(json);

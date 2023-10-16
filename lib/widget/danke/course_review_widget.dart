@@ -31,6 +31,7 @@ import 'package:flutter/material.dart';
 class CourseReviewWidget extends StatelessWidget {
   final CourseReview review;
   final CourseGroup courseGroup;
+  final void Function(CourseReview?)? reviewOperationCallback;
 
   // changeable style of the card
   final bool translucent;
@@ -39,7 +40,7 @@ class CourseReviewWidget extends StatelessWidget {
       {Key? key,
       required this.review,
       required this.courseGroup,
-      this.translucent = false})
+      this.translucent = false, this.reviewOperationCallback})
       : super(key: key);
 
   @override
@@ -121,6 +122,7 @@ class CourseReviewWidget extends StatelessWidget {
                                         ModifyMenuWidget(
                                           originalReview: review,
                                           courseGroup: courseGroup,
+                                          reviewOperationCallback: reviewOperationCallback ?? (rev){},
                                         )
                                     ])),
                               ],
@@ -302,9 +304,10 @@ class ReviewFooter extends StatelessWidget {
 
 class ModifyMenuWidget extends StatefulWidget {
   const ModifyMenuWidget(
-      {super.key, required this.originalReview, required this.courseGroup});
+      {super.key, required this.originalReview, required this.courseGroup, required this.reviewOperationCallback});
   final CourseReview originalReview;
   final CourseGroup courseGroup;
+  final void Function(CourseReview?) reviewOperationCallback;
 
   @override
   ModifyMenuWidgetState createState() => ModifyMenuWidgetState();
@@ -332,6 +335,7 @@ class ModifyMenuWidgetState extends State<ModifyMenuWidget> {
               context, widget.courseGroup, widget.originalReview)) {
             if (!context.mounted) return;
             Noticing.showMaterialNotice(context, S.of(context).request_success);
+            widget.reviewOperationCallback(widget.originalReview);
           }
         } else if (item == ActionItem.Delete) {
           if (!context.mounted) return;
@@ -346,6 +350,7 @@ class ModifyMenuWidgetState extends State<ModifyMenuWidget> {
             try {
               await CurriculumBoardRepository.getInstance()
                   .removeReview(widget.originalReview.reviewId!);
+              widget.reviewOperationCallback(null);
             } catch (e, st) {
               if (!context.mounted) return;
               Noticing.showErrorDialog(context, e, trace: st);

@@ -133,6 +133,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
               timeFilter = event.newFilter;
               break;
           }
+
           indicatorKey.currentState?.show();
         }),
         hashCode);
@@ -169,7 +170,15 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
         scoreCount += elem.reviewList!.length;
 
         for (var rev in elem.reviewList!) {
+          // Attach information about its parent course for each review
           rev.linkCourse(elem.getSummary());
+
+          // Convert grades to client format
+          if (!rev.rank!.isClientFormat) {
+            rev.rank = rev.rank?.convertFormat();
+          }
+
+          // calculate average score
           totalScore += rev.rank!.overall!;
         }
       }
@@ -258,8 +267,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                   withScrollbar: true,
                   scrollController: PrimaryScrollController.of(context),
                   // [_loadContent] does no internet request so it shall be quick
-                  allDataReceiver:
-                      Future.value(_loadContent()).then((value) {
+                  allDataReceiver: Future.value(_loadContent()).then((value) {
                     WidgetsBinding.instance.addPostFrameCallback((_) async {
                       if (locateReview != null && mounted) {
                         // Scroll to the specific floor
@@ -414,6 +422,14 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
     return CourseReviewWidget(
       review: review,
       courseGroup: _courseGroup!,
+      reviewOperationCallback: (affectedReview) async {
+        if (affectedReview != null) {
+          locateReview = affectedReview;
+        }
+
+        await _fetchCourseGroup(forceRefetch: true);
+        indicatorKey.currentState?.show();
+      },
     );
   }
 }
