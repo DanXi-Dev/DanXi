@@ -39,8 +39,9 @@ import 'package:flutter/services.dart';
 class Constant {
   /// The number of posts on each pages returned from the server of FDUHole.
   static const POST_COUNT_PER_PAGE = 10;
+
   /// The number of serach results on each pages returned from the server of Danke.
-  static const SEARCH_COUNT_PER_PAGE=10;
+  static const SEARCH_COUNT_PER_PAGE = 10;
 
   static const SUPPORT_QQ_GROUP = "941342818";
 
@@ -228,7 +229,7 @@ class Constant {
   /// A default dashboard card list to be shown on the initial startup.
   ///
   /// It will be overwritten by data stored with key [SettingsProvider.KEY_DASHBOARD_WIDGETS].
-  static List<DashboardCard> defaultDashboardCardList = [
+  static List<DashboardCard> defaultDashboardCardList = List.unmodifiable([
     DashboardCard(FEATURE_NEW_CARD, null, null, true),
     DashboardCard("welcome_feature", null, null, true),
     DashboardCard("next_course_feature", null, null, true),
@@ -243,7 +244,7 @@ class Constant {
     DashboardCard("pe_feature", null, null, true),
     DashboardCard(FEATURE_NEW_CARD, null, null, true),
     DashboardCard("qr_feature", null, null, true),
-  ];
+  ]);
 
   /// Information about developers.
   ///
@@ -283,8 +284,11 @@ class Constant {
             "https://github.com/fsy2001", S.of(context).fsy2001_description),
         Developer("koowz", "assets/graphics/koowz.jpg",
             "https://github.com/koowz", S.of(context).koowz_description),
-        Developer("HydrogenC", "assets/graphics/HydrogenC.jpg",
-            "https://github.com/HydrogenC", S.of(context).hydrogenc_description),
+        Developer(
+            "HydrogenC",
+            "assets/graphics/HydrogenC.jpg",
+            "https://github.com/HydrogenC",
+            S.of(context).hydrogenc_description),
       ];
 
   /// Add a Chinese symbol(￥) at the end of [num].

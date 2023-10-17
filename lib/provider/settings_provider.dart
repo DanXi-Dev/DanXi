@@ -325,7 +325,10 @@ class SettingsProvider with ChangeNotifier {
       }
       return rawCardList;
     }
-    return Constant.defaultDashboardCardList;
+    // [defaultDashboardCardList] is an immutable list, do not
+    // return it directly!
+    // Make a copy instead.
+    return Constant.defaultDashboardCardList.toList();
   }
 
   set dashboardWidgetsSequence(List<DashboardCard>? value) {
