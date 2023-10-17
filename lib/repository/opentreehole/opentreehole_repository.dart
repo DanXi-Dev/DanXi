@@ -18,7 +18,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dan_xi/common/Secret.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
@@ -47,11 +46,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   factory OpenTreeHoleRepository.getInstance() => _instance;
 
-  static const String _BASE_URL = "https://www.fduhole.com/api";
-  static const String _BASE_AUTH_URL = "https://auth.fduhole.com/api";
-  static const String _IMAGE_BASE_URL = "https://image.fduhole.com";
-
-  late FDUHoleProvider provider;
+  static final String _BASE_URL = SettingsProvider.getInstance().fduholeBaseUrl;
+  static final String _BASE_AUTH_URL =
+      SettingsProvider.getInstance().authBaseUrl;
+  static final String _IMAGE_BASE_URL =
+      SettingsProvider.getInstance().imageBaseUrl;
 
   /// Cached floors, used by [mentions]
   final Map<int, OTFloor> _floorCache = {};
@@ -64,9 +63,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   String? lastUploadToken;
 
-  static void init(FDUHoleProvider injectProvider) {
-    OpenTreeHoleRepository.getInstance().provider = injectProvider;
-  }
+  /// Short name for the provider singleton
+  FDUHoleProvider get provider => FDUHoleProvider.getInstance();
 
   Future<void> logout() async {
     if (!provider.isUserInitialized) {
@@ -146,14 +144,16 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<bool?> checkRegisterStatus(String email) async {
-    final response = await secureDio.get("$_BASE_AUTH_URL/verify/apikey",
-        queryParameters: {
-          "apikey": Secret.generateOneTimeAPIKey(),
-          "email": email,
-          "check_register": 1,
-        },
-        options: Options(validateStatus: (code) => code! <= 409));
-    return response.statusCode == 409;
+    final Response<Map<String, dynamic>> response = await secureDio.get(
+        "$_BASE_AUTH_URL/verify/email",
+        queryParameters: {"email": email, "check": true},
+        options: Options(
+            validateStatus: (status) => status != null && status <= 400));
+    if (response.data!.containsKey("registered")) {
+      return response.data!["registered"];
+    } else {
+      throw (response.data!["message"]);
+    }
   }
 
   Dio get secureDio {
@@ -183,17 +183,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       return httpClient;
     };*/
     return secureDio;
-  }
-
-  Future<String?> getVerifyCode(String email) async {
-    Response<Map<String, dynamic>> response =
-        await secureDio.get("$_BASE_AUTH_URL/verify/apikey",
-            queryParameters: {
-              "apikey": Secret.generateOneTimeAPIKey(),
-              "email": email,
-            },
-            options: Options(validateStatus: (code) => code! < 300));
-    return response.data?["code"].toString();
   }
 
   Future<void> requestEmailVerifyCode(String email) async {
@@ -395,17 +384,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<String?> uploadImage(File file) async {
-    final RegExp tokenReg = RegExp(r'PF\.obj\.config\.auth_token = "(\w+)"');
     String path = file.absolute.path;
     String fileName = path.substring(path.lastIndexOf("/") + 1, path.length);
-    Response<String> r = await dio.get("$_IMAGE_BASE_URL/upload");
-    String? token = tokenReg.firstMatch(r.data!)?.group(1);
     Response<Map<String, dynamic>> response =
         await dio.post<Map<String, dynamic>>("$_IMAGE_BASE_URL/json",
             data: FormData.fromMap({
-              "type": "file",
-              "action": "upload",
-              "auth_token": token!,
               "source": await MultipartFile.fromFile(path, filename: fileName)
             }),
             options: Options(headers: _tokenHeader));
@@ -438,9 +421,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }*/
 
   Future<OTFloor?> likeFloor(int floorId, int like) async {
-    final Response<Map<String, dynamic>> response =
-        await dio.post("$_BASE_URL/floors/$floorId/like/$like",
-            options: Options(headers: _tokenHeader));
+    final Response<Map<String, dynamic>> response = await dio.post(
+        "$_BASE_URL/floors/$floorId/like/$like",
+        options: Options(headers: _tokenHeader));
     return OTFloor.fromJson(response.data!);
   }
 
@@ -465,6 +448,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           .get("$_BASE_URL/users", options: Options(headers: _tokenHeader));
       provider.userInfo = OTUser.fromJson(response.data!);
       provider.userInfo?.favorites = null;
+      provider.userInfo?.subscriptions = null;
     }
     return provider.userInfo;
   }
@@ -476,6 +460,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         options: Options(headers: _tokenHeader));
     provider.userInfo = OTUser.fromJson(response.data!);
     provider.userInfo?.favorites = null;
+    provider.userInfo?.subscriptions = null;
     return provider.userInfo;
   }
 
@@ -539,6 +524,18 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return provider.userInfo?.favorites;
   }
 
+  Future<List<int>?> getSubscribedHoleId() async {
+    if (provider.userInfo?.subscriptions != null) {
+      return provider.userInfo?.subscriptions;
+    }
+    final Response<Map<String, dynamic>> response = await dio.get(
+        "$_BASE_URL/users/subscriptions",
+        queryParameters: {"plain": true},
+        options: Options(headers: _tokenHeader));
+    provider.userInfo?.subscriptions = response.data?['data']?.cast<int>();
+    return provider.userInfo?.subscriptions;
+  }
+
   Future<List<OTHole>?> getFavoriteHoles({
     int length = Constant.POST_COUNT_PER_PAGE,
     int prefetchLength = Constant.POST_COUNT_PER_PAGE,
@@ -550,20 +547,47 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
-  Future<void> setFavorite(SetFavoriteMode mode, int? holeId) async {
+  Future<List<OTHole>?> getSubscribedHoles({
+    int length = Constant.POST_COUNT_PER_PAGE,
+    int prefetchLength = Constant.POST_COUNT_PER_PAGE,
+  }) async {
+    final Response<List<dynamic>> response = await dio.get(
+        "$_BASE_URL/users/subscriptions",
+        queryParameters: {"length": length, "prefetch_length": prefetchLength},
+        options: Options(headers: _tokenHeader));
+    return response.data?.map((e) => OTHole.fromJson(e)).toList();
+  }
+
+  Future<void> setFavorite(SetStatusMode mode, int? holeId) async {
     Response<dynamic> response;
     switch (mode) {
-      case SetFavoriteMode.ADD:
+      case SetStatusMode.ADD:
         response = await dio.post("$_BASE_URL/user/favorites",
             data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
         break;
-      case SetFavoriteMode.DELETE:
+      case SetStatusMode.DELETE:
         response = await dio.delete("$_BASE_URL/user/favorites",
             data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
         break;
     }
     final Map<String, dynamic> result = response.data;
     provider.userInfo?.favorites = result["data"]?.cast<int>();
+  }
+
+  Future<void> setSubscription(SetStatusMode mode, int? holeId) async {
+    Response<dynamic> response;
+    switch (mode) {
+      case SetStatusMode.ADD:
+        response = await dio.post("$_BASE_URL/users/subscriptions",
+            data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
+        break;
+      case SetStatusMode.DELETE:
+        response = await dio.delete("$_BASE_URL/users/subscription",
+            data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
+        break;
+    }
+    final Map<String, dynamic> result = response.data;
+    provider.userInfo?.subscriptions = result["data"]?.cast<int>();
   }
 
   /// Modify a floor
@@ -761,7 +785,7 @@ extension StringRepresentation on PushNotificationServiceType? {
   }
 }
 
-enum SetFavoriteMode { ADD, DELETE }
+enum SetStatusMode { ADD, DELETE }
 
 class NotLoginError implements FatalException {
   final String errorMessage;

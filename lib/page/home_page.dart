@@ -73,6 +73,7 @@ void sendFduholeTokenToWatch(String? token) {
 GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
 GlobalKey<State<SettingsSubpage>> settingsPageKey = GlobalKey();
 GlobalKey<TreeHoleSubpageState> treeholePageKey = GlobalKey();
+GlobalKey<DankeSubPageState> dankePageKey = GlobalKey();
 GlobalKey<HomeSubpageState> dashboardPageKey = GlobalKey();
 GlobalKey<TimetableSubPageState> timetablePageKey = GlobalKey();
 const QuickActions quickActions = QuickActions();
@@ -104,7 +105,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// Listener to the url scheme.
   /// debounced to avoid duplicated events.
-  static final StateStreamListener<Uri?> _uniLinksSubscription = StateStreamListener();
+  static final StateStreamListener<Uri?> _uniLinksSubscription =
+      StateStreamListener();
 
   /// If we need to send the QR code to iWatch now.
   ///
@@ -134,7 +136,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (!SettingsProvider.getInstance().hideHole)
         TreeHoleSubpage(key: treeholePageKey),
       // Don't show Timetable in visitor mode
-      const DankeSubPage(),
+      DankeSubPage(key: dankePageKey),
       if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
         TimetableSubPage(key: timetablePageKey),
       SettingsSubpage(key: settingsPageKey),
@@ -272,6 +274,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
         break;
     }
   }
@@ -350,7 +353,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }, onError: (Object error) {
           // Handle exception by warning the user their action did not succeed
           return Noticing.showErrorDialog(context, error);
-        }), hashCode);
+        }),
+        hashCode);
   }
 
   /// Jump to the specified element e.g. hole, floor.
@@ -374,10 +378,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             .loadSpecificHole(postId))!;
         if (mounted) {
           smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-          "post": hole,
-        });
+            "post": hole,
+          });
         }
-
       } else if (element == 'floor') {
         final floor = (await OpenTreeHoleRepository.getInstance()
             .loadSpecificFloor(postId))!;
@@ -509,13 +512,15 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     await PlatformX.getUniqueDeviceId(),
                     PushNotificationServiceType.APNS);
           } catch (e, st) {
-            Noticing.showNotice(
-                context,
-                S.of(context).push_notification_reg_failed_des(
-                    ErrorPageWidget.generateUserFriendlyDescription(
-                        S.of(context), e,
-                        stackTrace: st)),
-                title: S.of(context).push_notification_reg_failed);
+            if (mounted) {
+              Noticing.showNotice(
+                  context,
+                  S.of(context).push_notification_reg_failed_des(
+                      ErrorPageWidget.generateUserFriendlyDescription(
+                          S.of(context), e,
+                          stackTrace: st)),
+                  title: S.of(context).push_notification_reg_failed);
+            }
           }
           break;
         case 'get_token':
@@ -684,7 +689,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   icon: PlatformX.isMaterial(context)
                       ? const Icon(Icons.egg_alt)
                       : const Icon(CupertinoIcons.book),
-                  label: S.of(context).danke,
+                  label: S.of(context).curriculum,
                 ),
                 // Don't show Timetable in visitor mode
                 if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)

@@ -10,6 +10,7 @@ OTUser _$OTUserFromJson(Map<String, dynamic> json) => OTUser(
       json['user_id'] as int?,
       json['nickname'] as String?,
       (json['favorites'] as List<dynamic>?)?.map((e) => e as int).toList(),
+      (json['subscriptions'] as List<dynamic>?)?.map((e) => e as int).toList(),
       json['is_admin'] as bool?,
       json['joined_time'] as String?,
       json['config'] == null
@@ -25,6 +26,7 @@ Map<String, dynamic> _$OTUserToJson(OTUser instance) => <String, dynamic>{
       'user_id': instance.user_id,
       'nickname': instance.nickname,
       'favorites': instance.favorites,
+      'subscriptions': instance.subscriptions,
       'permission': instance.permission,
       'config': instance.config,
       'joined_time': instance.joined_time,

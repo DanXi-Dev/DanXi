@@ -21,6 +21,8 @@ import 'dart:ui';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/page/danke/course_group_detail.dart';
+import 'package:dan_xi/page/danke/course_review_editor.dart';
 import 'package:dan_xi/page/dashboard/aao_notices.dart';
 import 'package:dan_xi/page/dashboard/announcement_notices.dart';
 import 'package:dan_xi/page/dashboard/bus.dart';
@@ -49,7 +51,6 @@ import 'package:dan_xi/provider/language_manager.dart';
 import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -125,7 +126,7 @@ class TouchMouseScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
         PointerDeviceKind.touch,
-        if (PlatformX.isWindows) PointerDeviceKind.mouse,
+        PointerDeviceKind.mouse,
         PointerDeviceKind.stylus,
         PointerDeviceKind.invertedStylus,
         PointerDeviceKind.trackpad,
@@ -188,6 +189,9 @@ class DanxiApp extends StatelessWidget {
     '/bbs/messages': (context, {arguments}) =>
         OTMessagesPage(arguments: arguments),
     '/bbs/search': (context, {arguments}) => OTSearchPage(arguments: arguments),
+    '/danke/courseDetail': (context, {arguments}) => CourseGroupDetail(arguments: arguments),
+    '/danke/fullScreenEditor':(context, {arguments}) =>
+        CourseReviewEditorPage(arguments: arguments)
   };
 
   const DanxiApp({Key? key}) : super(key: key);
@@ -306,7 +310,7 @@ class DanxiApp extends StatelessWidget {
     var fduHoleProvider = FDUHoleProvider();
     // Init OpenTreeHoleRepository with the provider. This is the api implementations
     // of OpenTreeHole.
-    OpenTreeHoleRepository.init(fduHoleProvider);
+    FDUHoleProvider.init(fduHoleProvider);
 
     // Wrap the whole app with [Phoenix] to enable fast reload. When user
     // logouts the Fudan UIS account, the whole app will be reloaded.

@@ -146,6 +146,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   bool _dataClearQueued = false;
 
   final List<T> _data = [];
+  GlobalKey<dynamic> headKey = GlobalKey();
   List<StateKey<T>> valueKeys = [];
   Future<List<T>?>? _futureData;
 
@@ -284,6 +285,12 @@ class PagedListViewState<T> extends State<PagedListView<T>>
     );
   }
 
+  /// The head builder wrapped with [GlobalKey].
+  Widget _headBuilderWithKey(BuildContext context) => KeyedSubtree(
+        key: headKey,
+        child: widget.headBuilder!(context),
+      );
+
   Widget _buildListView({AsyncSnapshot<List<T>?>? snapshot}) {
     // Show an empty indicator if there's no data at all.
     if (!_isRefreshing && _isEnded && _data.isEmpty) {
@@ -297,7 +304,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
         physics: const AlwaysScrollableScrollPhysics(),
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         children: [
-          if (_hasHeadWidget) widget.headBuilder!(context),
+          if (_hasHeadWidget) _headBuilderWithKey(context),
           if (!_hasError && widget.emptyBuilder != null)
             widget.emptyBuilder!(context),
         ],
@@ -322,7 +329,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   _getListItemAt(int index, AsyncSnapshot<List<T>?>? snapshot) {
     if (_hasHeadWidget) {
       if (index == 0) {
-        return widget.headBuilder!(context);
+        return _headBuilderWithKey(context);
       }
       index--;
     }
@@ -462,8 +469,12 @@ class PagedListViewState<T> extends State<PagedListView<T>>
 
   scrollToIndex(int index,
       [Duration duration = kDuration, Curve curve = kCurve]) async {
-    final double itemTop =
-        valueKeys.getRange(0, index).fold<double>(0.0, (value, element) {
+    // add the height of head widget, if it exists
+    final headBox = headKey.currentContext?.findRenderObject() as RenderBox?;
+
+    final double itemTop = valueKeys
+        .getRange(0, index)
+        .fold<double>(headBox?.size.height ?? 0.0, (value, element) {
       final RenderBox box =
           element.currentContext.findRenderObject() as RenderBox;
       return value + box.size.height;

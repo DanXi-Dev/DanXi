@@ -78,6 +78,11 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_HIDDEN_NOTIFICATIONS = "hidden_notifications";
   static const String KEY_THEME_TYPE = "theme_type";
   static const String KEY_MARKDOWN_ENABLED = "markdown_rendering_enabled";
+  static const String KEY_VISITED_TIMETABLE = "visited_timetable";
+  static const String KEY_FDUHOLE_BASE_URL = "fduhole_base_url";
+  static const String KEY_AUTH_BASE_URL = "auth_base_url";
+  static const String KEY_IMAGE_BASE_URL = "image_base_url";
+  static const String KEY_DANKE_BASE_URL = "danke_base_url";
 
   SettingsProvider._();
 
@@ -128,6 +133,83 @@ class SettingsProvider with ChangeNotifier {
     }
   }
 
+  /// Set and get _BASE_URL, _BASE_AUTH_URL, _IMAGE_BASE_URL, _DANKE_BASE_URL for debug
+  String get fduholeBaseUrl {
+    if (preferences!.containsKey(KEY_FDUHOLE_BASE_URL)) {
+      String? fduholeBaseUrl = preferences!.getString(KEY_FDUHOLE_BASE_URL);
+      if (fduholeBaseUrl != null) {
+        return fduholeBaseUrl;
+      }
+    }
+    return Constant.FDUHOLE_BASE_URL;
+  }
+
+  set fduholeBaseUrl(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_FDUHOLE_BASE_URL, value);
+    } else {
+      preferences!.setString(KEY_FDUHOLE_BASE_URL, Constant.FDUHOLE_BASE_URL);
+    }
+    notifyListeners();
+  }
+
+  String get authBaseUrl {
+    if (preferences!.containsKey(KEY_AUTH_BASE_URL)) {
+      String? authBaseUrl = preferences!.getString(KEY_AUTH_BASE_URL);
+      if (authBaseUrl != null) {
+        return authBaseUrl;
+      }
+    }
+    return Constant.AUTH_BASE_URL;
+  }
+
+  set authBaseUrl(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_AUTH_BASE_URL, value);
+    } else {
+      preferences!.setString(KEY_AUTH_BASE_URL, Constant.AUTH_BASE_URL);
+    }
+    notifyListeners();
+  }
+
+  String get imageBaseUrl {
+    if (preferences!.containsKey(KEY_IMAGE_BASE_URL)) {
+      String? imageBaseUrl = preferences!.getString(KEY_IMAGE_BASE_URL);
+      if (imageBaseUrl != null) {
+        return imageBaseUrl;
+      }
+    }
+    return Constant.IMAGE_BASE_URL;
+  }
+
+  set imageBaseUrl(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_IMAGE_BASE_URL, value);
+    } else {
+      preferences!.setString(KEY_IMAGE_BASE_URL, Constant.IMAGE_BASE_URL);
+    }
+    notifyListeners();
+  }
+
+  String get dankeBaseUrl {
+    if (preferences!.containsKey(KEY_DANKE_BASE_URL)) {
+      String? dankeBaseUrl = preferences!.getString(KEY_DANKE_BASE_URL);
+      if (dankeBaseUrl != null) {
+        return dankeBaseUrl;
+      }
+    }
+    return Constant.DANKE_BASE_URL;
+  }
+
+  set dankeBaseUrl(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_DANKE_BASE_URL, value);
+    } else {
+      preferences!.setString(KEY_DANKE_BASE_URL, Constant.DANKE_BASE_URL);
+    }
+    notifyListeners();
+  }
+
   String? get backgroundImagePath {
     if (preferences!.containsKey(KEY_BACKGROUND_IMAGE_PATH)) {
       return preferences!.getString(KEY_BACKGROUND_IMAGE_PATH)!;
@@ -173,6 +255,18 @@ class SettingsProvider with ChangeNotifier {
 
   set isAdEnabled(bool value) {
     preferences!.setBool(KEY_AD_ENABLED, value);
+    notifyListeners();
+  }
+
+  bool get hasVisitedTimeTable {
+    if (preferences!.containsKey(KEY_VISITED_TIMETABLE)) {
+      return preferences!.getBool(KEY_VISITED_TIMETABLE)!;
+    }
+    return false;
+  }
+
+  set hasVisitedTimeTable(bool value) {
+    preferences!.setBool(KEY_VISITED_TIMETABLE, value);
     notifyListeners();
   }
 
@@ -231,7 +325,10 @@ class SettingsProvider with ChangeNotifier {
       }
       return rawCardList;
     }
-    return Constant.defaultDashboardCardList;
+    // [defaultDashboardCardList] is an immutable list, do not
+    // return it directly!
+    // Make a copy instead.
+    return Constant.defaultDashboardCardList.toList();
   }
 
   set dashboardWidgetsSequence(List<DashboardCard>? value) {

@@ -21,10 +21,10 @@ packages:
     dependency: transitive
     description:
       name: archive
-      sha256: "0c8368c9b3f0abbc193b9d6133649a614204b528982bebc7026372d61677ce3a"
+      sha256: e0902a06f0e00414e4e3438a084580161279f137aeb862274710f29ec10cf01e
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.7"
+    version: "3.3.9"
   args:
     dependency: transitive
     description:
@@ -258,10 +258,10 @@ packages:
     dependency: "direct main"
     description:
       name: collection
-      sha256: "4a07be6cb69c84d677a6c3096fcf960cc3285a8330b4603e0d463d15d9bd934c"
+      sha256: f092b211a4319e98e5ff58223576de6c2803db36221657b46c82574721240687
       url: "https://pub.dev"
     source: hosted
-    version: "1.17.1"
+    version: "1.17.2"
   convert:
     dependency: transitive
     description:
@@ -394,10 +394,10 @@ packages:
     dependency: transitive
     description:
       name: encrypt
-      sha256: "4fd4e4fdc21b9d7d4141823e1e6515cd94e7b8d84749504c232999fba25d9bbb"
+      sha256: "62d9aa4670cc2a8798bab89b39fc71b6dfbacf615de6cf5001fb39f7e4a996a2"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.1"
+    version: "5.0.3"
   encrypt_shared_preferences:
     dependency: "direct main"
     description:
@@ -686,50 +686,50 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_secure_storage
-      sha256: "98352186ee7ad3639ccc77ad7924b773ff6883076ab952437d20f18a61f0a7c5"
+      sha256: "22dbf16f23a4bcf9d35e51be1c84ad5bb6f627750565edd70dab70f3ff5fff8f"
       url: "https://pub.dev"
     source: hosted
-    version: "8.0.0"
+    version: "8.1.0"
   flutter_secure_storage_linux:
     dependency: transitive
     description:
       name: flutter_secure_storage_linux
-      sha256: "0912ae29a572230ad52d8a4697e5518d7f0f429052fd51df7e5a7952c7efe2a3"
+      sha256: "3d5032e314774ee0e1a7d0a9f5e2793486f0dff2dd9ef5a23f4e3fb2a0ae6a9e"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.3"
+    version: "1.2.0"
   flutter_secure_storage_macos:
     dependency: transitive
     description:
       name: flutter_secure_storage_macos
-      sha256: "083add01847fc1c80a07a08e1ed6927e9acd9618a35e330239d4422cd2a58c50"
+      sha256: bd33935b4b628abd0b86c8ca20655c5b36275c3a3f5194769a7b3f37c905369c
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0"
+    version: "3.0.1"
   flutter_secure_storage_platform_interface:
     dependency: transitive
     description:
       name: flutter_secure_storage_platform_interface
-      sha256: b3773190e385a3c8a382007893d678ae95462b3c2279e987b55d140d3b0cb81b
+      sha256: "0d4d3a5dd4db28c96ae414d7ba3b8422fd735a8255642774803b2532c9a61d7e"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   flutter_secure_storage_web:
     dependency: transitive
     description:
       name: flutter_secure_storage_web
-      sha256: "42938e70d4b872e856e678c423cc0e9065d7d294f45bc41fc1981a4eb4beaffe"
+      sha256: "30f84f102df9dcdaa2241866a958c2ec976902ebdaa8883fbfe525f1f2f3cf20"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.1"
+    version: "1.1.2"
   flutter_secure_storage_windows:
     dependency: transitive
     description:
       name: flutter_secure_storage_windows
-      sha256: fc2910ec9b28d60598216c29ea763b3a96c401f0ce1d13cdf69ccb0e5c93c3ee
+      sha256: "38f9501c7cb6f38961ef0e1eacacee2b2d4715c63cc83fe56449c4d3d0b47255"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0"
+    version: "2.1.1"
   flutter_svg:
     dependency: transitive
     description:
@@ -922,10 +922,10 @@ packages:
     dependency: "direct dev"
     description:
       name: intl_utils
-      sha256: a509a2ada4d12c4dc70f9ca35c2fddf75f8b402409ac1a9e1b3dd8065681986b
+      sha256: "0d38f605f292321c0729f8c0632b845be77aa12d272b7bc5e3022bb670a7309e"
       url: "https://pub.dev"
     source: hosted
-    version: "2.8.3"
+    version: "2.8.4"
   io:
     dependency: transitive
     description:
@@ -1011,10 +1011,10 @@ packages:
     dependency: transitive
     description:
       name: matcher
-      sha256: "6501fbd55da300384b768785b83e5ce66991266cec21af89ab9ae7f5ce1c4cbb"
+      sha256: "1803e76e6653768d64ed8ff2e1e67bea3ad4b923eb5c56a295c3e634bad5960e"
       url: "https://pub.dev"
     source: hosted
-    version: "0.12.15"
+    version: "0.12.16"
   material_color_generator:
     dependency: "direct main"
     description:
@@ -1027,10 +1027,10 @@ packages:
     dependency: transitive
     description:
       name: material_color_utilities
-      sha256: d92141dc6fe1dad30722f9aa826c7fbc896d021d792f80678280601aff8cf724
+      sha256: "9528f2f296073ff54cb9fee677df673ace1218163c3bc7628093e7eed5203d41"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.0"
+    version: "0.5.0"
   meta:
     dependency: "direct main"
     description:
@@ -1594,10 +1594,10 @@ packages:
     dependency: transitive
     description:
       name: source_span
-      sha256: dd904f795d4b4f3b870833847c461801f6750a9fa8e61ea5ac53f9422b31f250
+      sha256: "53e943d4206a5e30df338fd4c6e7a077e02254531b138a15aec3bd143c1a8b3c"
       url: "https://pub.dev"
     source: hosted
-    version: "1.9.1"
+    version: "1.10.0"
   sqflite:
     dependency: transitive
     description:
@@ -1683,10 +1683,10 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: eb6ac1540b26de412b3403a163d919ba86f6a973fe6cc50ae3541b80092fdcfb
+      sha256: "75760ffd7786fffdfb9597c35c5b27eaeec82be8edfb6d71d32651128ed7aab8"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.1"
+    version: "0.6.0"
   timezone:
     dependency: transitive
     description:
@@ -1711,6 +1711,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
+  tutorial_coach_mark:
+    dependency: "direct main"
+    description:
+      name: tutorial_coach_mark
+      sha256: ba60583d1b500111bf5040eb24330862b25162d926f72923b8e45c16621878b0
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.9"
   typed_data:
     dependency: transitive
     description:
@@ -1855,6 +1863,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+  web:
+    dependency: transitive
+    description:
+      name: web
+      sha256: dc8ccd225a2005c1be616fe02951e2e342092edf968cf0844220383757ef8f10
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.4-beta"
   web_socket_channel:
     dependency: transitive
     description:
@@ -1904,5 +1920,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.0.0 <4.0.0"
+  dart: ">=3.1.0-185.0.dev <4.0.0"
   flutter: ">=3.10.0"

@@ -18,6 +18,7 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/fdu/qr_code_repository.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/screen_proxy.dart';
@@ -56,6 +57,8 @@ class QRDialog extends StatefulWidget {
 }
 
 class QRDialogState extends State<QRDialog> {
+  bool termsNotAgreed = false;
+
   @override
   Widget build(BuildContext context) => PlatformAlertDialog(
         title: Text(S.of(context).fudan_qr_code),
@@ -75,10 +78,16 @@ class QRDialogState extends State<QRDialog> {
                 },
                 loadingBuilder: Text(S.of(context).loading_qr_code),
                 errorBuilder:
-                    (BuildContext context, AsyncSnapshot<String?> snapShot) =>
-                        ErrorPageWidget.buildWidget(context, snapShot.error,
-                            stackTrace: snapShot.stackTrace,
-                            onTap: () => refreshSelf()),
+                    (BuildContext context, AsyncSnapshot<String?> snapShot) {
+                  if (snapShot.error is TermsNotAgreed) {
+                    termsNotAgreed = true;
+                    return Text(S.of(context).qr_code_terms_not_agreed);
+                  } else {
+                    return ErrorPageWidget.buildWidget(context, snapShot.error,
+                        stackTrace: snapShot.stackTrace,
+                        onTap: () => refreshSelf());
+                  }
+                },
               ),
             )),
         actions: <Widget>[
@@ -86,6 +95,10 @@ class QRDialogState extends State<QRDialog> {
               child: PlatformText(S.of(context).i_see),
               onPressed: () async {
                 Navigator.pop(context);
+                if (termsNotAgreed) {
+                  BrowserUtil.openUrl(
+                      QRCodeRepository.QR_URL, context, null, true);
+                }
               }),
         ],
       );

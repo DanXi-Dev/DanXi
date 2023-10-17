@@ -26,7 +26,7 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/fdu/library_repository.dart';
+import 'package:dan_xi/repository/fdu/empty_classroom_repository.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -101,7 +101,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
   }
 
   void checkConnection() {
-    FudanLibraryRepository.getInstance().checkConnection().then((connected) {
+    EmptyClassroomRepository.getInstance().checkConnection().then((connected) {
       if (connected) {
         _notificationProvider.removeNotification(LanConnectionNotification());
       } else {

@@ -112,14 +112,14 @@ class BBSPostDetail extends StatefulWidget {
 
 class BBSPostDetailState extends State<BBSPostDetail> {
   /// Unrelated to the state.
-  /// These field should only be initialized once when created.
+  /// These fields should only be initialized once when created.
   late OTHole _hole;
   RenderMode _renderMode = RenderMode.NORMAL;
   String? _searchKeyword;
   FileImage? _backgroundImage;
 
   /// Fields related to the display states.
-  bool? _isFavored;
+  bool? _isFavored, _isSubscribed;
   bool _onlyShowDZ = false;
   bool _multiSelectMode = false;
   final List<int> _selectedFloors = [];
@@ -163,6 +163,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     final List<int>? favorites =
         await (OpenTreeHoleRepository.getInstance().getFavoriteHoleId());
     return favorites!.any((elementId) => elementId == _hole.hole_id);
+  }
+
+  Future<bool?> _isHoleSubscribed() async {
+    if (_isSubscribed != null) return _isSubscribed;
+    final List<int>? subscriptions =
+        await (OpenTreeHoleRepository.getInstance().getSubscribedHoleId());
+    return subscriptions!.any((elementId) => elementId == _hole.hole_id);
   }
 
   // construct the uri of the floor and copy it to clipboard
@@ -265,9 +272,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        // Replaced precached data with updated ones
-        _listViewController.replaceInitialData(
-            (await OpenTreeHoleRepository.getInstance().loadFloors(_hole))!);
+        // Replace precached data with updated ones
+        if (_hole.hole_id != -1) {
+          List<OTFloor>? newFloors = await OpenTreeHoleRepository.getInstance().loadFloors(_hole);
+          _listViewController.replaceInitialData(newFloors!);
+          _hole.floors!.prefetch = newFloors;
+        }
       } catch (_) {}
       if (locateFloor != null && mounted) {
         try {
@@ -334,12 +344,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
         trailingActions: [
           if (_renderMode == RenderMode.NORMAL) ...[
+            _buildSubscribeActionButton(),
             _buildFavoredActionButton(),
             PlatformIconButton(
               padding: EdgeInsets.zero,
-              icon: PlatformX.isMaterial(context)
-                  ? const Icon(Icons.reply)
-                  : const Icon(CupertinoIcons.arrowshape_turn_up_left),
+              icon: Icon(PlatformX.isMaterial(context)
+                  ? Icons.reply
+                  : CupertinoIcons.arrowshape_turn_up_left),
               onPressed: () async {
                 if (await OTEditor.createNewReply(
                     context, _hole.hole_id, null)) {
@@ -467,42 +478,86 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     }
   }
 
-  Widget _buildFavoredActionButton() => PlatformIconButton(
-        padding: EdgeInsets.zero,
-        icon: FutureWidget<bool?>(
-          future: _isHoleFavorite(),
-          loadingBuilder: PlatformCircularProgressIndicator(),
-          successBuilder:
-              (BuildContext context, AsyncSnapshot<bool?> snapshot) {
-            _isFavored = snapshot.data;
-            return _isFavored!
-                ? Icon(PlatformX.isMaterial(context)
-                    ? Icons.star
-                    : CupertinoIcons.star_fill)
-                : Icon(PlatformX.isMaterial(context)
-                    ? Icons.star_outline
-                    : CupertinoIcons.star);
-          },
-          errorBuilder: () => Icon(
-            PlatformIcons(context).error,
-            color: Theme.of(context).colorScheme.error,
-          ),
-        ),
-        onPressed: () async {
-          if (_isFavored == null) return;
-          setState(() => _isFavored = !_isFavored!);
-          await OpenTreeHoleRepository.getInstance()
-              .setFavorite(
-                  _isFavored! ? SetFavoriteMode.ADD : SetFavoriteMode.DELETE,
-                  _hole.hole_id)
-              .onError((dynamic error, stackTrace) {
-            Noticing.showNotice(context, error.toString(),
-                title: S.of(context).operation_failed, useSnackBar: false);
-            setState(() => _isFavored = !_isFavored!);
-            return null;
-          });
+  Widget _buildFavoredActionButton() {
+    var notFavoredIcon = Icon(PlatformX.isMaterial(context)
+        ? Icons.star_outline
+        : CupertinoIcons.star);
+
+    return PlatformIconButton(
+      padding: EdgeInsets.zero,
+      icon: FutureWidget<bool?>(
+        future: _isHoleFavorite(),
+        loadingBuilder: notFavoredIcon,
+        successBuilder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
+          _isFavored = snapshot.data;
+          return _isFavored!
+              ? Icon(PlatformX.isMaterial(context)
+                  ? Icons.star
+                  : CupertinoIcons.star_fill)
+              : notFavoredIcon;
         },
-      );
+        errorBuilder: () => Icon(
+          PlatformIcons(context).error,
+          color: Theme.of(context).colorScheme.error,
+        ),
+      ),
+      onPressed: () async {
+        if (_isFavored == null) return;
+        setState(() => _isFavored = !_isFavored!);
+        await OpenTreeHoleRepository.getInstance()
+            .setFavorite(
+                _isFavored! ? SetStatusMode.ADD : SetStatusMode.DELETE,
+                _hole.hole_id)
+            .onError((dynamic error, stackTrace) {
+          Noticing.showNotice(context, error.toString(),
+              title: S.of(context).operation_failed, useSnackBar: false);
+          setState(() => _isFavored = !_isFavored!);
+          return null;
+        });
+      },
+    );
+  }
+
+  // TODO: refractor to reduce redundant code
+  Widget _buildSubscribeActionButton() {
+    var notSubscribedIcon = Icon(PlatformX.isMaterial(context)
+        ? Icons.visibility_off
+        : CupertinoIcons.eye_slash);
+
+    return PlatformIconButton(
+      padding: EdgeInsets.zero,
+      icon: FutureWidget<bool?>(
+        future: _isHoleSubscribed(),
+        loadingBuilder: notSubscribedIcon,
+        successBuilder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
+          _isSubscribed = snapshot.data;
+          return _isSubscribed!
+              ? Icon(PlatformX.isMaterial(context)
+                  ? Icons.visibility
+                  : CupertinoIcons.eye)
+              : notSubscribedIcon;
+        },
+        errorBuilder: () => Icon(
+          PlatformIcons(context).error,
+          color: Theme.of(context).colorScheme.error,
+        ),
+      ),
+      onPressed: () async {
+        if (_isSubscribed == null) return;
+        setState(() => _isSubscribed = !_isSubscribed!);
+        await OpenTreeHoleRepository.getInstance()
+            .setSubscription(
+                _isSubscribed! ? SetStatusMode.ADD : SetStatusMode.DELETE,
+                _hole.hole_id)
+            .onError((dynamic error, stackTrace) {
+          Noticing.showNotice(context, error.toString(),
+              title: S.of(context).operation_failed, useSnackBar: false);
+          setState(() => _isSubscribed = !_isSubscribed!);
+          return null;
+        });
+      },
+    );
+  }
 
   List<OTTag> deepCopyTagList(List<OTTag> list) =>
       list.map((e) => OTTag.fromJson(jsonDecode(jsonEncode(e)))).toList();
@@ -1176,6 +1231,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               : length ~/ Constant.POST_COUNT_PER_PAGE
         });
       },
+      searchKeyWord:
+          _renderMode == RenderMode.SEARCH_RESULT ? _searchKeyword : null,
     );
 
     if (_multiSelectMode && _selectedFloors.contains(floor.floor_id)) {

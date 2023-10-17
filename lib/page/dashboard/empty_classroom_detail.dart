@@ -101,6 +101,23 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
         },
       ));
 
+  bool useEhall = false;
+
+  Future<List<RoomInfo>?> _getRoomInfo(PersonInfo? info, String areaName,
+      String? buildingName, DateTime date) async {
+    dynamic repository;
+    bool connected =
+        await EmptyClassroomRepository.getInstance().checkConnection();
+    if (connected) {
+      useEhall = false;
+      repository = EmptyClassroomRepository.getInstance();
+    } else {
+      useEhall = true;
+      repository = EhallEmptyClassroomRepository.getInstance();
+    }
+    return repository.getBuildingRoomInfo(info, areaName, buildingName, date);
+  }
+
   @override
   Widget build(BuildContext context) {
     // Build tags and texts.
@@ -143,183 +160,214 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
           child: Text(S.of(context).empty_classrooms),
         )),
         body: SafeArea(
-            bottom: false,
-            child: Column(children: [
-              SizedBox(
-                height: PlatformX.isMaterial(context) ? 0 : 12,
-              ),
+          bottom: false,
+          child: FutureWidget<List<RoomInfo>?>(
+              future: LazyFuture.pack(_getRoomInfo(
+                  _personInfo,
+                  _buildingList[_selectBuildingIndex]!.data![0],
+                  _buildingList[_selectBuildingIndex]!.data,
+                  selectDate!)),
+              successBuilder: _buildSuccessWidget,
+              errorBuilder: _buildErrorWidget,
+              loadingBuilder: _buildLoadingWidget),
+        ));
+  }
 
-              // Use different widgets on iOS/Android: Tag/Tab.
-              PlatformWidget(
-                  material: (_, __) => TagContainer(
-                      fillRandomColor: false,
-                      fixedColor: Theme.of(context).colorScheme.secondary,
-                      fontSize: 12,
-                      enabled: true,
-                      wrapped: false,
-                      singleChoice: true,
-                      defaultChoice: _selectCampusIndex,
-                      onChoice: (Tag tag, list) {
-                        int index = _campusTags!.indexWhere(
-                            (element) => element.tagTitle == tag.tagTitle);
-                        if (index >= 0 && index != _selectCampusIndex) {
-                          _selectCampusIndex = index;
-                          _selectBuildingIndex = 0;
-                          refreshSelf();
-                        }
-                      },
-                      tagList: _campusTags),
-                  cupertino: (_, __) => CupertinoSlidingSegmentedControl<int>(
-                        onValueChanged: (int? value) {
-                          _selectCampusIndex = value;
-                          _selectBuildingIndex = 0;
-                          refreshSelf();
-                        },
-                        groupValue: _selectCampusIndex,
-                        children: Constant.CAMPUS_VALUES
-                            .map((e) => Text(e.displayTitle(context)))
-                            .toList()
-                            .asMap(),
-                      )),
-              //Building Selector
-              SizedBox(
-                height: PlatformX.isMaterial(context) ? 0 : 12,
-              ),
-              PlatformWidget(
-                  material: (_, __) => TagContainer(
-                      fillRandomColor: false,
-                      fixedColor: Theme.of(context).colorScheme.secondary,
-                      fontSize: 16,
-                      wrapped: false,
-                      enabled: true,
-                      singleChoice: true,
-                      defaultChoice: _selectBuildingIndex,
-                      onChoice: (Tag tag, list) {
-                        int index = _buildingTags!.indexWhere(
-                            (element) => element.tagTitle == tag.tagTitle);
-                        if (index >= 0 && index != _selectBuildingIndex) {
-                          _selectBuildingIndex = index;
-                          refreshSelf();
-                        }
-                      },
-                      tagList: _buildingTags),
-                  cupertino: (_, __) => CupertinoSlidingSegmentedControl<int>(
-                        onValueChanged: (int? value) {
-                          if (value! >= 0 && value != _selectBuildingIndex) {
-                            _selectBuildingIndex = value;
-                            refreshSelf();
-                          }
-                        },
-                        groupValue: _selectBuildingIndex,
-                        children: _buildingList,
-                      )),
-              const SizedBox(height: 12),
+  List<Widget> _getFixedWidgets() {
+    return <Widget>[
+      SizedBox(
+        height: PlatformX.isMaterial(context) ? 0 : 12,
+      ),
+      // Use different widgets on iOS/Android: Tag/Tab.
+      PlatformWidget(
+          material: (_, __) => TagContainer(
+              fillRandomColor: false,
+              fixedColor: Theme.of(context).colorScheme.secondary,
+              fontSize: 12,
+              enabled: true,
+              wrapped: false,
+              singleChoice: true,
+              defaultChoice: _selectCampusIndex,
+              onChoice: (Tag tag, list) {
+                int index = _campusTags!.indexWhere(
+                        (element) => element.tagTitle == tag.tagTitle);
+                if (index >= 0 && index != _selectCampusIndex) {
+                  _selectCampusIndex = index;
+                  _selectBuildingIndex = 0;
+                  refreshSelf();
+                }
+              },
+              tagList: _campusTags),
+          cupertino: (_, __) => CupertinoSlidingSegmentedControl<int>(
+                onValueChanged: (int? value) {
+                  _selectCampusIndex = value;
+                  _selectBuildingIndex = 0;
+                  refreshSelf();
+                },
+                groupValue: _selectCampusIndex,
+                children: Constant.CAMPUS_VALUES
+                    .map((e) => Text(e.displayTitle(context)))
+                    .toList()
+                    .asMap(),
+              )),
+      //Building Selector
+      SizedBox(
+        height: PlatformX.isMaterial(context) ? 0 : 12,
+      ),
+      PlatformWidget(
+          material: (_, __) => TagContainer(
+              fillRandomColor: false,
+              fixedColor: Theme.of(context).colorScheme.secondary,
+              fontSize: 16,
+              wrapped: false,
+              enabled: true,
+              singleChoice: true,
+              defaultChoice: _selectBuildingIndex,
+              onChoice: (Tag tag, list) {
+                int index = _buildingTags!.indexWhere(
+                        (element) => element.tagTitle == tag.tagTitle);
+                if (index >= 0 && index != _selectBuildingIndex) {
+                  _selectBuildingIndex = index;
+                  refreshSelf();
+                }
+              },
+              tagList: _buildingTags),
+          cupertino: (_, __) => CupertinoSlidingSegmentedControl<int>(
+                onValueChanged: (int? value) {
+                  if (value! >= 0 && value != _selectBuildingIndex) {
+                    _selectBuildingIndex = value;
+                    refreshSelf();
+                  }
+                },
+                groupValue: _selectBuildingIndex,
+                children: _buildingList,
+              )),
+      const SizedBox(height: 12),
 
-              PlatformWidget(
-                cupertino: (_, __) => Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(S.of(context).current_date),
-                    TextButton(
-                      onPressed: () {
-                        showCupertinoModalPopup(
-                            context: context,
-                            builder: (BuildContext context) =>
-                                _buildCupertinoDatePicker());
-                      },
-                      child: Text("${selectDate!.month}/${selectDate!.day}"),
+      PlatformWidget(
+        cupertino: (_, __) => Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(S.of(context).current_date),
+            TextButton(
+              onPressed: () {
+                showCupertinoModalPopup(
+                    context: context,
+                    builder: (BuildContext context) =>
+                        _buildCupertinoDatePicker());
+              },
+              child: Text("${selectDate!.month}/${selectDate!.day}"),
+            ),
+          ],
+        ),
+        material: (_, __) =>
+            _buildSlider(DateFormat("MM/dd").format(selectDate!)),
+      ),
+
+      Container(
+        padding: const EdgeInsets.fromLTRB(25, 10, 25, 0),
+        child: Column(children: [
+          Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                  S.of(context).classroom,
+                  style: const TextStyle(fontSize: 18),
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      width:
+                          (ViewportUtils.getMainNavigatorWidth(context) / 32 +
+                                      4) *
+                                  5 +
+                              7,
+                      child: Text(
+                        "| ${S.of(context).morning}",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      width:
+                          (ViewportUtils.getMainNavigatorWidth(context) / 32 +
+                                      4) *
+                                  5 +
+                              7,
+                      child: Text(
+                        "| ${S.of(context).afternoon}",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      width:
+                          (ViewportUtils.getMainNavigatorWidth(context) / 32 +
+                                  4) *
+                              3,
+                      child: Text(
+                        "| ${S.of(context).evening}",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
-                material: (_, __) =>
-                    _buildSlider(DateFormat("MM/dd").format(selectDate!)),
-              ),
+              ]),
+          const Divider(),
+        ]),
+      ),
+    ];
+  }
 
-              Container(
-                padding: const EdgeInsets.fromLTRB(25, 10, 25, 0),
-                child: Column(children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          S.of(context).classroom,
-                          style: const TextStyle(fontSize: 18),
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                            Container(
-                              alignment: Alignment.centerLeft,
-                              width: (ViewportUtils.getMainNavigatorWidth(
-                                                  context) /
-                                              32 +
-                                          4) *
-                                      5 +
-                                  7,
-                              child: Text(
-                                "| ${S.of(context).morning}",
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Container(
-                              alignment: Alignment.centerLeft,
-                              width: (ViewportUtils.getMainNavigatorWidth(
-                                                  context) /
-                                              32 +
-                                          4) *
-                                      5 +
-                                  7,
-                              child: Text(
-                                "| ${S.of(context).afternoon}",
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Container(
-                              alignment: Alignment.centerLeft,
-                              width: (ViewportUtils.getMainNavigatorWidth(
-                                              context) /
-                                          32 +
-                                      4) *
-                                  3,
-                              child: Text(
-                                "| ${S.of(context).evening}",
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ]),
-                  const Divider(),
-                ]),
-              ),
-              Expanded(
-                child: FutureWidget<List<RoomInfo>?>(
-                    future: LazyFuture.pack(
-                        EmptyClassroomRepository.getInstance()
-                            .getBuildingRoomInfo(
-                                _personInfo,
-                                _buildingList[_selectBuildingIndex]!.data![0],
-                                _buildingList[_selectBuildingIndex]!.data,
-                                selectDate)),
-                    successBuilder: (BuildContext context,
-                            AsyncSnapshot<dynamic> snapshot) =>
-                        WithScrollbar(
-                            controller: PrimaryScrollController.of(context),
-                            child: ListView(
-                              primary: true,
-                              children: _getListWidgets(snapshot.data),
-                            )),
-                    errorBuilder: (BuildContext context,
-                            AsyncSnapshot<List<RoomInfo>?> snapShot) =>
-                        ErrorPageWidget.buildWidget(context, snapShot.error,
-                            stackTrace: snapShot.stackTrace,
-                            onTap: () => refreshSelf()),
-                    loadingBuilder: _buildLoadingWidget()),
-              )
-            ])));
+  Widget _buildLoadingWidget() {
+    List<Widget> widgets = _getFixedWidgets();
+    widgets.add(Expanded(
+        child: Center(
+      child: PlatformCircularProgressIndicator(),
+    )));
+    return Column(children: widgets);
+  }
+
+  Widget _buildErrorWidget(
+      BuildContext context, AsyncSnapshot<List<RoomInfo>?> snapShot) {
+    List<Widget> widgets = _getFixedWidgets();
+    widgets.add(Expanded(
+        child: ErrorPageWidget.buildWidget(context, snapShot.error,
+            stackTrace: snapShot.stackTrace, onTap: () => refreshSelf())));
+    return Column(children: widgets);
+  }
+
+  Widget _buildSuccessWidget(
+      BuildContext context, AsyncSnapshot<dynamic> snapShot) {
+    List<Widget> widgets = _getFixedWidgets();
+    if (useEhall) {
+      widgets.insert(
+          0,
+          Card(
+              color: Theme.of(context).colorScheme.error,
+              child: ListTile(
+                visualDensity: VisualDensity.comfortable,
+                title: Text(
+                  S.of(context).limited_mode_title,
+                  style: const TextStyle(color: Colors.white),
+                ),
+                subtitle: Text(S.of(context).empty_classroom_warning,
+                    style: const TextStyle(color: Colors.white)),
+              )));
+    }
+    widgets.add(Expanded(
+        child: WithScrollbar(
+            controller: PrimaryScrollController.of(context),
+            child: ListView(
+              primary: true,
+              children: _getListWidgets(snapShot.data),
+            ))));
+    return Column(children: widgets);
   }
 
   List<Widget> _getListWidgets(List<RoomInfo>? data) {
@@ -332,7 +380,8 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
             Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Column(
+                  Expanded(
+                      child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -345,7 +394,7 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                         style: TextStyle(color: Theme.of(context).hintColor),
                       ),
                     ],
-                  ),
+                  )),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: _buildBusinessViewForRoom(element),
@@ -427,7 +476,7 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
           decoration: BoxDecoration(
               border: slot == time
                   ? Border.all(
-                color: Theme.of(context).textTheme.bodyLarge!.color!,
+                      color: Theme.of(context).textTheme.bodyLarge!.color!,
                       width: 1.5,
                     )
                   : null,
@@ -447,8 +496,4 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
     }
     return list;
   }
-
-  Widget _buildLoadingWidget() => Center(
-        child: PlatformCircularProgressIndicator(),
-      );
 }

@@ -64,10 +64,10 @@ Will consider after Flutter macOS support becomes stable.
 
 ```shell
 $ flutter --version
-Flutter 3.10.5 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 796c8ef792 (2 weeks ago) • 2023-06-13 15:51:02 -0700
-Engine • revision 45f6e00911
-Tools • Dart 3.0.5 • DevTools 2.23.1
+Flutter 3.13.0 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision efbf63d9c6 (3 days ago) • 2023-08-15 21:05:06 -0500
+Engine • revision 1ac611c64e
+Tools • Dart 3.1.0 • DevTools 2.25.0
 ```
 
 ## Notes on compilation
@@ -82,7 +82,12 @@ If you are building for `Android`, you should also [install and configure](https
 
 If you are building for `iOS/iPadOS`, you should also [install and configure](https://apps.apple.com/cn/app/xcode/id497799835) `Xcode`.
 
-Run the command `dart run build_runner build --delete-conflicting-outputs`, `dart run intl_utils:generate` and then  `flutter run [ios/android]` to start the app.
+Run the command 
+```
+dart run build_runner build --delete-conflicting-outputs
+dart run intl_utils:generate
+```
+and then  `flutter run [ios/android]` to start the app.
 
 [//]: #
 [//]: #

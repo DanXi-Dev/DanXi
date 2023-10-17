@@ -62,10 +62,10 @@
 
 ```shell
 $ flutter --version
-Flutter 3.10.5 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 796c8ef792 (2 weeks ago) • 2023-06-13 15:51:02 -0700
-Engine • revision 45f6e00911
-Tools • Dart 3.0.5 • DevTools 2.23.1
+Flutter 3.13.0 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision efbf63d9c6 (3 days ago) • 2023-08-15 21:05:06 -0500
+Engine • revision 1ac611c64e
+Tools • Dart 3.1.0 • DevTools 2.25.0
 ```
 
 ## 编译说明
@@ -80,7 +80,12 @@ Tools • Dart 3.0.5 • DevTools 2.23.1
 
 如果你正在为 `iOS/iPadOS/macOS`平台构建，您还需要[安装并配置](https://apps.apple.com/app/id497799835) `Xcode`。
 
-确定配置正确后，你需要首先在项目根目录下运行 `dart run build_runner build --delete-conflicting-outputs`，`dart run intl_utils:generate` 然后运行  `flutter run [ios/android]`即可运行应用。
+确定配置正确后，你需要首先在项目根目录下运行 
+```
+dart run build_runner build --delete-conflicting-outputs
+dart run intl_utils:generate
+```
+然后运行  `flutter run [ios/android]`即可运行应用。
 
 ## 赞助
 

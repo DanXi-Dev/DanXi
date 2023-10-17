@@ -32,7 +32,7 @@ dependencies:
   share_plus: ^7.0.2
   path_provider: ^2.0.9
   screen_brightness: ^0.2.1
-  flutter_email_sender: ^6.0.0
+  flutter_email_sender: ^6.0.1
   auto_size_text: ^3.0.0
   ical:
     git:
@@ -103,6 +103,7 @@ dependencies:
   flutter_secure_storage: ^8.0.0
   encrypt_shared_preferences: ^0.3.5
   device_identity: ^1.0.0
+  tutorial_coach_mark: ^1.2.9    
 
 
 dependency_overrides:

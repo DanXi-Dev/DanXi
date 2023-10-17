@@ -58,7 +58,7 @@ class HoleLoginPageState extends State<HoleLoginPage> {
   void initState() {
     super.initState();
     info = widget.arguments!["info"];
-    _currentWidget = OTLoginMethodSelectionWidget(state: this);
+    _currentWidget = OTEmailSelectionWidget(state: this);
     _widgetStack.add(_currentWidget);
   }
 
@@ -176,45 +176,6 @@ abstract class SubStatelessWidget extends StatelessWidget {
   }
 }
 
-class OTLoginMethodSelectionWidget extends SubStatelessWidget {
-  const OTLoginMethodSelectionWidget(
-      {Key? key, required HoleLoginPageState state})
-      : super(key: key, state: state);
-
-  @override
-  Widget buildContent(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            S.of(context).select_login_method,
-            style: Theme.of(context).textTheme.titleLarge,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(
-            height: 32,
-          ),
-          // ListTile(
-          //   title: Text(S.of(context).fudan_uis_quick_login),
-          //   onTap: () => state.jumpTo(OTEmailSelectionWidget(
-          //     state: state,
-          //   )),
-          // ),
-          const Divider(),
-          ListTile(
-            title: Text(S.of(context).login_by_email_password),
-            onTap: () => state.jumpTo(OTEmailPasswordLoginWidget(
-              state: state,
-            )),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class OTEmailSelectionWidget extends SubStatelessWidget {
   const OTEmailSelectionWidget({Key? key, required HoleLoginPageState state})
       : super(key: key, state: state);
@@ -223,8 +184,7 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
   ///
   /// if [isRecommendedEmail], get the verify code straightly.
   /// Otherwise request an email OTP code.
-  Future<void> checkEmailInfo(
-      BuildContext context, String email, bool isRecommendedEmail) async {
+  Future<void> checkEmailInfo(BuildContext context, String email) async {
     var model = Provider.of<LoginInfoModel>(context, listen: false);
     state.jumpTo(OTLoadingWidget(state: state), putInStack: false);
     bool? registered =
@@ -232,14 +192,8 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
     if (registered!) {
       state.jumpTo(OTEmailPasswordLoginWidget(state: state));
     } else {
-      if (isRecommendedEmail) {
-        model.verifyCode =
-            await OpenTreeHoleRepository.getInstance().getVerifyCode(email);
-        state.jumpTo(OTSetPasswordWidget(state: state));
-      } else {
-        model.verifyCode = null;
-        state.jumpTo(OTSetPasswordWidget(state: state));
-      }
+      model.verifyCode = null;
+      state.jumpTo(OTSetPasswordWidget(state: state));
     }
   }
 
@@ -260,7 +214,7 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Text(
-          S.of(context).fudan_uis_quick_login,
+          S.of(context).fudan_uis_email_login,
           style: Theme.of(context).textTheme.titleLarge,
           textAlign: TextAlign.center,
         ),
@@ -306,8 +260,7 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
                   Provider.of<LoginInfoModel>(context, listen: false)
                       .selectedEmail = email;
                   if (email != null) {
-                    checkEmailInfo(context, email, email == recommendedEmail)
-                        .catchError((e, st) {
+                    checkEmailInfo(context, email).catchError((e, st) {
                       state.jumpBackFromLoadingPage();
                       Noticing.showErrorDialog(state.context, e, trace: st);
                     });

@@ -1,5 +1,5 @@
 /*
- *     Copyright (C) 2022  DanXi-Dev
+ *     Copyright (C) 2023  DanXi-Dev
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -15,34 +15,22 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/model/curriculum/course.dart';
+import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'course_group.g.dart';
+part 'search_results.g.dart';
 
 @JsonSerializable()
-class CourseGroup {
-  int? id;
-  String? name;
-  String? code;
-  String? department;
-  List<Course>? course_list;
+class CourseSearchResults {
+  int? page;
+  @JsonKey(name: 'page_size')
+  int? pageSize;
+  String? extra;
+  List<CourseGroup>? items;
 
-  CourseGroup(this.id, this.name, this.code, this.department, this.course_list);
+  CourseSearchResults(this.page, this.pageSize, this.extra, this.items);
 
-  @override
-  String toString() {
-    return 'CourseGroup{id: $id, name: $name, code: $code, department: $department, course_list: $course_list}';
-  }
+  factory CourseSearchResults.fromJson(Map<String, dynamic> json) => _$CourseSearchResultsFromJson(json);
 
-  factory CourseGroup.fromJson(Map<String, dynamic> json) =>
-      _$CourseGroupFromJson(json);
-
-  Map<String, dynamic> toJson() => _$CourseGroupToJson(this);
-
-  @override
-  bool operator ==(Object other) => (other is CourseGroup) && id == other.id;
-
-  @override
-  int get hashCode => id ?? name.hashCode;
+  Map<String, dynamic> toJson() => _$CourseSearchResultsToJson(this);
 }

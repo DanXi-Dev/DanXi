@@ -52,7 +52,11 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   @override
   void initState() {
     super.initState();
-    diagnoses = [diagnoseFDUHole, diagnoseDanXi];
+    diagnoses = [
+      diagnoseFDUHole,
+      diagnoseDanXi,
+      diagnoseUrl
+    ];
     unawaited(diagnose());
   }
 
@@ -97,6 +101,15 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
 
   static const _IGNORE_KEYS = ["password"];
 
+  Future<void> diagnoseUrl() async {
+    _console
+        .writeln("Base URL: ${SettingsProvider.getInstance().fduholeBaseUrl}");
+    _console.writeln(
+        "Base Auth URL: ${SettingsProvider.getInstance().authBaseUrl}");
+    _console.writeln(
+        "Image Base URL: ${SettingsProvider.getInstance().imageBaseUrl}");
+  }
+
   Future<void> diagnoseDanXi() async {
     _console.writeln(
         "User Agent used by DanXi for UIS: ${UserAgentInterceptor.defaultUsedUserAgent}");
@@ -133,6 +146,42 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
       Noticing.showModalNotice(context,
           message: S.of(context).operation_successful);
     }
+  }
+
+  Future<void> changeBaseUrl() async {
+    String? fduholeBaseUrl = await Noticing.showInputDialog(context,
+        "Input new base url (leave empty to reset to ${Constant.FDUHOLE_BASE_URL})");
+    if (fduholeBaseUrl == null || !mounted) return;
+    if (fduholeBaseUrl.isEmpty) {
+      SettingsProvider.getInstance().fduholeBaseUrl = Constant.FDUHOLE_BASE_URL;
+    } else {
+      SettingsProvider.getInstance().fduholeBaseUrl = fduholeBaseUrl;
+    }
+    Noticing.showNotice(context, "Restart app to take effects");
+  }
+
+  Future<void> changeBaseAuthUrl() async {
+    String? baseAuthUrl = await Noticing.showInputDialog(context,
+        "Input new base auth url (leave empty to reset to ${Constant.AUTH_BASE_URL})");
+    if (baseAuthUrl == null || !mounted) return;
+    if (baseAuthUrl.isEmpty) {
+      SettingsProvider.getInstance().authBaseUrl = Constant.AUTH_BASE_URL;
+    } else {
+      SettingsProvider.getInstance().authBaseUrl = baseAuthUrl;
+    }
+    Noticing.showNotice(context, "Restart app to take effects");
+  }
+
+  Future<void> changeImageBaseUrl() async {
+    String? imageBaseUrl = await Noticing.showInputDialog(context,
+        "Input new image base url (leave empty to reset to ${Constant.IMAGE_BASE_URL}))");
+    if (imageBaseUrl == null || !mounted) return;
+    if (imageBaseUrl.isEmpty) {
+      SettingsProvider.getInstance().imageBaseUrl = Constant.IMAGE_BASE_URL;
+    } else {
+      SettingsProvider.getInstance().imageBaseUrl = imageBaseUrl;
+    }
+    Noticing.showNotice(context, "Restart app to take effects");
   }
 
   Future<void> sendMessage() async {
@@ -218,6 +267,24 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
                   child: const Text("Clear Cookies"),
                   onPressed: () async {
                     await BaseRepositoryWithDio.clearAllCookies();
+                  },
+                ),
+                PlatformElevatedButton(
+                  child: const Text("Set _BASE_URL"),
+                  onPressed: () async {
+                    await changeBaseUrl();
+                  },
+                ),
+                PlatformElevatedButton(
+                  child: const Text("Set  _BASE_AUTH_URL"),
+                  onPressed: () async {
+                    await changeBaseAuthUrl();
+                  },
+                ),
+                PlatformElevatedButton(
+                  child: const Text("Set _IMAGE_BASE_URL"),
+                  onPressed: () async {
+                    await changeImageBaseUrl();
                   },
                 ),
                 ChangeNotifierProvider.value(
