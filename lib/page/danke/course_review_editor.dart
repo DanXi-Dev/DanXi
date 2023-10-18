@@ -579,8 +579,9 @@ class CourseRatingWidgetState extends State<CourseRatingWidget> {
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(children: [
-          SizedBox(width: 80, child: Text(widget.label)),
+          SizedBox(width: 88, child: Text(widget.label)),
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: List.generate(
                 5,
                 (index) => IconButton(
