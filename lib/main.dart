@@ -33,6 +33,7 @@ import 'package:dan_xi/page/dashboard/empty_classroom_detail.dart';
 import 'package:dan_xi/page/dashboard/exam_detail.dart';
 import 'package:dan_xi/page/dashboard/gpa_table.dart';
 import 'package:dan_xi/page/home_page.dart';
+import 'package:dan_xi/page/opentreehole/admin_operation.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/opentreehole/hole_login.dart';
@@ -187,12 +188,15 @@ class DanxiApp extends StatelessWidget {
     '/bus/detail': (context, {arguments}) => BusPage(arguments: arguments),
     '/bbs/tags/blocklist': (context, {arguments}) =>
         BBSHiddenTagsPreferencePage(arguments: arguments),
+    '/bbs/admin': (context, {arguments}) =>
+        AdminOperationPage(arguments: arguments),
     '/bbs/login': (context, {arguments}) => HoleLoginPage(arguments: arguments),
     '/bbs/messages': (context, {arguments}) =>
         OTMessagesPage(arguments: arguments),
     '/bbs/search': (context, {arguments}) => OTSearchPage(arguments: arguments),
-    '/danke/courseDetail': (context, {arguments}) => CourseGroupDetail(arguments: arguments),
-    '/danke/fullScreenEditor':(context, {arguments}) =>
+    '/danke/courseDetail': (context, {arguments}) =>
+        CourseGroupDetail(arguments: arguments),
+    '/danke/fullScreenEditor': (context, {arguments}) =>
         CourseReviewEditorPage(arguments: arguments)
   };
 

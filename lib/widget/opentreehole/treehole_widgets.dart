@@ -890,39 +890,43 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                   setState(() {
                     selectedActionItem = item;
                   });
-                  if (item == ActionItem.Report) {
-                    if (await OTEditor.reportPost(context, floor.floor_id)) {
-                      if (!context.mounted) return;
-                      Noticing.showMaterialNotice(
-                          context, S.of(context).report_success);
-                    }
-                  }
-                  if (item == ActionItem.Delete) {
-                    if (!context.mounted) return;
-                    if (await Noticing.showConfirmationDialog(
-                            context,
-                            S.of(context).about_to_delete_floor(
-                                floor.floor_id ?? "null"),
-                            title: S.of(context).are_you_sure,
-                            isConfirmDestructive: true) ==
-                        true) {
-                      try {
-                        await OpenTreeHoleRepository.getInstance()
-                            .deleteFloor(floor.floor_id!);
-                      } catch (e, st) {
+                  switch (item) {
+                    case ActionItem.Report:
+                      if (await OTEditor.reportPost(context, floor.floor_id)) {
                         if (!context.mounted) return;
-                        Noticing.showErrorDialog(context, e, trace: st);
+                        Noticing.showMaterialNotice(
+                            context, S.of(context).report_success);
                       }
-                    }
-                  }
-                  if (item == ActionItem.Modify) {
-                    if (!context.mounted) return;
-                    if (await OTEditor.modifyReply(context, floor.hole_id,
-                        floor.floor_id, floor.content)) {
+                      break;
+                    case ActionItem.Delete:
                       if (!context.mounted) return;
-                      Noticing.showMaterialNotice(
-                          context, S.of(context).request_success);
-                    }
+                      if (await Noticing.showConfirmationDialog(
+                              context,
+                              S.of(context).about_to_delete_floor(
+                                  floor.floor_id ?? "null"),
+                              title: S.of(context).are_you_sure,
+                              isConfirmDestructive: true) ==
+                          true) {
+                        try {
+                          await OpenTreeHoleRepository.getInstance()
+                              .deleteFloor(floor.floor_id!);
+                        } catch (e, st) {
+                          if (!context.mounted) return;
+                          Noticing.showErrorDialog(context, e, trace: st);
+                        }
+                      }
+                      break;
+                    case ActionItem.Modify:
+                      if (!context.mounted) return;
+                      if (await OTEditor.modifyReply(context, floor.hole_id,
+                          floor.floor_id, floor.content)) {
+                        if (!context.mounted) return;
+                        Noticing.showMaterialNotice(
+                            context, S.of(context).request_success);
+                      }
+                      break;
+                    default:
+                      break;
                   }
                 },
                 itemBuilder: (BuildContext context) =>

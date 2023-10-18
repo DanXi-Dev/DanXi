@@ -179,12 +179,12 @@ class CourseReviewEditor {
         originalContent.title!,
         originalContent.courseInfo.id,
         originalContent.rank!);
-    final CourseReviewEditorText? content = (await _showEditor(
+    final CourseReviewEditorText? content = await _showEditor(
         context, S.of(context).modify_to(originalContent.reviewId!),
         initialContent: initialContent,
         interceptor: _kStopWordInterceptor.mergeWith(interceptor),
         courseGroup: courseGroup,
-        isModify: true));
+        isModify: true);
     if (content == null) return false;
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
