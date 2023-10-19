@@ -82,5 +82,6 @@ class FDUHoleProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Whether the user has logged in and we have fetched his/her profile.
   bool get isUserInitialized => token != null && userInfo != null;
 }

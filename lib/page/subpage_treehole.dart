@@ -344,7 +344,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       context.read<FDUHoleProvider>().currentDivision?.division_id ?? 1;
 
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
-      OpenTreeHoleRepository.getInstance().userInfo?.config?.show_folded);
+      context.read<FDUHoleProvider>().userInfo?.config?.show_folded);
 
   FileImage? _backgroundImage;
 
