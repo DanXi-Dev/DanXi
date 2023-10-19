@@ -33,6 +33,11 @@ import 'package:provider/provider.dart';
 abstract class PlatformSubpage<T> extends StatefulWidget {
   const PlatformSubpage({Key? key}) : super(key: key);
 
+  @deprecated
+  final bool needPadding = false;
+  @deprecated
+  final bool needBottomPadding = false;
+
   Create<Widget> get title;
 
   Create<List<AppBarButtonItem>> get leading => (_) => [];
@@ -162,6 +167,8 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
       controller: _buildPrimaryScrollController(context),
       child: PlatformScaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          iosContentBottomPadding: widget.needBottomPadding,
+          iosContentPadding: widget.needPadding,
           appBar: PlatformAppBar(
             cupertino: (_, __) => CupertinoNavigationBarData(
               title: MediaQuery(
@@ -170,7 +177,6 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
                   child: TopController(child: widget.title(context))),
             ),
             material: (_, __) => MaterialAppBarData(
-              titleSpacing: 0,
                 title: TopController(child: widget.title(context))),
             leading: leadingButton,
             trailingActions: trailingButtons,
