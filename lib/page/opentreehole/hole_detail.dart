@@ -334,8 +334,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
-        material: (_, __) => MaterialAppBarData(
-                titleSpacing: 0),
         title: TopController(
           controller: PrimaryScrollController.of(context),
           child: switch (_renderMode) {

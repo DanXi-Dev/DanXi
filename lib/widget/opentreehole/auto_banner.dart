@@ -187,9 +187,7 @@ class AutoBannerState extends State<AutoBanner> {
                                   onExpand!(_displayAll);
                                 }
                               }),
-                              child: Icon(_displayAll
-                                  ? Icons.arrow_drop_up
-                                  : Icons.arrow_drop_down),
+                              child: const Icon(Icons.arrow_drop_up),
                             ))
                     ],
                   ));

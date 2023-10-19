@@ -170,7 +170,6 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
                   child: TopController(child: widget.title(context))),
             ),
             material: (_, __) => MaterialAppBarData(
-              titleSpacing: 0,
                 title: TopController(child: widget.title(context))),
             leading: leadingButton,
             trailingActions: trailingButtons,
