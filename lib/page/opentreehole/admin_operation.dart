@@ -2,9 +2,11 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/punishment.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
@@ -44,6 +46,7 @@ class AdminOperationPageState extends State<AdminOperationPage> {
   late bool _isSingleFloor;
   late String _title;
   FileImage? _backgroundImage;
+  List<String>? _punishments;
   late TextEditingController _reasonController;
   final ValueNotifier<bool> _punishUser = ValueNotifier(false);
   final ValueNotifier<int> _punishmentDays = ValueNotifier(0);
@@ -62,6 +65,13 @@ class AdminOperationPageState extends State<AdminOperationPage> {
     _isSingleFloor = _floors.length == 1;
 
     super.didChangeDependencies();
+  }
+
+  Future<List<String>> getPunishmentHistory() async {
+    _punishments ??= await OpenTreeHoleRepository.getInstance()
+        .adminGetPunishmentHistory(_floors.first.floor_id!);
+
+    return _punishments!;
   }
 
   @override
@@ -139,9 +149,7 @@ class AdminOperationPageState extends State<AdminOperationPage> {
                                 secondary: const Icon(CupertinoIcons.nosign),
                                 value: _punishUser.value,
                                 onChanged: (bool value) {
-                                  setState(() {
-                                    _punishUser.value = value;
-                                  });
+                                  _punishUser.value = value;
                                 },
                               )),
                       ValueListenableBuilder(
@@ -158,21 +166,37 @@ class AdminOperationPageState extends State<AdminOperationPage> {
                               )),
                     ])),
                     const Divider(),
-                    ExpansionTileX(
-                      expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                      expandedAlignment: Alignment.topLeft,
-                      childrenPadding: const EdgeInsets.symmetric(vertical: 4),
-                      tilePadding: EdgeInsets.zero,
-                      initiallyExpanded: false,
-                      title: const Row(
-                        children: [
-                          Icon(CupertinoIcons.person_badge_minus),
-                          SizedBox(width: 8),
-                          // FIXME: remove hardcoded number
-                          Text("违规记录: 0 条")
-                        ],
+                    FutureWidget<List<String>>(
+                      future: getPunishmentHistory(),
+                      loadingBuilder: Center(
+                        child: PlatformCircularProgressIndicator(),
                       ),
-                      children: [],
+                      successBuilder: (BuildContext context,
+                          AsyncSnapshot<List<String>> snapshot) {
+                        return ExpansionTileX(
+                            expandedCrossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            expandedAlignment: Alignment.topLeft,
+                            childrenPadding:
+                                const EdgeInsets.symmetric(vertical: 4),
+                            tilePadding: EdgeInsets.zero,
+                            initiallyExpanded: false,
+                            title: Row(
+                              children: [
+                                const Icon(CupertinoIcons.person_badge_minus),
+                                const SizedBox(width: 8),
+                                Text("违规记录: ${snapshot.data!.length} 条")
+                              ],
+                            ),
+                            children: [
+                              ...snapshot.data!.map(
+                                  (e) => Card(child: ListTile(title: Text(e))))
+                            ]);
+                      },
+                      errorBuilder: () => Icon(
+                        PlatformIcons(context).error,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
                     ),
                   ]
                 ],

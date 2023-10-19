@@ -1007,8 +1007,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         child: Text(S.of(menuContext).report),
       ),
 
-      // TODO: Uncomment before submit
-      // if (OpenTreeHoleRepository.getInstance().isAdmin)
+      if (OpenTreeHoleRepository.getInstance().isAdmin)
       PlatformContextMenuItem(
         onPressed: () async {
           if (await showAdminOperation(context, [e])) {
@@ -1026,8 +1025,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   List<Widget> _buildMultiSelectContextMenu(BuildContext menuContext) {
     List<Widget> menu = [
-      // TODO: Uncomment before submit
-      // if (OpenTreeHoleRepository.getInstance().isAdmin)
+      if (OpenTreeHoleRepository.getInstance().isAdmin)
       PlatformContextMenuItem(
         onPressed: () async {
           if (await showAdminOperation(context, _selectedFloors)) {
