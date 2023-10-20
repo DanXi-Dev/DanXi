@@ -19,6 +19,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:clipboard/clipboard.dart';
+import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/division.dart';
@@ -563,70 +564,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       list.map((e) => OTTag.fromJson(jsonDecode(jsonEncode(e)))).toList();
 
   List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {
-    List<Widget> buildAdminPenaltyMenu(BuildContext menuContext, OTFloor e) {
-      Future<void> onExecutePenalty(int level) async {
-        // Confirm the operation
-        bool? confirmed = await Noticing.showConfirmationDialog(context,
-            "You are going to add a penalty of level $level to floor ${e.floor_id} in its division. Are you sure?",
-            isConfirmDestructive: true);
-        if (confirmed != true) return;
-
-        int? result = await OpenTreeHoleRepository.getInstance()
-            .adminAddPenalty(e.floor_id, level);
-        if (result != null && result < 300 && mounted) {
-          Noticing.showMaterialNotice(
-              context, S.of(context).operation_successful);
-        }
-      }
-
-      Future<void> onExecutePenaltyDays() async {
-        // Input the number of days
-        String? dayStr = await Noticing.showInputDialog(
-            context, "Please input the number of days");
-        if (dayStr == null) return;
-        int? days = int.tryParse(dayStr);
-        if (days == null) return;
-
-        // Confirm the operation
-        bool? confirmed = await Noticing.showConfirmationDialog(context,
-            "You are going to add a penalty of $days days to floor ${e.floor_id} in its division. Are you sure?",
-            isConfirmDestructive: true);
-        if (confirmed != true) return;
-
-        int? result = await OpenTreeHoleRepository.getInstance()
-            .adminAddPenaltyDays(e.floor_id, days);
-        if (result != null && result < 300 && mounted) {
-          Noticing.showMaterialNotice(
-              context, S.of(context).operation_successful);
-        }
-      }
-
-      return [
-        PlatformContextMenuItem(
-          onPressed: () => onExecutePenalty(1),
-          menuContext: menuContext,
-          child: Text(S.of(context).level(1)),
-        ),
-        PlatformContextMenuItem(
-          onPressed: () => onExecutePenalty(2),
-          menuContext: menuContext,
-          child: Text(S.of(context).level(2)),
-        ),
-        PlatformContextMenuItem(
-          onPressed: () => onExecutePenalty(3),
-          menuContext: menuContext,
-          isDestructive: true,
-          child: Text(S.of(context).level(3)),
-        ),
-        PlatformContextMenuItem(
-          onPressed: onExecutePenaltyDays,
-          menuContext: menuContext,
-          isDestructive: true,
-          child: const Text("Custom penalty..."),
-        ),
-      ];
-    }
-
+    
     List<Widget> buildAdminMenu(BuildContext menuContext, OTFloor e) {
       return [
         PlatformContextMenuItem(
@@ -643,23 +581,14 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformContextMenuItem(
           onPressed: () async {
-            if (await Noticing.showConfirmationDialog(
-                    context, S.of(context).are_you_sure,
-                    isConfirmDestructive: true) ==
-                true) {
-              final reason = await Noticing.showInputDialog(
-                  context, S.of(context).input_reason);
-              int? result = await OpenTreeHoleRepository.getInstance()
-                  .adminDeleteFloor(e.floor_id, reason);
-              if (result != null && result < 300 && mounted) {
-                Noticing.showMaterialNotice(
-                    context, S.of(context).operation_successful);
-              }
+            if (await showAdminOperation(context, [e])) {
+              Noticing.showMaterialNotice(
+                  context, S.of(context).request_success);
             }
           },
           isDestructive: true,
           menuContext: menuContext,
-          child: Text(S.of(context).delete_floor),
+          child: const Text("删除或封禁"),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
@@ -699,19 +628,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           isDestructive: true,
           menuContext: menuContext,
           child: Text(S.of(context).hide_hole),
-        ),
-        PlatformContextMenuItem(
-          onPressed: () => showPlatformModalSheet(
-              context: context,
-              builder: (subMenuContext) => PlatformContextMenu(
-                  actions: buildAdminPenaltyMenu(subMenuContext, e),
-                  cancelButton: CupertinoActionSheetAction(
-                    child: Text(S.of(subMenuContext).cancel),
-                    onPressed: () => Navigator.of(subMenuContext).pop(),
-                  ))),
-          isDestructive: true,
-          menuContext: menuContext,
-          child: Text(S.of(context).add_penalty),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
@@ -1007,35 +923,110 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         child: Text(S.of(menuContext).report),
       ),
 
-      if (OpenTreeHoleRepository.getInstance().isAdmin)
-      PlatformContextMenuItem(
-        onPressed: () async {
-          if (await showAdminOperation(context, [e])) {
-            Noticing.showMaterialNotice(context, S.of(context).request_success);
-          }
-        },
-        isDestructive: true,
-        menuContext: menuContext,
-        child: Text(S.of(context).admin_options),
-      )
+      if (OpenTreeHoleRepository.getInstance().isAdmin) ...[
+        PlatformContextMenuItem(
+          onPressed: () => showPlatformModalSheet(
+              context: context,
+              builder: (subMenuContext) => PlatformContextMenu(
+                  actions: buildAdminMenu(subMenuContext, e),
+                  cancelButton: CupertinoActionSheetAction(
+                    child: Text(S.of(subMenuContext).cancel),
+                    onPressed: () => Navigator.of(subMenuContext).pop(),
+                  ))),
+          isDestructive: true,
+          menuContext: menuContext,
+          child: Text(S.of(context).admin_options),
+        ),
+      ]
     ];
 
     return menu;
   }
 
   List<Widget> _buildMultiSelectContextMenu(BuildContext menuContext) {
+    Future<void> multiExecution(List<OTFloor> floorsList,
+        Future<int?> Function(OTFloor floors) action) async {
+      final floors = floorsList.toList();
+      List<int?> results = await Future.wait(floors.map(action));
+
+      List<int> successIds = [];
+      List<int> failedIds = [];
+      results.forEachIndexed((index, result) {
+        if (result != null && result < 300) {
+          successIds.add(floors[index].floor_id!);
+        } else {
+          failedIds.add(floors[index].floor_id!);
+        }
+      });
+      if (mounted) {
+        Noticing.showMaterialNotice(context,
+            "${S.of(context).operation_successful}\nOK ($successIds), Failed ($failedIds)");
+      }
+    }
+
+    List<Widget> buildAdminMenu(BuildContext menuContext) {
+      return [
+        PlatformContextMenuItem(
+          onPressed: () async {
+            if (await showAdminOperation(context, _selectedFloors)) {
+              Noticing.showMaterialNotice(
+                  context, S.of(context).request_success);
+            }
+          },
+          isDestructive: true,
+          menuContext: menuContext,
+          child: Text(S.of(context).delete_floor),
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
+            final tag = await Noticing.showInputDialog(
+                context, S.of(context).input_reason);
+            if (tag == null) {
+              return; // Note: don't return if tag is empty string, because user may want to clear the special tag with this
+            }
+            await multiExecution(
+                _selectedFloors,
+                (floor) async => await OpenTreeHoleRepository.getInstance()
+                    .adminAddSpecialTag(tag, floor.floor_id));
+          },
+          menuContext: menuContext,
+          child: Text(S.of(context).add_special_tag),
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
+            final reason = await Noticing.showInputDialog(
+                context, S.of(context).input_reason);
+            if (reason == null) {
+              return; // Note: don't return if tag is empty string, because user may want to clear the special tag with this
+            }
+            await multiExecution(
+                _selectedFloors,
+                (floor) async => await OpenTreeHoleRepository.getInstance()
+                    .adminFoldFloor(
+                        reason.isEmpty ? [] : [reason], floor.floor_id));
+          },
+          menuContext: menuContext,
+          child: Text(S.of(context).fold_floor),
+        ),
+      ];
+    }
+
     List<Widget> menu = [
-      if (OpenTreeHoleRepository.getInstance().isAdmin)
-      PlatformContextMenuItem(
-        onPressed: () async {
-          if (await showAdminOperation(context, _selectedFloors)) {
-            Noticing.showMaterialNotice(context, S.of(context).request_success);
-          }
-        },
-        isDestructive: true,
-        menuContext: menuContext,
-        child: Text(S.of(context).admin_options),
-      ),
+      if (OpenTreeHoleRepository.getInstance().isAdmin) ...[
+        PlatformContextMenuItem(
+          onPressed: () => showPlatformModalSheet(
+              context: context,
+              builder: (subMenuContext) => PlatformContextMenu(
+                  actions: buildAdminMenu(subMenuContext),
+                  cancelButton: CupertinoActionSheetAction(
+                    child: Text(S.of(subMenuContext).cancel),
+                    onPressed: () => Navigator.of(subMenuContext).pop(),
+                  ))),
+          isDestructive: true,
+          menuContext: menuContext,
+          child: Text(S.of(context).admin_options),
+        ),
+      ]
     ];
 
     return menu;
