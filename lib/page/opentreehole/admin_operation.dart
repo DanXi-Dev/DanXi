@@ -1,24 +1,26 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
+import 'package:dan_xi/model/opentreehole/history.dart';
 import 'package:dan_xi/model/opentreehole/punishment.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/opentreehole/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
+import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-Future<bool> showAdminOperation(
-    BuildContext context, List<OTFloor> floors) async {
+Future<bool> showAdminOperation(BuildContext context, OTFloor floor) async {
   final dynamic result =
       await smartNavigatorPush(context, '/bbs/admin', arguments: {
-    "floors": floors,
+    "floor": floor,
   });
 
   if (result == null) return false;
@@ -41,14 +43,16 @@ class AdminOperationPage extends StatefulWidget {
 }
 
 class AdminOperationPageState extends State<AdminOperationPage> {
-  late List<OTFloor> _floors;
+  late OTFloor _floor;
   // Don't show penalty menu if multi-floor
-  late bool _isSingleFloor;
   late String _title;
   FileImage? _backgroundImage;
-  List<String>? _punishments;
+  List<String>? _punishmentHistory;
+  List<OTHistory>? _modifyHistory;
+
   late TextEditingController _reasonController;
   final ValueNotifier<bool> _punishUser = ValueNotifier(false);
+  final ValueNotifier<bool> _deletePost = ValueNotifier(true);
   final ValueNotifier<int> _punishmentDays = ValueNotifier(0);
 
   @override
@@ -61,17 +65,23 @@ class AdminOperationPageState extends State<AdminOperationPage> {
   void didChangeDependencies() {
     _title =
         widget.arguments!['title'] ?? S.of(context).forum_post_enter_content;
-    _floors = widget.arguments!['floors']!;
-    _isSingleFloor = _floors.length == 1;
+    _floor = widget.arguments!['floor']!;
 
     super.didChangeDependencies();
   }
 
   Future<List<String>> getPunishmentHistory() async {
-    _punishments ??= await OpenTreeHoleRepository.getInstance()
-        .adminGetPunishmentHistory(_floors.first.floor_id!);
+    _punishmentHistory ??= await OpenTreeHoleRepository.getInstance()
+        .adminGetPunishmentHistory(_floor.floor_id!);
 
-    return _punishments!;
+    return _punishmentHistory!;
+  }
+
+  Future<List<OTHistory>> getModifyHistory() async {
+    _modifyHistory ??=
+        await OpenTreeHoleRepository.getInstance().getHistory(_floor.floor_id);
+
+    return _modifyHistory!;
   }
 
   @override
@@ -100,47 +110,71 @@ class AdminOperationPageState extends State<AdminOperationPage> {
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
               child: SingleChildScrollView(
                   child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ExpansionTileX(
-                    expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                    expandedAlignment: Alignment.topLeft,
-                    childrenPadding: const EdgeInsets.symmetric(vertical: 4),
-                    tilePadding: EdgeInsets.zero,
-                    initiallyExpanded: true,
-                    title: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(CupertinoIcons.text_alignleft),
-                        SizedBox(width: 8),
-                        Text("查看将删除的内容")
-                      ],
+                    OTFloorWidget(
+                        floor: _floor,
+                        showBottomBar: false,
+                        hasBackgroundImage: _backgroundImage != null),
+                    const Divider(),
+                    FutureFoledListWidget(
+                        future: getModifyHistory(),
+                        itemBuilder: (e) => Card(
+                            child: ListTile(
+                                subtitle: Text(HumanDuration.tryFormat(context,
+                                    DateTime.tryParse(e.time_updated ?? ""))),
+                                title: Text(e.content!))),
+                        text: "历史修改"),
+                    const Divider(),
+                    PlatformTextField(
+                      hintText: "输入删帖/折叠理由",
+                      material: (_, __) => MaterialTextFieldData(
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder(gapPadding: 2.0))),
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 1,
+                      expands: false,
+                      autofocus: true,
+                      textAlignVertical: TextAlignVertical.top,
+                      onChanged: (text) {},
+                      controller: _reasonController,
                     ),
-                    children: [
-                      ..._floors.map((e) => OTFloorWidget(
-                          floor: e,
-                          showBottomBar: false,
-                          hasBackgroundImage: _backgroundImage != null))
-                    ],
-                  ),
-                  const Divider(),
-                  PlatformTextField(
-                    hintText: "输入删帖理由",
-                    material: (_, __) => MaterialTextFieldData(
-                        decoration: const InputDecoration(
-                            border: OutlineInputBorder(gapPadding: 2.0))),
-                    keyboardType: TextInputType.multiline,
-                    maxLines: 1,
-                    expands: false,
-                    autofocus: true,
-                    textAlignVertical: TextAlignVertical.top,
-                    onChanged: (text) {},
-                    controller: _reasonController,
-                  ),
-                  const Divider(),
-                  if (_isSingleFloor) ...[
+                    const Divider(),
                     Card(
                         child: Column(children: [
+                      ValueListenableBuilder(
+                          valueListenable: _deletePost,
+                          builder: (context, value, child) => ListTile(
+                                title: const Text("帖子操作"),
+                                leading: const Icon(CupertinoIcons.hand_draw),
+                                subtitle: Text(_deletePost.value ? "删除" : "折叠"),
+                                onTap: () => showPlatformModalSheet(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        PlatformContextMenu(
+                                            actions: [
+                                              PlatformContextMenuItem(
+                                                menuContext: context,
+                                                child: const Text("删除"),
+                                                onPressed: () =>
+                                                    _deletePost.value = true,
+                                              ),
+                                              PlatformContextMenuItem(
+                                                menuContext: context,
+                                                child: const Text("折叠"),
+                                                onPressed: () =>
+                                                    _deletePost.value = false,
+                                              )
+                                            ],
+                                            cancelButton:
+                                                CupertinoActionSheetAction(
+                                                    child: Text(
+                                                        S.of(context).cancel),
+                                                    onPressed: () =>
+                                                        Navigator.of(context)
+                                                            .pop()))),
+                              )),
                       ValueListenableBuilder(
                           valueListenable: _punishUser,
                           builder: (context, value, child) =>
@@ -166,41 +200,12 @@ class AdminOperationPageState extends State<AdminOperationPage> {
                               )),
                     ])),
                     const Divider(),
-                    FutureWidget<List<String>>(
-                      future: getPunishmentHistory(),
-                      loadingBuilder: Center(
-                        child: PlatformCircularProgressIndicator(),
-                      ),
-                      successBuilder: (BuildContext context,
-                          AsyncSnapshot<List<String>> snapshot) {
-                        return ExpansionTileX(
-                            expandedCrossAxisAlignment:
-                                CrossAxisAlignment.start,
-                            expandedAlignment: Alignment.topLeft,
-                            childrenPadding:
-                                const EdgeInsets.symmetric(vertical: 4),
-                            tilePadding: EdgeInsets.zero,
-                            initiallyExpanded: false,
-                            title: Row(
-                              children: [
-                                const Icon(CupertinoIcons.person_badge_minus),
-                                const SizedBox(width: 8),
-                                Text("违规记录: ${snapshot.data!.length} 条")
-                              ],
-                            ),
-                            children: [
-                              ...snapshot.data!.map(
-                                  (e) => Card(child: ListTile(title: Text(e))))
-                            ]);
-                      },
-                      errorBuilder: () => Icon(
-                        PlatformIcons(context).error,
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    ),
-                  ]
-                ],
-              )))),
+                    FutureFoledListWidget(
+                        future: getPunishmentHistory(),
+                        itemBuilder: (e) =>
+                            Card(child: ListTile(title: Text(e))),
+                        text: "违规记录")
+                  ])))),
     );
   }
 
@@ -249,6 +254,80 @@ class SpinBoxTile extends StatelessWidget {
                   onPressed: () => onChanged(1)),
             ],
           )),
+    );
+  }
+}
+
+class FutureFoledListWidget<T> extends StatefulWidget {
+  final bool? initiallyExpanded;
+  final Future<List<T>> future;
+  final Widget Function(T) itemBuilder;
+  final String text;
+
+  const FutureFoledListWidget(
+      {super.key,
+      this.initiallyExpanded,
+      required this.future,
+      required this.itemBuilder,
+      required this.text});
+
+  @override
+  FutureFoldedListWidgetState<T> createState() =>
+      FutureFoldedListWidgetState<T>();
+}
+
+class FutureFoldedListWidgetState<T> extends State<FutureFoledListWidget<T>> {
+  late bool _expanded;
+  late String _text;
+  late Future<List<T>> _future;
+  late Widget Function(T) _itemBuilder;
+
+  @override
+  void initState() {
+    super.initState();
+    _expanded = widget.initiallyExpanded ?? false;
+    _future = widget.future;
+    _text = widget.text;
+    _itemBuilder = widget.itemBuilder;
+  }
+
+  @override
+  void didUpdateWidget(covariant FutureFoledListWidget<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _expanded = widget.initiallyExpanded ?? _expanded;
+    _future = widget.future;
+    _text = widget.text;
+    _itemBuilder = widget.itemBuilder;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureWidget<List<T>>(
+      future: _future,
+      loadingBuilder: Center(
+        child: PlatformCircularProgressIndicator(),
+      ),
+      successBuilder: (BuildContext context, AsyncSnapshot<List<T>> snapshot) {
+        return ExpansionTileX(
+            expandedCrossAxisAlignment: CrossAxisAlignment.start,
+            expandedAlignment: Alignment.topLeft,
+            childrenPadding: const EdgeInsets.symmetric(vertical: 4),
+            tilePadding: EdgeInsets.zero,
+            initiallyExpanded: _expanded,
+            onExpansionChanged: (value) => _expanded = value,
+            title: Row(
+              children: [
+                const Icon(CupertinoIcons.person_badge_minus),
+                const SizedBox(width: 8),
+                Text("$_text: ${snapshot.data!.length} 条")
+              ],
+            ),
+            children: [...snapshot.data!.map(_itemBuilder)]);
+      },
+      errorBuilder: () => Icon(
+        PlatformIcons(context).error,
+        color: Theme.of(context).colorScheme.error,
+      ),
     );
   }
 }

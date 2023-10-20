@@ -58,8 +58,6 @@ import 'package:linkify/linkify.dart';
 import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
 
-import '../../model/opentreehole/history.dart';
-
 /// This function preprocesses content downloaded from FDUHOLE so that
 /// (1) HTML href is added to raw links
 /// (2) Markdown Images are converted to HTML images.
@@ -564,7 +562,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       list.map((e) => OTTag.fromJson(jsonDecode(jsonEncode(e)))).toList();
 
   List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {
-    
     List<Widget> buildAdminMenu(BuildContext menuContext, OTFloor e) {
       return [
         PlatformContextMenuItem(
@@ -581,20 +578,20 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformContextMenuItem(
           onPressed: () async {
-            if (await showAdminOperation(context, [e])) {
+            if (await showAdminOperation(context, e)) {
               Noticing.showMaterialNotice(
-                  context, S.of(context).request_success);
+                  context, S.of(context).operation_successful);
             }
           },
           isDestructive: true,
           menuContext: menuContext,
-          child: const Text("删除或封禁"),
+          child: const Text("打开帖子管理页面"),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
             bool? lock = await Noticing.showConfirmationDialog(
-                context, "Lock or unlock the hole?",
-                confirmText: "Lock", cancelText: "Unlock");
+                context, "锁定或解锁树洞？",
+                confirmText: "锁定", cancelText: "解锁");
             if (lock != null) {
               int? result = await OpenTreeHoleRepository.getInstance()
                   .adminLockHole(e.hole_id, lock);
@@ -606,12 +603,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           },
           isDestructive: true,
           menuContext: menuContext,
-          child: const Text("Lock/Unlock hole"),
+          child: const Text("锁定/解锁树洞"),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
             bool? hide = await Noticing.showConfirmationDialog(
-                context, "Hide or unhide the hole?",
+                context, "隐藏或显示树洞？",
                 confirmText: "Hide", cancelText: "Unhide");
             if (hide != null) {
               int? result = hide
@@ -627,7 +624,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           },
           isDestructive: true,
           menuContext: menuContext,
-          child: Text(S.of(context).hide_hole),
+          child: const Text("隐藏/显示树洞"),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
@@ -788,55 +785,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           child: Text(S.of(context).fold_floor),
         ),
-        PlatformContextMenuItem(
-          onPressed: () async {
-            List<String>? history = await OpenTreeHoleRepository.getInstance()
-                .adminGetPunishmentHistory(e.floor_id!);
-            if (history != null && mounted) {
-              StringBuffer content = StringBuffer();
-              for (int i = 0; i < history.length; i++) {
-                content.writeln(history[i]);
-                if (i < history.length - 1) {
-                  content.writeln("================");
-                }
-              }
-              Noticing.showModalNotice(context,
-                  title: S.of(context).punishment_history_of(e.floor_id ?? "?"),
-                  message: content.toString(),
-                  selectable: true);
-            }
-          },
-          menuContext: menuContext,
-          child: Text(S.of(context).show_punishment_history),
-        ),
-        PlatformContextMenuItem(
-          onPressed: () async {
-            List<OTHistory>? history =
-                await OpenTreeHoleRepository.getInstance()
-                    .getHistory(e.floor_id);
-            if (history != null && mounted) {
-              StringBuffer content = StringBuffer();
-              for (int i = 0; i < history.length; i++) {
-                var record = history[i];
-                content.writeln(
-                    S.of(context).history_time(record.time_updated ?? "?"));
-                content.writeln(
-                    S.of(context).history_altered_by(record.user_id ?? "?"));
-                content.writeln(S.of(context).original_content);
-                content.writeln(record.content);
-                if (i < history.length - 1) {
-                  content.writeln("================");
-                }
-              }
-              Noticing.showModalNotice(context,
-                  title: S.of(context).history_of(e.floor_id ?? "?"),
-                  message: content.toString(),
-                  selectable: true);
-            }
-          },
-          menuContext: menuContext,
-          child: Text(S.of(context).view_history),
-        ),
       ];
     }
 
@@ -968,9 +916,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       return [
         PlatformContextMenuItem(
           onPressed: () async {
-            if (await showAdminOperation(context, _selectedFloors)) {
-              Noticing.showMaterialNotice(
-                  context, S.of(context).request_success);
+            if (await Noticing.showConfirmationDialog(
+                    context, S.of(context).are_you_sure,
+                    isConfirmDestructive: true) ==
+                true) {
+              final reason = await Noticing.showInputDialog(
+                  context, S.of(context).input_reason);
+              await multiExecution(
+                  _selectedFloors,
+                  (floor) async => await OpenTreeHoleRepository.getInstance()
+                      .adminDeleteFloor(floor.floor_id, reason));
             }
           },
           isDestructive: true,
