@@ -70,7 +70,7 @@ class OTTagSelectorState extends State<OTTagSelector> {
                     value.name!.toLowerCase().contains(filter.toLowerCase()))
                 .toList();
           },
-          additionCallback: (value) => OTTag(0, 0, value),
+          additionCallback: (value) => OTTag(0, 0, value.trim()),
           onAdded: (tag) => tag,
           configureSuggestion: (tag) => SuggestionConfiguration(
                 title: Text(tag.name!, style: TextStyle(color: tag.color)),

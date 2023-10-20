@@ -41,6 +41,14 @@ import 'package:dio/dio.dart';
 
 import '../../model/opentreehole/history.dart';
 
+/// The repository for OpenTreeHole.
+///
+/// # State
+/// During to some history reasons, this repository's state can be complex.
+/// Please read the method comments carefully before using them.
+///
+/// All states have been moved to [FDUHoleProvider], which is a [ChangeNotifier];
+/// any field in this class should be considered as temporary variables, e.g. caches.
 class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   static final _instance = OpenTreeHoleRepository._();
 
@@ -52,20 +60,24 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   static final String _IMAGE_BASE_URL =
       SettingsProvider.getInstance().imageBaseUrl;
 
-  /// Cached floors, used by [mentions]
+  /// Cached floors, used by [mentions].
   final Map<int, OTFloor> _floorCache = {};
 
-  /// Cached OTTags
+  /// Cached OTTags.
   List<OTTag> _tagCache = [];
 
-  /// Push Notification Registration Cache
+  /// Push notification registration cache.
   PushNotificationRegData? _pushNotificationRegData;
 
+  /// Store the last upload push token, used for debug purpose only.
   String? lastUploadToken;
 
-  /// Short name for the provider singleton
+  /// Short aliases.
   FDUHoleProvider get provider => FDUHoleProvider.getInstance();
 
+  /// Logout, removing all cached data, tokens, on-disk local settings, etc.
+  ///
+  /// It also unregisters the push notification token.
   Future<void> logout() async {
     if (!provider.isUserInitialized) {
       if (SettingsProvider.getInstance().fduholeToken == null) {
@@ -79,6 +91,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     SettingsProvider.getInstance().deleteAllFduholeData();
   }
 
+  /// Clear all cached data and in-memory states (i.e. token and user info that have been loaded).
+  ///
+  /// Next time, you have to call [initializeToken] or [initializeRepo] again.
   void clearCache() {
     provider.token = null;
     provider.userInfo = null;
@@ -88,6 +103,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     _tagCache.clear();
   }
 
+  /// Cache a floor for future reuse.
   void cacheFloor(OTFloor floor) {
     if (floor.floor_id == null) return;
     _floorCache[floor.floor_id!] = floor;
@@ -96,6 +112,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
   }
 
+  /// Reduce the floor cache by a factor.
   void reduceFloorCache({int factor = 2}) {
     _floorCache.removeWhere((key, value) => key % factor == 0);
   }
@@ -117,6 +134,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
   }
 
+  /// Load the token from disk to the provider. It is a "minimal" initialization of the provider.
+  ///
+  /// If the token is not valid, it will throw a [NotLoginError].
   void initializeToken() {
     if (SettingsProvider.getInstance().fduholeToken != null) {
       provider.token = SettingsProvider.getInstance().fduholeToken;
@@ -125,6 +145,13 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
   }
 
+  /// A "complete" initialization of the repository and provider.
+  ///
+  /// It loads the token, user info, divisions, and register the push notification token eagerly.
+  ///
+  /// Mostly, it is used to reduce a feeling of "progressive loading" when the user opens the app.
+  ///
+  /// We cache them all, so that one loading, everything done.
   Future<void> initializeRepo() async {
     initializeToken();
     try {
@@ -144,7 +171,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<bool?> checkRegisterStatus(String email) async {
-    final Response<Map<String, dynamic>> response = await secureDio.get(
+    final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_AUTH_URL/verify/email",
         queryParameters: {"email": email, "check": true},
         options: Options(
@@ -156,9 +183,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
   }
 
+  /// FIXME: we used to use a pinned cert to prevent HTTPS traffic sniffing. But now we do not need it anymore.
   Dio get secureDio {
     Dio secureDio = Dio();
-    //Pin HTTPS cert
+    // Pin HTTPS cert
     /*(secureDio.httpClientAdapter as DefaultHttpClientAdapter)
         .onHttpClientCreate = (client) {
       final SecurityContext sc = SecurityContext(withTrustedRoots: false);
@@ -226,9 +254,11 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
     final Response<List<dynamic>> response = await dio
         .get("$_BASE_URL/divisions", options: Options(headers: _tokenHeader));
-    provider.divisionCache =
-        response.data?.map((e) => OTDivision.fromJson(e)).toList() ?? [];
-    return provider.divisionCache;
+    final result = response.data?.map((e) => OTDivision.fromJson(e)).toList();
+    if (result != null) {
+      provider.divisionCache = result;
+    }
+    return provider.divisionCache.isNotEmpty ? provider.divisionCache : null;
   }
 
   List<OTHole> getPinned(int divisionId) {
@@ -236,15 +266,13 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       return provider.divisionCache
               .firstWhere((element) => element.division_id == divisionId)
               .pinned ??
-          List<OTHole>.empty();
+          [];
     } catch (ignored) {
-      return List<OTHole>.empty();
+      return [];
     }
   }
 
-  List<OTDivision> getDivisions() {
-    return provider.divisionCache;
-  }
+  List<OTDivision> getDivisions() => provider.divisionCache;
 
   Future<OTDivision?> loadSpecificDivision(int divisionId,
       {bool useCache = true}) async {
@@ -428,20 +456,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   }
 
   Future<int?> reportPost(int? postId, String reason) async {
-    // Suppose user is logged in. He should be.
     final Response<dynamic> response = await dio.post("$_BASE_URL/reports",
         data: {"floor_id": postId, "reason": reason},
         options: Options(headers: _tokenHeader));
     return response.statusCode;
   }
 
-  OTUser? get userInfo => provider.userInfo;
-
-  set userInfo(OTUser? value) {
-    provider.userInfo = value;
-    updateUserProfile();
-  }
-
+  /// Note: this method should return a mutable reference to the provider's user info.
+  /// i.e. [provider.userInfo].
   Future<OTUser?> getUserProfile({bool forceUpdate = false}) async {
     if (provider.userInfo == null || forceUpdate) {
       final Response<Map<String, dynamic>> response = await dio
@@ -520,8 +542,13 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         "$_BASE_URL/user/favorites",
         queryParameters: {"plain": true},
         options: Options(headers: _tokenHeader));
-    provider.userInfo?.favorites = response.data?['data']?.cast<int>();
-    return provider.userInfo?.favorites;
+
+    var results = response.data?['data']?.cast<int>() ?? [];
+    // when setting fields, we must make sure that the user info is initialized.
+    // Otherwise, this line has no effect at all, and we will save nothing.
+    // And [getUserProfile] will do this.
+    (await getUserProfile())?.favorites = results;
+    return results;
   }
 
   Future<List<int>?> getSubscribedHoleId() async {
@@ -532,8 +559,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         "$_BASE_URL/users/subscriptions",
         queryParameters: {"plain": true},
         options: Options(headers: _tokenHeader));
-    provider.userInfo?.subscriptions = response.data?['data']?.cast<int>();
-    return provider.userInfo?.subscriptions;
+    var results = response.data?['data']?.cast<int>();
+    (await getUserProfile())?.subscriptions =
+        response.data?['data']?.cast<int>();
+    return results;
   }
 
   Future<List<OTHole>?> getFavoriteHoles({
@@ -571,7 +600,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         break;
     }
     final Map<String, dynamic> result = response.data;
-    provider.userInfo?.favorites = result["data"]?.cast<int>();
+    (await getUserProfile())?.favorites = result["data"]?.cast<int>();
   }
 
   Future<void> setSubscription(SetStatusMode mode, int? holeId) async {
@@ -587,7 +616,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         break;
     }
     final Map<String, dynamic> result = response.data;
-    provider.userInfo?.subscriptions = result["data"]?.cast<int>();
+    (await getUserProfile())?.subscriptions = result["data"]?.cast<int>();
   }
 
   /// Modify a floor
