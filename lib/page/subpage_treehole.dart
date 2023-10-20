@@ -55,6 +55,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 import '../util/watermark.dart';
 import '../widget/opentreehole/tag_selector/tag.dart';
@@ -466,7 +467,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             style: TextStyle(color: Theme.of(context).colorScheme.error)),
         subtitle: Text(
           S.of(context).ban_post_until(
-              "${silenceDate.year}-${silenceDate.month}-${silenceDate.day} ${silenceDate.hour}:${silenceDate.minute}"),
+              DateFormat('yyyy-MM-dd H:mm').format(silenceDate)),
         ),
         onTap: () => Noticing.showNotice(context, S.of(context).silence_detail,
             title: S.of(context).silence_notice, useSnackBar: false),
