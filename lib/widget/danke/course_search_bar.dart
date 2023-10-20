@@ -15,15 +15,16 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class CourseSearchBar extends StatefulWidget {
   final Function(String) onSearch;
+  final void Function(bool)? onFocusChanged;
 
-  const CourseSearchBar({Key? key, required this.onSearch}) : super(key: key);
+  const CourseSearchBar({Key? key, required this.onSearch, this.onFocusChanged})
+      : super(key: key);
 
   @override
   _CourseSearchBarState createState() => _CourseSearchBarState();
@@ -40,9 +41,10 @@ class _CourseSearchBarState extends State<CourseSearchBar> {
   // }
 
   void _onFocusChange() {
-    if (_focusNode.hasFocus) {
-      widget.onSearch(_controller.text);
+    if (widget.onFocusChanged != null) {
+      widget.onFocusChanged!(_focusNode.hasFocus);
     }
+    if (_focusNode.hasFocus) widget.onSearch(_controller.text);
   }
 
   @override
@@ -68,7 +70,7 @@ class _CourseSearchBarState extends State<CourseSearchBar> {
           Expanded(
             child: SizedBox(
               child: PlatformTextField(
-                autofocus: true,
+                autofocus: false,
                 keyboardType: TextInputType.text,
                 // press enter key to search
                 textInputAction: TextInputAction.search,
@@ -92,6 +94,9 @@ class _CourseSearchBarState extends State<CourseSearchBar> {
                 focusNode: _focusNode,
                 onTapOutside: (e) {
                   _focusNode.unfocus();
+                  _onFocusChange();
+                },
+                onTap: () {
                   _onFocusChange();
                 },
               ),
