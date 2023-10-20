@@ -1,7 +1,6 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/history.dart';
-import 'package:dan_xi/model/opentreehole/punishment.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
@@ -17,6 +16,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
+class AdminOperationInfo {
+  int floorId;
+  bool isDelete;
+  bool doPenalty;
+  int penaltyDays;
+  String reason;
+
+  AdminOperationInfo(
+      {required this.floorId,
+      required this.isDelete,
+      required this.doPenalty,
+      required this.penaltyDays,
+      required this.reason});
+}
+
 Future<bool> showAdminOperation(BuildContext context, OTFloor floor) async {
   final dynamic result =
       await smartNavigatorPush(context, '/bbs/admin', arguments: {
@@ -25,7 +39,32 @@ Future<bool> showAdminOperation(BuildContext context, OTFloor floor) async {
 
   if (result == null) return false;
 
-  try {} catch (e, st) {
+  try {
+    final operation = result! as AdminOperationInfo;
+    int? response;
+    if (operation.isDelete) {
+      response = await OpenTreeHoleRepository.getInstance().adminDeleteFloor(
+          operation.floorId,
+          operation.reason.isEmpty ? "未知原因" : operation.reason);
+    } else {
+      response = await OpenTreeHoleRepository.getInstance().adminFoldFloor(
+          operation.reason.isEmpty ? [] : [operation.reason],
+          operation.floorId);
+    }
+
+    if (response == null || response >= 300) {
+      throw Exception(
+          "Request for deleting post #${operation.floorId} failed! ");
+    }
+
+    if (operation.doPenalty && operation.penaltyDays > 0) {
+      response = await OpenTreeHoleRepository.getInstance()
+          .adminAddPenaltyDays(operation.floorId, operation.penaltyDays);
+      if (response == null || response >= 300) {
+        throw Exception("Request for adding penalty failed! ");
+      }
+    }
+  } catch (e, st) {
     Noticing.showErrorDialog(context, e,
         trace: st, title: S.of(context).reply_failed);
     return false;
@@ -95,13 +134,14 @@ class AdminOperationPageState extends State<AdminOperationPage> {
       appBar: PlatformAppBarX(
         title: Text(_title),
         trailingActions: [
-          PlatformIconButton(
-            padding: EdgeInsets.zero,
-            icon: PlatformX.isMaterial(context)
-                ? const Icon(Icons.send)
-                : const Icon(CupertinoIcons.paperplane),
-            onPressed: () async => _sendDocument(),
-          ),
+          if (!_floor.deleted!)
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: PlatformX.isMaterial(context)
+                  ? const Icon(Icons.send)
+                  : const Icon(CupertinoIcons.paperplane),
+              onPressed: () async => _sendDocument(),
+            ),
         ],
       ),
       body: SafeArea(
@@ -184,6 +224,11 @@ class AdminOperationPageState extends State<AdminOperationPage> {
                                 value: _punishUser.value,
                                 onChanged: (bool value) {
                                   _punishUser.value = value;
+                                  if (!_punishUser.value) {
+                                    _punishmentDays.value = 0;
+                                  } else if (_punishmentDays.value == 0) {
+                                    _punishmentDays.value = 1;
+                                  }
                                 },
                               )),
                       ValueListenableBuilder(
@@ -192,10 +237,11 @@ class AdminOperationPageState extends State<AdminOperationPage> {
                                 secondary: const Icon(CupertinoIcons.calendar),
                                 title: Text("封禁时长: ${_punishmentDays.value}"),
                                 onChanged: (int delta) {
+                                  if (!_punishUser.value) return;
                                   _punishmentDays.value =
                                       (_punishmentDays.value + delta)
                                           // PS: I admit this is ugly
-                                          .clamp(0, 0x7fffffff);
+                                          .clamp(1, 10000);
                                 },
                               )),
                     ])),
@@ -210,7 +256,28 @@ class AdminOperationPageState extends State<AdminOperationPage> {
   }
 
   Future<void> _sendDocument() async {
-    Navigator.pop<OTPunishment>(context, null);
+    String confirmationText =
+        "您将要${_deletePost.value ? '删除' : '折叠'}帖子 #${_floor.floor_id}, ";
+    if (_punishUser.value) {
+      confirmationText += "\n并处以${_punishmentDays.value}天的封禁, ";
+    }
+    confirmationText += "\n确定吗? ";
+
+    bool? confirmed = await Noticing.showConfirmationDialog(
+        context, confirmationText,
+        isConfirmDestructive: true);
+    if (confirmed != true) {
+      return;
+    }
+
+    final op = AdminOperationInfo(
+        doPenalty: _punishUser.value,
+        floorId: _floor.floor_id!,
+        penaltyDays: _punishmentDays.value,
+        isDelete: _deletePost.value,
+        reason: _reasonController.text);
+
+    Navigator.pop<AdminOperationInfo>(context, op);
   }
 }
 

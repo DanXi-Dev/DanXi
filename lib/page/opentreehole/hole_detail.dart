@@ -768,23 +768,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           child: Text(S.of(context).modify_tag_division),
         ),
-        PlatformContextMenuItem(
-          onPressed: () async {
-            final reason = await Noticing.showInputDialog(
-                context, S.of(context).input_reason);
-            if (reason == null) {
-              return; // Note: don't return if tag is empty string, because user may want to clear the special tag with this
-            }
-            int? result = await OpenTreeHoleRepository.getInstance()
-                .adminFoldFloor(reason.isEmpty ? [] : [reason], e.floor_id);
-            if (result != null && result < 300 && mounted) {
-              Noticing.showMaterialNotice(
-                  context, S.of(context).operation_successful);
-            }
-          },
-          menuContext: menuContext,
-          child: Text(S.of(context).fold_floor),
-        ),
       ];
     }
 
