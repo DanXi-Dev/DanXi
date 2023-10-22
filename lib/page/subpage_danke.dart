@@ -15,8 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:math';
-
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/page/home_page.dart';
@@ -34,8 +32,6 @@ import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:dan_xi/widget/danke/random_review_widgets.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
-import 'package:dan_xi/widget/libraries/sized_by_child_builder.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -89,31 +85,25 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
             await _loadRandomReview(forceRefetch: true);
             setState(() {});
           },
-          child: SizedByChildBuilder(
-            child: (context, key) => CourseSearchBar(
-              key: key,
-              onSearch: (text) {},
-            ),
-            builder: (context, size) => Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                CourseSearchBar(
-                  onSearch: (String text) {
-                    // Avoid unnecessary rebuilding
-                    if (text != searchText) {
-                      setState(
-                        () {
-                          idle = text.isEmpty;
-                          searchText = text;
-                        },
-                      );
-                    }
-                  },
-                ),
-                _buildPageContent(context),
-              ],
-              // button
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              CourseSearchBar(
+                onSearch: (String text) {
+                  // Avoid unnecessary rebuilding
+                  if (text != searchText) {
+                    setState(
+                      () {
+                        idle = text.isEmpty;
+                        searchText = text;
+                      },
+                    );
+                  }
+                },
+              ),
+              Expanded(child: _buildPageContent(context)),
+            ],
+            // button
           )),
     );
   }
@@ -136,48 +126,46 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
   }
 
   Widget _buildPageContent(BuildContext context) {
-    return Expanded(
-        child: idle
-            ? ListView(children: [
-                FutureWidget<CourseReview?>(
-                    future: _loadRandomReview(),
-                    successBuilder: (context, snapshot) => RandomReviewWidgets(
-                        review: snapshot.data!,
-                        onTap: () async => await smartNavigatorPush(
-                                context, "/danke/courseDetail", arguments: {
-                              "group_id": snapshot.data!.groupId,
-                              "locate": snapshot.data
-                            })),
-                    errorBuilder: (BuildContext context,
-                        AsyncSnapshot<CourseReview?> snapshot) {
-                      if (snapshot.error is NotLoginError) {
-                        return Column(children: [
-                          Text(S.of(context).require_login),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: PlatformElevatedButton(
-                              onPressed: () async {
-                                await smartNavigatorPush(context, "/bbs/login",
-                                    arguments: {
-                                      "info": StateProvider.personInfo.value!
-                                    });
-                                onLogin();
-                              },
-                              child: Text(S.of(context).login),
-                            ),
-                          ),
-                        ]);
-                      } else {
-                        return ErrorPageWidget.buildWidget(
-                            context, snapshot.error,
-                            stackTrace: snapshot.stackTrace,
-                            onTap: () => setState(() {}));
-                      }
-                    },
-                    loadingBuilder: Center(
-                      child: PlatformCircularProgressIndicator(),
-                    ))
-              ])
-            : CourseListWidget(searchKeyword: searchText));
+    return idle
+        ? ListView(children: [
+            FutureWidget<CourseReview?>(
+                future: _loadRandomReview(),
+                successBuilder: (context, snapshot) => RandomReviewWidgets(
+                    review: snapshot.data!,
+                    onTap: () async => await smartNavigatorPush(
+                            context, "/danke/courseDetail", arguments: {
+                          "group_id": snapshot.data!.groupId,
+                          "locate": snapshot.data
+                        })),
+                errorBuilder: (BuildContext context,
+                    AsyncSnapshot<CourseReview?> snapshot) {
+                  if (snapshot.error is NotLoginError) {
+                    return Column(children: [
+                      Text(S.of(context).require_login),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: PlatformElevatedButton(
+                          onPressed: () async {
+                            await smartNavigatorPush(context, "/bbs/login",
+                                arguments: {
+                                  "info": StateProvider.personInfo.value!
+                                });
+                            onLogin();
+                          },
+                          child: Text(S.of(context).login),
+                        ),
+                      ),
+                    ]);
+                  } else {
+                    return ErrorPageWidget.buildWidget(context, snapshot.error,
+                        stackTrace: snapshot.stackTrace,
+                        onTap: () => setState(() {}));
+                  }
+                },
+                loadingBuilder: Center(
+                  child: PlatformCircularProgressIndicator(),
+                ))
+          ])
+        : CourseListWidget(searchKeyword: searchText);
   }
 }
