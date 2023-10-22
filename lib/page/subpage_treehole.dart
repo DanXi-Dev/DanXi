@@ -56,6 +56,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 import '../util/watermark.dart';
 import '../widget/opentreehole/tag_selector/tag.dart';
@@ -345,7 +346,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       context.read<FDUHoleProvider>().currentDivision?.division_id ?? 1;
 
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
-      OpenTreeHoleRepository.getInstance().userInfo?.config?.show_folded);
+      context.read<FDUHoleProvider>().userInfo?.config?.show_folded);
 
   FileImage? _backgroundImage;
 
@@ -467,7 +468,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
             style: TextStyle(color: Theme.of(context).colorScheme.error)),
         subtitle: Text(
           S.of(context).ban_post_until(
-              "${silenceDate.year}-${silenceDate.month}-${silenceDate.day} ${silenceDate.hour}:${silenceDate.minute}"),
+              DateFormat('yyyy-MM-dd H:mm').format(silenceDate)),
         ),
         onTap: () => Noticing.showNotice(context, S.of(context).silence_detail,
             title: S.of(context).silence_notice, useSnackBar: false),

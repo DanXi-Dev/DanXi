@@ -149,7 +149,7 @@ class PlatformX {
     if (isAndroid) {
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      if ((androidInfo.version.sdkInt ?? 0) >= 29) return true;
+      if ((androidInfo.version.sdkInt) >= 29) return true;
       return await Permission.storage.status.isGranted;
     } else {
       return true;

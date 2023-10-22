@@ -38,7 +38,6 @@ class RoundChip extends StatelessWidget {
           onTap: onTap,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
-            height: 24,
             decoration: BoxDecoration(
               border: Border.all(
                 color: effectiveColor,

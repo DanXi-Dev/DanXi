@@ -578,27 +578,31 @@ class CourseRatingWidgetState extends State<CourseRatingWidget> {
         : Theme.of(context).textTheme.bodyLarge!.color;
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(children: [
-          SizedBox(width: 80, child: Text(widget.label)),
-          Row(
-            children: List.generate(
-                5,
-                (index) => IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    onPressed: () {
-                      setState(() {
-                        rating = index + 1;
-                      });
-                      widget.onRate(rating);
-                    },
-                    icon: Icon(index < rating ? Icons.star : Icons.star_border,
-                        color: mainColor))),
-          ),
-          const SizedBox(width: 10),
-          Text(rating > 0 ? widget.words[rating - 1] : "",
-              style: TextStyle(color: mainColor))
-        ]));
+        child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(width: 88, child: Text(widget.label)),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: List.generate(
+                    5,
+                    (index) => IconButton(
+                        constraints: BoxConstraints.loose(const Size(32, 32)),
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          setState(() {
+                            rating = index + 1;
+                          });
+                          widget.onRate(rating);
+                        },
+                        icon: Icon(
+                            index < rating ? Icons.star : Icons.star_border,
+                            color: mainColor))),
+              ),
+              const SizedBox(width: 10),
+              Text(rating > 0 ? widget.words[rating - 1] : "",
+                  style: TextStyle(color: mainColor))
+            ]));
   }
 }
 

@@ -125,9 +125,17 @@ class AutoBannerState extends State<AutoBanner> {
             final bannerExtra = list![index];
             if (bannerExtra == null) return Container();
             return SlimMaterialBanner(
-                icon: PlatformX.isMaterial(context)
-                    ? const Icon(Icons.campaign)
-                    : const Icon(CupertinoIcons.bell_circle),
+                icon: IconButton(
+                    icon: const Icon(Icons.arrow_drop_down),
+                    iconSize: 28,
+                    padding: EdgeInsets.zero,
+                    alignment: Alignment.center,
+                    onPressed: () => setState(() {
+                          _displayAll = true;
+                          if (onExpand != null) {
+                            onExpand!(_displayAll);
+                          }
+                        })),
                 title: bannerExtra.title,
                 actionName: bannerExtra.actionName,
                 onTapAction: () => onTapAction(bannerExtra.action));
@@ -169,19 +177,18 @@ class AutoBannerState extends State<AutoBanner> {
                       _displayAll
                           ? _buildAllList(size.height)
                           : _buildSingleItem(size.height),
-                      SizedBox(
-                          height: 20,
-                          child: InkWell(
-                            onTap: () => setState(() {
-                              _displayAll = !_displayAll;
-                              if (onExpand != null) {
-                                onExpand!(_displayAll);
-                              }
-                            }),
-                            child: Icon(_displayAll
-                                ? Icons.arrow_drop_up
-                                : Icons.arrow_drop_down),
-                          ))
+                      if (_displayAll)
+                        SizedBox(
+                            height: 20,
+                            child: InkWell(
+                              onTap: () => setState(() {
+                                _displayAll = false;
+                                if (onExpand != null) {
+                                  onExpand!(_displayAll);
+                                }
+                              }),
+                              child: const Icon(Icons.arrow_drop_up),
+                            ))
                     ],
                   ));
         },
