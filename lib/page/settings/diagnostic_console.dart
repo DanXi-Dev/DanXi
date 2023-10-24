@@ -109,6 +109,8 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
         "Base Auth URL: ${SettingsProvider.getInstance().authBaseUrl}");
     _console.writeln(
         "Image Base URL: ${SettingsProvider.getInstance().imageBaseUrl}");
+    _console.writeln(
+        "Danke Base URL: ${SettingsProvider.getInstance().dankeBaseUrl}");
   }
 
   Future<void> diagnoseDanXi() async {
@@ -181,6 +183,18 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
       SettingsProvider.getInstance().imageBaseUrl = Constant.IMAGE_BASE_URL;
     } else {
       SettingsProvider.getInstance().imageBaseUrl = imageBaseUrl;
+    }
+    Noticing.showNotice(context, "Restart app to take effects");
+  }
+
+  Future<void> changeDankeBaseUrl() async {
+    String? dankeBaseUrl = await Noticing.showInputDialog(context,
+        "Input new danke base url (leave empty to reset to ${Constant.DANKE_BASE_URL}))");
+    if (dankeBaseUrl == null || !mounted) return;
+    if (dankeBaseUrl.isEmpty) {
+      SettingsProvider.getInstance().dankeBaseUrl = Constant.DANKE_BASE_URL;
+    } else {
+      SettingsProvider.getInstance().dankeBaseUrl = dankeBaseUrl;
     }
     Noticing.showNotice(context, "Restart app to take effects");
   }
@@ -286,6 +300,12 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
                   child: const Text("Set _IMAGE_BASE_URL"),
                   onPressed: () async {
                     await changeImageBaseUrl();
+                  },
+                ),
+                PlatformElevatedButton(
+                  child: const Text("Set _DANKE_BASE_URL"),
+                  onPressed: () async {
+                    await changeDankeBaseUrl();
                   },
                 ),
                 ChangeNotifierProvider.value(
