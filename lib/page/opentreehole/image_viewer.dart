@@ -125,13 +125,16 @@ class ImageViewerPageState extends State<ImageViewerPage> {
   @override
   void didUpdateWidget(ImageViewerPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    originalLoading.clear();
+    // remove only failed and loading state, as the image may be reloaded
+    originalLoading.removeWhere((key, value) => value);
     originalLoadFailError.clear();
   }
 
   Future<void> shareImage(BuildContext context) async {
     File image =
         await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
+    if (!mounted) return;
+
     if (PlatformX.isMobile) {
       final box = context.findRenderObject() as RenderBox?;
       Share.shareXFiles(
@@ -316,9 +319,11 @@ class ImageViewerBodyViewState extends State<ImageViewerBodyView> {
             stackTrace: st);
       });
     } finally {
-      ImageLoadNotification(
-              widget.imageInfo, originalLoading, originalLoadFailError)
-          .dispatch(context);
+      if (mounted) {
+        ImageLoadNotification(
+                widget.imageInfo, originalLoading, originalLoadFailError)
+            .dispatch(context);
+      }
     }
   }
 

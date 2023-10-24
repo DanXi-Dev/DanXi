@@ -65,7 +65,9 @@ Future<void> updateOTUserProfile(BuildContext context) async {
   try {
     await OpenTreeHoleRepository.getInstance().updateUserProfile();
   } catch (e, st) {
-    Noticing.showErrorDialog(context, e, trace: st);
+    if (context.mounted) {
+      Noticing.showErrorDialog(context, e, trace: st);
+    }
   }
 }
 
@@ -263,7 +265,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
   List<Widget> _buildFoldBehaviorList(BuildContext menuContext) {
     List<Widget> list = [];
     void onTapListener(FoldBehavior value) {
-      OpenTreeHoleRepository.getInstance().userInfo!.config!.show_folded =
+      context.read<FDUHoleProvider>().userInfo!.config!.show_folded =
           value.internalString();
       updateOTUserProfile(context);
       treeholePageKey.currentState?.setState(() {});
@@ -601,8 +603,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
             title: Text(S.of(context).forum),
             subtitle: Text(context.read<FDUHoleProvider>().isUserInitialized
                 ? S.of(context).fduhole_user_id(
-                    (OpenTreeHoleRepository.getInstance().userInfo?.user_id)
-                        .toString())
+                    context.read<FDUHoleProvider>().userInfo!.user_id ?? "null")
                 : S.of(context).not_logged_in),
             children: [
               if (context.read<FDUHoleProvider>().isUserInitialized) ...[
@@ -1150,11 +1151,11 @@ class _OTNotificationSettingsWidgetState
 
   List<Widget> _buildNotificationSettingsList(BuildContext context) {
     List<Widget> list = [];
-    if (OpenTreeHoleRepository.getInstance().userInfo?.config?.notify == null) {
+    if (context.read<FDUHoleProvider>().userInfo?.config?.notify == null) {
       return [Text(S.of(context).fatal_error)];
     }
     getNotifyListNonNull() =>
-        OpenTreeHoleRepository.getInstance().userInfo!.config!.notify!;
+        context.read<FDUHoleProvider>().userInfo!.config!.notify!;
     for (var value in OTNotificationTypes.values) {
       list.add(SwitchListTile.adaptive(
           title: Text(value.displayTitle(context) ?? "null"),
