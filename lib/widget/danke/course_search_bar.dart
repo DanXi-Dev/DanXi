@@ -70,6 +70,7 @@ class _CourseSearchBarState extends State<CourseSearchBar> {
           Expanded(
             child: SizedBox(
               child: PlatformTextField(
+                autofocus: false,
                 keyboardType: TextInputType.text,
                 // press enter key to search
                 textInputAction: TextInputAction.search,

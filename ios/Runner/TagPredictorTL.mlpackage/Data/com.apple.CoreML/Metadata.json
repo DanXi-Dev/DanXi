@@ -1,0 +1,9 @@
+{
+  "MLModelCreatorDefinedKey" : {
+    "com.apple.createml.version" : "12.5.0",
+    "com.apple.createml.app.tag" : "78.8",
+    "com.apple.createml.app.version" : "3.0",
+    "com.apple.coreml.model.preview.type" : "textClassifier"
+  },
+  "MLModelAuthorKey" : "Singularity"
+}

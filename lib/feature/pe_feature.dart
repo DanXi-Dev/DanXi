@@ -85,6 +85,9 @@ class PEFeature extends Feature {
               case '晚锻炼':
                 exerciseCategory[2] += element.times!;
                 break;
+              case '夜跑':
+                exerciseCategory[1] += element.times!;
+                break;
               case '仰卧起坐':
                 exerciseCategory[1] += element.times!;
                 break;
