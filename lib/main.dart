@@ -18,7 +18,7 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:bitsdojo_window_v3/bitsdojo_window_v3.dart';
 import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/page/danke/course_group_detail.dart';
