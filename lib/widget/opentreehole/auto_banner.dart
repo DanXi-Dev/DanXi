@@ -35,11 +35,10 @@ class AutoBanner extends StatefulWidget {
   final int maxDisplay;
 
   const AutoBanner(
-      {Key? key,
+      {super.key,
       required this.refreshDuration,
       this.onExpand,
-      this.maxDisplay = 5})
-      : super(key: key);
+      this.maxDisplay = 5});
 
   @override
   State<AutoBanner> createState() => AutoBannerState();

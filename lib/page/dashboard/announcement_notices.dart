@@ -39,7 +39,7 @@ class AnnouncementList extends StatefulWidget {
   @override
   AnnouncementListState createState() => AnnouncementListState();
 
-  const AnnouncementList({Key? key, this.arguments}) : super(key: key);
+  const AnnouncementList({super.key, this.arguments});
 }
 
 class AnnouncementListState extends State<AnnouncementList> {

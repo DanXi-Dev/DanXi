@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 class FakeCupertinoSearchTextField extends StatelessWidget {
   FakeCupertinoSearchTextField({
-    Key? key,
+    super.key,
     this.controller,
     this.onChanged,
     this.onSubmitted,
@@ -27,7 +27,7 @@ class FakeCupertinoSearchTextField extends StatelessWidget {
     this.onTap,
     this.autocorrect = true,
     this.enabled,
-  }) : super(key: key);
+  });
 
   /// Controls the text being edited.
   ///

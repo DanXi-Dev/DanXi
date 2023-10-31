@@ -196,7 +196,7 @@ class DanxiApp extends StatelessWidget {
         CourseReviewEditorPage(arguments: arguments)
   };
 
-  const DanxiApp({Key? key}) : super(key: key);
+  const DanxiApp({super.key});
 
   Widget errorBuilder(FlutterErrorDetails details) => Builder(
       builder: (context) =>

@@ -41,7 +41,7 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 class BBSReportDetail extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const BBSReportDetail({Key? key, this.arguments}) : super(key: key);
+  const BBSReportDetail({super.key, this.arguments});
 
   @override
   BBSReportDetailState createState() => BBSReportDetailState();

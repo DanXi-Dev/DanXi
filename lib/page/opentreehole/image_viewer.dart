@@ -68,9 +68,8 @@ class ImageViewerPage extends StatefulWidget {
   @override
   ImageViewerPageState createState() => ImageViewerPageState();
 
-  ImageViewerPage({Key? key, this.arguments})
-      : assert(arguments == null || arguments['hd_url'] != null),
-        super(key: key);
+  ImageViewerPage({super.key, this.arguments})
+      : assert(arguments == null || arguments['hd_url'] != null);
 
   static bool isImage(String url) {
     if (url.isEmpty || Uri.tryParse(url) == null) return false;
@@ -294,8 +293,7 @@ class ImageViewerBodyView extends StatefulWidget {
   final ImageUrlInfo imageInfo;
   final Object? heroTag;
 
-  const ImageViewerBodyView({Key? key, required this.imageInfo, this.heroTag})
-      : super(key: key);
+  const ImageViewerBodyView({super.key, required this.imageInfo, this.heroTag});
 
   @override
   ImageViewerBodyViewState createState() => ImageViewerBodyViewState();

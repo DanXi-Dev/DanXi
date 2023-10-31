@@ -37,11 +37,11 @@ class CourseReviewWidget extends StatelessWidget {
   final bool translucent;
 
   const CourseReviewWidget(
-      {Key? key,
+      {super.key,
       required this.review,
       required this.courseGroup,
-      this.translucent = false, this.reviewOperationCallback})
-      : super(key: key);
+      this.translucent = false,
+      this.reviewOperationCallback});
 
   @override
   Widget build(BuildContext context) {
@@ -149,12 +149,11 @@ class ReviewHeader extends StatelessWidget {
   // final String reviewContent;
 
   const ReviewHeader(
-      {Key? key,
+      {super.key,
       required this.userId,
       required this.teacher,
       required this.time,
-      required this.title})
-      : super(key: key);
+      required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -223,12 +222,11 @@ class ReviewHeader extends StatelessWidget {
 
 class ReviewFooter extends StatelessWidget {
   const ReviewFooter(
-      {Key? key,
+      {super.key,
       required this.overallLevel,
       required this.styleLevel,
       required this.workloadLevel,
-      required this.assessmentLevel})
-      : super(key: key);
+      required this.assessmentLevel});
 
   final int overallLevel;
   final int styleLevel;

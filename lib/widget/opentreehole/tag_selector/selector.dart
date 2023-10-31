@@ -61,7 +61,7 @@ class TagContainer extends StatefulWidget {
   final bool wrapped;
 
   const TagContainer(
-      {Key? key,
+      {super.key,
       required this.tagList,
       required this.fillRandomColor,
       this.singleChoice = false,
@@ -75,8 +75,7 @@ class TagContainer extends StatefulWidget {
       this.wrapped = true})
       : assert(
             fillRandomColor || (fillRandomColor == false && fixedColor != null),
-            "fixedColor can't be empty."),
-        super(key: key);
+            "fixedColor can't be empty.");
 
   @override
   TagContainerState createState() => TagContainerState();

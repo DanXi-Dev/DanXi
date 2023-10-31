@@ -26,8 +26,7 @@ import 'package:material_color_generator/material_color_generator.dart';
 class SwatchPickerDialog extends StatefulWidget {
   final int initialSelectedColor;
 
-  const SwatchPickerDialog({Key? key, required this.initialSelectedColor})
-      : super(key: key);
+  const SwatchPickerDialog({super.key, required this.initialSelectedColor});
 
   @override
   State<SwatchPickerDialog> createState() => _SwatchPickerDialogState();

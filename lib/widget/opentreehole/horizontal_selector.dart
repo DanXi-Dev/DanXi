@@ -26,11 +26,10 @@ class HorizontalSelector<T> extends StatelessWidget {
   final void Function(T)? onSelect;
 
   const HorizontalSelector(
-      {Key? key,
+      {super.key,
       required this.options,
       this.onSelect,
-      required this.selectedOption})
-      : super(key: key);
+      required this.selectedOption});
 
   @override
   Widget build(BuildContext context) {

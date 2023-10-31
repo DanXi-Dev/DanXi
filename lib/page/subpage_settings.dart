@@ -75,7 +75,7 @@ class SettingsSubpage extends PlatformSubpage<SettingsSubpage> {
   @override
   SettingsSubpageState createState() => SettingsSubpageState();
 
-  const SettingsSubpage({Key? key}) : super(key: key);
+  const SettingsSubpage({super.key});
 
   @override
   Create<Widget> get title => (cxt) => Text(S.of(cxt).settings);
@@ -1132,7 +1132,7 @@ class Developer {
 }
 
 class OTNotificationSettingsWidget extends StatefulWidget {
-  const OTNotificationSettingsWidget({Key? key}) : super(key: key);
+  const OTNotificationSettingsWidget({super.key});
 
   @override
   State<OTNotificationSettingsWidget> createState() =>
@@ -1180,8 +1180,7 @@ class _OTNotificationSettingsWidgetState
 class OTNotificationSettingsTile extends StatelessWidget {
   final void Function() onSettingsUpdate;
 
-  const OTNotificationSettingsTile({Key? key, required this.onSettingsUpdate})
-      : super(key: key);
+  const OTNotificationSettingsTile({super.key, required this.onSettingsUpdate});
 
   String _generateNotificationSettingsSummary(
       BuildContext context, List<String>? data) {

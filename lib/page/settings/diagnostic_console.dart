@@ -38,7 +38,7 @@ import 'package:uuid/uuid.dart';
 class DiagnosticConsole extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const DiagnosticConsole({Key? key, this.arguments}) : super(key: key);
+  const DiagnosticConsole({super.key, this.arguments});
 
   @override
   DiagnosticConsoleState createState() => DiagnosticConsoleState();

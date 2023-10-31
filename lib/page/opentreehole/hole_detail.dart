@@ -104,7 +104,7 @@ String preprocessContentForDisplay(String content) {
 class BBSPostDetail extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const BBSPostDetail({Key? key, this.arguments}) : super(key: key);
+  const BBSPostDetail({super.key, this.arguments});
 
   @override
   BBSPostDetailState createState() => BBSPostDetailState();

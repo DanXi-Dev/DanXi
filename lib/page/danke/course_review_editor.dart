@@ -231,12 +231,11 @@ class CourseReviewEditorWidget extends StatefulWidget {
   final CourseReviewEditorText review;
 
   const CourseReviewEditorWidget(
-      {Key? key,
+      {super.key,
       this.fullscreen = false,
       required this.courseGroup,
       required this.review,
-      this.focusContent = false})
-      : super(key: key);
+      this.focusContent = false});
 
   final CourseGroup courseGroup;
 
@@ -617,7 +616,7 @@ class CourseRatingWidgetState extends State<CourseRatingWidget> {
 class CourseReviewEditorPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const CourseReviewEditorPage({Key? key, this.arguments}) : super(key: key);
+  const CourseReviewEditorPage({super.key, this.arguments});
 
   @override
   CourseReviewEditorPageState createState() => CourseReviewEditorPageState();

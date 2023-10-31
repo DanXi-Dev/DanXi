@@ -29,6 +29,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/danke/course_review_widget.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
@@ -42,7 +43,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:dan_xi/util/stream_listener.dart';
 
 enum FilterType { TEACHER_FILTER, TIME_FILTER }
 
@@ -57,7 +57,7 @@ class RefreshFilterEvent {
 class CourseGroupDetail extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const CourseGroupDetail({Key? key, this.arguments}) : super(key: key);
+  const CourseGroupDetail({super.key, this.arguments});
 
   @override
   CourseGroupDetailState createState() => CourseGroupDetailState();

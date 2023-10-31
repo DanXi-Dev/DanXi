@@ -28,8 +28,7 @@ class FeatureListItem extends StatefulWidget implements FeatureContainer {
   @override
   FeatureListItemState createState() => FeatureListItemState();
 
-  const FeatureListItem({required this.feature, this.arguments, Key? key})
-      : super(key: key);
+  const FeatureListItem({required this.feature, this.arguments, super.key});
 
   @override
   Feature get childFeature => feature;

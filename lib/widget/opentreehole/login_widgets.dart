@@ -25,8 +25,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 class OTWelcomeWidget extends StatelessWidget {
   final void Function() loginCallback;
 
-  const OTWelcomeWidget({Key? key, required this.loginCallback})
-      : super(key: key);
+  const OTWelcomeWidget({super.key, required this.loginCallback});
 
   @override
   Widget build(BuildContext context) {

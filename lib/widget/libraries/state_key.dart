@@ -25,14 +25,14 @@ import 'package:flutter/cupertino.dart';
 class StateKey<T> extends ValueKey<T> {
   late BuildContext currentContext;
 
-  StateKey(T value) : super(value);
+  StateKey(super.value);
 }
 
 class WithStateKey<T> extends StatefulWidget {
   final StateKey<T>? childKey;
   final Widget? child;
 
-  const WithStateKey({Key? key, this.childKey, this.child}) : super(key: key);
+  const WithStateKey({super.key, this.childKey, this.child});
 
   @override
   WithStateKeyState<T> createState() => WithStateKeyState<T>();
