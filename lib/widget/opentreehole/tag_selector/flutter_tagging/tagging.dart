@@ -194,6 +194,7 @@ class FlutterTaggingState<T extends Taggable> extends State<FlutterTagging<T>> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         TypeAheadField<T>(
+          ignoreAccessibleNavigation: true,
           getImmediateSuggestions: widget.enableImmediateSuggestion,
           debounceDuration: widget.debounceDuration,
           hideOnEmpty: widget.hideOnEmpty,

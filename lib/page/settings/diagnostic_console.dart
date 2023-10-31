@@ -116,6 +116,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
         "User Agent used by DanXi for UIS: ${UserAgentInterceptor.defaultUsedUserAgent}");
     _console
         .writeln("User Agent used by DanXi for FDUHole: ${Constant.version}");
+    _console.writeln("Media Query: ${MediaQuery.of(context)}");
 
     _console.writeln("Everything we stored in the local device:");
     var allKeys = await context.read<SettingsProvider>().preferences?.getKeys();
