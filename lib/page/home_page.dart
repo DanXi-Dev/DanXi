@@ -15,8 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
@@ -60,7 +58,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
-import 'package:receive_intent/receive_intent.dart' as ri;
 import 'package:screen_capture_event/screen_capture_event.dart';
 import 'package:uni_links/uni_links.dart';
 
@@ -98,10 +95,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _captchaSubscription = StateStreamListener();
   static final StateStreamListener<CredentialsInvalidException>
       _credentialsInvalidSubscription = StateStreamListener();
-
-  /// Listener to Android Activity intents.
-  static final StateStreamListener<ri.Intent?> _receivedIntentSubscription =
-      StateStreamListener();
 
   /// Listener to the url scheme.
   /// debounced to avoid duplicated events.
@@ -147,7 +140,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _captchaSubscription.cancel();
-    _receivedIntentSubscription.cancel();
     _uniLinksSubscription.cancel();
     screenListener?.dispose();
     super.dispose();
@@ -401,24 +393,24 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _initReceiveIntents() async {
-    Future<void> dealWithIntent(ri.Intent? intent) async {
-      if (intent?.isNotNull == true) {
-        if (intent?.extra?.containsKey("key_message") == true) {
-          final keyMessage = intent!.extra!["key_message"];
-          final content = keyMessage["content"] as String;
-          final payload = jsonDecode(Uri.decodeComponent(content));
-          await onTapNotification(context, payload['code'], payload['data']);
-        }
-      }
-    }
-
-    if (!PlatformX.isAndroid) return;
-    ri.Intent? intent = await ri.ReceiveIntent.getInitialIntent();
-    await dealWithIntent(intent);
-    _receivedIntentSubscription.bindOnlyInvalid(
-        ri.ReceiveIntent.receivedIntentStream.listen((ri.Intent? intent) {
-      dealWithIntent(intent);
-    }), hashCode);
+    // Future<void> dealWithIntent(ri.Intent? intent) async {
+    //   if (intent?.isNotNull == true) {
+    //     if (intent?.extra?.containsKey("key_message") == true) {
+    //       final keyMessage = intent!.extra!["key_message"];
+    //       final content = keyMessage["content"] as String;
+    //       final payload = jsonDecode(Uri.decodeComponent(content));
+    //       await onTapNotification(context, payload['code'], payload['data']);
+    //     }
+    //   }
+    // }
+    //
+    // if (!PlatformX.isAndroid) return;
+    // ri.Intent? intent = await ri.ReceiveIntent.getInitialIntent();
+    // await dealWithIntent(intent);
+    // _receivedIntentSubscription.bindOnlyInvalid(
+    //     ri.ReceiveIntent.receivedIntentStream.listen((ri.Intent? intent) {
+    //   dealWithIntent(intent);
+    // }), hashCode);
   }
 
   Future<void> onTapNotification(

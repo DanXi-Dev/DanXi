@@ -97,13 +97,13 @@ dependencies:
   flutter_swiper_view: ^1.1.8
   mutex: ^3.0.1
   device_info_plus: ^9.0.2
-  receive_intent:
-    git:
-      url: https://github.com/w568w/receive_intent.git
+  #  receive_intent:
+  #    git:
+  #      url: https://github.com/w568w/receive_intent.git
   flutter_secure_storage: ^8.0.0
   encrypt_shared_preferences: ^0.3.5
   device_identity: ^1.0.0
-  tutorial_coach_mark: ^1.2.9    
+  tutorial_coach_mark: ^1.2.9
 
 
 dependency_overrides:
