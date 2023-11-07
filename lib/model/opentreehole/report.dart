@@ -33,7 +33,7 @@ class OTReport {
   final String? time_created;
   final String? time_updated;
   final bool? dealt;
-  final String? dealt_by;
+  final int? dealt_by;
 
   const OTReport(
       this.report_id,

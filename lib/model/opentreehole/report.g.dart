@@ -18,7 +18,7 @@ OTReport _$OTReportFromJson(Map<String, dynamic> json) => OTReport(
       json['time_created'] as String?,
       json['time_updated'] as String?,
       json['dealt'] as bool?,
-      json['dealt_by'] as String?,
+      json['dealt_by'] as int?,
     );
 
 Map<String, dynamic> _$OTReportToJson(OTReport instance) => <String, dynamic>{
