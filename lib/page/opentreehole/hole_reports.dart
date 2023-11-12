@@ -69,17 +69,14 @@ class BBSReportDetailState extends State<BBSReportDetail> {
   Future<List<OTReport>?> _loadReportContent(int page) =>
       OpenTreeHoleRepository.getInstance().adminGetReports(page * 10, 10);
 
-  Future<List<OTAudit>?> _loadAuditContent(int page) async {
+  Future<List<OTAudit>?> _loadAuditContent(int page, bool open) async {
     List<OTAudit>? loadedAuditFloors = await adaptLayer
         .generateReceiver(_auditListViewController, (lastElement) async {
       DateTime time = DateTime.now();
       if (lastElement != null) {
         time = DateTime.parse(lastElement.time_updated!);
       }
-      // var answer = (await OpenTreeHoleRepository.getInstance()
-      //         .adminGetAuditFloors(time, 10))
-      //     .toString();
-      return OpenTreeHoleRepository.getInstance().adminGetAuditFloors(time, 10);
+      return OpenTreeHoleRepository.getInstance().adminGetAuditFloors(time, open, 10);
     }).call(page);
 
     // If not more posts, notify ListView that we reached the end.
@@ -118,7 +115,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                         });
                       },
                       groupValue: _tabIndex,
-                      children: ["Report", "Audit"]
+                      children: ["Report", "Audit", "Audit (dealt)"]
                           .map((t) => Text(t))
                           .toList()
                           .asMap(),
@@ -128,7 +125,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                   Expanded(
                     child: LazyLoadIndexedStack(
                         index: _tabIndex,
-                        children: [_buildReportPage(), _buildAuditPage()]),
+                        children: [_buildReportPage(), _buildAuditPage(true), _buildAuditPage(false)]),
                   ),
                 ],
               ),
@@ -171,7 +168,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
         ),
       );
 
-  Widget _buildAuditPage() => RefreshIndicator(
+  Widget _buildAuditPage(bool open) => RefreshIndicator(
         edgeOffset: MediaQuery.of(context).padding.top,
         color: Theme.of(context).colorScheme.secondary,
         backgroundColor: Theme.of(context).dialogBackgroundColor,
@@ -186,7 +183,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
           pagedController: _auditListViewController,
           withScrollbar: true,
           scrollController: _auditScrollController,
-          dataReceiver: _loadAuditContent,
+          dataReceiver: (page) => _loadAuditContent(page, open),
           builder: _getAuditFloorsListItems,
           loadingBuilder: (BuildContext context) => Container(
             padding: const EdgeInsets.all(8),

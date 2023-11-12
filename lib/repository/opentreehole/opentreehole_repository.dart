@@ -40,7 +40,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/dio.dart';
 
-import '../../model/opentreehole/history.dart';
+import 'package:dan_xi/model/opentreehole/history.dart';
 
 /// The repository for OpenTreeHole.
 ///
@@ -656,14 +656,14 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return result.map<OTReport>((e) => OTReport.fromJson(e)).toList();
   }
 
-  Future<List<OTAudit>?> adminGetAuditFloors(DateTime startTime,
+  Future<List<OTAudit>?> adminGetAuditFloors(DateTime startTime, bool open,
       [int length = 10]) async {
     final response = await dio.get("$_BASE_URL/floors/_sensitive",
         queryParameters: {
           "offset": startTime.toUtc().toIso8601String(),
           "size": length,
           "all": false,
-          "open": true
+          "open": open
         },
         options: Options(headers: _tokenHeader));
     final result = response.data;
