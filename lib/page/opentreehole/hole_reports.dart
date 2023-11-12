@@ -156,6 +156,12 @@ class BBSReportDetailState extends State<BBSReportDetail> {
             padding: const EdgeInsets.all(8),
             child: Center(child: PlatformCircularProgressIndicator()),
           ),
+          emptyBuilder: (context) => Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text(S.of(context).no_data),
+            ),
+          ),
           endBuilder: (context) => Center(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 16),
