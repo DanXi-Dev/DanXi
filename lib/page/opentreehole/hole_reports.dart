@@ -49,8 +49,11 @@ class BBSReportDetail extends StatefulWidget {
 }
 
 class BBSReportDetailState extends State<BBSReportDetail> {
-  final PagedListViewController<OTReport> _listViewController =
+  final PagedListViewController<OTReport> _reportListViewController =
       PagedListViewController();
+  final PagedListViewController<OTReport> _auditListViewController =
+      PagedListViewController();
+  final ScrollController _auditScrollController = ScrollController();
 
   int _tabIndex = 0;
 
@@ -77,33 +80,31 @@ class BBSReportDetailState extends State<BBSReportDetail> {
             bottom: false,
             child: StatefulBuilder(
               // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-              builder: (context, setState) {
-                return Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: CupertinoSlidingSegmentedControl<int>(
-                        onValueChanged: (int? value) {
-                          setState(() {
-                            _tabIndex = value!;
-                          });
-                        },
-                        groupValue: _tabIndex,
-                        children: ["Report", "Audit"]
-                            .map((t) => Text(t))
-                            .toList()
-                            .asMap(),
-                        // todo reformat the code
-                      ),
+              builder: (context, setState) => Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: CupertinoSlidingSegmentedControl<int>(
+                      onValueChanged: (int? value) {
+                        setState(() {
+                          _tabIndex = value!;
+                        });
+                      },
+                      groupValue: _tabIndex,
+                      children: ["Report", "Audit"]
+                          .map((t) => Text(t))
+                          .toList()
+                          .asMap(),
+                      // todo reformat the code
                     ),
-                    Expanded(
-                      child: LazyLoadIndexedStack(index: _tabIndex, children: [
-                        _buildReportPage(),
-                      ]),
-                    ),
-                  ],
-                );
-              },
+                  ),
+                  Expanded(
+                    child: LazyLoadIndexedStack(
+                        index: _tabIndex,
+                        children: [_buildReportPage(), _buildAuditPage()]),
+                  ),
+                ],
+              ),
             )));
   }
 
@@ -114,12 +115,12 @@ class BBSReportDetailState extends State<BBSReportDetail> {
         onRefresh: () async {
           HapticFeedback.mediumImpact();
           await refreshSelf();
-          await _listViewController.notifyUpdate(
+          await _reportListViewController.notifyUpdate(
               useInitialData: false, queueDataClear: false);
         },
         child: PagedListView<OTReport>(
           startPage: 0,
-          pagedController: _listViewController,
+          pagedController: _reportListViewController,
           withScrollbar: true,
           scrollController: PrimaryScrollController.of(context),
           dataReceiver: _loadContent,
@@ -137,9 +138,35 @@ class BBSReportDetailState extends State<BBSReportDetail> {
         ),
       );
 
-  // Widget _buildAuditPage() {
-  //   return
-  // }
+  Widget _buildAuditPage() => RefreshIndicator(
+        edgeOffset: MediaQuery.of(context).padding.top,
+        color: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Theme.of(context).dialogBackgroundColor,
+        onRefresh: () async {
+          HapticFeedback.mediumImpact();
+          await refreshSelf();
+          await _auditListViewController.notifyUpdate(
+              useInitialData: false, queueDataClear: false);
+        },
+        child: PagedListView<OTReport>(
+          startPage: 0,
+          pagedController: _auditListViewController,
+          withScrollbar: true,
+          scrollController: _auditScrollController,
+          dataReceiver: _loadContent,
+          builder: _getListItems,
+          loadingBuilder: (BuildContext context) => Container(
+            padding: const EdgeInsets.all(8),
+            child: Center(child: PlatformCircularProgressIndicator()),
+          ),
+          endBuilder: (context) => Center(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Text(S.of(context).end_reached),
+            ),
+          ),
+        ),
+      );
 
   List<Widget> _buildContextMenu(
           BuildContext pageContext, BuildContext menuContext, OTReport e) =>
