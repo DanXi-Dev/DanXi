@@ -19,6 +19,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/model/opentreehole/audit.dart';
 import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
@@ -653,6 +654,27 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         options: Options(headers: _tokenHeader));
     final result = response.data;
     return result.map<OTReport>((e) => OTReport.fromJson(e)).toList();
+  }
+
+  Future<List<OTAudit>?> adminGetAuditFloors(DateTime startTime,
+      [int length = 10]) async {
+    final response = await dio.get("$_BASE_URL/floors/_sensitive",
+        queryParameters: {
+          "offset": startTime.toUtc().toIso8601String(),
+          "size": length,
+          "all": false,
+          "open": true
+        },
+        options: Options(headers: _tokenHeader));
+    final result = response.data;
+    return result.map<OTAudit>((e) => OTAudit.fromJson(e)).toList();
+  }
+
+  Future<int?> adminSetAuditFloor(int floorId, bool isActualSensitive) async {
+    return (await dio.put("$_BASE_URL/floors/$floorId/_sensitive",
+            data: {"is_actual_sensitive": isActualSensitive},
+            options: Options(headers: _tokenHeader)))
+        .statusCode;
   }
 
   Future<int?> adminDeleteFloor(int? floorId, String? deleteReason) async {
