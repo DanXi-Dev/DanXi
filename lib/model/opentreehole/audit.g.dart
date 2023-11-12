@@ -12,6 +12,8 @@ OTAudit _$OTAuditFromJson(Map<String, dynamic> json) => OTAudit(
       json['id'] as int,
       json['is_actual_sensitive'] as bool?,
       json['modified'] as int,
+      json['time_created'] as String?,
+      json['time_updated'] as String?,
     );
 
 Map<String, dynamic> _$OTAuditToJson(OTAudit instance) => <String, dynamic>{
@@ -20,4 +22,6 @@ Map<String, dynamic> _$OTAuditToJson(OTAudit instance) => <String, dynamic>{
       'id': instance.id,
       'is_actual_sensitive': instance.is_actual_sensitive,
       'modified': instance.modified,
+      'time_created': instance.time_created,
+      'time_updated': instance.time_updated,
     };
