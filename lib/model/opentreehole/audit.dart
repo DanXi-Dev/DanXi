@@ -14,6 +14,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+// ignore_for_file: non_constant_identifier_names
 
 import 'package:json_annotation/json_annotation.dart';
 
@@ -26,12 +27,19 @@ class OTAudit {
   final int id;
   final bool? is_actual_sensitive;
   final int modified;
+  final String? time_created;
+  final String? time_updated;
 
   OTAudit(this.content, this.hole_id, this.id, this.is_actual_sensitive,
-      this.modified);
+      this.modified, this.time_created, this.time_updated);
 
   factory OTAudit.fromJson(Map<String, dynamic> json) =>
       _$OTAuditFromJson(json);
 
   Map<String, dynamic> toJson() => _$OTAuditToJson(this);
+
+  @override
+  String toString() {
+    return 'OTAudit{content: $content, hole_id: $hole_id, id: $id, is_actual_sensitive: $is_actual_sensitive, modified: $modified, time_created: $time_created, time_updated: $time_updated}';
+  }
 }

@@ -38,6 +38,11 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 
+import '../../common/constant.dart';
+import '../../model/opentreehole/audit.dart';
+import '../../model/opentreehole/floor.dart';
+import '../subpage_treehole.dart';
+
 /// A list page showing the reports for administrators.
 class BBSReportDetail extends StatefulWidget {
   final Map<String, dynamic>? arguments;
@@ -51,15 +56,37 @@ class BBSReportDetail extends StatefulWidget {
 class BBSReportDetailState extends State<BBSReportDetail> {
   final PagedListViewController<OTReport> _reportListViewController =
       PagedListViewController();
-  final PagedListViewController<OTReport> _auditListViewController =
+  final PagedListViewController<OTAudit> _auditListViewController =
       PagedListViewController();
-  final ScrollController _auditScrollController = ScrollController();
 
-  int _tabIndex = 0;
+  final ScrollController _auditScrollController = ScrollController();
+  final TimeBasedLoadAdaptLayer<OTAudit> adaptLayer =
+      TimeBasedLoadAdaptLayer(Constant.POST_COUNT_PER_PAGE, 1);
+
+  int _tabIndex = 1;
 
   /// Reload/load the (new) content and set the [_content] future.
-  Future<List<OTReport>?> _loadContent(int page) =>
+  Future<List<OTReport>?> _loadReportContent(int page) =>
       OpenTreeHoleRepository.getInstance().adminGetReports(page * 10, 10);
+
+  Future<List<OTAudit>?> _loadAuditContent(int page) async {
+    List<OTAudit>? loadedAuditFloors = await adaptLayer
+        .generateReceiver(_auditListViewController, (lastElement) async {
+      DateTime time = DateTime.now();
+      if (lastElement != null) {
+        time = DateTime.parse(lastElement.time_updated!);
+      }
+      // var answer = (await OpenTreeHoleRepository.getInstance()
+      //         .adminGetAuditFloors(time, 10))
+      //     .toString();
+      return OpenTreeHoleRepository.getInstance().adminGetAuditFloors(time, 10);
+    }).call(page);
+
+    // If not more posts, notify ListView that we reached the end.
+    if (loadedAuditFloors?.isEmpty ?? false) return [];
+
+    return loadedAuditFloors;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,8 +150,8 @@ class BBSReportDetailState extends State<BBSReportDetail> {
           pagedController: _reportListViewController,
           withScrollbar: true,
           scrollController: PrimaryScrollController.of(context),
-          dataReceiver: _loadContent,
-          builder: _getListItems,
+          dataReceiver: _loadReportContent,
+          builder: _getReportListItems,
           loadingBuilder: (BuildContext context) => Container(
             padding: const EdgeInsets.all(8),
             child: Center(child: PlatformCircularProgressIndicator()),
@@ -148,16 +175,22 @@ class BBSReportDetailState extends State<BBSReportDetail> {
           await _auditListViewController.notifyUpdate(
               useInitialData: false, queueDataClear: false);
         },
-        child: PagedListView<OTReport>(
+        child: PagedListView<OTAudit>(
           startPage: 0,
           pagedController: _auditListViewController,
           withScrollbar: true,
           scrollController: _auditScrollController,
-          dataReceiver: _loadContent,
-          builder: _getListItems,
+          dataReceiver: _loadAuditContent,
+          builder: _getAuditFloorsListItems,
           loadingBuilder: (BuildContext context) => Container(
             padding: const EdgeInsets.all(8),
             child: Center(child: PlatformCircularProgressIndicator()),
+          ),
+          emptyBuilder: (context) => Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text(S.of(context).no_data),
+            ),
           ),
           endBuilder: (context) => Center(
             child: Padding(
@@ -168,7 +201,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
         ),
       );
 
-  List<Widget> _buildContextMenu(
+  List<Widget> _buildReportContextMenu(
           BuildContext pageContext, BuildContext menuContext, OTReport e) =>
       [
         PlatformContextMenuItem(
@@ -185,7 +218,36 @@ class BBSReportDetailState extends State<BBSReportDetail> {
         )
       ];
 
-  Widget _getListItems(BuildContext context,
+  List<Widget> _buildAuditContextMenu(
+          BuildContext pageContext, BuildContext menuContext, OTAudit e) =>
+      [
+        PlatformContextMenuItem(
+          menuContext: menuContext,
+          child: const Text("Mark as sensitive"),
+          onPressed: () async {
+            int? result = await OpenTreeHoleRepository.getInstance()
+                .adminSetAuditFloor(e.id, true);
+            if (result != null && result < 300 && mounted) {
+              Noticing.showModalNotice(pageContext,
+                  message: S.of(pageContext).operation_successful);
+            }
+          },
+        ),
+        PlatformContextMenuItem(
+          menuContext: menuContext,
+          child: const Text("Mark as not sensitive"),
+          onPressed: () async {
+            int? result = await OpenTreeHoleRepository.getInstance()
+                .adminSetAuditFloor(e.id, false);
+            if (result != null && result < 300 && mounted) {
+              Noticing.showModalNotice(pageContext,
+                  message: S.of(pageContext).operation_successful);
+            }
+          },
+        )
+      ];
+
+  Widget _getReportListItems(BuildContext context,
       ListProvider<OTReport> dataProvider, int index, OTReport e) {
     void onLinkTap(String? url) {
       BrowserUtil.openUrl(url!, context);
@@ -205,7 +267,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
         showPlatformModalSheet(
             context: context,
             builder: (BuildContext cxt) => PlatformContextMenu(
-                  actions: _buildContextMenu(context, cxt, e),
+                  actions: _buildReportContextMenu(context, cxt, e),
                   cancelButton: CupertinoActionSheetAction(
                     child: Text(S.of(cxt).cancel),
                     onPressed: () => Navigator.of(cxt).pop(),
@@ -275,6 +337,86 @@ class BBSReportDetailState extends State<BBSReportDetail> {
               }
             }),
       ),
+    );
+  }
+
+  Widget _getAuditFloorsListItems(BuildContext context,
+      ListProvider<OTAudit> dataProvider, int index, OTAudit e) {
+    void onLinkTap(String? url) {
+      BrowserUtil.openUrl(url!, context);
+    }
+
+    void onImageTap(String? url, Object heroTag) {
+      smartNavigatorPush(context, '/image/detail', arguments: {
+        'preview_url': url,
+        'hd_url': OpenTreeHoleRepository.getInstance()
+            .extractHighDefinitionImageUrl(url!),
+        'hero_tag': heroTag
+      });
+    }
+
+    return GestureDetector(
+      onLongPress: () {
+        showPlatformModalSheet(
+            context: context,
+            builder: (BuildContext cxt) => PlatformContextMenu(
+                  actions: _buildAuditContextMenu(context, cxt, e),
+                  cancelButton: CupertinoActionSheetAction(
+                    child: Text(S.of(cxt).cancel),
+                    onPressed: () => Navigator.of(cxt).pop(),
+                  ),
+                ));
+      },
+      child: Card(
+          child: ListTile(
+              dense: true,
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                      alignment: Alignment.topLeft,
+                      child: smartRender(
+                          context, e.content, onLinkTap, onImageTap, false)),
+                  const Divider(),
+                ],
+              ),
+              subtitle: Column(children: [
+                const SizedBox(
+                  height: 8,
+                ),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "#${e.hole_id} (##${e.id})",
+                        style: TextStyle(
+                            color: Theme.of(context).hintColor, fontSize: 12),
+                      ),
+                      Text(
+                        HumanDuration.tryFormat(
+                            context, DateTime.parse(e.time_created!)),
+                        style: TextStyle(
+                            color: Theme.of(context).hintColor, fontSize: 12),
+                      ),
+                    ]),
+              ]),
+              onTap: () async {
+                ProgressFuture progressDialog = showProgressDialog(
+                    loadingText: S.of(context).loading, context: context);
+                try {
+                  final OTHole? post =
+                      await OpenTreeHoleRepository.getInstance()
+                          .loadSpecificHole(e.hole_id);
+                  final OTFloor? floor = await OpenTreeHoleRepository.getInstance().loadSpecificFloor(e.id);
+                  if (!mounted) return;
+                  smartNavigatorPush(context, "/bbs/postDetail",
+                      arguments: {"post": post!, "locate": floor!});
+                } catch (error, st) {
+                  Noticing.showErrorDialog(context, error, trace: st);
+                } finally {
+                  progressDialog.dismiss(showAnim: false);
+                }
+              })),
     );
   }
 }
