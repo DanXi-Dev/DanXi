@@ -276,7 +276,6 @@ class AuditListState extends State<AuditList> {
   Future<List<OTAudit>?> _loadAuditContent(int page, bool open) async {
     List<OTAudit>? loadedAuditFloors = await auditAdaptLayer
         .generateReceiver(_auditListViewController, (lastElement) async {
-      // print(lastElement);
       DateTime time = DateTime.now();
       if (lastElement != null) {
         time = DateTime.parse(lastElement.time_updated!);
@@ -284,7 +283,6 @@ class AuditListState extends State<AuditList> {
       return OpenTreeHoleRepository.getInstance()
           .adminGetAuditFloors(time, open, Constant.POST_COUNT_PER_PAGE);
     }).call(page);
-    // print('loaded:${loadedAuditFloors}');
     // If not more posts, notify ListView that we reached the end.
     if (loadedAuditFloors?.isEmpty ?? false) return [];
     return loadedAuditFloors;
