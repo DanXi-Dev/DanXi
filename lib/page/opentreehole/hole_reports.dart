@@ -260,7 +260,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
 class AuditList extends StatefulWidget {
   final bool open;
 
-  AuditList(this.open, {super.key});
+  const AuditList(this.open, {super.key});
 
   @override
   AuditListState createState() => AuditListState();
