@@ -55,36 +55,12 @@ class BBSReportDetail extends StatefulWidget {
 class BBSReportDetailState extends State<BBSReportDetail> {
   final PagedListViewController<OTReport> _reportListViewController =
       PagedListViewController();
-  final PagedListViewController<OTAudit> _auditListViewController =
-      PagedListViewController();
-
-  final ScrollController _auditScrollController = ScrollController();
-  final TimeBasedLoadAdaptLayer<OTAudit> adaptLayer =
-      TimeBasedLoadAdaptLayer(Constant.POST_COUNT_PER_PAGE, 0);
 
   int _tabIndex = 1;
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTReport>?> _loadReportContent(int page) =>
       OpenTreeHoleRepository.getInstance().adminGetReports(page * 10, 10);
-
-  Future<List<OTAudit>?> _loadAuditContent(int page, bool open) async {
-    List<OTAudit>? loadedAuditFloors = await adaptLayer
-        .generateReceiver(_auditListViewController, (lastElement) async {
-      // print(lastElement);
-      DateTime time = DateTime.now();
-      if (lastElement != null) {
-        time = DateTime.parse(lastElement.time_updated!);
-      }
-      return OpenTreeHoleRepository.getInstance()
-          .adminGetAuditFloors(time, open, Constant.POST_COUNT_PER_PAGE);
-    }).call(page);
-    // print('loaded:${loadedAuditFloors}');
-    // If not more posts, notify ListView that we reached the end.
-    if (loadedAuditFloors?.isEmpty ?? false) return [];
-
-    return loadedAuditFloors;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,8 +101,8 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                   Expanded(
                     child: LazyLoadIndexedStack(index: _tabIndex, children: [
                       _buildReportPage(),
-                      _buildAuditPage(true),
-                      _buildAuditPage(false)
+                      AuditList(true),
+                      AuditList(false)
                     ]),
                   ),
                 ],
@@ -170,42 +146,6 @@ class BBSReportDetailState extends State<BBSReportDetail> {
         ),
       );
 
-  Widget _buildAuditPage(bool open) => RefreshIndicator(
-        edgeOffset: MediaQuery.of(context).padding.top,
-        color: Theme.of(context).colorScheme.secondary,
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
-        onRefresh: () async {
-          HapticFeedback.mediumImpact();
-          await refreshSelf();
-          await _auditListViewController.notifyUpdate(
-              useInitialData: false, queueDataClear: false);
-        },
-        child: PagedListView<OTAudit>(
-          startPage: 0,
-          pagedController: _auditListViewController,
-          withScrollbar: true,
-          scrollController: _auditScrollController,
-          dataReceiver: (page) => _loadAuditContent(page, open),
-          builder: _getAuditFloorsListItems,
-          loadingBuilder: (BuildContext context) => Container(
-            padding: const EdgeInsets.all(8),
-            child: Center(child: PlatformCircularProgressIndicator()),
-          ),
-          emptyBuilder: (context) => Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Text(S.of(context).no_data),
-            ),
-          ),
-          endBuilder: (context) => Center(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Text(S.of(context).end_reached),
-            ),
-          ),
-        ),
-      );
-
   List<Widget> _buildReportContextMenu(
           BuildContext pageContext, BuildContext menuContext, OTReport e) =>
       [
@@ -215,35 +155,6 @@ class BBSReportDetailState extends State<BBSReportDetail> {
           onPressed: () async {
             int? result = await OpenTreeHoleRepository.getInstance()
                 .adminSetReportDealt(e.report_id!);
-            if (result != null && result < 300 && mounted) {
-              Noticing.showModalNotice(pageContext,
-                  message: S.of(pageContext).operation_successful);
-            }
-          },
-        )
-      ];
-
-  List<Widget> _buildAuditContextMenu(
-          BuildContext pageContext, BuildContext menuContext, OTAudit e) =>
-      [
-        PlatformContextMenuItem(
-          menuContext: menuContext,
-          child: const Text("Mark as sensitive"),
-          onPressed: () async {
-            int? result = await OpenTreeHoleRepository.getInstance()
-                .adminSetAuditFloor(e.id, true);
-            if (result != null && result < 300 && mounted) {
-              Noticing.showModalNotice(pageContext,
-                  message: S.of(pageContext).operation_successful);
-            }
-          },
-        ),
-        PlatformContextMenuItem(
-          menuContext: menuContext,
-          child: const Text("Mark as not sensitive"),
-          onPressed: () async {
-            int? result = await OpenTreeHoleRepository.getInstance()
-                .adminSetAuditFloor(e.id, false);
             if (result != null && result < 300 && mounted) {
               Noticing.showModalNotice(pageContext,
                   message: S.of(pageContext).operation_successful);
@@ -344,6 +255,73 @@ class BBSReportDetailState extends State<BBSReportDetail> {
       ),
     );
   }
+}
+
+class AuditList extends StatefulWidget {
+  final bool open;
+
+  AuditList(this.open, {super.key});
+
+  @override
+  AuditListState createState() => AuditListState();
+}
+
+class AuditListState extends State<AuditList> {
+  final PagedListViewController<OTAudit> _auditListViewController =
+      PagedListViewController();
+  final ScrollController _auditScrollController = ScrollController();
+  final TimeBasedLoadAdaptLayer<OTAudit> auditAdaptLayer =
+      TimeBasedLoadAdaptLayer(Constant.POST_COUNT_PER_PAGE, 0);
+
+  Future<List<OTAudit>?> _loadAuditContent(int page, bool open) async {
+    List<OTAudit>? loadedAuditFloors = await auditAdaptLayer
+        .generateReceiver(_auditListViewController, (lastElement) async {
+      // print(lastElement);
+      DateTime time = DateTime.now();
+      if (lastElement != null) {
+        time = DateTime.parse(lastElement.time_updated!);
+      }
+      return OpenTreeHoleRepository.getInstance()
+          .adminGetAuditFloors(time, open, Constant.POST_COUNT_PER_PAGE);
+    }).call(page);
+    // print('loaded:${loadedAuditFloors}');
+    // If not more posts, notify ListView that we reached the end.
+    if (loadedAuditFloors?.isEmpty ?? false) return [];
+    return loadedAuditFloors;
+  }
+
+  List<Widget> _buildAuditContextMenu(
+          BuildContext pageContext, BuildContext menuContext, OTAudit e) =>
+      [
+        PlatformContextMenuItem(
+          menuContext: menuContext,
+          child: const Text("Mark as sensitive"),
+          onPressed: () async {
+            int? result = await OpenTreeHoleRepository.getInstance()
+                .adminSetAuditFloor(e.id, true);
+            if (result != null && result < 300 && mounted) {
+              Noticing.showModalNotice(pageContext,
+                  message: S.of(pageContext).operation_successful);
+              await _auditListViewController.notifyUpdate(
+                  useInitialData: false, queueDataClear: false);
+            }
+          },
+        ),
+        PlatformContextMenuItem(
+          menuContext: menuContext,
+          child: const Text("Mark as not sensitive"),
+          onPressed: () async {
+            int? result = await OpenTreeHoleRepository.getInstance()
+                .adminSetAuditFloor(e.id, false);
+            if (result != null && result < 300 && mounted) {
+              Noticing.showModalNotice(pageContext,
+                  message: S.of(pageContext).operation_successful);
+              await _auditListViewController.notifyUpdate(
+                  useInitialData: false, queueDataClear: false);
+            }
+          },
+        )
+      ];
 
   Widget _getAuditFloorsListItems(BuildContext context,
       ListProvider<OTAudit> dataProvider, int index, OTAudit e) {
@@ -432,6 +410,45 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                   progressDialog.dismiss(showAnim: false);
                 }
               })),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      edgeOffset: MediaQuery.of(context).padding.top,
+      color: Theme.of(context).colorScheme.secondary,
+      backgroundColor: Theme.of(context).dialogBackgroundColor,
+      onRefresh: () async {
+        HapticFeedback.mediumImpact();
+        await refreshSelf();
+        await _auditListViewController.notifyUpdate(
+            useInitialData: false, queueDataClear: false);
+      },
+      child: PagedListView<OTAudit>(
+        startPage: 0,
+        pagedController: _auditListViewController,
+        withScrollbar: true,
+        scrollController: _auditScrollController,
+        dataReceiver: (page) => _loadAuditContent(page, widget.open),
+        builder: _getAuditFloorsListItems,
+        loadingBuilder: (BuildContext context) => Container(
+          padding: const EdgeInsets.all(8),
+          child: Center(child: PlatformCircularProgressIndicator()),
+        ),
+        emptyBuilder: (context) => Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Text(S.of(context).no_data),
+          ),
+        ),
+        endBuilder: (context) => Center(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(S.of(context).end_reached),
+          ),
+        ),
+      ),
     );
   }
 }
