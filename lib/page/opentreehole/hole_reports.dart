@@ -76,7 +76,8 @@ class BBSReportDetailState extends State<BBSReportDetail> {
       if (lastElement != null) {
         time = DateTime.parse(lastElement.time_updated!);
       }
-      return OpenTreeHoleRepository.getInstance().adminGetAuditFloors(time, open, 10);
+      return OpenTreeHoleRepository.getInstance()
+          .adminGetAuditFloors(time, open, 10);
     }).call(page);
     // print('loaded:${loadedAuditFloors}');
     // If not more posts, notify ListView that we reached the end.
@@ -122,9 +123,11 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                     ),
                   ),
                   Expanded(
-                    child: LazyLoadIndexedStack(
-                        index: _tabIndex,
-                        children: [_buildReportPage(), _buildAuditPage(true), _buildAuditPage(false)]),
+                    child: LazyLoadIndexedStack(index: _tabIndex, children: [
+                      _buildReportPage(),
+                      _buildAuditPage(true),
+                      _buildAuditPage(false)
+                    ]),
                   ),
                 ],
               ),
@@ -400,16 +403,14 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                         style: TextStyle(
                             color: Theme.of(context).hintColor, fontSize: 12),
                       ),
-                      // if (e.is_actual_sensitive == null) do not display
-                      Text(
-                        e.is_actual_sensitive == null
-                            ? ""
-                            : e.is_actual_sensitive!
-                                ? "Sensitive"
-                                : "Not sensitive",
-                        style: TextStyle(
-                            color: Theme.of(context).hintColor, fontSize: 12),
-                      ),
+                      if (e.is_actual_sensitive != null)
+                        Text(
+                          e.is_actual_sensitive!
+                              ? "Sensitive"
+                              : "Not Sensitive",
+                          style: TextStyle(
+                              color: Theme.of(context).hintColor, fontSize: 12),
+                        )
                     ]),
               ]),
               onTap: () async {
@@ -419,7 +420,9 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                   final OTHole? post =
                       await OpenTreeHoleRepository.getInstance()
                           .loadSpecificHole(e.hole_id);
-                  final OTFloor? floor = await OpenTreeHoleRepository.getInstance().loadSpecificFloor(e.id);
+                  final OTFloor? floor =
+                      await OpenTreeHoleRepository.getInstance()
+                          .loadSpecificFloor(e.id);
                   if (!mounted) return;
                   smartNavigatorPush(context, "/bbs/postDetail",
                       arguments: {"post": post!, "locate": floor!});
