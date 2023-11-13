@@ -72,13 +72,14 @@ class BBSReportDetailState extends State<BBSReportDetail> {
   Future<List<OTAudit>?> _loadAuditContent(int page, bool open) async {
     List<OTAudit>? loadedAuditFloors = await adaptLayer
         .generateReceiver(_auditListViewController, (lastElement) async {
+      // print(lastElement);
       DateTime time = DateTime.now();
       if (lastElement != null) {
         time = DateTime.parse(lastElement.time_updated!);
       }
       return OpenTreeHoleRepository.getInstance().adminGetAuditFloors(time, open, 10);
     }).call(page);
-
+    // print('loaded:${loadedAuditFloors}');
     // If not more posts, notify ListView that we reached the end.
     if (loadedAuditFloors?.isEmpty ?? false) return [];
 
@@ -119,7 +120,6 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                           .map((t) => Text(t))
                           .toList()
                           .asMap(),
-                      // todo reformat the code
                     ),
                   ),
                   Expanded(
@@ -398,6 +398,16 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                       Text(
                         HumanDuration.tryFormat(
                             context, DateTime.parse(e.time_created!)),
+                        style: TextStyle(
+                            color: Theme.of(context).hintColor, fontSize: 12),
+                      ),
+                      // if (e.is_actual_sensitive == null) do not display
+                      Text(
+                        e.is_actual_sensitive == null
+                            ? ""
+                            : e.is_actual_sensitive!
+                                ? "Sensitive"
+                                : "Not sensitive",
                         style: TextStyle(
                             color: Theme.of(context).hintColor, fontSize: 12),
                       ),
