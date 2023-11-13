@@ -37,11 +37,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
-
-import '../../common/constant.dart';
-import '../../model/opentreehole/audit.dart';
-import '../../model/opentreehole/floor.dart';
-import '../subpage_treehole.dart';
+import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/model/opentreehole/audit.dart';
+import 'package:dan_xi/model/opentreehole/floor.dart';
+import 'package:dan_xi/page/subpage_treehole.dart';
 
 /// A list page showing the reports for administrators.
 class BBSReportDetail extends StatefulWidget {
