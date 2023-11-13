@@ -60,7 +60,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
 
   final ScrollController _auditScrollController = ScrollController();
   final TimeBasedLoadAdaptLayer<OTAudit> adaptLayer =
-      TimeBasedLoadAdaptLayer(Constant.POST_COUNT_PER_PAGE, 1);
+      TimeBasedLoadAdaptLayer(Constant.POST_COUNT_PER_PAGE, 0);
 
   int _tabIndex = 1;
 
@@ -77,7 +77,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
         time = DateTime.parse(lastElement.time_updated!);
       }
       return OpenTreeHoleRepository.getInstance()
-          .adminGetAuditFloors(time, open, 10);
+          .adminGetAuditFloors(time, open, Constant.POST_COUNT_PER_PAGE);
     }).call(page);
     // print('loaded:${loadedAuditFloors}');
     // If not more posts, notify ListView that we reached the end.
