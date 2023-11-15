@@ -26,7 +26,6 @@ import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/human_duration.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
@@ -116,7 +115,6 @@ class BBSReportDetailState extends State<BBSReportDetail> {
         backgroundColor: Theme.of(context).dialogBackgroundColor,
         onRefresh: () async {
           HapticFeedback.mediumImpact();
-          await refreshSelf();
           await _reportListViewController.notifyUpdate(
               useInitialData: false, queueDataClear: false);
         },
@@ -158,6 +156,8 @@ class BBSReportDetailState extends State<BBSReportDetail> {
             if (result != null && result < 300 && mounted) {
               Noticing.showModalNotice(pageContext,
                   message: S.of(pageContext).operation_successful);
+              await _reportListViewController.notifyUpdate(
+                  useInitialData: false, queueDataClear: false);
             }
           },
         )
@@ -232,6 +232,8 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                     if (result != null && result < 300 && mounted) {
                       Noticing.showModalNotice(context,
                           message: S.of(context).operation_successful);
+                      await _reportListViewController.notifyUpdate(
+                          useInitialData: false, queueDataClear: false);
                     }
                   },
                 ),
@@ -419,7 +421,6 @@ class AuditListState extends State<AuditList> {
       backgroundColor: Theme.of(context).dialogBackgroundColor,
       onRefresh: () async {
         HapticFeedback.mediumImpact();
-        await refreshSelf();
         await _auditListViewController.notifyUpdate(
             useInitialData: false, queueDataClear: false);
       },
