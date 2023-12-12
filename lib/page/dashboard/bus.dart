@@ -153,26 +153,30 @@ class BusPageState extends State<BusPage> {
     });
   }
 
+  void swapBusDetails(BusScheduleItem element) {
+    final start = element.start;
+    element.start = element.end;
+    element.end = start;
+    final startTime = element.startTime;
+    element.startTime = element.endTime;
+    element.endTime = startTime;
+  }
+
   List<BusScheduleItem> _filterBus(List<BusScheduleItem> origBusList) {
-    // Normalize all entries
+    // Normalize all backward entries and reversed dual entries
     for (var element in origBusList) {
       if (element.direction == BusDirection.BACKWARD) {
-        final start = element.start;
-        element.start = element.end;
-        element.end = start;
-        final startTime = element.startTime;
-        element.startTime = element.endTime;
-        element.endTime = startTime;
+        swapBusDetails(element);
         element.direction = BusDirection.FORWARD;
+      } else if (element.direction == BusDirection.DUAL &&
+          element.start == _endSelectItem &&
+          element.end == _startSelectItem) {
+        swapBusDetails(element);
       }
     }
     return origBusList
-        .where((element) =>
-            (element.start == _startSelectItem &&
-                element.end == _endSelectItem) ||
-            (element.start == _endSelectItem &&
-                element.end == _startSelectItem &&
-                element.direction == BusDirection.DUAL))
+        .where((element) => (element.start == _startSelectItem &&
+            element.end == _endSelectItem))
         .toList();
   }
 
