@@ -28,7 +28,6 @@ import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/page/opentreehole/admin_operation.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
-import 'package:dan_xi/page/opentreehole/hole_report.dart';
 import 'package:dan_xi/page/opentreehole/image_viewer.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
@@ -848,7 +847,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         menuContext: menuContext,
         isDestructive: true,
         onPressed: () async {
-          if (await reportPost(context, e.floor_id)) {
+          if (await OTEditor.reportPost(context, e.floor_id)) {
             Noticing.showMaterialNotice(context, S.of(context).report_success);
           }
         },

@@ -38,8 +38,7 @@ import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/opentreehole/hole_login.dart';
 import 'package:dan_xi/page/opentreehole/hole_messages.dart';
-import 'package:dan_xi/page/opentreehole/admin_reports.dart';
-import 'package:dan_xi/page/opentreehole/hole_report.dart';
+import 'package:dan_xi/page/opentreehole/hole_reports.dart';
 import 'package:dan_xi/page/opentreehole/hole_search.dart';
 import 'package:dan_xi/page/opentreehole/hole_tags.dart';
 import 'package:dan_xi/page/opentreehole/image_viewer.dart';
@@ -159,8 +158,6 @@ class DanxiApp extends StatelessWidget {
         DiagnosticConsole(arguments: arguments),
     '/bbs/reports': (context, {arguments}) =>
         BBSReportDetail(arguments: arguments),
-    '/bbs/report': (context, {arguments}) =>
-        BBSReportPage(arguments: arguments),
     '/card/detail': (context, {arguments}) =>
         CardDetailPage(arguments: arguments),
     '/card/crowdData': (context, {arguments}) =>

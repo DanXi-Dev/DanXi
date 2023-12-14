@@ -23,7 +23,6 @@ import 'package:dan_xi/model/opentreehole/message.dart';
 import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
-import 'package:dan_xi/page/opentreehole/hole_report.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
@@ -893,7 +892,7 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                   });
                   switch (item) {
                     case ActionItem.Report:
-                      if (await reportPost(context, floor.floor_id)) {
+                      if (await OTEditor.reportPost(context, floor.floor_id)) {
                         if (!context.mounted) return;
                         Noticing.showMaterialNotice(
                             context, S.of(context).report_success);
