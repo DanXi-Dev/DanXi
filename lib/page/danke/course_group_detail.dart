@@ -211,8 +211,8 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
             PlatformIconButton(
               padding: EdgeInsets.zero,
               icon: PlatformX.isMaterial(context)
-                  ? const Icon(Icons.reply)
-                  : const Icon(CupertinoIcons.arrowshape_turn_up_left),
+                  ? const Icon(Icons.add)
+                  : const Icon(CupertinoIcons.add),
               onPressed: () async {
                 if (await CourseReviewEditor.createNewPost(
                     context, _courseGroup!)) {
