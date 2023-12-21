@@ -26,31 +26,33 @@ part 'report.g.dart';
 class OTReport {
   final int? report_id;
   final String? reason;
+  final String? result;
   final String? content;
   final OTFloor? floor;
   final int? hole_id;
   final String? time_created;
   final String? time_updated;
-  final bool? dealed;
-  final String? dealed_by;
+  final bool? dealt;
+  final int? dealt_by;
 
   const OTReport(
       this.report_id,
       this.reason,
+      this.result,
       this.content,
       this.floor,
       this.hole_id,
       this.time_created,
       this.time_updated,
-      this.dealed,
-      this.dealed_by);
+      this.dealt,
+      this.dealt_by);
 
   @override
   int get hashCode => report_id!;
 
   @override
   String toString() {
-    return 'OTReport{report_id: $report_id, reason: $reason, content: $content, floor: $floor, hole_id: $hole_id, time_created: $time_created, time_updated: $time_updated, dealed: $dealed, dealed_by: $dealed_by}';
+    return 'OTReport{report_id: $report_id, reason: $reason, result:$result, content: $content, floor: $floor, hole_id: $hole_id, time_created: $time_created, time_updated: $time_updated, dealt: $dealt, dealt_by: $dealt_by}';
   }
 
   @override
