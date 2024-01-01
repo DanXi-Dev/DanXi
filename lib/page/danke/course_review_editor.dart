@@ -579,8 +579,9 @@ class CourseRatingWidgetState extends State<CourseRatingWidget> {
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox(width: 88, child: Text(widget.label)),
+              SizedBox(width: 80, child: Text(widget.label)),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: List.generate(
@@ -598,7 +599,6 @@ class CourseRatingWidgetState extends State<CourseRatingWidget> {
                             index < rating ? Icons.star : Icons.star_border,
                             color: mainColor))),
               ),
-              const SizedBox(width: 10),
               Text(rating > 0 ? widget.words[rating - 1] : "",
                   style: TextStyle(color: mainColor))
             ]));
