@@ -581,7 +581,7 @@ class CourseRatingWidgetState extends State<CourseRatingWidget> {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox(width: 80, child: Text(widget.label)),
+              SizedBox(width: 88, child: Text(widget.label)),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: List.generate(
