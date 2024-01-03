@@ -41,7 +41,7 @@ class BusPage extends StatefulWidget {
   @override
   BusPageState createState() => BusPageState();
 
-  const BusPage({Key? key, this.arguments}) : super(key: key);
+  const BusPage({super.key, this.arguments});
 }
 
 class BusPageState extends State<BusPage> {

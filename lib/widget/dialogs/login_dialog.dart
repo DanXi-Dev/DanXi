@@ -69,11 +69,10 @@ class LoginDialog extends StatefulWidget {
   }
 
   const LoginDialog(
-      {Key? key,
+      {super.key,
       required this.sharedPreferences,
       required this.personInfo,
-      required this.dismissible})
-      : super(key: key);
+      required this.dismissible});
 
   @override
   LoginDialogState createState() => LoginDialogState();

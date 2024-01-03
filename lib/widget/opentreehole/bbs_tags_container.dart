@@ -25,8 +25,7 @@ class BBSTagsContainer extends StatefulWidget {
   final List<OTTag>? tags;
   final OnTapTag? onTap;
 
-  const BBSTagsContainer({Key? key, required this.tags, this.onTap})
-      : super(key: key);
+  const BBSTagsContainer({super.key, required this.tags, this.onTap});
 
   @override
   BBSTagsContainerState createState() => BBSTagsContainerState();

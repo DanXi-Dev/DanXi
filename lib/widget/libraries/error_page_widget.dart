@@ -34,14 +34,13 @@ class ErrorPageWidget extends StatelessWidget {
   final VoidCallback? onTap;
 
   const ErrorPageWidget(
-      {Key? key,
+      {super.key,
       this.icon,
       required this.buttonText,
       required this.errorMessage,
       this.onTap,
       this.error,
-      this.trace})
-      : super(key: key);
+      this.trace});
 
   /// Try to parse error information from [error].
   static String generateUserFriendlyDescription(S locale, dynamic error,

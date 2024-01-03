@@ -24,8 +24,7 @@ class RoundChip extends StatelessWidget {
   final VoidCallback? onTap;
   final Color? color;
 
-  const RoundChip({Key? key, this.label, this.onTap, this.color})
-      : super(key: key);
+  const RoundChip({super.key, this.label, this.onTap, this.color});
 
   @override
   Widget build(BuildContext context) {

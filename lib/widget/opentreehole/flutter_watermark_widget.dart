@@ -27,11 +27,11 @@ class FullScreenWatermark extends StatelessWidget {
   final TextStyle textStyle;
 
   const FullScreenWatermark({
-    Key? key,
+    super.key,
     required this.rowCount,
     required this.columnCount,
     required this.textStyle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

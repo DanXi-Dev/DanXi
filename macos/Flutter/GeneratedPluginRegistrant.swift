@@ -5,12 +5,13 @@
 import FlutterMacOS
 import Foundation
 
-import bitsdojo_window_macos
+import bitsdojo_window_macos_v3
 import desktop_window
 import device_info_plus
 import file_selector_macos
 import flutter_js
 import flutter_secure_storage_macos
+import gal
 import in_app_review
 import open_file
 import path_provider_foundation
@@ -30,6 +31,7 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   FileSelectorPlugin.register(with: registry.registrar(forPlugin: "FileSelectorPlugin"))
   FlutterJsPlugin.register(with: registry.registrar(forPlugin: "FlutterJsPlugin"))
   FlutterSecureStoragePlugin.register(with: registry.registrar(forPlugin: "FlutterSecureStoragePlugin"))
+  GalPlugin.register(with: registry.registrar(forPlugin: "GalPlugin"))
   InAppReviewPlugin.register(with: registry.registrar(forPlugin: "InAppReviewPlugin"))
   OpenFilePlugin.register(with: registry.registrar(forPlugin: "OpenFilePlugin"))
   PathProviderPlugin.register(with: registry.registrar(forPlugin: "PathProviderPlugin"))

@@ -50,7 +50,7 @@ class ExamList extends StatefulWidget {
   @override
   ExamListState createState() => ExamListState();
 
-  const ExamList({Key? key, this.arguments}) : super(key: key);
+  const ExamList({super.key, this.arguments});
 }
 
 class ExamListState extends State<ExamList> {

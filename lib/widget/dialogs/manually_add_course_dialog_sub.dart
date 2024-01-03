@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
-import '../../generated/l10n.dart';
 import '../../common/constant.dart';
+import '../../generated/l10n.dart';
 import '../../model/time_table.dart';
 import '../../provider/settings_provider.dart';
 import '../../util/platform_universal.dart';
 
 class AddCourseDialogSub extends StatefulWidget {
-  const AddCourseDialogSub({Key? key})
-      : super(key: key);
+  const AddCourseDialogSub({super.key});
+
   @override
   State<AddCourseDialogSub> createState() => _AddCourseDialogSubState();
 }

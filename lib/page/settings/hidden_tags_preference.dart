@@ -32,8 +32,7 @@ class BBSHiddenTagsPreferencePage extends StatefulWidget {
   BBSHiddenTagsPreferencePageState createState() =>
       BBSHiddenTagsPreferencePageState();
 
-  const BBSHiddenTagsPreferencePage({Key? key, this.arguments})
-      : super(key: key);
+  const BBSHiddenTagsPreferencePage({super.key, this.arguments});
 }
 
 class BBSHiddenTagsPreferencePageState

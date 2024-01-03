@@ -231,12 +231,11 @@ class CourseReviewEditorWidget extends StatefulWidget {
   final CourseReviewEditorText review;
 
   const CourseReviewEditorWidget(
-      {Key? key,
+      {super.key,
       this.fullscreen = false,
       required this.courseGroup,
       required this.review,
-      this.focusContent = false})
-      : super(key: key);
+      this.focusContent = false});
 
   final CourseGroup courseGroup;
 
@@ -580,6 +579,7 @@ class CourseRatingWidgetState extends State<CourseRatingWidget> {
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               SizedBox(width: 88, child: Text(widget.label)),
               Row(
@@ -599,7 +599,6 @@ class CourseRatingWidgetState extends State<CourseRatingWidget> {
                             index < rating ? Icons.star : Icons.star_border,
                             color: mainColor))),
               ),
-              const SizedBox(width: 10),
               Text(rating > 0 ? widget.words[rating - 1] : "",
                   style: TextStyle(color: mainColor))
             ]));
@@ -617,7 +616,7 @@ class CourseRatingWidgetState extends State<CourseRatingWidget> {
 class CourseReviewEditorPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const CourseReviewEditorPage({Key? key, this.arguments}) : super(key: key);
+  const CourseReviewEditorPage({super.key, this.arguments});
 
   @override
   CourseReviewEditorPageState createState() => CourseReviewEditorPageState();

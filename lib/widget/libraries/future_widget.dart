@@ -23,14 +23,13 @@ import 'package:flutter/material.dart';
 /// which will build different widgets depending on different states: See [ConnectionState.values].
 class FutureWidget<T> extends StatefulWidget {
   const FutureWidget(
-      {Key? key,
+      {super.key,
       this.initialData,
       required this.future,
       required this.successBuilder,
       required this.errorBuilder,
       required this.loadingBuilder,
-      this.nullable = false})
-      : super(key: key);
+      this.nullable = false});
   final dynamic errorBuilder;
   final dynamic loadingBuilder;
   final Future<T>? future;

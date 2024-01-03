@@ -62,11 +62,10 @@ mount it.
 ## Flutter version that we're using
 
 ```shell
-$ flutter --version
-Flutter 3.13.8 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 6c4930c4ac (9 days ago) • 2023-10-18 10:57:55 -0500
-Engine • revision 767d8c75e8
-Tools • Dart 3.1.4 • DevTools 2.25.0
+Flutter 3.16.3 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision b0366e0a3f (2 weeks ago) • 2023-12-05 19:46:39 -0800
+Engine • revision 54a7145303
+Tools • Dart 3.2.3 • DevTools 2.28.4
 ```
 
 ## Notes on compilation

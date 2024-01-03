@@ -36,7 +36,7 @@ class BBSTagsPage extends StatefulWidget {
   @override
   BBSTagsPageState createState() => BBSTagsPageState();
 
-  const BBSTagsPage({Key? key, this.arguments}) : super(key: key);
+  const BBSTagsPage({super.key, this.arguments});
 }
 
 class BBSTagsPageState extends State<BBSTagsPage> {

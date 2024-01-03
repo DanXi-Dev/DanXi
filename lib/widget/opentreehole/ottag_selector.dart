@@ -37,8 +37,7 @@ class OTTagSelector extends StatefulWidget {
   final List<OTTag> initialTags;
   final VoidCallback? onChanged;
 
-  const OTTagSelector({Key? key, required this.initialTags, this.onChanged})
-      : super(key: key);
+  const OTTagSelector({super.key, required this.initialTags, this.onChanged});
 
   @override
   OTTagSelectorState createState() => OTTagSelectorState();

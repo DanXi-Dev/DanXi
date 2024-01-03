@@ -30,8 +30,7 @@ class RandomReviewWidgets extends StatelessWidget {
   final CourseReview review;
 
   const RandomReviewWidgets(
-      {Key? key, required this.review, this.translucent = false, this.onTap})
-      : super(key: key);
+      {super.key, required this.review, this.translucent = false, this.onTap});
 
   @override
   Widget build(BuildContext context) {
