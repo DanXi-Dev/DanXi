@@ -67,72 +67,51 @@ class CourseReviewWidget extends StatelessWidget {
         Expanded(
           child: ListTile(
             contentPadding: EdgeInsets.zero,
-            title: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                alignment: WrapAlignment.spaceBetween,
-                runSpacing: 4,
-                children: [
-                  Column(
-                    children: [
-                      // course name, department name, course code and credits
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // use Expanded wrap the text to avoid overflow
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // todo add card information style
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 2),
-                                  child: ReviewHeader(
-                                    userId: review.reviewerId!,
-                                    teacher: review.courseInfo.teachers,
-                                    time: review.courseInfo.time,
-                                    title: review.title!,
-                                  ),
-                                ),
-                                const Divider(),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 2),
-                                  child: smartRender(context, review.content!,
-                                      null, null, translucent),
-                                ),
-                                const Divider(),
-                                Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 2),
-                                    child: Row(children: [
-                                      Expanded(
-                                        child: ReviewFooter(
-                                          overallLevel:
-                                              review.rank!.overall! - 1,
-                                          styleLevel: review.rank!.content! - 1,
-                                          workloadLevel:
-                                              review.rank!.workload! - 1,
-                                          assessmentLevel:
-                                              review.rank!.assessment! - 1,
-                                        ),
-                                      ),
-                                      if (review.isMe!)
-                                        ModifyMenuWidget(
-                                          originalReview: review,
-                                          courseGroup: courseGroup,
-                                          reviewOperationCallback: reviewOperationCallback ?? (rev){},
-                                        )
-                                    ])),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+            title: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // todo add card information style
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  child: ReviewHeader(
+                    userId: review.reviewerId!,
+                    teacher: review.courseInfo.teachers,
+                    time: review.courseInfo.time,
+                    title: review.title!,
                   ),
-                ]),
+                ),
+                const Divider(),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  child: smartRender(
+                      context, review.content!, null, null, translucent),
+                ),
+                const Divider(),
+                Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                    child: Row(children: [
+                      Expanded(
+                        child: ReviewFooter(
+                          overallLevel: review.rank!.overall! - 1,
+                          styleLevel: review.rank!.content! - 1,
+                          workloadLevel: review.rank!.workload! - 1,
+                          assessmentLevel: review.rank!.assessment! - 1,
+                        ),
+                      ),
+                      if (review.isMe!)
+                        ModifyMenuWidget(
+                          originalReview: review,
+                          courseGroup: courseGroup,
+                          reviewOperationCallback:
+                              reviewOperationCallback ?? (rev) {},
+                        )
+                    ])),
+              ],
+            ),
           ),
         )
       ]),
