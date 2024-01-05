@@ -452,7 +452,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                 ),
                 StreamBuilder(
                     stream: _ratingChangedStream.stream,
-                    initialData: RatingChangedEvent(CourseGrade(0, 0, 0, 0)),
+                    initialData: RatingChangedEvent(review.grade),
                     builder: (ctx, snapshot) => RatingTextWidget(
                         words: overallWord!,
                         rating: snapshot.data!.newRating.overall ?? 0)),
@@ -466,7 +466,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                     }),
                 StreamBuilder(
                     stream: _ratingChangedStream.stream,
-                    initialData: RatingChangedEvent(CourseGrade(0, 0, 0, 0)),
+                    initialData: RatingChangedEvent(review.grade),
                     builder: (ctx, snapshot) => RatingTextWidget(
                         words: contentWord!,
                         rating: review.grade.content ?? 0)),
@@ -480,7 +480,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                 ),
                 StreamBuilder(
                     stream: _ratingChangedStream.stream,
-                    initialData: RatingChangedEvent(CourseGrade(0, 0, 0, 0)),
+                    initialData: RatingChangedEvent(review.grade),
                     builder: (ctx, snapshot) => RatingTextWidget(
                         words: workloadWord!,
                         rating: review.grade.workload ?? 0)),
@@ -495,7 +495,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                 ),
                 StreamBuilder(
                     stream: _ratingChangedStream.stream,
-                    initialData: RatingChangedEvent(CourseGrade(0, 0, 0, 0)),
+                    initialData: RatingChangedEvent(review.grade),
                     builder: (ctx, snapshot) => RatingTextWidget(
                         words: assessmentWord!,
                         rating: review.grade.assessment ?? 0)),
