@@ -38,7 +38,7 @@ class CardCrowdData extends StatefulWidget {
   @override
   CardCrowdDataState createState() => CardCrowdDataState();
 
-  const CardCrowdData({Key? key, this.arguments}) : super(key: key);
+  const CardCrowdData({super.key, this.arguments});
 }
 
 class CardCrowdDataState extends State<CardCrowdData> {

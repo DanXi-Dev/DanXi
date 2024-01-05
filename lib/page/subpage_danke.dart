@@ -41,7 +41,7 @@ class DankeSubPage extends PlatformSubpage<DankeSubPage> {
   @override
   DankeSubPageState createState() => DankeSubPageState();
 
-  const DankeSubPage({Key? key}) : super(key: key);
+  const DankeSubPage({super.key});
 
   @override
   Create<Widget> get title => (cxt) => Text(S.of(cxt).curriculum);

@@ -27,8 +27,8 @@ class TopController extends StatelessWidget {
   final ScrollController? controller;
   final Function? onDoubleTap;
 
-  const TopController({Key? key, this.controller, this.onDoubleTap, this.child})
-      : super(key: key);
+  const TopController(
+      {super.key, this.controller, this.onDoubleTap, this.child});
 
   static scrollToTop(ScrollController? controller) =>
       controller?.animateTo(-controller.initialScrollOffset,

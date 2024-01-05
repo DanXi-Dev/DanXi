@@ -37,8 +37,7 @@ class CourseGroupCardWidget extends StatelessWidget {
   final CourseGroup courseGroup;
 
   const CourseGroupCardWidget(
-      {Key? key, required this.courseGroup, this.translucent = false})
-      : super(key: key);
+      {super.key, required this.courseGroup, this.translucent = false});
 
   @override
   Widget build(BuildContext context) {
@@ -165,8 +164,10 @@ class FilterTagWidget extends StatelessWidget {
   final void Function() onTap;
 
   const FilterTagWidget(
-      {Key? key, required this.color, required this.text, required this.onTap})
-      : super(key: key);
+      {super.key,
+      required this.color,
+      required this.text,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) => RoundChip(

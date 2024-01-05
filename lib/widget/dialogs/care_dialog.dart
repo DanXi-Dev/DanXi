@@ -8,7 +8,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import '../../generated/l10n.dart';
 
 class CareDialog extends StatefulWidget {
-  const CareDialog({Key? key}) : super(key: key);
+  const CareDialog({super.key});
 
   @override
   State<CareDialog> createState() => _CareDialogState();

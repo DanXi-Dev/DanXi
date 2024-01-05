@@ -33,7 +33,7 @@ class TextSelectorPage extends StatefulWidget {
   @override
   TextSelectorPageState createState() => TextSelectorPageState();
 
-  const TextSelectorPage({Key? key, this.arguments}) : super(key: key);
+  const TextSelectorPage({super.key, this.arguments});
 }
 
 class TextSelectorPageState extends State<TextSelectorPage> {

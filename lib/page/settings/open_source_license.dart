@@ -30,7 +30,7 @@ class OpenSourceLicenseList extends StatefulWidget {
   /// 'items': A list of [LicenseItem] to display on the page
   final Map<String, dynamic>? arguments;
 
-  const OpenSourceLicenseList({Key? key, this.arguments}) : super(key: key);
+  const OpenSourceLicenseList({super.key, this.arguments});
 
   @override
   OpenSourceListState createState() => OpenSourceListState();

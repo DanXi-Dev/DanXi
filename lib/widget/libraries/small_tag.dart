@@ -24,7 +24,7 @@ import 'package:flutter/material.dart';
 class SmallTag extends StatelessWidget {
   final String? label;
 
-  const SmallTag({Key? key, this.label}) : super(key: key);
+  const SmallTag({super.key, this.label});
 
   @override
   Widget build(BuildContext context) {

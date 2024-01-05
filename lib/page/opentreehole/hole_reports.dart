@@ -45,7 +45,7 @@ import 'package:dan_xi/page/subpage_treehole.dart';
 class BBSReportDetail extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const BBSReportDetail({Key? key, this.arguments}) : super(key: key);
+  const BBSReportDetail({super.key, this.arguments});
 
   @override
   BBSReportDetailState createState() => BBSReportDetailState();

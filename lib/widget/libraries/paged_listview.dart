@@ -100,7 +100,7 @@ class PagedListView<T> extends StatefulWidget {
   final Future<bool?> Function(BuildContext, int, T)? onConfirmDismissItem;
 
   const PagedListView(
-      {Key? key,
+      {super.key,
       this.pagedController,
       this.initialData,
       required this.builder,
@@ -120,8 +120,7 @@ class PagedListView<T> extends StatefulWidget {
       this.onDismissItem,
       this.onConfirmDismissItem})
       : assert((!withScrollbar) || (withScrollbar && scrollController != null)),
-        assert(dataReceiver != null || allDataReceiver != null),
-        super(key: key);
+        assert(dataReceiver != null || allDataReceiver != null);
 
   @override
   PagedListViewState<T> createState() => PagedListViewState<T>();

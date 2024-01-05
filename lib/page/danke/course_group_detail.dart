@@ -29,6 +29,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/danke/course_review_widget.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
@@ -42,7 +43,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:dan_xi/util/stream_listener.dart';
 
 enum FilterType { TEACHER_FILTER, TIME_FILTER }
 
@@ -56,7 +56,7 @@ class RefreshFilterEvent {
 class CourseGroupDetail extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const CourseGroupDetail({Key? key, this.arguments}) : super(key: key);
+  const CourseGroupDetail({super.key, this.arguments});
 
   @override
   CourseGroupDetailState createState() => CourseGroupDetailState();
@@ -86,9 +86,13 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
       GlobalKey<RefreshIndicatorState>();
 
   CourseReview? locateReview;
+  Future<CourseGroup?>? _courseGroupFuture;
+  Future<List<CourseReview>?>? _reviewListFuture;
 
   /// Reload/load the (new) content
-  List<CourseReview>? _loadContent() {
+  Future<List<CourseReview>?> _loadContent() async {
+    await _courseGroupFuture;
+
     List<CourseReview> result = [];
     for (var elem in _courseGroup!.courseList!) {
       if (elem.reviewList != null) {
@@ -106,6 +110,15 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
         });
       }
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (locateReview != null && mounted) {
+        // Scroll to the specific floor
+        await PagedListViewHelper.scrollToItem(
+            context, _listViewController, locateReview, ScrollDirection.DOWN);
+        locateReview = null;
+      }
+    });
 
     return result;
   }
@@ -140,7 +153,10 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
 
   /// Refresh the whole list (excluding the head)
   Future<void> refreshList({bool scrollToEnd = false}) async {
-    await _fetchCourseGroup(forceRefetch: true);
+    _courseGroupFuture = _fetchCourseGroup(forceRefetch: true);
+    _reviewListFuture = _loadContent();
+
+    await _courseGroupFuture;
     await refreshSelf();
     if (scrollToEnd) _listViewController.queueScrollToEnd();
     return _listViewController.notifyUpdate(
@@ -195,6 +211,8 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   @override
   Widget build(BuildContext context) {
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
+    _courseGroupFuture ??= _fetchCourseGroup();
+    _reviewListFuture ??= _loadContent();
 
     return PlatformScaffold(
       iosContentPadding: false,
@@ -240,73 +258,53 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   }
 
   Widget _buildBody(BuildContext context) {
-    return Builder(
-      // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-      builder: (context) => Container(
-        decoration: _backgroundImage == null
-            ? null
-            : BoxDecoration(
-                image: DecorationImage(
-                    image: _backgroundImage!, fit: BoxFit.cover)),
-        child: RefreshIndicator(
-          key: indicatorKey,
-          edgeOffset: MediaQuery.of(context).padding.top,
-          color: Theme.of(context).colorScheme.secondary,
-          backgroundColor: Theme.of(context).dialogBackgroundColor,
-          onRefresh: () async {
-            HapticFeedback.mediumImpact();
-            // Refresh the list...
-            await refreshList();
-          },
-          child: FutureWidget<CourseGroup?>(
-              future: _fetchCourseGroup(),
-              successBuilder: (context, snapshot) {
-                return PagedListView<CourseReview>(
-                  pagedController: _listViewController,
-                  withScrollbar: true,
-                  scrollController: PrimaryScrollController.of(context),
-                  // [_loadContent] does no internet request so it shall be quick
-                  allDataReceiver: Future.value(_loadContent()).then((value) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) async {
-                      if (locateReview != null && mounted) {
-                        // Scroll to the specific floor
-                        await PagedListViewHelper.scrollToItem(
-                            context,
-                            _listViewController,
-                            locateReview,
-                            ScrollDirection.DOWN);
-                        locateReview = null;
-                      }
-                    });
-
-                    return value;
-                  }),
-                  builder: _getListItems,
-                  headBuilder: (ctx) => _buildHead(ctx),
-                  loadingBuilder: (BuildContext context) => Container(
-                    padding: const EdgeInsets.all(8),
-                    child: Center(child: PlatformCircularProgressIndicator()),
+    return Container(
+      decoration: _backgroundImage == null
+          ? null
+          : BoxDecoration(
+              image:
+                  DecorationImage(image: _backgroundImage!, fit: BoxFit.cover)),
+      child: RefreshIndicator(
+        key: indicatorKey,
+        edgeOffset: MediaQuery.of(context).padding.top,
+        color: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Theme.of(context).dialogBackgroundColor,
+        onRefresh: () async {
+          HapticFeedback.mediumImpact();
+          // Refresh the list...
+          await refreshList();
+        },
+        child: FutureWidget<CourseGroup?>(
+            future: _courseGroupFuture,
+            successBuilder: (context, snapshot) {
+              return PagedListView<CourseReview>(
+                pagedController: _listViewController,
+                withScrollbar: true,
+                scrollController: PrimaryScrollController.of(context),
+                // [_loadContent] does no internet request so it shall be quick
+                allDataReceiver: _reviewListFuture,
+                builder: _getListItems,
+                headBuilder: _buildHead,
+                loadingBuilder: (BuildContext context) => Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Center(child: PlatformCircularProgressIndicator()),
+                ),
+                emptyBuilder: (context) =>
+                    Center(child: Text(S.of(context).no_course_review)),
+                endBuilder: (context) => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Text(S.of(context).end_reached),
                   ),
-                  emptyBuilder: (context) =>
-                      Center(child: Text(S.of(context).no_course_review)),
-                  endBuilder: (context) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: Text(S.of(context).end_reached),
-                      ),
-                    );
-                  },
-                );
-              },
-              errorBuilder: (BuildContext context,
-                      AsyncSnapshot<CourseGroup?> snapshot) =>
-                  ErrorPageWidget.buildWidget(context, snapshot.error,
-                      stackTrace: snapshot.stackTrace,
-                      onTap: () => setState(() {})),
-              loadingBuilder:
-                  Center(child: PlatformCircularProgressIndicator())),
-        ),
+                ),
+              );
+            },
+            errorBuilder:
+                (BuildContext context, AsyncSnapshot<CourseGroup?> snapshot) =>
+                    ErrorPageWidget.buildWidget(context, snapshot.error,
+                        stackTrace: snapshot.stackTrace,
+                        onTap: () => setState(() {})),
+            loadingBuilder: Center(child: PlatformCircularProgressIndicator())),
       ),
     );
   }
@@ -426,7 +424,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
           locateReview = affectedReview;
         }
 
-        await _fetchCourseGroup(forceRefetch: true);
         indicatorKey.currentState?.show();
       },
     );

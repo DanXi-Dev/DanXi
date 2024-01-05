@@ -84,7 +84,7 @@ const QuickActions quickActions = QuickActions();
 /// The main page of DanXi.
 /// It is a container for [PlatformSubpage].
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   HomePageState createState() => HomePageState();

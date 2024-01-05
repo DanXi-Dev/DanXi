@@ -25,7 +25,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 ///
 /// It is commonly used in [Feature] to indicate that the feature is loading.
 class FeatureProgressIndicator extends StatelessWidget {
-  const FeatureProgressIndicator({Key? key}) : super(key: key);
+  const FeatureProgressIndicator({super.key});
 
   @override
   Widget build(BuildContext context) {

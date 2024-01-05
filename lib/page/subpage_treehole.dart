@@ -53,9 +53,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 
 import '../util/watermark.dart';
 import '../widget/opentreehole/tag_selector/tag.dart';
@@ -149,7 +149,7 @@ const String KEY_NO_TAG = "默认";
 
 /// The tab bar for switching divisions.
 class OTTitle extends StatelessWidget {
-  const OTTitle({Key? key}) : super(key: key);
+  const OTTitle({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +189,7 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
   @override
   TreeHoleSubpageState createState() => TreeHoleSubpageState();
 
-  const TreeHoleSubpage({Key? key, this.arguments}) : super(key: key);
+  const TreeHoleSubpage({super.key, this.arguments});
 
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
