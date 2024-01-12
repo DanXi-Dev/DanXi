@@ -16,32 +16,66 @@
  */
 import 'dart:core';
 
+import 'package:flutter/cupertino.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'course_grade.g.dart';
 
 @JsonSerializable()
-class CourseGrade {
-  int? overall;
-  int? content;
-  int? workload;
-  int? assessment;
+class CourseGrade with ChangeNotifier {
+  @JsonKey(name: 'overall')
+  int? _overall;
+
+  @JsonKey(name: 'content')
+  int? _content;
+
+  @JsonKey(name: 'workload')
+  int? _workload;
+
+  @JsonKey(name: 'assessment')
+  int? _assessment;
+
+  int? get overall => _overall;
+
+  set overall(int? val) {
+    _overall = val;
+    notifyListeners();
+  }
+
+  int? get content => _content;
+
+  set content(int? val) {
+    _content = val;
+    notifyListeners();
+  }
+
+  int? get workload => _workload;
+
+  set workload(int? val) {
+    _workload = val;
+    notifyListeners();
+  }
+
+  int? get assessment => _assessment;
+
+  set assessment(int? val) {
+    _assessment = val;
+    notifyListeners();
+  }
 
   // Indicates the format of the grade,
   @JsonKey(includeFromJson: false, includeToJson: false)
   bool isClientFormat = false;
 
-  CourseGrade(this.overall, this.content, this.workload, this.assessment,
+  CourseGrade(this._overall, this._content, this._workload, this._assessment,
       {this.isClientFormat = false});
 
-  CourseGrade withFields(
-          {int? overall, int? content, int? workload, int? assessment}) =>
-      CourseGrade(overall ?? this.overall, content ?? this.content,
-          workload ?? this.workload, assessment ?? this.assessment);
+  CourseGrade clone() =>
+      CourseGrade(_overall, _content, _workload, _assessment);
 
   CourseGrade convertFormat() {
     // Reverse the content and workload score
-    return CourseGrade(overall, 6 - content!, 6 - workload!, assessment,
+    return CourseGrade(_overall, 6 - _content!, 6 - _workload!, _assessment,
         isClientFormat: !isClientFormat);
   }
 

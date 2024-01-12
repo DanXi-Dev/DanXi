@@ -145,12 +145,6 @@ class CourseReviewEditorText with ChangeNotifier {
   }
 }
 
-class RatingChangedEvent {
-  final CourseGrade newRating;
-
-  RatingChangedEvent(this.newRating);
-}
-
 class CourseReviewEditor {
   static Future<bool> createNewPost(
       BuildContext context, CourseGroup courseGroup,
@@ -259,9 +253,6 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
   late CourseReviewEditorText review;
   late TextEditingController contentController, titleController;
 
-  final StreamController<RatingChangedEvent> _ratingChangedStream =
-      StreamController.broadcast();
-
   @override
   void initState() {
     super.initState();
@@ -312,7 +303,6 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
 
   @override
   void dispose() {
-    _ratingChangedStream.close();
     super.dispose();
   }
 
@@ -348,173 +338,193 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
       teacherFilterNotifier.value = selectedCourse.teachers!;
     }
 
-    return SingleChildScrollView(
-      child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(widget.courseGroup.code!,
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                    fontSize: 20)),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(children: [
-                Expanded(
-                    flex: 1,
-                    child: DropdownListWidget(
-                      initialSelection: selectedCourse?.teachers,
-                      items: widget.courseGroup.courseList!
-                          .map((e) => e.teachers!)
-                          .toSet()
-                          .toList(),
-                      hintText: S.of(context).curriculum_select_teacher,
-                      labelText: S.of(context).course_teacher_name,
-                      onChanged: (e) {
-                        teacherFilterNotifier.value = e!;
-                      },
-                      itemBuilder: (e) => DropdownMenuItem(
-                          value: e,
-                          child: Text(e, overflow: TextOverflow.ellipsis)),
-                    )),
-                Expanded(
-                    flex: 1,
-                    child: ValueListenableBuilder(
-                      builder: (context, value, child) =>
-                          DropdownListWidget<Course>(
-                              initialSelection: selectedCourse,
-                              items: value == "*"
-                                  ? []
-                                  : widget.courseGroup.courseList!
-                                      .filter((e) => e.teachers == value),
-                              hintText: S.of(context).curriculum_select_time,
-                              labelText: S.of(context).course_schedule,
+    return ChangeNotifierProvider(
+        create: (_) => review.grade.clone(),
+        builder: (ctx, _) => SingleChildScrollView(
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(widget.courseGroup.code!,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey,
+                            fontSize: 20)),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(children: [
+                        Expanded(
+                            flex: 1,
+                            child: DropdownListWidget(
+                              initialSelection: selectedCourse?.teachers,
+                              items: widget.courseGroup.courseList!
+                                  .map((e) => e.teachers!)
+                                  .toSet()
+                                  .toList(),
+                              hintText: S.of(context).curriculum_select_teacher,
+                              labelText: S.of(context).course_teacher_name,
                               onChanged: (e) {
-                                review.courseId = e!.id!;
+                                teacherFilterNotifier.value = e!;
                               },
                               itemBuilder: (e) => DropdownMenuItem(
                                   value: e,
-                                  child: Text(e.formatTime(),
-                                      overflow: TextOverflow.ellipsis))),
-                      valueListenable: teacherFilterNotifier,
-                    )),
-              ]),
-            ),
-            PlatformTextField(
-              hintText: S.of(context).curriculum_enter_title,
-              material: (_, __) => MaterialTextFieldData(
-                  decoration: const InputDecoration(
-                      border: OutlineInputBorder(gapPadding: 2.0))),
-              keyboardType: TextInputType.multiline,
-              maxLines: 1,
-              expands: false,
-              autofocus: !widget.focusContent,
-              textAlignVertical: TextAlignVertical.top,
-              onChanged: (text) {
-                review.title = text;
-              },
-              controller: titleController,
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildIntroButton(
-                    context,
-                    IconFont.markdown,
-                    S.of(context).markdown_enabled,
-                    S.of(context).markdown_description),
-                _buildIntroButton(
-                    context,
-                    IconFont.tex,
-                    S.of(context).latex_enabled,
-                    S.of(context).latex_description),
-                PlatformTextButton(
-                  child: Text(S.of(context).community_convention),
-                  onPressed: () => BrowserUtil.openUrl(
-                      "https://www.fduhole.com/#/licence", context),
-                )
-              ],
-            ),
-            textField,
-            const Divider(),
-            LayoutGrid(
-              columnSizes: [auto, 1.fr, auto],
-              rowSizes: const [auto, auto, auto, auto],
-              children: [
-                Center(child: Text(S.of(context).curriculum_ratings_overall)),
-                RatingStarWidget(
-                  initialRating: review.grade.overall,
-                  onRate: (e) {
-                    review.grade = review.grade.withFields(overall: e);
-                    _ratingChangedStream.add(RatingChangedEvent(review.grade));
-                  },
-                ),
-                StreamBuilder(
-                    stream: _ratingChangedStream.stream,
-                    initialData: RatingChangedEvent(review.grade),
-                    builder: (ctx, snapshot) => RatingTextWidget(
-                        words: overallWord!,
-                        rating: snapshot.data!.newRating.overall ?? 0)),
-                Center(child: Text(S.of(context).curriculum_ratings_content)),
-                RatingStarWidget(
-                    initialRating: review.grade.content,
-                    onRate: (e) {
-                      review.grade = review.grade.withFields(content: e);
-                      _ratingChangedStream
-                          .add(RatingChangedEvent(review.grade));
-                    }),
-                StreamBuilder(
-                    stream: _ratingChangedStream.stream,
-                    initialData: RatingChangedEvent(review.grade),
-                    builder: (ctx, snapshot) => RatingTextWidget(
-                        words: contentWord!,
-                        rating: review.grade.content ?? 0)),
-                Center(child: Text(S.of(context).curriculum_ratings_workload)),
-                RatingStarWidget(
-                  initialRating: review.grade.workload,
-                  onRate: (e) {
-                    review.grade = review.grade.withFields(workload: e);
-                    _ratingChangedStream.add(RatingChangedEvent(review.grade));
-                  },
-                ),
-                StreamBuilder(
-                    stream: _ratingChangedStream.stream,
-                    initialData: RatingChangedEvent(review.grade),
-                    builder: (ctx, snapshot) => RatingTextWidget(
-                        words: workloadWord!,
-                        rating: review.grade.workload ?? 0)),
-                Center(
-                    child: Text(S.of(context).curriculum_ratings_assessment)),
-                RatingStarWidget(
-                  initialRating: review.grade.assessment,
-                  onRate: (e) {
-                    review.grade = review.grade.withFields(assessment: e);
-                    _ratingChangedStream.add(RatingChangedEvent(review.grade));
-                  },
-                ),
-                StreamBuilder(
-                    stream: _ratingChangedStream.stream,
-                    initialData: RatingChangedEvent(review.grade),
-                    builder: (ctx, snapshot) => RatingTextWidget(
-                        words: assessmentWord!,
-                        rating: review.grade.assessment ?? 0)),
-              ],
-            ),
-            const Divider(),
-            Text(S.of(context).preview,
-                style: TextStyle(color: Theme.of(context).hintColor)),
-            Padding(
-              padding: const EdgeInsets.only(top: 4.0),
-              child: ValueListenableBuilder<TextEditingValue>(
-                builder: (context, value, child) => smartRender(
-                    context, value.text, null, null, false,
-                    preview: true),
-                valueListenable: contentController,
-              ),
-            ),
-          ]),
-    );
+                                  child:
+                                      Text(e, overflow: TextOverflow.ellipsis)),
+                            )),
+                        Expanded(
+                            flex: 1,
+                            child: ValueListenableBuilder(
+                              builder: (context, value, child) =>
+                                  DropdownListWidget<Course>(
+                                      initialSelection: selectedCourse,
+                                      items: value == "*"
+                                          ? []
+                                          : widget.courseGroup.courseList!
+                                              .filter(
+                                                  (e) => e.teachers == value),
+                                      hintText:
+                                          S.of(context).curriculum_select_time,
+                                      labelText: S.of(context).course_schedule,
+                                      onChanged: (e) {
+                                        review.courseId = e!.id!;
+                                      },
+                                      itemBuilder: (e) => DropdownMenuItem(
+                                          value: e,
+                                          child: Text(e.formatTime(),
+                                              overflow:
+                                                  TextOverflow.ellipsis))),
+                              valueListenable: teacherFilterNotifier,
+                            )),
+                      ]),
+                    ),
+                    PlatformTextField(
+                      hintText: S.of(context).curriculum_enter_title,
+                      material: (_, __) => MaterialTextFieldData(
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder(gapPadding: 2.0))),
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 1,
+                      expands: false,
+                      autofocus: !widget.focusContent,
+                      textAlignVertical: TextAlignVertical.top,
+                      onChanged: (text) {
+                        review.title = text;
+                      },
+                      controller: titleController,
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildIntroButton(
+                            context,
+                            IconFont.markdown,
+                            S.of(context).markdown_enabled,
+                            S.of(context).markdown_description),
+                        _buildIntroButton(
+                            context,
+                            IconFont.tex,
+                            S.of(context).latex_enabled,
+                            S.of(context).latex_description),
+                        PlatformTextButton(
+                          child: Text(S.of(context).community_convention),
+                          onPressed: () => BrowserUtil.openUrl(
+                              "https://www.fduhole.com/#/licence", context),
+                        )
+                      ],
+                    ),
+                    textField,
+                    const Divider(),
+                    LayoutGrid(
+                      columnSizes: [auto, 1.fr, auto],
+                      rowSizes: const [auto, auto, auto, auto],
+                      children: [
+                        Center(
+                            child:
+                                Text(S.of(context).curriculum_ratings_overall)),
+                        RatingStarWidget(
+                          initialRating: review.grade.overall,
+                          onRate: (e) {
+                            final grade =
+                                Provider.of<CourseGrade>(ctx, listen: false);
+                            grade.overall = e;
+                            // Notify cache update
+                            review.grade = grade.clone();
+                          },
+                        ),
+                        Consumer<CourseGrade>(
+                            builder: (context, grade, child) =>
+                                RatingTextWidget(
+                                    words: overallWord!,
+                                    rating: grade.overall ?? 0)),
+                        Center(
+                            child:
+                                Text(S.of(context).curriculum_ratings_content)),
+                        RatingStarWidget(
+                            initialRating: review.grade.content,
+                            onRate: (e) {
+                              final grade =
+                                  Provider.of<CourseGrade>(ctx, listen: false);
+                              grade.content = e;
+                              // Notify cache update
+                              review.grade = grade.clone();
+                            }),
+                        Consumer<CourseGrade>(
+                            builder: (context, grade, child) =>
+                                RatingTextWidget(
+                                    words: contentWord!,
+                                    rating: grade.content ?? 0)),
+                        Center(
+                            child: Text(
+                                S.of(context).curriculum_ratings_workload)),
+                        RatingStarWidget(
+                          initialRating: review.grade.workload,
+                          onRate: (e) {
+                            final grade =
+                                Provider.of<CourseGrade>(ctx, listen: false);
+                            grade.workload = e;
+                            // Notify cache update
+                            review.grade = grade.clone();
+                          },
+                        ),
+                        Consumer<CourseGrade>(
+                            builder: (context, grade, child) =>
+                                RatingTextWidget(
+                                    words: workloadWord!,
+                                    rating: grade.workload ?? 0)),
+                        Center(
+                            child: Text(
+                                S.of(context).curriculum_ratings_assessment)),
+                        RatingStarWidget(
+                          initialRating: review.grade.assessment,
+                          onRate: (e) {
+                            final grade =
+                                Provider.of<CourseGrade>(ctx, listen: false);
+                            grade.assessment = e;
+                            // Notify cache update
+                            review.grade = grade.clone();
+                          },
+                        ),
+                        Consumer<CourseGrade>(
+                            builder: (context, grade, child) =>
+                                RatingTextWidget(
+                                    words: assessmentWord!,
+                                    rating: grade.assessment ?? 0)),
+                      ],
+                    ),
+                    const Divider(),
+                    Text(S.of(context).preview,
+                        style: TextStyle(color: Theme.of(context).hintColor)),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: ValueListenableBuilder<TextEditingValue>(
+                        builder: (context, value, child) => smartRender(
+                            context, value.text, null, null, false,
+                            preview: true),
+                        valueListenable: contentController,
+                      ),
+                    ),
+                  ]),
+            ));
   }
 }
 

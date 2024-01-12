@@ -15,8 +15,8 @@ CourseGrade _$CourseGradeFromJson(Map<String, dynamic> json) => CourseGrade(
 
 Map<String, dynamic> _$CourseGradeToJson(CourseGrade instance) =>
     <String, dynamic>{
-      'overall': instance.overall,
-      'content': instance.content,
-      'workload': instance.workload,
-      'assessment': instance.assessment,
+      'overall': instance._overall,
+      'content': instance._content,
+      'workload': instance._workload,
+      'assessment': instance._assessment,
     };
