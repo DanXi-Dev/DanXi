@@ -454,7 +454,7 @@ class ExamListState extends State<ExamList> {
                                   child: Text(
                                       _cachedScoreData!
                                           .firstWhere((element) =>
-                                              element.name == value.name)
+                                              element.id == value.id)
                                           .level,
                                       textScaleFactor: 1.2),
                                 ));
