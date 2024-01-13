@@ -135,7 +135,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
   }
 
-  /// Load the token from disk to the provider. It is a "minimal" initialization of the provider.
+  /// A "minimal" initialization of the provider.
+  ///
+  /// It loads the token from disk to the provider.
   ///
   /// If the token is not valid, it will throw a [NotLoginError].
   void initializeToken() {
@@ -146,6 +148,16 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
   }
 
+  /// A full initialization of the user data.
+  ///
+  /// It loads the token and user info which are shared across treehole and danke.
+  ///
+  /// It is used to provide user data for sections apart from treehole (specifically danke for now).
+  Future<void> initializeUser() async {
+    initializeToken();
+    if (provider.userInfo == null) await getUserProfile(forceUpdate: true);
+  }
+
   /// A "complete" initialization of the repository and provider.
   ///
   /// It loads the token, user info, divisions, and register the push notification token eagerly.
@@ -154,12 +166,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   ///
   /// We cache them all, so that one loading, everything done.
   Future<void> initializeRepo() async {
-    initializeToken();
+    initializeUser();
+
     try {
       FDUHolePlatformBridge.registerRemoteNotification();
     } catch (_) {}
 
-    if (provider.userInfo == null) await getUserProfile(forceUpdate: true);
     if (provider.divisionCache.isEmpty) await loadDivisions(useCache: false);
     if (_pushNotificationRegData != null) {
       // No need for [await] here, we can do this in the background
