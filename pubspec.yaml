@@ -119,6 +119,14 @@ dependency_overrides:
       path: bitsdojo_window_linux
       ref: master
 
+  # Temporary fixed version of bitsdojo_window_windows_v3.
+  # Should be removed if the fix is merged in the upstream.
+  # bitsdojo_window_windows_v3:
+  #  git:
+  #    url: https://github.com/HydrogenC/bitsdojo_window.git
+  #    path: bitsdojo_window_windows
+  #    ref: master
+
   # Temporary override version for flutter_progress_dialog.
   # Should be removed if the dependency is updated.
   flutter_platform_widgets: ^6.0.2

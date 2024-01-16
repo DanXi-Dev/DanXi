@@ -47,7 +47,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 enum FilterType { TEACHER_FILTER, TIME_FILTER }
 
 class RefreshFilterEvent {
-  // 0: Teacher filter, 1: Time filter
   final FilterType filterType;
   final String newFilter;
 
