@@ -22,17 +22,30 @@ import 'package:json_annotation/json_annotation.dart';
 part 'course_grade.g.dart';
 
 @JsonSerializable()
+class CourseGradeObject {
+  int? overall;
+
+  int? content;
+
+  int? workload;
+
+  int? assessment;
+
+  CourseGradeObject(this.overall, this.content, this.workload, this.assessment);
+
+  factory CourseGradeObject.fromJson(Map<String, dynamic> json) =>
+      _$CourseGradeObjectFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CourseGradeObjectToJson(this);
+}
+
 class CourseGrade with ChangeNotifier {
-  @JsonKey(name: 'overall')
   int? _overall;
 
-  @JsonKey(name: 'content')
   int? _content;
 
-  @JsonKey(name: 'workload')
   int? _workload;
 
-  @JsonKey(name: 'assessment')
   int? _assessment;
 
   int? get overall => _overall;
@@ -63,8 +76,7 @@ class CourseGrade with ChangeNotifier {
     notifyListeners();
   }
 
-  // Indicates the format of the grade,
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  // Indicates the format of the grade
   bool isClientFormat = false;
 
   CourseGrade(this._overall, this._content, this._workload, this._assessment,
@@ -79,8 +91,15 @@ class CourseGrade with ChangeNotifier {
         isClientFormat: !isClientFormat);
   }
 
-  factory CourseGrade.fromJson(Map<String, dynamic> json) =>
-      _$CourseGradeFromJson(json);
+  factory CourseGrade.fromJson(Map<String, dynamic> json) {
+    final obj = CourseGradeObject.fromJson(json);
+    return CourseGrade(obj.overall, obj.content, obj.workload, obj.assessment);
+  }
 
-  Map<String, dynamic> toJson() => _$CourseGradeToJson(this);
+  Map<String, dynamic> toJson() {
+    final raw = isClientFormat ? convertFormat() : this;
+    return CourseGradeObject(
+            raw.overall, raw.content, raw.workload, raw.assessment)
+        .toJson();
+  }
 }
