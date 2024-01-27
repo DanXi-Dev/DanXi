@@ -3,11 +3,12 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  bitsdojo_window_windows
+  bitsdojo_window_windows_v3
   desktop_window
   file_selector_windows
   flutter_js
   flutter_secure_storage_windows
+  gal
   permission_handler_windows
   platform_device_id_windows
   screen_brightness_windows

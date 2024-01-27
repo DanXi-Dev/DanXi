@@ -40,6 +40,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 
 typedef PostInterceptor = Future<bool> Function(
     BuildContext context, CourseReviewEditorText? text);
@@ -80,24 +81,28 @@ class CourseReviewEditorText with ChangeNotifier {
   String? _content, _title;
 
   int get courseId => _courseId;
+
   set courseId(int val) {
     _courseId = val;
     notifyListeners();
   }
 
   CourseGrade get grade => _grade;
+
   set grade(CourseGrade val) {
     _grade = val;
     notifyListeners();
   }
 
   String? get content => _content;
+
   set content(String? val) {
     _content = val;
     notifyListeners();
   }
 
   String? get title => _title;
+
   set title(String? val) {
     _title = val;
     notifyListeners();
@@ -231,12 +236,11 @@ class CourseReviewEditorWidget extends StatefulWidget {
   final CourseReviewEditorText review;
 
   const CourseReviewEditorWidget(
-      {Key? key,
+      {super.key,
       this.fullscreen = false,
       required this.courseGroup,
       required this.review,
-      this.focusContent = false})
-      : super(key: key);
+      this.focusContent = false});
 
   final CourseGroup courseGroup;
 
@@ -298,6 +302,11 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
               }));
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final Widget textField = PlatformTextField(
       hintText: S.of(context).curriculum_enter_content,
@@ -329,141 +338,184 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
       teacherFilterNotifier.value = selectedCourse.teachers!;
     }
 
-    return SingleChildScrollView(
-      child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(widget.courseGroup.code!,
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                    fontSize: 20)),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(children: [
-                Expanded(
-                    flex: 1,
-                    child: DropdownListWidget(
-                      initialSelection: selectedCourse?.teachers,
-                      items: widget.courseGroup.courseList!
-                          .map((e) => e.teachers!)
-                          .toSet()
-                          .toList(),
-                      hintText: S.of(context).curriculum_select_teacher,
-                      labelText: S.of(context).course_teacher_name,
-                      onChanged: (e) {
-                        teacherFilterNotifier.value = e!;
-                      },
-                      itemBuilder: (e) => DropdownMenuItem(
-                          value: e,
-                          child: Text(e, overflow: TextOverflow.ellipsis)),
-                    )),
-                Expanded(
-                    flex: 1,
-                    child: ValueListenableBuilder(
-                      builder: (context, value, child) =>
-                          DropdownListWidget<Course>(
-                              initialSelection: selectedCourse,
-                              items: value == "*"
-                                  ? []
-                                  : widget.courseGroup.courseList!
-                                      .filter((e) => e.teachers == value),
-                              hintText: S.of(context).curriculum_select_time,
-                              labelText: S.of(context).course_schedule,
-                              onChanged: (e) {
-                                review.courseId = e!.id!;
-                              },
-                              itemBuilder: (e) => DropdownMenuItem(
-                                  value: e,
-                                  child: Text(e.formatTime(),
-                                      overflow: TextOverflow.ellipsis))),
-                      valueListenable: teacherFilterNotifier,
-                    )),
-              ]),
-            ),
-            PlatformTextField(
-              hintText: S.of(context).curriculum_enter_title,
-              material: (_, __) => MaterialTextFieldData(
-                  decoration: const InputDecoration(
-                      border: OutlineInputBorder(gapPadding: 2.0))),
-              keyboardType: TextInputType.multiline,
-              maxLines: 1,
-              expands: false,
-              autofocus: !widget.focusContent,
-              textAlignVertical: TextAlignVertical.top,
-              onChanged: (text) {
-                review.title = text;
-              },
-              controller: titleController,
-            ),
-            Row(
+    return ChangeNotifierProvider(
+        create: (_) => review.grade.clone(),
+        child: SingleChildScrollView(
+          child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildIntroButton(
-                    context,
-                    IconFont.markdown,
-                    S.of(context).markdown_enabled,
-                    S.of(context).markdown_description),
-                _buildIntroButton(
-                    context,
-                    IconFont.tex,
-                    S.of(context).latex_enabled,
-                    S.of(context).latex_description),
-                PlatformTextButton(
-                  child: Text(S.of(context).community_convention),
-                  onPressed: () => BrowserUtil.openUrl(
-                      "https://www.fduhole.com/#/licence", context),
-                )
-              ],
-            ),
-            textField,
-            const Divider(),
-            CourseRatingWidget(
-              label: S.of(context).curriculum_ratings_overall,
-              words: overallWord!,
-              initialRating: review.grade.overall,
-              onRate: (e) {
-                review.grade = review.grade.withFields(overall: e);
-              },
-            ),
-            CourseRatingWidget(
-                label: S.of(context).curriculum_ratings_content,
-                words: contentWord!,
-                initialRating: review.grade.content,
-                onRate: (e) {
-                  review.grade = review.grade.withFields(content: e);
-                }),
-            CourseRatingWidget(
-              label: S.of(context).curriculum_ratings_workload,
-              words: workloadWord!,
-              initialRating: review.grade.workload,
-              onRate: (e) {
-                review.grade = review.grade.withFields(workload: e);
-              },
-            ),
-            CourseRatingWidget(
-              label: S.of(context).curriculum_ratings_assessment,
-              words: assessmentWord!,
-              initialRating: review.grade.assessment,
-              onRate: (e) {
-                review.grade = review.grade.withFields(assessment: e);
-              },
-            ),
-            const Divider(),
-            Text(S.of(context).preview,
-                style: TextStyle(color: Theme.of(context).hintColor)),
-            Padding(
-              padding: const EdgeInsets.only(top: 4.0),
-              child: ValueListenableBuilder<TextEditingValue>(
-                builder: (context, value, child) => smartRender(
-                    context, value.text, null, null, false,
-                    preview: true),
-                valueListenable: contentController,
-              ),
-            ),
-          ]),
-    );
+                Text(widget.courseGroup.code!,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                        fontSize: 20)),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(children: [
+                    Expanded(
+                        flex: 1,
+                        child: DropdownListWidget(
+                          initialSelection: selectedCourse?.teachers,
+                          items: widget.courseGroup.courseList!
+                              .map((e) => e.teachers!)
+                              .toSet()
+                              .toList(),
+                          hintText: S.of(context).curriculum_select_teacher,
+                          labelText: S.of(context).course_teacher_name,
+                          onChanged: (e) {
+                            teacherFilterNotifier.value = e!;
+                          },
+                          itemBuilder: (e) => DropdownMenuItem(
+                              value: e,
+                              child: Text(e, overflow: TextOverflow.ellipsis)),
+                        )),
+                    Expanded(
+                        flex: 1,
+                        child: ValueListenableBuilder(
+                          builder: (context, value, child) =>
+                              DropdownListWidget<Course>(
+                                  initialSelection: selectedCourse,
+                                  items: value == "*"
+                                      ? []
+                                      : widget.courseGroup.courseList!
+                                          .filter((e) => e.teachers == value),
+                                  hintText:
+                                      S.of(context).curriculum_select_time,
+                                  labelText: S.of(context).course_schedule,
+                                  onChanged: (e) {
+                                    review.courseId = e!.id!;
+                                  },
+                                  itemBuilder: (e) => DropdownMenuItem(
+                                      value: e,
+                                      child: Text(e.formatTime(),
+                                          overflow: TextOverflow.ellipsis))),
+                          valueListenable: teacherFilterNotifier,
+                        )),
+                  ]),
+                ),
+                PlatformTextField(
+                  hintText: S.of(context).curriculum_enter_title,
+                  material: (_, __) => MaterialTextFieldData(
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(gapPadding: 2.0))),
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 1,
+                  expands: false,
+                  autofocus: !widget.focusContent,
+                  textAlignVertical: TextAlignVertical.top,
+                  onChanged: (text) {
+                    review.title = text;
+                  },
+                  controller: titleController,
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildIntroButton(
+                        context,
+                        IconFont.markdown,
+                        S.of(context).markdown_enabled,
+                        S.of(context).markdown_description),
+                    _buildIntroButton(
+                        context,
+                        IconFont.tex,
+                        S.of(context).latex_enabled,
+                        S.of(context).latex_description),
+                    PlatformTextButton(
+                      child: Text(S.of(context).community_convention),
+                      onPressed: () => BrowserUtil.openUrl(
+                          "https://www.fduhole.com/#/licence", context),
+                    )
+                  ],
+                ),
+                textField,
+                const Divider(),
+                LayoutGrid(
+                  columnSizes: [auto, 1.fr, auto],
+                  rowSizes: const [auto, auto, auto, auto],
+                  children: [
+                    Center(
+                        child: Text(S.of(context).curriculum_ratings_overall)),
+                    Builder(
+                        builder: (ctx) => RatingStarWidget(
+                              initialRating: review.grade.overall,
+                              onRate: (e) {
+                                final grade = Provider.of<CourseGrade>(ctx,
+                                    listen: false);
+                                grade.overall = e;
+                                // Notify cache update
+                                review.grade = grade.clone();
+                              },
+                            )),
+                    Consumer<CourseGrade>(
+                        builder: (ctx, grade, _) => RatingTextWidget(
+                            words: overallWord!, rating: grade.overall ?? 0)),
+                    Center(
+                        child: Text(S.of(context).curriculum_ratings_content)),
+                    Builder(
+                        builder: (ctx) => RatingStarWidget(
+                            initialRating: review.grade.content,
+                            onRate: (e) {
+                              final grade =
+                                  Provider.of<CourseGrade>(ctx, listen: false);
+                              grade.content = e;
+                              // Notify cache update
+                              review.grade = grade.clone();
+                            })),
+                    Consumer<CourseGrade>(
+                        builder: (ctx, grade, _) => RatingTextWidget(
+                            words: contentWord!, rating: grade.content ?? 0)),
+                    Center(
+                        child: Text(S.of(context).curriculum_ratings_workload)),
+                    Builder(
+                        builder: (ctx) => RatingStarWidget(
+                              initialRating: review.grade.workload,
+                              onRate: (e) {
+                                final grade = Provider.of<CourseGrade>(ctx,
+                                    listen: false);
+                                grade.workload = e;
+                                // Notify cache update
+                                review.grade = grade.clone();
+                              },
+                            )),
+                    Consumer<CourseGrade>(
+                        builder: (ctx, grade, _) => RatingTextWidget(
+                            words: workloadWord!, rating: grade.workload ?? 0)),
+                    Center(
+                        child:
+                            Text(S.of(context).curriculum_ratings_assessment)),
+                    Builder(
+                        builder: (ctx) => RatingStarWidget(
+                              initialRating: review.grade.assessment,
+                              onRate: (e) {
+                                final grade = Provider.of<CourseGrade>(ctx,
+                                    listen: false);
+                                grade.assessment = e;
+                                // Notify cache update
+                                review.grade = grade.clone();
+                              },
+                            )),
+                    Consumer<CourseGrade>(
+                        builder: (ctx, grade, _) => RatingTextWidget(
+                            words: assessmentWord!,
+                            rating: grade.assessment ?? 0)),
+                  ],
+                ),
+                const Divider(),
+                Text(S.of(context).preview,
+                    style: TextStyle(color: Theme.of(context).hintColor)),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: ValueListenableBuilder<TextEditingValue>(
+                    builder: (context, value, child) => smartRender(
+                        context, value.text, null, null, false,
+                        preview: true),
+                    valueListenable: contentController,
+                  ),
+                ),
+              ]),
+        ));
   }
 }
 
@@ -539,24 +591,17 @@ class DropdownListWidgetState<T> extends State<DropdownListWidget<T>> {
   }
 }
 
-class CourseRatingWidget extends StatefulWidget {
+class RatingStarWidget extends StatefulWidget {
   final void Function(int) onRate;
-  final String label;
-  final List<String> words;
   final int? initialRating;
 
-  const CourseRatingWidget(
-      {super.key,
-      required this.label,
-      required this.onRate,
-      required this.words,
-      this.initialRating});
+  const RatingStarWidget({super.key, required this.onRate, this.initialRating});
 
   @override
-  CourseRatingWidgetState createState() => CourseRatingWidgetState();
+  RatingStarWidgetState createState() => RatingStarWidgetState();
 }
 
-class CourseRatingWidgetState extends State<CourseRatingWidget> {
+class RatingStarWidgetState extends State<RatingStarWidget> {
   int rating = 0;
 
   @override
@@ -566,7 +611,7 @@ class CourseRatingWidgetState extends State<CourseRatingWidget> {
   }
 
   @override
-  void didUpdateWidget(covariant CourseRatingWidget oldWidget) {
+  void didUpdateWidget(covariant RatingStarWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     rating = widget.initialRating ?? rating;
   }
@@ -578,31 +623,44 @@ class CourseRatingWidgetState extends State<CourseRatingWidget> {
         : Theme.of(context).textTheme.bodyLarge!.color;
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          const Spacer(),
+          Row(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(width: 88, child: Text(widget.label)),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: List.generate(
-                    5,
-                    (index) => IconButton(
-                        constraints: BoxConstraints.loose(const Size(32, 32)),
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          setState(() {
-                            rating = index + 1;
-                          });
-                          widget.onRate(rating);
-                        },
-                        icon: Icon(
-                            index < rating ? Icons.star : Icons.star_border,
-                            color: mainColor))),
-              ),
-              const SizedBox(width: 10),
-              Text(rating > 0 ? widget.words[rating - 1] : "",
-                  style: TextStyle(color: mainColor))
-            ]));
+            children: List.generate(
+                5,
+                (index) => IconButton(
+                    constraints: BoxConstraints.loose(const Size(32, 32)),
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      setState(() {
+                        rating = index + 1;
+                      });
+                      widget.onRate(rating);
+                    },
+                    icon: Icon(index < rating ? Icons.star : Icons.star_border,
+                        color: mainColor))),
+          ),
+          const SizedBox(width: 8),
+        ]));
+  }
+}
+
+class RatingTextWidget extends StatelessWidget {
+  final List<String> words;
+  final int rating;
+
+  const RatingTextWidget(
+      {super.key, required this.words, required this.rating});
+
+  @override
+  Widget build(BuildContext context) {
+    var mainColor = rating > 0
+        ? wordColor[rating - 1]
+        : Theme.of(context).textTheme.bodyLarge!.color;
+    return Center(
+        child: Text(rating > 0 ? words[rating - 1] : "",
+            style: TextStyle(color: mainColor)));
   }
 }
 
@@ -617,7 +675,7 @@ class CourseRatingWidgetState extends State<CourseRatingWidget> {
 class CourseReviewEditorPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const CourseReviewEditorPage({Key? key, this.arguments}) : super(key: key);
+  const CourseReviewEditorPage({super.key, this.arguments});
 
   @override
   CourseReviewEditorPageState createState() => CourseReviewEditorPageState();

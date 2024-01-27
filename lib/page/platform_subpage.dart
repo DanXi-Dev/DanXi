@@ -31,7 +31,7 @@ import 'package:provider/provider.dart';
 /// Note: a [PlatformSubpage] must have a parent widget [PageWithTab]. Otherwise, it will
 /// suppose that it is NOT in a tab page, and functions like a empty [Container].
 abstract class PlatformSubpage<T> extends StatefulWidget {
-  const PlatformSubpage({Key? key}) : super(key: key);
+  const PlatformSubpage({super.key});
 
   Create<Widget> get title;
 
@@ -50,7 +50,7 @@ abstract class PlatformSubpage<T> extends StatefulWidget {
 class PageWithTab extends StatelessWidget {
   final Widget child;
 
-  const PageWithTab({Key? key, required this.child}) : super(key: key);
+  const PageWithTab({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) => child;

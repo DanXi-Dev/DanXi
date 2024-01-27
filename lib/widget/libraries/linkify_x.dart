@@ -25,44 +25,29 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 /// have to create a new class to override it.
 class LinkifyX extends Linkify {
   const LinkifyX({
-    Key? key,
-    required String text,
-    void Function(LinkableElement)? onOpen,
-    TextAlign textAlign = TextAlign.start,
-    double textScaleFactor = 1.0,
-    int? maxLines,
-    TextOverflow overflow = TextOverflow.clip,
-    TextStyle? style,
+    super.key,
+    required super.text,
+    super.onOpen,
+    super.textAlign,
+    super.textScaleFactor,
+    super.maxLines,
+    TextOverflow super.overflow,
+    super.style,
   }) : super(
-          key: key,
-          text: text,
           linkStyle: Constant.LINKIFY_THEME,
-          onOpen: onOpen,
-          textAlign: textAlign,
-          textScaleFactor: textScaleFactor,
-          maxLines: maxLines,
-          overflow: overflow,
-          style: style,
         );
 }
 
 class SelectableLinkifyX extends SelectableLinkify {
   const SelectableLinkifyX({
-    Key? key,
-    required String text,
-    void Function(LinkableElement)? onOpen,
-    TextAlign textAlign = TextAlign.start,
-    double textScaleFactor = 1.0,
-    int? maxLines,
-    TextStyle? style,
+    super.key,
+    required super.text,
+    super.onOpen,
+    TextAlign super.textAlign = TextAlign.start,
+    super.textScaleFactor,
+    super.maxLines,
+    super.style,
   }) : super(
-          key: key,
-          text: text,
           linkStyle: Constant.LINKIFY_THEME,
-          onOpen: onOpen,
-          textAlign: textAlign,
-          textScaleFactor: textScaleFactor,
-          maxLines: maxLines,
-          style: style,
         );
 }

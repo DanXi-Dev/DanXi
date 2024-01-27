@@ -159,9 +159,8 @@ class FlutterTagging<T extends Taggable> extends StatefulWidget {
       this.animationDuration = const Duration(milliseconds: 500),
       this.animationStart = 0.25,
       this.onAdded,
-      Key? key,
-      this.customChipBuilder})
-      : super(key: key);
+      super.key,
+      this.customChipBuilder});
 
   @override
   FlutterTaggingState<T> createState() => FlutterTaggingState<T>();
@@ -194,6 +193,7 @@ class FlutterTaggingState<T extends Taggable> extends State<FlutterTagging<T>> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         TypeAheadField<T>(
+          ignoreAccessibleNavigation: true,
           getImmediateSuggestions: widget.enableImmediateSuggestion,
           debounceDuration: widget.debounceDuration,
           hideOnEmpty: widget.hideOnEmpty,

@@ -53,6 +53,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -75,7 +76,7 @@ class SettingsSubpage extends PlatformSubpage<SettingsSubpage> {
   @override
   SettingsSubpageState createState() => SettingsSubpageState();
 
-  const SettingsSubpage({Key? key}) : super(key: key);
+  const SettingsSubpage({super.key});
 
   @override
   Create<Widget> get title => (cxt) => Text(S.of(cxt).settings);
@@ -1012,23 +1013,12 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       ),
                       Divider(color: originalDividerColor),
                       const SizedBox(height: 4),
-                      Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: developersIcons.sublist(
-                                      0, (developersIcons.length + 1) ~/ 2)),
-                            ),
-                            Expanded(
-                                child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: developersIcons
-                                  .sublist((developersIcons.length + 1) ~/ 2),
-                            )),
-                          ]),
+                      LayoutGrid(
+                        columnSizes: [1.fr, 1.fr],
+                        rowSizes: List.filled(
+                            (developersIcons.length + 1) ~/ 2, auto),
+                        children: developersIcons,
+                      ),
                       const SizedBox(height: 16),
                       //Version
                       Align(
@@ -1132,7 +1122,7 @@ class Developer {
 }
 
 class OTNotificationSettingsWidget extends StatefulWidget {
-  const OTNotificationSettingsWidget({Key? key}) : super(key: key);
+  const OTNotificationSettingsWidget({super.key});
 
   @override
   State<OTNotificationSettingsWidget> createState() =>
@@ -1180,8 +1170,7 @@ class _OTNotificationSettingsWidgetState
 class OTNotificationSettingsTile extends StatelessWidget {
   final void Function() onSettingsUpdate;
 
-  const OTNotificationSettingsTile({Key? key, required this.onSettingsUpdate})
-      : super(key: key);
+  const OTNotificationSettingsTile({super.key, required this.onSettingsUpdate});
 
   String _generateNotificationSettingsSummary(
       BuildContext context, List<String>? data) {

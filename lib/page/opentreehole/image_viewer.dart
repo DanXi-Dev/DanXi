@@ -30,7 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/src/cache_managers/default_cache_manager.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:gallery_saver/gallery_saver.dart';
+import 'package:gal/gal.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:share_plus/share_plus.dart';
@@ -68,9 +68,8 @@ class ImageViewerPage extends StatefulWidget {
   @override
   ImageViewerPageState createState() => ImageViewerPageState();
 
-  ImageViewerPage({Key? key, this.arguments})
-      : assert(arguments == null || arguments['hd_url'] != null),
-        super(key: key);
+  ImageViewerPage({super.key, this.arguments})
+      : assert(arguments == null || arguments['hd_url'] != null);
 
   static bool isImage(String url) {
     if (url.isEmpty || Uri.tryParse(url) == null) return false;
@@ -171,13 +170,13 @@ class ImageViewerPageState extends State<ImageViewerPage> {
       // Attach an extension name for the picture file
       File tempFileWithExtName = await image.copy(image.absolute.path +
           (_guessExtensionNameFromUrl(_imageList[showIndex].hdUrl) ?? ""));
-      bool? result;
+      bool result = false;
       try {
-        result =
-            await GallerySaver.saveImage(tempFileWithExtName.absolute.path);
+        await Gal.putImage(tempFileWithExtName.absolute.path);
+        result = true;
       } catch (_) {}
       if (!mounted) return;
-      if (result != null && result) {
+      if (result) {
         Noticing.showNotice(context, S.of(context).image_save_success);
       } else {
         Noticing.showNotice(context, S.of(context).image_save_failed);
@@ -294,8 +293,7 @@ class ImageViewerBodyView extends StatefulWidget {
   final ImageUrlInfo imageInfo;
   final Object? heroTag;
 
-  const ImageViewerBodyView({Key? key, required this.imageInfo, this.heroTag})
-      : super(key: key);
+  const ImageViewerBodyView({super.key, required this.imageInfo, this.heroTag});
 
   @override
   ImageViewerBodyViewState createState() => ImageViewerBodyViewState();

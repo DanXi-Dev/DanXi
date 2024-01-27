@@ -46,7 +46,7 @@ class EmptyClassroomDetailPage extends StatefulWidget {
   EmptyClassroomDetailPageState createState() =>
       EmptyClassroomDetailPageState();
 
-  const EmptyClassroomDetailPage({Key? key, this.arguments}) : super(key: key);
+  const EmptyClassroomDetailPage({super.key, this.arguments});
 }
 
 class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {

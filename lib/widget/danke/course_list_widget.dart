@@ -34,7 +34,7 @@ class CourseListWidget extends StatefulWidget {
 
   final String? searchKeyword;
 
-  const CourseListWidget({Key? key, this.searchKeyword}) : super(key: key);
+  const CourseListWidget({super.key, this.searchKeyword});
 }
 
 class CourseListWidgetState extends State<CourseListWidget> {

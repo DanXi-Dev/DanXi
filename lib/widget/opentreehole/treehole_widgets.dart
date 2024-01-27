@@ -73,8 +73,7 @@ class OTLeadingTag extends StatelessWidget {
   final Color color;
   final String text;
 
-  const OTLeadingTag({Key? key, required this.color, this.text = "DZ"})
-      : super(key: key);
+  const OTLeadingTag({super.key, required this.color, this.text = "DZ"});
 
   @override
   Widget build(BuildContext context) {
@@ -128,12 +127,11 @@ class OTHoleWidget extends StatelessWidget {
   final bool isFolded;
 
   const OTHoleWidget(
-      {Key? key,
+      {super.key,
       required this.postElement,
       this.translucent = false,
       this.isPinned = false,
-      this.isFolded = false})
-      : super(key: key);
+      this.isFolded = false});
 
   @override
   Widget build(BuildContext context) {
@@ -349,7 +347,7 @@ class OTFloorWidget extends StatelessWidget {
   final String? searchKeyWord;
 
   const OTFloorWidget({
-    Key? key,
+    super.key,
     required this.floor,
     this.isInMention = false,
     this.showBottomBar = true,
@@ -360,7 +358,7 @@ class OTFloorWidget extends StatelessWidget {
     required this.hasBackgroundImage,
     this.onTapImage,
     this.searchKeyWord,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -561,12 +559,12 @@ class OTMentionPreviewWidget extends StatefulWidget {
   final bool hasBackgroundImage;
 
   const OTMentionPreviewWidget({
-    Key? key,
+    super.key,
     required this.id,
     required this.type,
     this.showBottomBar = false,
     required this.hasBackgroundImage,
-  }) : super(key: key);
+  });
 
   @override
   OTMentionPreviewWidgetState createState() => OTMentionPreviewWidgetState();
@@ -612,11 +610,11 @@ class OTFloorMentionWidget extends StatelessWidget {
   final bool hasBackgroundImage;
 
   const OTFloorMentionWidget({
-    Key? key,
+    super.key,
     required this.future,
     this.showBottomBar = false,
     required this.hasBackgroundImage,
-  }) : super(key: key);
+  });
 
   static Future<bool?> showFloorDetail(BuildContext context, OTFloor floor,
       [String? extraTips]) {
@@ -759,8 +757,7 @@ class OTFloorWidgetBottomBar extends StatefulWidget {
   final int? index;
 
   const OTFloorWidgetBottomBar(
-      {Key? key, required this.floor, required this.index})
-      : super(key: key);
+      {super.key, required this.floor, required this.index});
 
   @override
   OTFloorWidgetBottomBarState createState() => OTFloorWidgetBottomBarState();
@@ -983,8 +980,7 @@ class OTFloorWidgetBottomBarButton extends StatelessWidget {
   final Icon icon;
 
   const OTFloorWidgetBottomBarButton(
-      {Key? key, this.onTap, required this.text, required this.icon})
-      : super(key: key);
+      {super.key, this.onTap, required this.text, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -1013,7 +1009,7 @@ class OTFloorWidgetBottomBarButton extends StatelessWidget {
 class OTMessageItem extends StatefulWidget {
   final OTMessage message;
 
-  const OTMessageItem({Key? key, required this.message}) : super(key: key);
+  const OTMessageItem({super.key, required this.message});
 
   static Future<void> markMessageAsRead(OTMessage message) async {
     if (message.has_read == true) return;

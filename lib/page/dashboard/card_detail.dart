@@ -39,7 +39,7 @@ class CardDetailPage extends StatefulWidget {
   @override
   CardDetailPageState createState() => CardDetailPageState();
 
-  const CardDetailPage({Key? key, this.arguments}) : super(key: key);
+  const CardDetailPage({super.key, this.arguments});
 }
 
 class CardDetailPageState extends State<CardDetailPage> {

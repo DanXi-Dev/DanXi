@@ -3,7 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  bitsdojo_window_linux
+  bitsdojo_window_linux_v3
   desktop_window
   file_selector_linux
   flutter_js

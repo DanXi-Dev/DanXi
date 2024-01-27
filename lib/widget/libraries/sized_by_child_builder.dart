@@ -25,8 +25,7 @@ class SizedByChildBuilder extends StatefulWidget {
   final Widget Function(BuildContext, Size) builder;
 
   const SizedByChildBuilder(
-      {Key? key, required this.child, required this.builder})
-      : super(key: key);
+      {super.key, required this.child, required this.builder});
 
   @override
   State<SizedByChildBuilder> createState() => _SizedByChildBuilderState();

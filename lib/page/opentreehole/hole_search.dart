@@ -41,7 +41,7 @@ import 'package:provider/provider.dart';
 class OTSearchPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const OTSearchPage({Key? key, this.arguments}) : super(key: key);
+  const OTSearchPage({super.key, this.arguments});
 
   @override
   State<OTSearchPage> createState() => _OTSearchPageState();

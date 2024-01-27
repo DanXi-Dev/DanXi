@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 
 class MySlideTransition extends AnimatedWidget {
   const MySlideTransition({
-    Key? key,
+    super.key,
     required Animation<Offset> position,
     this.transformHitTests = true,
     required this.child,
-  }) : super(key: key, listenable: position);
+  }) : super(listenable: position);
 
   Animation<Offset> get position => listenable as Animation<Offset>;
   final bool transformHitTests;

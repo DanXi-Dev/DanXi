@@ -27,7 +27,7 @@ class GpaTablePage extends StatefulWidget {
   @override
   GpaTablePageState createState() => GpaTablePageState();
 
-  const GpaTablePage({Key? key, this.arguments}) : super(key: key);
+  const GpaTablePage({super.key, this.arguments});
 }
 
 class GpaTablePageState extends State<GpaTablePage> {

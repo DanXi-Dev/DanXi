@@ -8,7 +8,7 @@
   
   MIT License
   
-  Copyright (c) 2023 Plague Fox
+  Copyright (c) 2024 Plague Fox
   
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'338'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1700069432;
+const int timestamp = 1704437052;
 
 /// Name [name]
 const String name = r'dan_xi';
@@ -113,7 +113,6 @@ const Map<String, Object> dependencies = <String, Object>{
   'qr_flutter': r'^4.0.0',
   'provider': r'^6.0.5',
   'event_bus': r'^2.0.0',
-  'flutter_platform_widgets': r'^3.0.0',
   'share_plus': r'^7.0.2',
   'path_provider': r'^2.0.9',
   'screen_brightness': r'^0.2.1',
@@ -128,7 +127,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'url_launcher': r'^6.1.12',
   'uni_links': r'^0.5.1',
   'desktop_window': r'^0.4.0',
-  'http': r'^0.13.4',
+  'http': r'^1.0.0',
   'dio': r'^4.0.6',
   'shared_preferences': r'^2.0.15',
   'flutter_phoenix': r'^1.0.0',
@@ -136,7 +135,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'image_picker': r'^1.0.0',
   'clipboard': r'^0.1.3',
   'flutter_inappwebview': r'^5.3.2',
-  'permission_handler': r'^10.2.0',
+  'permission_handler': r'^11.0.1',
   'in_app_review': r'^2.0.4',
   'flutter_linkify': r'^6.0.0',
   'linkify': r'^4.0.0',
@@ -148,7 +147,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'dio_log': r'^2.0.2',
   'json_serializable': r'^6.2.0',
   'photo_view': r'^0.14.0',
-  'gallery_saver': r'^2.3.2',
+  'gal': r'^2.1.2',
   'flutter_markdown': <String, Object>{
     'git': <String, Object>{
       'url': r'https://github.com/singularity-s0/flutter_markdown_selectable.git',
@@ -161,22 +160,16 @@ const Map<String, Object> dependencies = <String, Object>{
       'ref': r'main',
     },
   },
-  'bitsdojo_window': <String, Object>{
-    'git': <String, Object>{
-      'url': r'https://github.com/DartGit-dev/bitsdojo_window.git',
-      'path': r'bitsdojo_window',
-      'ref': r'master',
-    },
-  },
+  'bitsdojo_window_v3': r'^3.0.0',
   'win32': r'^5.0.2',
-  'file_picker': r'^5.3.2',
+  'file_picker': r'^6.0.0',
   'cached_network_image': r'^3.2.1',
-  'flutter_typeahead': r'^4.3.3',
+  'flutter_typeahead': r'^4.8.0',
   'collection': r'>=1.15.0 <2.0.0',
   'meta': r'>=1.3.0 <2.0.0',
   'flutter_layout_grid': r'^2.0.1',
-  'flutter_js': r'^0.7.0',
-  'flutter_math_fork': r'^0.7.1',
+  'flutter_js': r'^0.8.0',
+  'flutter_math_fork': r'^0.7.2',
   'platform_device_id': r'^1.0.1',
   'uuid': r'^3.0.6',
   'screen_capture_event': r'^1.0.0+1',
@@ -205,12 +198,12 @@ const Map<String, Object> dependencies = <String, Object>{
 /// Developer dependencies
 const Map<String, Object> devDependencies = <String, Object>{
   'build_runner': r'^2.1.2',
-  'pubspec_generator': r'^3.0.1',
+  'pubspec_generator': r'^3.0.0',
   'flutter_test': <String, Object>{
     'sdk': r'flutter',
   },
-  'flutter_lints': r'^2.0.1',
-  'intl_utils': r'^2.8.3',
+  'flutter_lints': r'^3.0.0',
+  'intl_utils': r'^2.8.5',
 };
 
 /// Dependency overrides
@@ -228,34 +221,14 @@ const Map<String, Object> dependencyOverrides = <String, Object>{
       'ref': r'master',
     },
   },
-  'bitsdojo_window_platform_interface': <String, Object>{
+  'bitsdojo_window_linux_v3': <String, Object>{
     'git': <String, Object>{
-      'url': r'https://github.com/DartGit-dev/bitsdojo_window.git',
-      'path': r'bitsdojo_window_platform_interface',
-      'ref': r'master',
-    },
-  },
-  'bitsdojo_window_windows': <String, Object>{
-    'git': <String, Object>{
-      'url': r'https://github.com/DartGit-dev/bitsdojo_window.git',
-      'path': r'bitsdojo_window_windows',
-      'ref': r'master',
-    },
-  },
-  'bitsdojo_window_macos': <String, Object>{
-    'git': <String, Object>{
-      'url': r'https://github.com/DartGit-dev/bitsdojo_window.git',
-      'path': r'bitsdojo_window_macos',
-      'ref': r'master',
-    },
-  },
-  'bitsdojo_window_linux': <String, Object>{
-    'git': <String, Object>{
-      'url': r'https://github.com/DartGit-dev/bitsdojo_window.git',
+      'url': r'https://github.com/w568w/bitsdojo_window.git',
       'path': r'bitsdojo_window_linux',
       'ref': r'master',
     },
   },
+  'flutter_platform_widgets': r'^6.0.2',
 };
 
 /// Executables

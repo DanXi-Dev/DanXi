@@ -29,15 +29,14 @@ class SlimMaterialBanner extends StatelessWidget {
   final bool dismissible;
 
   const SlimMaterialBanner(
-      {Key? key,
+      {super.key,
       this.icon,
       required this.title,
       this.actionName,
       this.onTapAction,
       this.dismissible = false,
       this.onDismissed})
-      : assert(!dismissible || key != null),
-        super(key: key);
+      : assert(!dismissible || key != null);
 
   @override
   Widget build(BuildContext context) {

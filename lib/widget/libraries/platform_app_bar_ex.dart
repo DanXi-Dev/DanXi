@@ -51,7 +51,7 @@ class PlatformAppBarX extends PlatformAppBar {
   final PlatformBuilder<CupertinoNavigationBarData>? cupertino;
 
   PlatformAppBarX({
-    Key? key,
+    super.key,
     this.widgetKey,
     this.title,
     this.backgroundColor,
@@ -60,7 +60,7 @@ class PlatformAppBarX extends PlatformAppBar {
     this.automaticallyImplyLeading,
     this.material,
     this.cupertino,
-  }) : super(key: key);
+  });
 
   @override
   PreferredSizeWidget createMaterialWidget(BuildContext context) {
