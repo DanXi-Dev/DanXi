@@ -88,16 +88,16 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     LicenseItem("asn1lib", LICENSE_BSD, "https://github.com/wstrange/asn1lib"),
     LicenseItem("cached_network_image", LICENSE_MIT,
         "https://github.com/Baseflow/flutter_cached_network_image"),
-    LicenseItem(
-        "system_tray", LICENSE_MIT, "https://github.com/antler119/system_tray"),
+    LicenseItem("tray_manager", LICENSE_MIT,
+        "https://github.com/leanflutter/tray_manager"),
     LicenseItem(
         "win32", LICENSE_BSD_3_0_CLAUSE, "https://github.com/timsneath/win32"),
     LicenseItem("collection", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/dart-lang/collection"),
     LicenseItem(
         "meta", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dart-lang/sdk"),
-    LicenseItem("bitsdojo_window", LICENSE_MIT,
-        "https://github.com/bitsdojo/bitsdojo_window"),
+    LicenseItem("bitsdojo_window_v3", LICENSE_MIT,
+        "https://github.com/DartGit-dev/bitsdojo_window"),
     LicenseItem("flutter_layout_grid", LICENSE_MIT,
         "https://github.com/madewithfelt/flutter_layout_grid"),
     LicenseItem(
@@ -225,8 +225,18 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
         "https://github.com/berkanaslan/material-color-generator"),
     LicenseItem("flutter_swiper_view", LICENSE_MIT,
         "https://github.com/feicien/flutter_swiper_view"),
-    LicenseItem(
-        "mutex", LICENSE_BSD_3_0_CLAUSE, "https://github.com/hoylen/dart-mutex")
+    LicenseItem("mutex", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/hoylen/dart-mutex"),
+    LicenseItem("receive_intent", LICENSE_GPL_3_0,
+        "https://github.com/w568w/receive_intent"),
+    LicenseItem("flutter_secure_storage", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/mogol/flutter_secure_storage"),
+    LicenseItem("encrypt_shared_preferences", LICENSE_APACHE_2_0,
+        "https://github.com/xaldarof/encrypted-shared-preferences"),
+    LicenseItem("device_identity", LICENSE_MIT,
+        "https://devgit.starschina.com/flutter_open_srouce/device_identity"),
+    LicenseItem("tutorial_coach_mark", LICENSE_MIT,
+        "https://github.com/RafaelBarbosatec/tutorial_coach_mark")
   ];
 
   String? _clearCacheSubtitle;

@@ -3,19 +3,19 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  bitsdojo_window_windows_v3
-  desktop_window
-  file_selector_windows
-  flutter_js
-  flutter_secure_storage_windows
-  gal
-  permission_handler_windows
-  platform_device_id_windows
-  screen_brightness_windows
-  share_plus
-  system_tray
-  url_launcher_windows
-)
+        bitsdojo_window_windows
+        desktop_window
+        file_selector_windows
+        flutter_js
+        flutter_secure_storage_windows
+        gal
+        permission_handler_windows
+        platform_device_id_windows
+        screen_brightness_windows
+        share_plus
+        tray_manager
+        url_launcher_windows
+        )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
 )
