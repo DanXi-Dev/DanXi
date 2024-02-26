@@ -173,7 +173,8 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
             cupertino: (_, __) => CupertinoNavigationBarData(
               title: MediaQuery(
                   data: MediaQueryData(
-                      textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+                      textScaler: TextScaler.linear(
+                          MediaQuery.textScaleFactorOf(context))),
                   child: TopController(child: widget.title(context))),
             ),
             material: (_, __) => MaterialAppBarData(

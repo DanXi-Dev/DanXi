@@ -60,7 +60,10 @@ class CardCrowdDataState extends State<CardCrowdData> {
 
   /// Load dining hall data
   Future<void> _onSelectedItemChanged(Campus? e) async {
-    setState(() => {_selectItem = e, _trafficInfo = null});
+    setState(() {
+      _selectItem = e;
+      _trafficInfo = null;
+    });
     _trafficInfo = await DataCenterRepository.getInstance()
         .getCrowdednessInfo(_personInfo, _selectItem!.index)
         .catchError((e) {
