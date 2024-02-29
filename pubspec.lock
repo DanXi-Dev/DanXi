@@ -824,6 +824,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
+  git_info:
+    dependency: "direct main"
+    description:
+      name: git_info
+      sha256: f00efd20ff8f084e7910afa071606c025eb4848db40000256cc1996427cf798b
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.2"
   glob:
     dependency: transitive
     description:
