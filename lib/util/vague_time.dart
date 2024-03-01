@@ -32,13 +32,15 @@ class VagueTime implements Comparable<VagueTime> {
       this.millisecond,
       this.microsecond});
 
-  factory VagueTime.onlyMMSS(String mmss) {
-    var splitTime = mmss.split(":");
+  /// Split the HHmm time string by ':' or '.'.
+  factory VagueTime.onlyHHmm(String hhmm) {
+    final pattern = RegExp(r'[:.]');
+    var splitTime = hhmm.split(pattern);
     return VagueTime(
         hour: int.parse(splitTime[0]), minute: int.parse(splitTime[1]));
   }
 
-  factory VagueTime.onlymmdd(String mmdd) {
+  factory VagueTime.onlyMMdd(String mmdd) {
     var splitTime = mmdd.split("-");
     return VagueTime(
         month: int.parse(splitTime[0]), day: int.parse(splitTime[1]));

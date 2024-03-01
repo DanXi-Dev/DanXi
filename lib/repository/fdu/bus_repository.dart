@@ -87,10 +87,10 @@ class BusScheduleItem implements Comparable<BusScheduleItem> {
           CampusEx.fromChineseName(json['start']),
           CampusEx.fromChineseName(json['end']),
           (json['stime'] as String).isNotEmpty
-              ? VagueTime.onlyMMSS(json['stime'])
+              ? VagueTime.onlyHHmm(json['stime'])
               : null,
           (json['etime'] as String).isNotEmpty
-              ? VagueTime.onlyMMSS(json['etime'])
+              ? VagueTime.onlyHHmm(json['etime'])
               : null,
           BusDirection.values[int.parse(json['arrow'])],
           int.parse(json['holiday']) != 0);
