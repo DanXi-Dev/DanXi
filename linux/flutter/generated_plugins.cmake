@@ -3,13 +3,13 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-        bitsdojo_window_linux_v3
+        bitsdojo_window_linux
         desktop_window
         file_selector_linux
         flutter_js
         flutter_secure_storage_linux
         platform_device_id_linux
-        system_tray
+        tray_manager
         url_launcher_linux
         )
 

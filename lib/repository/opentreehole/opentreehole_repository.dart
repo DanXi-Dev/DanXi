@@ -19,6 +19,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/model/opentreehole/audit.dart';
 import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
@@ -39,7 +40,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/dio.dart';
 
-import '../../model/opentreehole/history.dart';
+import 'package:dan_xi/model/opentreehole/history.dart';
 
 /// The repository for OpenTreeHole.
 ///
@@ -134,7 +135,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
   }
 
-  /// Load the token from disk to the provider. It is a "minimal" initialization of the provider.
+  /// A "minimal" initialization of the provider.
+  ///
+  /// It loads the token from disk to the provider.
   ///
   /// If the token is not valid, it will throw a [NotLoginError].
   void initializeToken() {
@@ -145,6 +148,16 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
   }
 
+  /// A full initialization of the user data.
+  ///
+  /// It loads the token and user info which are shared across treehole and danke.
+  ///
+  /// It is used to provide user data for sections apart from treehole (specifically danke for now).
+  Future<void> initializeUser() async {
+    initializeToken();
+    if (provider.userInfo == null) await getUserProfile(forceUpdate: true);
+  }
+
   /// A "complete" initialization of the repository and provider.
   ///
   /// It loads the token, user info, divisions, and register the push notification token eagerly.
@@ -153,12 +166,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   ///
   /// We cache them all, so that one loading, everything done.
   Future<void> initializeRepo() async {
-    initializeToken();
+    initializeUser();
+
     try {
       FDUHolePlatformBridge.registerRemoteNotification();
     } catch (_) {}
 
-    if (provider.userInfo == null) await getUserProfile(forceUpdate: true);
     if (provider.divisionCache.isEmpty) await loadDivisions(useCache: false);
     if (_pushNotificationRegData != null) {
       // No need for [await] here, we can do this in the background
@@ -653,6 +666,27 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         options: Options(headers: _tokenHeader));
     final result = response.data;
     return result.map<OTReport>((e) => OTReport.fromJson(e)).toList();
+  }
+
+  Future<List<OTAudit>?> adminGetAuditFloors(DateTime startTime, bool open,
+      [int length = 10]) async {
+    final response = await dio.get("$_BASE_URL/floors/_sensitive",
+        queryParameters: {
+          "offset": startTime.toUtc().toIso8601String(),
+          "size": length,
+          "all": false,
+          "open": open
+        },
+        options: Options(headers: _tokenHeader));
+    final result = response.data;
+    return result.map<OTAudit>((e) => OTAudit.fromJson(e)).toList();
+  }
+
+  Future<int?> adminSetAuditFloor(int floorId, bool isActualSensitive) async {
+    return (await dio.put("$_BASE_URL/floors/$floorId/_sensitive",
+            data: {"is_actual_sensitive": isActualSensitive},
+            options: Options(headers: _tokenHeader)))
+        .statusCode;
   }
 
   Future<int?> adminDeleteFloor(int? floorId, String? deleteReason) async {

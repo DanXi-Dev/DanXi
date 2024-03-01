@@ -1,4 +1,4 @@
-/*
+ /*
  *     Copyright (C) 2021  DanXi-Dev
  *
  *     This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:bitsdojo_window_v3/bitsdojo_window_v3.dart';
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/page/danke/course_group_detail.dart';
@@ -65,6 +65,7 @@ import 'package:flutter_fgbg/flutter_fgbg.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:git_info/git_info.dart';
 import 'package:material_color_generator/material_color_generator.dart';
 import 'package:provider/provider.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
@@ -79,8 +80,8 @@ void main() {
 
   // Init Mi push Service.
   if (PlatformX.isAndroid) {
-    XiaoMiPushPlugin.init(
-        appId: "2882303761519940685", appKey: "5821994071685");
+    unawaited(XiaoMiPushPlugin.init(
+        appId: "2882303761519940685", appKey: "5821994071685"));
   }
 
   // Init Feature registration.
@@ -324,7 +325,8 @@ class DanxiApp extends StatelessWidget {
       child: MultiProvider(providers: [
         ChangeNotifierProvider.value(value: SettingsProvider.getInstance()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
-        ChangeNotifierProvider.value(value: fduHoleProvider)
+        ChangeNotifierProvider.value(value: fduHoleProvider),
+        FutureProvider.value(value: GitInfo.get(), initialData: null)
       ], child: mainApp),
     );
   }

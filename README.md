@@ -55,10 +55,11 @@ dmg 硬盘映像，挂载拷贝即可。
 ## 我们当前使用的 Flutter 编译版本
 
 ```shell
-Flutter 3.13.8 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 6c4930c4ac (9 days ago) • 2023-10-18 10:57:55 -0500
-Engine • revision 767d8c75e8
-Tools • Dart 3.1.4 • DevTools 2.25.0
+$ flutter --version
+Flutter 3.16.9 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 41456452f2 (3 周前) • 2024-01-25 10:06:23 -0800
+Engine • revision f40e976bed
+Tools • Dart 3.2.6 • DevTools 2.28.5
 ```
 
 ## 编译说明

@@ -1031,14 +1031,11 @@ class OTMessageItem extends StatefulWidget {
           }
           break;
         case 'report':
+        case 'report_dealt':
           // data should be [OTReport]
           final report = OTReport.fromJson(data!);
-
-          // fixme: [OTReport.floor]'s fields are not filled at all at the moment.
-          //        Currently, we have to construct a fake [OTFloor] to display.
-          final floor =
-              OTFloor.special("点击下面查看帖子，定位用不了", "##${data["floor_id"]}");
-
+          final floor = report.floor!;
+          if (floor.floor_id == null) return;
           if (await OTFloorMentionWidget.showFloorDetail(
                       context, floor, report.reason) ==
                   true &&

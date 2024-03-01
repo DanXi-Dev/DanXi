@@ -3,7 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-        bitsdojo_window_windows_v3
+        bitsdojo_window_windows
         desktop_window
         file_selector_windows
         flutter_js
@@ -13,7 +13,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
         platform_device_id_windows
         screen_brightness_windows
         share_plus
-        system_tray
+        tray_manager
         url_launcher_windows
         )
 
