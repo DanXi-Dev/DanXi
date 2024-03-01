@@ -32,10 +32,8 @@ class VagueTime implements Comparable<VagueTime> {
       this.millisecond,
       this.microsecond});
 
-  /// Split the HHmm time string by ':' or '.'.
   factory VagueTime.onlyHHmm(String hhmm) {
-    final pattern = RegExp(r'[:.]');
-    var splitTime = hhmm.split(pattern);
+    var splitTime = hhmm.split(":");
     return VagueTime(
         hour: int.parse(splitTime[0]), minute: int.parse(splitTime[1]));
   }
