@@ -95,7 +95,7 @@ class BusScheduleItem implements Comparable<BusScheduleItem> {
     if (time.isEmpty) {
       return null;
     }
-    return VagueTime.onlyMMSS(time.replaceAll(".", ":"));
+    return VagueTime.onlyHHmm(time.replaceAll(".", ":"));
   }
 
   @override
