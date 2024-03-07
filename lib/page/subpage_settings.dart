@@ -18,7 +18,7 @@
 import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
+import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
 import 'package:dan_xi/page/home_page.dart';
@@ -1039,7 +1039,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         child: Consumer<GitInformation?>(
                           builder: (context, value, child) {
                             return Text(
-                              '${S.of(context).version} ${FlutterApp.versionName} build ${pubspec.build.first} #${value?.hash?.substring(0, 7)}',
+                              '${S.of(context).version} ${FlutterApp.versionName} build ${Pubspec.version.build.single} #${value?.hash?.substring(0, 7)}',
                               textScaleFactor: 0.7,
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold),

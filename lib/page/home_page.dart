@@ -745,7 +745,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (PlatformX.isIOS) return;
     final UpdateInfo updateInfo =
         AnnouncementRepository.getInstance().checkVersion();
-    if (updateInfo.isAfter(major, minor, patch)) {
+    if (updateInfo.isAfter(
+        Pubspec.version.major, Pubspec.version.minor, Pubspec.version.patch)) {
       await showPlatformDialog(
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(

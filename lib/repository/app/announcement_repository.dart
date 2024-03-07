@@ -77,7 +77,7 @@ class AnnouncementRepository {
   }
 
   List<Announcement> getAnnouncements() {
-    final version = int.tryParse(build.first) ?? 0;
+    final version = int.tryParse(Pubspec.version.build.single) ?? 0;
     return _announcementCache
         .filter((element) => element.maxVersion! >= version);
   }
