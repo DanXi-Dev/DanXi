@@ -27,14 +27,13 @@ class PostRenderWidget extends StatelessWidget {
   final bool isPreviewWidget;
 
   const PostRenderWidget(
-      {Key? key,
+      {super.key,
       required this.content,
       required this.render,
       this.onTapImage,
       this.onTapLink,
       required this.hasBackgroundImage,
-      this.isPreviewWidget = false})
-      : super(key: key);
+      this.isPreviewWidget = false});
 
   @override
   Widget build(BuildContext context) => render.call(context, content,

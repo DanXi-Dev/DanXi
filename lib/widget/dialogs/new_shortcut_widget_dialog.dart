@@ -29,8 +29,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 /// Allows user to create custom dashboard widgets that link to certain websites.
 class NewShortcutDialog extends StatefulWidget {
 
-  const NewShortcutDialog({
-    Key? key}) : super(key: key);
+  const NewShortcutDialog({super.key});
 
   @override
   NewShortcutDialogState createState() => NewShortcutDialogState();

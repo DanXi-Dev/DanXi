@@ -18,7 +18,7 @@
 import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
+import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
 import 'package:dan_xi/page/home_page.dart';
@@ -53,6 +53,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:intl/intl.dart';
@@ -74,7 +75,7 @@ class SettingsSubpage extends PlatformSubpage<SettingsSubpage> {
   @override
   SettingsSubpageState createState() => SettingsSubpageState();
 
-  const SettingsSubpage({Key? key}) : super(key: key);
+  const SettingsSubpage({super.key});
 
   @override
   Create<Widget> get title => (cxt) => Text(S.of(cxt).settings);
@@ -86,16 +87,16 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     LicenseItem("asn1lib", LICENSE_BSD, "https://github.com/wstrange/asn1lib"),
     LicenseItem("cached_network_image", LICENSE_MIT,
         "https://github.com/Baseflow/flutter_cached_network_image"),
-    LicenseItem(
-        "system_tray", LICENSE_MIT, "https://github.com/antler119/system_tray"),
+    LicenseItem("tray_manager", LICENSE_MIT,
+        "https://github.com/leanflutter/tray_manager"),
     LicenseItem(
         "win32", LICENSE_BSD_3_0_CLAUSE, "https://github.com/timsneath/win32"),
     LicenseItem("collection", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/dart-lang/collection"),
     LicenseItem(
         "meta", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dart-lang/sdk"),
-    LicenseItem("bitsdojo_window", LICENSE_MIT,
-        "https://github.com/bitsdojo/bitsdojo_window"),
+    LicenseItem("bitsdojo_window_v3", LICENSE_MIT,
+        "https://github.com/DartGit-dev/bitsdojo_window"),
     LicenseItem("flutter_layout_grid", LICENSE_MIT,
         "https://github.com/madewithfelt/flutter_layout_grid"),
     LicenseItem(
@@ -223,8 +224,18 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
         "https://github.com/berkanaslan/material-color-generator"),
     LicenseItem("flutter_swiper_view", LICENSE_MIT,
         "https://github.com/feicien/flutter_swiper_view"),
-    LicenseItem(
-        "mutex", LICENSE_BSD_3_0_CLAUSE, "https://github.com/hoylen/dart-mutex")
+    LicenseItem("mutex", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/hoylen/dart-mutex"),
+    LicenseItem("receive_intent", LICENSE_GPL_3_0,
+        "https://github.com/w568w/receive_intent"),
+    LicenseItem("flutter_secure_storage", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/mogol/flutter_secure_storage"),
+    LicenseItem("encrypt_shared_preferences", LICENSE_APACHE_2_0,
+        "https://github.com/xaldarof/encrypted-shared-preferences"),
+    LicenseItem("device_identity", LICENSE_MIT,
+        "https://devgit.starschina.com/flutter_open_srouce/device_identity"),
+    LicenseItem("tutorial_coach_mark", LICENSE_MIT,
+        "https://github.com/RafaelBarbosatec/tutorial_coach_mark")
   ];
 
   String? _clearCacheSubtitle;
@@ -978,29 +989,18 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       ),
                       Divider(color: originalDividerColor),
                       const SizedBox(height: 4),
-                      Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: developersIcons.sublist(
-                                      0, (developersIcons.length + 1) ~/ 2)),
-                            ),
-                            Expanded(
-                                child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: developersIcons
-                                  .sublist((developersIcons.length + 1) ~/ 2),
-                            )),
-                          ]),
+                      LayoutGrid(
+                        columnSizes: [1.fr, 1.fr],
+                        rowSizes: List.filled(
+                            (developersIcons.length + 1) ~/ 2, auto),
+                        children: developersIcons,
+                      ),
                       const SizedBox(height: 16),
                       //Version
                       Align(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          'FOSS ${S.of(context).version} ${FlutterApp.versionName} build ${pubspec.build.first}',
+                          'FOSS ${S.of(context).version} ${FlutterApp.versionName} build ${Pubspec.version.build.single} #${const String.fromEnvironment("GIT_HASH", defaultValue: "?")}',
                           textScaleFactor: 0.7,
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
@@ -1098,7 +1098,7 @@ class Developer {
 }
 
 class OTNotificationSettingsWidget extends StatefulWidget {
-  const OTNotificationSettingsWidget({Key? key}) : super(key: key);
+  const OTNotificationSettingsWidget({super.key});
 
   @override
   State<OTNotificationSettingsWidget> createState() =>
@@ -1146,8 +1146,7 @@ class _OTNotificationSettingsWidgetState
 class OTNotificationSettingsTile extends StatelessWidget {
   final void Function() onSettingsUpdate;
 
-  const OTNotificationSettingsTile({Key? key, required this.onSettingsUpdate})
-      : super(key: key);
+  const OTNotificationSettingsTile({super.key, required this.onSettingsUpdate});
 
   String _generateNotificationSettingsSummary(
       BuildContext context, List<String>? data) {

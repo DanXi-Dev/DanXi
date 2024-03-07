@@ -50,7 +50,7 @@ class QRHelper {
 class QRDialog extends StatefulWidget {
   final PersonInfo? personInfo;
 
-  const QRDialog({Key? key, this.personInfo}) : super(key: key);
+  const QRDialog({super.key, this.personInfo});
 
   @override
   QRDialogState createState() => QRDialogState();

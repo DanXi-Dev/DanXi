@@ -78,7 +78,7 @@ const QuickActions quickActions = QuickActions();
 /// The main page of DanXi.
 /// It is a container for [PlatformSubpage].
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   HomePageState createState() => HomePageState();
@@ -736,7 +736,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (PlatformX.isIOS) return;
     final UpdateInfo updateInfo =
         AnnouncementRepository.getInstance().checkVersion();
-    if (updateInfo.isAfter(major, minor, patch)) {
+    if (updateInfo.isAfter(
+        Pubspec.version.major, Pubspec.version.minor, Pubspec.version.patch)) {
       await showPlatformDialog(
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(

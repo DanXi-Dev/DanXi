@@ -54,7 +54,8 @@
 
 使用 Apple Silicon 的用户可以直接从 [App Store](https://apps.apple.com/app/id1568629997) 下载。
 
-其他用户：我们将等待 Flutter 框架对 macOS 的支持稳定后考虑发行专属的 macOS 版本。
+Apple Intel 用户请打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版
+dmg 硬盘映像，挂载拷贝即可。
 
 # 构建
 
@@ -62,10 +63,10 @@
 
 ```shell
 $ flutter --version
-Flutter 3.13.0 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision efbf63d9c6 (3 days ago) • 2023-08-15 21:05:06 -0500
-Engine • revision 1ac611c64e
-Tools • Dart 3.1.0 • DevTools 2.25.0
+Flutter 3.19.2 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 7482962148 (8 天前) • 2024-02-27 16:51:22 -0500
+Engine • revision 04817c99c9
+Tools • Dart 3.3.0 • DevTools 2.31.1
 ```
 
 ## 编译说明
@@ -81,10 +82,12 @@ Tools • Dart 3.1.0 • DevTools 2.25.0
 如果你正在为 `iOS/iPadOS/macOS`平台构建，您还需要[安装并配置](https://apps.apple.com/app/id497799835) `Xcode`。
 
 确定配置正确后，你需要首先在项目根目录下运行 
+
 ```
 dart run build_runner build --delete-conflicting-outputs
 dart run intl_utils:generate
 ```
+
 然后运行  `flutter run [ios/android]`即可运行应用。
 
 ## 赞助
@@ -92,11 +95,3 @@ dart run intl_utils:generate
 由于 Apple Developer Program 费用（发布应用至 App Store 和 TestFlight 所必需）费用较高，如果您希望赞助我们，请通过邮件联系我们！
 
 我们的邮箱：[dev@fduhole.com](mailto:dev@fduhole.com)
-
-[//]: #
-[//]: #
-[//]: #
-[//]: #
-[//]: #
-[//]: #
-[//]: #

@@ -24,11 +24,10 @@ import 'package:flutter/material.dart';
 
 class ReviewVoteWidget extends StatefulWidget {
   const ReviewVoteWidget(
-      {Key? key,
+      {super.key,
       required this.myVote,
       required this.reviewVote,
-      required this.reviewId})
-      : super(key: key);
+      required this.reviewId});
 
   final int reviewVote;
   final int myVote;

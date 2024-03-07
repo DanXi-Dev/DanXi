@@ -1,4 +1,4 @@
-/*
+ /*
  *     Copyright (C) 2021  DanXi-Dev
  *
  *     This program is free software: you can redistribute it and/or modify
@@ -194,7 +194,7 @@ class DanxiApp extends StatelessWidget {
         CourseReviewEditorPage(arguments: arguments)
   };
 
-  const DanxiApp({Key? key}) : super(key: key);
+  const DanxiApp({super.key});
 
   Widget errorBuilder(FlutterErrorDetails details) => Builder(
       builder: (context) =>

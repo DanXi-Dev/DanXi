@@ -19,7 +19,7 @@ import 'dart:io' show Platform;
 import 'dart:math';
 
 import 'package:dan_xi/common/feature_registers.dart';
-import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
+import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
@@ -95,7 +95,7 @@ class Constant {
   /// Currently, it is used in the [OpenTreeHoleRepository] to tell the server
   /// about the client version.
   static String get version =>
-      "DanXi/${FlutterApp.versionName}b${pubspec.build.single} (${Platform.operatingSystem}; ${Platform.operatingSystemVersion})";
+      "DanXi/${FlutterApp.versionName}b${Pubspec.version.build.single} (${Platform.operatingSystem}; ${Platform.operatingSystemVersion})";
 
   /// The tips to be shown as hints in the [BBSEditorWidget].
   static List<String> fduHoleTips = [];

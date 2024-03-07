@@ -50,7 +50,7 @@ class ExamList extends StatefulWidget {
   @override
   ExamListState createState() => ExamListState();
 
-  const ExamList({Key? key, this.arguments}) : super(key: key);
+  const ExamList({super.key, this.arguments});
 }
 
 class ExamListState extends State<ExamList> {
@@ -454,7 +454,7 @@ class ExamListState extends State<ExamList> {
                                   child: Text(
                                       _cachedScoreData!
                                           .firstWhere((element) =>
-                                              element.name == value.name)
+                                              element.id == value.id)
                                           .level,
                                       textScaleFactor: 1.2),
                                 ));

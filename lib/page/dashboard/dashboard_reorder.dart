@@ -33,7 +33,7 @@ class DashboardReorderPage extends StatefulWidget {
   /// 'items': A list of [LicenseItem] to display on the page
   final Map<String, dynamic>? arguments;
 
-  const DashboardReorderPage({Key? key, this.arguments}) : super(key: key);
+  const DashboardReorderPage({super.key, this.arguments});
 
   @override
   DashboardReorderPageState createState() => DashboardReorderPageState();

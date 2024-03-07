@@ -25,8 +25,7 @@ class WithScrollbar extends StatelessWidget {
   final ScrollController? controller;
   final Widget? child;
 
-  const WithScrollbar({Key? key, this.controller, this.child})
-      : super(key: key);
+  const WithScrollbar({super.key, this.controller, this.child});
 
   @override
   Widget build(BuildContext context) {

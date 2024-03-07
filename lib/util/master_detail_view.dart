@@ -28,8 +28,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
   final GlobalKey<NavigatorState>? navigatorKey;
 
   const PlatformMasterDetailApp(
-      {Key? key, this.onGenerateRoute, this.navigatorKey})
-      : super(key: key);
+      {super.key, this.onGenerateRoute, this.navigatorKey});
 
   @override
   Widget build(BuildContext context) {

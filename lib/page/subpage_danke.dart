@@ -41,7 +41,7 @@ class DankeSubPage extends PlatformSubpage<DankeSubPage> {
   @override
   DankeSubPageState createState() => DankeSubPageState();
 
-  const DankeSubPage({Key? key}) : super(key: key);
+  const DankeSubPage({super.key});
 
   @override
   Create<Widget> get title => (cxt) => Text(S.of(cxt).curriculum);
@@ -110,7 +110,7 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
 
   Future<CourseReview?> _loadRandomReview({bool forceRefetch = false}) async {
     if (!context.read<FDUHoleProvider>().isUserInitialized) {
-      await OpenTreeHoleRepository.getInstance().initializeRepo();
+      await OpenTreeHoleRepository.getInstance().initializeUser();
       settingsPageKey.currentState?.setState(() {});
     }
 

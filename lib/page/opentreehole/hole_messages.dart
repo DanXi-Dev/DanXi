@@ -34,7 +34,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 class OTMessagesPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const OTMessagesPage({Key? key, this.arguments}) : super(key: key);
+  const OTMessagesPage({super.key, this.arguments});
 
   @override
   OTMessagesPageState createState() => OTMessagesPageState();

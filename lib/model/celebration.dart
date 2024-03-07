@@ -45,7 +45,7 @@ class Celebration {
         return lunarDate.getMonth() == int.parse(splitTime[0]) &&
             lunarDate.getDay() == int.parse(splitTime[1]);
       case 3:
-        return VagueTime.onlymmdd(date).match(dateTime);
+        return VagueTime.onlyMMdd(date).match(dateTime);
     }
     return false;
   }

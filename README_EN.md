@@ -32,16 +32,21 @@ This application is still at active development stage, we will be happy if you c
 
 # Install
 
-If you meet abnormal behavior in DanXi，Please [create an issue](https://github.com/w568w/DanXi/issues/new/choose) or [create a new pull request](https://github.com/w568w/DanXi/compare).
+If you meet abnormal behavior in
+DanXi，Please [create an issue](https://github.com/DanXi-Dev/DanXi/issues/new/choose)
+or [create a new pull request](https://github.com/DanXi-Dev/DanXi/compare).
 
 ## Windows
 
-Go to [release page](https://github.com/w568w/DanXi/releases), just download the zip file and unzip it.
+Go to [release page](https://github.com/DanXi-Dev/DanXi/releases), just download the zip file and
+unzip it.
 
 ## Android
 
-Go to [release page](https://github.com/w568w/DanXi/releases), just download the apk file and install it.
-(Depending on the device, you may need to allow "Install apps from unknown sources" in the settings.)
+Go to [release page](https://github.com/DanXi-Dev/DanXi/releases), just download the apk file and
+install it.
+(Depending on the device, you may need to allow "Install apps from unknown sources" in the
+settings.)
 
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
      alt="Get it on F-Droid"
@@ -56,7 +61,8 @@ Download from [App Store](https://apps.apple.com/us/app/旦夕/id1568629997)
 
 ## macOS
 
-Will consider after Flutter macOS support becomes stable.
+Go to [release page](https://github.com/DanXi-Dev/DanXi/releases), just download the dmg file and
+mount it.
 
 # Compile
 
@@ -64,10 +70,10 @@ Will consider after Flutter macOS support becomes stable.
 
 ```shell
 $ flutter --version
-Flutter 3.13.0 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision efbf63d9c6 (3 days ago) • 2023-08-15 21:05:06 -0500
-Engine • revision 1ac611c64e
-Tools • Dart 3.1.0 • DevTools 2.25.0
+Flutter 3.19.2 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 7482962148 (8 days ago) • 2024-02-27 16:51:22 -0500
+Engine • revision 04817c99c9
+Tools • Dart 3.3.0 • DevTools 2.31.1
 ```
 
 ## Notes on compilation
@@ -83,18 +89,10 @@ If you are building for `Android`, you should also [install and configure](https
 If you are building for `iOS/iPadOS`, you should also [install and configure](https://apps.apple.com/cn/app/xcode/id497799835) `Xcode`.
 
 Run the command 
+
 ```
 dart run build_runner build --delete-conflicting-outputs
 dart run intl_utils:generate
 ```
-and then  `flutter run [ios/android]` to start the app.
 
-[//]: #
-[//]: #
-[//]: #
-[//]: #
-[//]: #
-[//]: #
-[//]: #
-[//]: #
-[//]: #
+and then  `flutter run [ios/android]` to start the app.

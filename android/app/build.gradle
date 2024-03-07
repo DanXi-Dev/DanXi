@@ -1,14 +1,15 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
     localPropertiesFile.withReader('UTF-8') { reader ->
         localProperties.load(reader)
     }
-}
-
-def flutterRoot = localProperties.getProperty('flutter.sdk')
-if (flutterRoot == null) {
-    throw new Exception("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
 }
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
@@ -21,16 +22,13 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
-// Skip Crashlytics upload. It breaks the procesmicof building.
+// Skip Crashlytics upload. It breaks the process of building.
 gradle.taskGraph.whenReady {
     tasks.each { task ->
         if (task.name.contains("uploadCrashlyticsMappingFileRelease")) {
@@ -39,9 +37,9 @@ gradle.taskGraph.whenReady {
     }
 }
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
 
-    ndkVersion "25.1.8937393"
+    ndkVersion "26.2.11394342"
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -50,8 +48,9 @@ android {
 
     defaultConfig {
         applicationId "io.github.danxi_dev.dan_xi"
+        namespace "io.github.danxi_dev.dan_xi"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -82,6 +81,6 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.22"
+    implementation 'com.google.android.material:material:1.11.0'
 }

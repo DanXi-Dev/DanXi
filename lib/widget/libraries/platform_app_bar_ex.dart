@@ -51,7 +51,7 @@ class PlatformAppBarX extends PlatformAppBar {
   final PlatformBuilder<CupertinoNavigationBarData>? cupertino;
 
   PlatformAppBarX({
-    Key? key,
+    super.key,
     this.widgetKey,
     this.title,
     this.backgroundColor,
@@ -60,7 +60,7 @@ class PlatformAppBarX extends PlatformAppBar {
     this.automaticallyImplyLeading,
     this.material,
     this.cupertino,
-  }) : super(key: key);
+  });
 
   @override
   PreferredSizeWidget createMaterialWidget(BuildContext context) {
@@ -105,14 +105,16 @@ class PlatformAppBarX extends PlatformAppBar {
       //backgroundColor: Colors.white.withAlpha(254),
       leading: MediaQuery(
         data: MediaQueryData(
-            textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+            textScaler:
+                TextScaler.linear(MediaQuery.textScaleFactorOf(context))),
         child: CupertinoNavigationBarBackButton(
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       title: MediaQuery(
           data: MediaQueryData(
-              textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+              textScaler:
+                  TextScaler.linear(MediaQuery.textScaleFactorOf(context))),
           child: data?.title ?? title!),
     );
     var trailing = trailingActions?.isEmpty ?? true

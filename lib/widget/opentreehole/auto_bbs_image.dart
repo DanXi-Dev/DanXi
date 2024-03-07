@@ -26,8 +26,7 @@ class BBSImagePlaceholder extends StatelessWidget {
   final Widget? child;
   final double? size;
 
-  const BBSImagePlaceholder({Key? key, this.child, this.size})
-      : super(key: key);
+  const BBSImagePlaceholder({super.key, this.child, this.size});
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +52,7 @@ class AutoBBSImage extends StatelessWidget {
   final double? maxWidth;
   final ImageTapCallback? onTapImage;
 
-  AutoBBSImage({Key? key, required this.src, this.maxWidth, this.onTapImage})
-      : super(key: key);
+  AutoBBSImage({super.key, required this.src, this.maxWidth, this.onTapImage});
 
   @override
   Widget build(BuildContext context) {

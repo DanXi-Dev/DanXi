@@ -10,8 +10,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
 class ManuallyAddCourseDialog extends StatefulWidget {
-  const ManuallyAddCourseDialog(this.courseAvailableList, {Key? key})
-      : super(key: key);
+  const ManuallyAddCourseDialog(this.courseAvailableList, {super.key});
 
   final List<int> courseAvailableList;
 

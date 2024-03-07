@@ -22,7 +22,7 @@ class ScaleTransform extends StatelessWidget {
   final Widget? child;
   final double? scale;
 
-  const ScaleTransform({Key? key, this.scale, this.child}) : super(key: key);
+  const ScaleTransform({super.key, this.scale, this.child});
 
   @override
   Widget build(BuildContext context) => Transform(

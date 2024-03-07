@@ -45,7 +45,7 @@ class HomeSubpage extends PlatformSubpage<HomeSubpage> {
   @override
   HomeSubpageState createState() => HomeSubpageState();
 
-  const HomeSubpage({Key? key}) : super(key: key);
+  const HomeSubpage({super.key});
 
   @override
   Create<Widget> get title => (cxt) => Text(S.of(cxt).dashboard);

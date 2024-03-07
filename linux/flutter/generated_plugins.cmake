@@ -9,7 +9,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_js
   flutter_secure_storage_linux
   platform_device_id_linux
-  system_tray
+  tray_manager
   url_launcher_linux
 )
 

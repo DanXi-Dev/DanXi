@@ -305,13 +305,12 @@ class BBSEditorWidget extends StatefulWidget {
   final String? tip;
 
   const BBSEditorWidget(
-      {Key? key,
+      {super.key,
       required this.controller,
       this.allowTags,
       this.editorObject,
       this.fullscreen = false,
-      this.tip})
-      : super(key: key);
+      this.tip});
 
   @override
   BBSEditorWidgetState createState() => BBSEditorWidgetState();
@@ -498,8 +497,7 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
 
 class TagSuggestionWidget extends StatefulWidget {
   const TagSuggestionWidget(
-      {Key? key, required this.content, required this.tagSelectorKey})
-      : super(key: key);
+      {super.key, required this.content, required this.tagSelectorKey});
   final String content;
   final GlobalKey<OTTagSelectorState> tagSelectorKey;
 
@@ -595,7 +593,7 @@ class PostEditorText {
 class BBSEditorPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const BBSEditorPage({Key? key, this.arguments}) : super(key: key);
+  const BBSEditorPage({super.key, this.arguments});
 
   @override
   BBSEditorPageState createState() => BBSEditorPageState();

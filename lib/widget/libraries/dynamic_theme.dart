@@ -28,11 +28,10 @@ class DynamicThemeController extends StatefulWidget {
   final ThemeData darkTheme;
 
   const DynamicThemeController(
-      {Key? key,
+      {super.key,
       required this.child,
       required this.lightTheme,
-      required this.darkTheme})
-      : super(key: key);
+      required this.darkTheme});
 
   @override
   DynamicThemeControllerState createState() => DynamicThemeControllerState();
@@ -85,7 +84,7 @@ class DynamicThemeControllerState extends State<DynamicThemeController>
 class ThemedSystemOverlay extends StatelessWidget {
   final Widget child;
 
-  const ThemedSystemOverlay({Key? key, required this.child}) : super(key: key);
+  const ThemedSystemOverlay({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

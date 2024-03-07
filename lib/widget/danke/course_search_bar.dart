@@ -23,8 +23,8 @@ class CourseSearchBar extends StatefulWidget {
   final Function(String) onSearch;
   final void Function(bool)? onFocusChanged;
 
-  const CourseSearchBar({Key? key, required this.onSearch, this.onFocusChanged})
-      : super(key: key);
+  const CourseSearchBar(
+      {super.key, required this.onSearch, this.onFocusChanged});
 
   @override
   _CourseSearchBarState createState() => _CourseSearchBarState();
