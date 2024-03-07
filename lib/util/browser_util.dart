@@ -31,18 +31,19 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class BrowserUtil {
-  static InAppBrowserClassOptions getOptions(BuildContext context) =>
-      InAppBrowserClassOptions(
-          crossPlatform: InAppBrowserOptions(
-              toolbarTopBackgroundColor: Theme.of(context).cardTheme.color),
-          android: AndroidInAppBrowserOptions(hideTitleBar: true),
-          ios: IOSInAppBrowserOptions(hideToolbarBottom: true),
-          inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-              crossPlatform: InAppWebViewOptions(
-                  javaScriptEnabled: true,
-                  useOnDownloadStart: true,
-                  incognito: true),
-              ios: IOSInAppWebViewOptions(sharedCookiesEnabled: true)));
+  static InAppBrowserClassSettings getOptions(BuildContext context) =>
+      InAppBrowserClassSettings(
+          browserSettings: InAppBrowserSettings(
+            toolbarTopBackgroundColor: Theme.of(context).cardTheme.color,
+            hideTitleBar: true,
+            hideToolbarBottom: true,
+          ),
+          webViewSettings: InAppWebViewSettings(
+            sharedCookiesEnabled: true,
+            javaScriptEnabled: true,
+            useOnDownloadStart: true,
+            incognito: true,
+          ));
 
   /// Open a URL in the browser.
   ///
@@ -67,7 +68,7 @@ class BrowserUtil {
     }
 
     if (cookieJar != null) {
-      Uri uri = Uri.parse(url);
+      WebUri uri = WebUri(url);
       CookieManager.instance().deleteCookies(url: uri);
       if (uri.host.startsWith(Constant.UIS_HOST)) {
         cookieJar.hostCookies.forEach((host, value) {
@@ -107,8 +108,8 @@ class BrowserUtil {
       }
     }
     CustomInAppBrowser().openUrlRequest(
-        urlRequest: URLRequest(url: Uri.parse(url)),
-        options: getOptions(context!));
+        urlRequest: URLRequest(url: WebUri(url)),
+        settings: getOptions(context!));
   }
 }
 
@@ -178,7 +179,7 @@ class CustomInAppBrowser extends InAppBrowser {
             .startsWith("https://uis.fudan.edu.cn/authserver/login") ==
         true) {
       Future.delayed(const Duration(milliseconds: 1000)).then((_) =>
-          webViewController.evaluateJavascript(
+          webViewController?.evaluateJavascript(
               source: uisLoginJavaScript(StateProvider.personInfo.value!)));
     }
   }

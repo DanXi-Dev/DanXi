@@ -34,3 +34,6 @@ analyzer:
   exclude: [ build/**, lib/generated/** ]
   language:
     strict-raw-types: true
+  # allow .git/ to be non-existent
+  errors:
+    asset_directory_does_not_exist: ignore

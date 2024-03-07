@@ -17,10 +17,14 @@
 
 import 'dart:async';
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/opentreehole/audit.dart';
+import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/page/opentreehole/hole_detail.dart';
+import 'package:dan_xi/page/subpage_treehole.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
@@ -36,10 +40,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
-import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/model/opentreehole/audit.dart';
-import 'package:dan_xi/model/opentreehole/floor.dart';
-import 'package:dan_xi/page/subpage_treehole.dart';
 
 /// A list page showing the reports for administrators.
 class BBSReportDetail extends StatefulWidget {
@@ -100,8 +100,8 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                   Expanded(
                     child: LazyLoadIndexedStack(index: _tabIndex, children: [
                       _buildReportPage(),
-                      AuditList(true),
-                      AuditList(false)
+                      const AuditList(true),
+                      const AuditList(false)
                     ]),
                   ),
                 ],

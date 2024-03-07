@@ -1,7 +1,7 @@
 #include "my_application.h"
 
 #include <flutter_linux/flutter_linux.h>
-#include <bitsdojo_window_linux_v3/bitsdojo_window_plugin.h>
+#include <bitsdojo_window_linux/bitsdojo_window_plugin.h>
 
 #ifdef GDK_WINDOWING_X11
 #include <gdk/gdkx.h>
