@@ -24,7 +24,7 @@ const RESOURCES = {"assets/assets/texts/care_words.dat": "52b374fed441176c3d3118
 "assets/AssetManifest.bin": "3bcc5d354e215c0f941bc70918092e24",
 "assets/AssetManifest.bin.json": "6e4d8a60a388b07f8ca876df87faa280",
 "assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8cb9b6ce",
-"assets/NOTICES": "98e58c5c979736af503c576e42555e30",
+"assets/NOTICES": "48627ccb4a1d762a08806d38b72892a9",
 "assets/AssetManifest.json": "247b7612f636a6f3ca359e70068f7551",
 "assets/fonts/MaterialIcons-Regular.otf": "1609a8052bccbce92526fdefcc413dc5",
 "assets/packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css": "5a8d0222407e388155d7d1395a75d5b9",
@@ -69,8 +69,8 @@ const RESOURCES = {"assets/assets/texts/care_words.dat": "52b374fed441176c3d3118
 "version.json": "83745be098d8f5aa7cb6fdf6bb6c0a82",
 "flutter.js": "c71a09214cb6f5f8996a531350400a9a",
 "manifest.json": "012d91b9edf492757ddf24dd1b15d03e",
-"index.html": "4cdc0d0e1a4da284891b68c012bd4208",
-"/": "4cdc0d0e1a4da284891b68c012bd4208",
+"index.html": "b88df175a400f5ae49edf1f157151703",
+"/": "b88df175a400f5ae49edf1f157151703",
 "main.dart.js": "8990e70437b70ad73a48c618addc2a78",
 "favicon.webp": "5d8a19c576a1ba2a24af3b99f340237d"};
 // The application shell files that are downloaded before a service worker can
