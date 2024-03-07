@@ -56,7 +56,6 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:git_info/git_info.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:nil/nil.dart';
 import 'package:path_provider/path_provider.dart';
@@ -237,9 +236,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     LicenseItem("device_identity", LICENSE_MIT,
         "https://devgit.starschina.com/flutter_open_srouce/device_identity"),
     LicenseItem("tutorial_coach_mark", LICENSE_MIT,
-        "https://github.com/RafaelBarbosatec/tutorial_coach_mark"),
-    LicenseItem("git_info", LICENSE_BSD_3_0_CLAUSE,
-        "https://github.com/Rexios80/git_info")
+        "https://github.com/RafaelBarbosatec/tutorial_coach_mark")
   ];
 
   String? _clearCacheSubtitle;
@@ -1036,15 +1033,10 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       //Version
                       Align(
                         alignment: Alignment.centerRight,
-                        child: Consumer<GitInformation?>(
-                          builder: (context, value, child) {
-                            return Text(
-                              '${S.of(context).version} ${FlutterApp.versionName} build ${Pubspec.version.build.single} #${value?.hash?.substring(0, 7)}',
-                              textScaleFactor: 0.7,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            );
-                          },
+                        child: Text(
+                          '${S.of(context).version} ${FlutterApp.versionName} build ${Pubspec.version.build.single}',
+                          textScaleFactor: 0.7,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(height: 4),

@@ -23,10 +23,3 @@ plugins {
 }
 
 include ":app"
-
-// >>> Required by git_info to unignore .git directory
-import org.apache.tools.ant.DirectoryScanner
-
-DirectoryScanner.removeDefaultExclude('**/.git')
-DirectoryScanner.removeDefaultExclude('**/.git/**')
-// <<< Required by git_info to unignore .git directory

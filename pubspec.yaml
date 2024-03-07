@@ -95,7 +95,6 @@ dependencies:
   encrypt_shared_preferences: ^0.3.5
   device_identity: ^1.0.0
   tutorial_coach_mark: ^1.2.9
-  git_info: ^1.1.2
 
 
 dependency_overrides:
@@ -129,11 +128,6 @@ flutter:
   assets:
     - assets/graphics/
     - assets/texts/
-    # to show Git commit hash in the app. Add your .git/refs/heads/<branch> file here!
-    - .git/
-    - .git/refs/heads/
-    - .git/refs/heads/main
-    - .git/refs/heads/foss-build
   fonts:
     - family: iconfont
       fonts:
