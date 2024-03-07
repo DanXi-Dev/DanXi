@@ -18,7 +18,7 @@ packages:
     source: hosted
     version: "6.4.1"
   archive:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: archive
       sha256: "22600aa1e926be775fa5fe7e6894e7fb3df9efda8891c73f70fb3262399a432d"
@@ -824,6 +824,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
+  git:
+    dependency: "direct dev"
+    description:
+      name: git
+      sha256: "1982737427ef1ef2bb69027ea0234469774495e86afe202de81ee46d37364e55"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.1"
   glob:
     dependency: transitive
     description:
@@ -1196,7 +1204,7 @@ packages:
     source: hosted
     version: "2.1.0"
   path:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: path
       sha256: "087ce49c3f0dc39180befefc60fdb4acd8f8620e5682fe2476afd0b3688bb4af"

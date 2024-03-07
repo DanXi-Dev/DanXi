@@ -14,7 +14,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
+      - name: Workaround - Export pub environment variable on Windows
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            echo "PUB_CACHE=$LOCALAPPDATA\\Pub\\Cache" >> $GITHUB_ENV
+          fi
+        shell: bash
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -28,11 +33,7 @@ jobs:
 
       - name: Build Executable
         run: |
-          .\run_build.bat windows dummy
-
-      - name: Package Executable
-        run: 7z a -r -sse ..\..\..\..\build\app\app-release.zip *
-        working-directory: build\windows\runner\Release
+          dart build_release.dart windows dummy
 
       - if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name != 'nightly'
         name: Release
