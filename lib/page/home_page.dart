@@ -346,6 +346,11 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       }
     }
 
+    // fixme: uni_links *can* handle web, but our web version could have extra path
+    // by default (e.g. "DanXi/" in "https://danxi.fduhole.com/DanXi/"), which
+    // is recognized as an invalid path by [dealWithUri] now. Improve it later.
+    if (PlatformX.isWeb) return;
+
     Uri? initialUri;
     initialUri = await getInitialUri();
     if (initialUri != null) await dealWithUri(initialUri);
