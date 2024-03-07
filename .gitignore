@@ -8,6 +8,7 @@
 .buildlog/
 .history
 .svn/
+.gradle/
 
 # IntelliJ related
 *.iml
@@ -31,6 +32,7 @@
 .pub/
 /build/
 lib/generated/
+**/*.g.dart
 
 # Web related
 lib/generated_plugin_registrant.dart
@@ -52,7 +54,7 @@ app.*.map.json
 # macOS
 ios/build
 
-#Private Key
+# Private Key
 macos/Podfile.lock
 
 # Visual Studio
