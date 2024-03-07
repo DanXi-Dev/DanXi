@@ -5,7 +5,7 @@
 #include "flutter_window.h"
 #include "run_loop.h"
 #include "utils.h"
-#include <bitsdojo_window_windows_v3/bitsdojo_window_plugin.h>
+#include <bitsdojo_window_windows/bitsdojo_window_plugin.h>
 auto bdw = bitsdojo_window_configure(BDW_HIDE_ON_STARTUP);
 
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
