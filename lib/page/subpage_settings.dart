@@ -1034,7 +1034,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          '${S.of(context).version} ${FlutterApp.versionName} build ${Pubspec.version.build.single}',
+                          '${S.of(context).version} ${FlutterApp.versionName} build ${Pubspec.version.build.single} #${const String.fromEnvironment("GIT_HASH", defaultValue: "?")}',
                           textScaleFactor: 0.7,
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
