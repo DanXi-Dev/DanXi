@@ -126,7 +126,7 @@ Future<void> buildWindows(String? versionCode, String gitHash) async {
   print('Compress file...');
   var encoder = ZipFileEncoder();
   File newFile = File('build/app/DanXi-$versionCode-release.windows-x64.zip');
-  Directory sourceDir = Directory('build/windows/runner/Release');
+  Directory sourceDir = Directory('build/windows/x64/runner/Release');
   encoder.zipDirectory(sourceDir, filename: newFile.path);
   print('Build success.');
 }
