@@ -30,6 +30,9 @@
 
   <title>旦夕 Web</title>
   <link rel="manifest" href="manifest.json">
+
+  <script type="application/javascript"
+          src="/assets/packages/flutter_inappwebview_web/assets/web/web_support.js" defer></script>
 </head>
 
 <body>
@@ -39,7 +42,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('flutter-first-frame', function () {
-        navigator.serviceWorker.register('flutter_service_worker.js?v=1329311886');
+        navigator.serviceWorker.register('flutter_service_worker.js?v=1267368597');
       });
     }
   </script>
