@@ -17,11 +17,16 @@
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+# if the 2nd argument is provided, it will be used as the version code
 echo "Warning: Before building task, ensure that you have uncommented"
 echo "the line \"signingConfig signingConfigs.release\" in android/app/build.gradle,"
 echo "and choose your signing key in android/key.properties."
 echo
-read -p "Input your version name to continue: " version_code
+if [ -z "$2" ]; then
+  read -p "Input your version name to continue: " version_code
+else
+  version_code=$2
+fi
 echo "Start building..."
 
 # get current hash
@@ -75,7 +80,5 @@ elif [ "$1" == "windows" ]; then
 elif [ "$1" == "aab" ]; then
     build_bundle
 else
-    build_android
-    build_windows
-    build_bundle
+    printf "A valid target is required: android, windows, aab\n"
 fi

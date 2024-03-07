@@ -20,12 +20,6 @@ jobs:
         with:
           channel: 'stable'
 
-      #      - name: Install MSVC Build Tools
-      #        uses: microsoft/setup-msbuild@v1.0.2
-      #        with:
-      #          vs-version: '16.0'
-      #          architecture: 'x64'
-
       - name: Prepare Flutter Dependencies
         run: |
           flutter pub get
@@ -34,7 +28,7 @@ jobs:
 
       - name: Build Executable
         run: |
-          flutter build windows --release
+          .\run_build.bat windows dummy
 
       - name: Package Executable
         run: 7z a -r -sse ..\..\..\..\build\app\app-release.zip *
@@ -44,7 +38,7 @@ jobs:
         name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/app/app-release.zip
+          files: build/app/DanXi-dummy-release.windows-x64.zip
           prerelease: false
           tag_name: ${{ github.event.inputs.tag_name }}
           name: Release ${{ github.ref }}
@@ -55,7 +49,7 @@ jobs:
         name: Release Nightly
         uses: softprops/action-gh-release@v1
         with:
-          files: build/app/app-release.zip
+          files: build/app/DanXi-dummy-release.windows-x64.zip
           prerelease: true
           tag_name: nightly
           name: Nightly build

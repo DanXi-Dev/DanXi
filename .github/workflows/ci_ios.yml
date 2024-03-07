@@ -1,5 +1,7 @@
 name: Automated-CI-iOS-Beta
 
+# fixme(2024-3-7): this CI action does not inject GIT_HASH into the build command, so it should not be used for releases.
+
 on:
   workflow_dispatch:
 

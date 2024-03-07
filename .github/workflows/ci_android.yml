@@ -41,7 +41,7 @@ jobs:
 
       - name: Build APK
         run: |
-          ./run_build.sh android
+          bash ./run_build.sh android dummy
 
       - if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name != 'nightly'
         name: Release
