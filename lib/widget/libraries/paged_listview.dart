@@ -25,6 +25,7 @@ import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/state_key.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/material.dart';
+import 'package:super_sliver_list/super_sliver_list.dart';
 
 const kDuration = Duration(milliseconds: 500);
 const kCurve = Curves.easeInOut;
@@ -295,7 +296,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
     if (!_isRefreshing && _isEnded && _data.isEmpty) {
       // Tell the listView not to try to load anymore.
       _shouldLoad = false;
-      return ListView(
+      return SuperListView(
         //clipBehavior: Clip.none,
         padding: widget.padding,
         key: _scrollKey,
@@ -315,7 +316,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
         (_isEnded ? 1 : 0) +
         (_hasError ? 1 : 0) +
         (_hasHeadWidget ? 1 : 0);
-    return ListView.builder(
+    return SuperListView.builder(
       key: _scrollKey,
       padding: widget.padding,
       controller: widget.scrollController,
