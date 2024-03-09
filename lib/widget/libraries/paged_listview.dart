@@ -153,6 +153,8 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   ScrollController? get currentController =>
       widget.scrollController ?? PrimaryScrollController.of(context);
 
+  ListController currentListController = ListController();
+
   @override
   Widget build(BuildContext context) {
     bool scrollToEnd(ScrollNotification scrollInfo) {
@@ -301,6 +303,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
         padding: widget.padding,
         key: _scrollKey,
         controller: widget.scrollController,
+        listController: currentListController,
         physics: const AlwaysScrollableScrollPhysics(),
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         children: [
@@ -320,6 +323,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
       key: _scrollKey,
       padding: widget.padding,
       controller: widget.scrollController,
+      listController: currentListController,
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: realWidgetCount,
       itemBuilder: (context, index) => _getListItemAt(index, snapshot),
@@ -469,21 +473,16 @@ class PagedListViewState<T> extends State<PagedListView<T>>
 
   scrollToIndex(int index,
       [Duration duration = kDuration, Curve curve = kCurve]) async {
-    // add the height of head widget, if it exists
-    final headBox = headKey.currentContext?.findRenderObject() as RenderBox?;
-
-    final double itemTop = valueKeys
-        .getRange(0, index)
-        .fold<double>(headBox?.size.height ?? 0.0, (value, element) {
-      final RenderBox box =
-          element.currentContext.findRenderObject() as RenderBox;
-      return value + box.size.height;
-    });
     if (kDuration.inMicroseconds == 0) {
-      currentController!.jumpTo(itemTop);
+      currentListController.jumpToItem(
+          index: index, scrollController: currentController!, alignment: 0);
     } else {
-      await currentController!
-          .animateTo(itemTop, duration: duration, curve: curve);
+      currentListController.animateToItem(
+          index: index,
+          scrollController: currentController!,
+          alignment: 0,
+          duration: (_) => duration,
+          curve: (_) => curve);
     }
   }
 
@@ -545,7 +544,9 @@ class PagedListViewController<T> implements ListProvider<T> {
       [Duration duration = kDuration, Curve curve = kCurve]) async {
     try {
       await _state.scrollToItem(item, duration, curve);
-    } catch (ignored) {
+    } catch (e, st) {
+      debugPrint(e.toString());
+      debugPrintStack(stackTrace: st);
       return false;
     }
     return true;
