@@ -25,6 +25,7 @@ import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/state_key.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/material.dart';
+import 'package:super_sliver_list/super_sliver_list.dart';
 
 const kDuration = Duration(milliseconds: 500);
 const kCurve = Curves.easeInOut;
@@ -151,6 +152,8 @@ class PagedListViewState<T> extends State<PagedListView<T>>
 
   ScrollController? get currentController =>
       widget.scrollController ?? PrimaryScrollController.of(context);
+
+  ListController currentListController = ListController();
 
   @override
   Widget build(BuildContext context) {
@@ -295,11 +298,12 @@ class PagedListViewState<T> extends State<PagedListView<T>>
     if (!_isRefreshing && _isEnded && _data.isEmpty) {
       // Tell the listView not to try to load anymore.
       _shouldLoad = false;
-      return ListView(
+      return SuperListView(
         //clipBehavior: Clip.none,
         padding: widget.padding,
         key: _scrollKey,
         controller: widget.scrollController,
+        listController: currentListController,
         physics: const AlwaysScrollableScrollPhysics(),
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         children: [
@@ -315,10 +319,11 @@ class PagedListViewState<T> extends State<PagedListView<T>>
         (_isEnded ? 1 : 0) +
         (_hasError ? 1 : 0) +
         (_hasHeadWidget ? 1 : 0);
-    return ListView.builder(
+    return SuperListView.builder(
       key: _scrollKey,
       padding: widget.padding,
       controller: widget.scrollController,
+      listController: currentListController,
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: realWidgetCount,
       itemBuilder: (context, index) => _getListItemAt(index, snapshot),
@@ -468,21 +473,16 @@ class PagedListViewState<T> extends State<PagedListView<T>>
 
   scrollToIndex(int index,
       [Duration duration = kDuration, Curve curve = kCurve]) async {
-    // add the height of head widget, if it exists
-    final headBox = headKey.currentContext?.findRenderObject() as RenderBox?;
-
-    final double itemTop = valueKeys
-        .getRange(0, index)
-        .fold<double>(headBox?.size.height ?? 0.0, (value, element) {
-      final RenderBox box =
-          element.currentContext.findRenderObject() as RenderBox;
-      return value + box.size.height;
-    });
     if (kDuration.inMicroseconds == 0) {
-      currentController!.jumpTo(itemTop);
+      currentListController.jumpToItem(
+          index: index, scrollController: currentController!, alignment: 0);
     } else {
-      await currentController!
-          .animateTo(itemTop, duration: duration, curve: curve);
+      currentListController.animateToItem(
+          index: index,
+          scrollController: currentController!,
+          alignment: 0,
+          duration: (_) => duration,
+          curve: (_) => curve);
     }
   }
 
@@ -544,7 +544,9 @@ class PagedListViewController<T> implements ListProvider<T> {
       [Duration duration = kDuration, Curve curve = kCurve]) async {
     try {
       await _state.scrollToItem(item, duration, curve);
-    } catch (ignored) {
+    } catch (e, st) {
+      debugPrint(e.toString());
+      debugPrintStack(stackTrace: st);
       return false;
     }
     return true;

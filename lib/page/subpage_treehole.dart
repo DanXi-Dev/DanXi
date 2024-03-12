@@ -138,11 +138,16 @@ Future<OTHole> prefetchAllFloors(OTHole hole) async {
   if (hole.reply != null && hole.reply! < Constant.POST_COUNT_PER_PAGE) {
     return hole;
   }
-  List<OTFloor>? floors = await OpenTreeHoleRepository.getInstance()
-      .loadFloors(hole, startFloor: 0, length: 0);
+  List<OTFloor>? floors = await loadAllFloors(hole);
 
   OTHole holeClone = OTHole.fromJson(jsonDecode(jsonEncode(hole)));
   return holeClone..floors?.prefetch = floors;
+}
+
+/// Return all floors of a [OTHole].
+Future<List<OTFloor>?> loadAllFloors(OTHole hole) async {
+  return await OpenTreeHoleRepository.getInstance()
+      .loadFloors(hole, startFloor: 0, length: 0);
 }
 
 const String KEY_NO_TAG = "默认";
