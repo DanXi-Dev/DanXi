@@ -188,11 +188,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
           // Attach information about its parent course for each review
           rev.linkCourse(elem.getSummary());
 
-          // Convert grades to client format
-          if (!rev.rank!.isClientFormat) {
-            rev.rank = rev.rank?.convertFormat();
-          }
-
           // calculate average score
           totalScore += rev.rank!.overall!;
         }

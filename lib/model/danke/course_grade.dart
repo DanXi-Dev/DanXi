@@ -76,28 +76,20 @@ class CourseGrade with ChangeNotifier {
     notifyListeners();
   }
 
-  // Indicates the format of the grade
-  bool isClientFormat = false;
-
-  CourseGrade(this._overall, this._content, this._workload, this._assessment,
-      {this.isClientFormat = false});
+  CourseGrade(this._overall, this._content, this._workload, this._assessment);
 
   CourseGrade clone() =>
       CourseGrade(_overall, _content, _workload, _assessment);
 
-  CourseGrade convertFormat() {
-    // Reverse the content and workload score
-    return CourseGrade(_overall, 6 - _content!, 6 - _workload!, _assessment,
-        isClientFormat: !isClientFormat);
-  }
-
   factory CourseGrade.fromJson(Map<String, dynamic> json) {
     final obj = CourseGradeObject.fromJson(json);
-    return CourseGrade(obj.overall, obj.content, obj.workload, obj.assessment);
+    return CourseGrade(
+        obj.overall, 6 - obj.content!, 6 - obj.workload!, obj.assessment);
   }
 
   Map<String, dynamic> toJson() {
-    final raw = isClientFormat ? convertFormat() : this;
+    final raw =
+        CourseGrade(_overall, 6 - _content!, 6 - _workload!, _assessment);
     return CourseGradeObject(
             raw.overall, raw.content, raw.workload, raw.assessment)
         .toJson();
