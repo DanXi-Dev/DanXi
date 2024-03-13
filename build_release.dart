@@ -20,24 +20,42 @@
 import 'dart:io';
 
 import 'package:archive/archive_io.dart';
+import 'package:args/args.dart';
 import 'package:git/git.dart';
 import 'package:path/path.dart' as p;
 
-void main(List<String> arguments) async {
-  if (arguments.isEmpty ||
-      !['android', 'windows', 'aab'].contains(arguments[0])) {
-    print('A valid target is required: android, windows, aab');
-    exit(1);
-  }
+String flutterExecutable = 'flutter';
+String dartExecutable = 'dart';
 
+void main(List<String> arguments) async {
+  var parser = ArgParser()
+    ..addOption("target",
+        allowed: ['android', 'windows', 'aab'],
+        help: "The target to build for.",
+        mandatory: true)
+    ..addOption("versionCode",
+        help:
+            "The version code to use. If not provided, the user will be prompted.",
+        mandatory: false)
+    ..addOption("flutterPath",
+        help: "The path to the flutter executable.",
+        mandatory: false,
+        defaultsTo: "flutter")
+    ..addOption("dartPath",
+        help: "The path to the dart executable.",
+        mandatory: false,
+        defaultsTo: "dart");
+  final args = parser.parse(arguments);
   print('Warning: Before building task, ensure that you have uncommented');
   print(
       'the line "signingConfig signingConfigs.release" in android/app/build.gradle,');
   print('and choose your signing key in android/key.properties.');
 
-  String? versionCode;
-  if (arguments.length > 1) {
-    versionCode = arguments[1];
+  String? versionCode = args['versionCode'];
+  flutterExecutable = args['flutterPath'];
+  dartExecutable = args['dartPath'];
+
+  if (versionCode != null) {
     print('Version code: $versionCode');
   } else {
     print('Please enter the version code:');
@@ -61,7 +79,7 @@ void main(List<String> arguments) async {
   await runDartProcess(
       ['run', 'build_runner', 'build', '--delete-conflicting-outputs']);
 
-  switch (arguments[0]) {
+  switch (args['target']) {
     case 'android':
       await buildAndroid(versionCode, gitHash);
       break;
@@ -75,14 +93,16 @@ void main(List<String> arguments) async {
 }
 
 Future<int> runFlutterProcess(List<String> args) async {
-  final buildProcess = await Process.start('flutter', args, runInShell: true);
+  final buildProcess =
+      await Process.start(flutterExecutable, args, runInShell: true);
   stdout.addStream(buildProcess.stdout);
   stderr.addStream(buildProcess.stderr);
   return await buildProcess.exitCode;
 }
 
 Future<int> runDartProcess(List<String> args) async {
-  final buildProcess = await Process.start('dart', args, runInShell: true);
+  final buildProcess =
+      await Process.start(dartExecutable, args, runInShell: true);
   stdout.addStream(buildProcess.stdout);
   stderr.addStream(buildProcess.stderr);
   return await buildProcess.exitCode;

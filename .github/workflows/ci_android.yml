@@ -41,7 +41,7 @@ jobs:
 
       - name: Build APK
         run: |
-          dart build_release.dart android dummy
+          dart build_release.dart --target android --versionCode dummy
 
       - if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name != 'nightly'
         name: Release

@@ -1,4 +1,4 @@
- /*
+/*
  *     Copyright (C) 2021  DanXi-Dev
  *
  *     This program is free software: you can redistribute it and/or modify
@@ -103,7 +103,9 @@ void main() {
   SettingsProvider.getInstance().init().then((_) {
     SettingsProvider.getInstance().isTagSuggestionAvailable().then((value) {
       SettingsProvider.getInstance().tagSuggestionAvailable = value;
-      DeviceIdentity.register().then((value) {
+      final registerDeviceIdentity =
+          PlatformX.isAndroid ? DeviceIdentity.register() : Future.value();
+      registerDeviceIdentity.then((_) {
         // This is the entrypoint of a simple Flutter app.
         // runApp() is a function that takes a [Widget] and makes it the root
         // of the widget tree.

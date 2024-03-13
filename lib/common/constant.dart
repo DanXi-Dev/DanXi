@@ -94,8 +94,14 @@ class Constant {
   /// It is used to identify the client in the HTTP request header.
   /// Currently, it is used in the [OpenTreeHoleRepository] to tell the server
   /// about the client version.
-  static String get version =>
-      "DanXi/${FlutterApp.versionName}b${Pubspec.version.build.single} (${Platform.operatingSystem}; ${Platform.operatingSystemVersion})";
+  static String get version {
+    if (PlatformX.isWeb) {
+      // web does not support [Platform] API
+      return "DanXi/${FlutterApp.versionName}b${Pubspec.version.build.single} (Web)";
+    } else {
+      return "DanXi/${FlutterApp.versionName}b${Pubspec.version.build.single} (${Platform.operatingSystem}; ${Platform.operatingSystemVersion})";
+    }
+  }
 
   /// The tips to be shown as hints in the [BBSEditorWidget].
   static List<String> fduHoleTips = [];

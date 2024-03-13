@@ -33,6 +33,7 @@ dependencies:
   screen_brightness: ^1.0.0
   flutter_email_sender: ^6.0.1
   auto_size_text: ^3.0.0
+  super_sliver_list: ^0.2.1
   ical:
     git:
       url: https://github.com/dartclub/ical.git
@@ -124,6 +125,7 @@ dev_dependencies:
   archive: ^3.4.10
   git: ^2.2.1
   path: ^1.9.0
+  args: ^2.4.2
 
 flutter_intl:
   enabled: true
