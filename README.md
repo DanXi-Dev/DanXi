@@ -77,8 +77,10 @@ Tools • Dart 3.3.0 • DevTools 2.31.1
 确定配置正确后，你需要首先在项目根目录下运行 
 
 ```
-dart run build_runner build --delete-conflicting-outputs
+flutter pub get
+flutter pub global activate intl_utils
 dart run intl_utils:generate
+dart run build_runner build --delete-conflicting-outputs
 ```
 
 然后运行  `flutter run [ios/android]`即可运行应用。

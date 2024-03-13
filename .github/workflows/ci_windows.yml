@@ -33,7 +33,7 @@ jobs:
 
       - name: Build Executable
         run: |
-          dart build_release.dart windows dummy
+          dart build_release.dart --target windows --versionCode dummy
 
       - if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name != 'nightly'
         name: Release

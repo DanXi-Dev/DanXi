@@ -124,6 +124,7 @@ dev_dependencies:
   archive: ^3.4.10
   git: ^2.2.1
   path: ^1.9.0
+  args: ^2.4.2
 
 flutter_intl:
   enabled: true
