@@ -26,6 +26,7 @@ import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
+import 'package:dan_xi/page/opentreehole/admin_operation.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
 import 'package:dan_xi/page/opentreehole/image_viewer.dart';
 import 'package:dan_xi/page/subpage_treehole.dart';
@@ -56,8 +57,6 @@ import 'package:intl/intl.dart';
 import 'package:linkify/linkify.dart';
 import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
-
-import '../../model/opentreehole/history.dart';
 
 /// This function preprocesses content downloaded from FDUHOLE so that
 /// (1) HTML href is added to raw links
@@ -118,7 +117,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   /// Fields related to the display states.
   bool _multiSelectMode = false;
-  final List<int> _selectedFloors = [];
+  final List<OTFloor> _selectedFloors = [];
   bool shouldScrollToEnd = false;
   OTFloor? locateFloor;
 
@@ -569,70 +568,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       list.map((e) => OTTag.fromJson(jsonDecode(jsonEncode(e)))).toList();
 
   List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {
-    List<Widget> buildAdminPenaltyMenu(BuildContext menuContext, OTFloor e) {
-      Future<void> onExecutePenalty(int level) async {
-        // Confirm the operation
-        bool? confirmed = await Noticing.showConfirmationDialog(context,
-            "You are going to add a penalty of level $level to floor ${e.floor_id} in its division. Are you sure?",
-            isConfirmDestructive: true);
-        if (confirmed != true) return;
-
-        int? result = await OpenTreeHoleRepository.getInstance()
-            .adminAddPenalty(e.floor_id, level);
-        if (result != null && result < 300 && mounted) {
-          Noticing.showMaterialNotice(
-              context, S.of(context).operation_successful);
-        }
-      }
-
-      Future<void> onExecutePenaltyDays() async {
-        // Input the number of days
-        String? dayStr = await Noticing.showInputDialog(
-            context, "Please input the number of days");
-        if (dayStr == null) return;
-        int? days = int.tryParse(dayStr);
-        if (days == null) return;
-
-        // Confirm the operation
-        bool? confirmed = await Noticing.showConfirmationDialog(context,
-            "You are going to add a penalty of $days days to floor ${e.floor_id} in its division. Are you sure?",
-            isConfirmDestructive: true);
-        if (confirmed != true) return;
-
-        int? result = await OpenTreeHoleRepository.getInstance()
-            .adminAddPenaltyDays(e.floor_id, days);
-        if (result != null && result < 300 && mounted) {
-          Noticing.showMaterialNotice(
-              context, S.of(context).operation_successful);
-        }
-      }
-
-      return [
-        PlatformContextMenuItem(
-          onPressed: () => onExecutePenalty(1),
-          menuContext: menuContext,
-          child: Text(S.of(context).level(1)),
-        ),
-        PlatformContextMenuItem(
-          onPressed: () => onExecutePenalty(2),
-          menuContext: menuContext,
-          child: Text(S.of(context).level(2)),
-        ),
-        PlatformContextMenuItem(
-          onPressed: () => onExecutePenalty(3),
-          menuContext: menuContext,
-          isDestructive: true,
-          child: Text(S.of(context).level(3)),
-        ),
-        PlatformContextMenuItem(
-          onPressed: onExecutePenaltyDays,
-          menuContext: menuContext,
-          isDestructive: true,
-          child: const Text("Custom penalty..."),
-        ),
-      ];
-    }
-
     List<Widget> buildAdminMenu(BuildContext menuContext, OTFloor e) {
       return [
         PlatformContextMenuItem(
@@ -649,29 +584,20 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformContextMenuItem(
           onPressed: () async {
-            if (await Noticing.showConfirmationDialog(
-                    context, S.of(context).are_you_sure,
-                    isConfirmDestructive: true) ==
-                true) {
-              final reason = await Noticing.showInputDialog(
-                  context, S.of(context).input_reason);
-              int? result = await OpenTreeHoleRepository.getInstance()
-                  .adminDeleteFloor(e.floor_id, reason);
-              if (result != null && result < 300 && mounted) {
-                Noticing.showMaterialNotice(
-                    context, S.of(context).operation_successful);
-              }
+            if (await showAdminOperation(context, e)) {
+              Noticing.showMaterialNotice(
+                  context, S.of(context).operation_successful);
             }
           },
           isDestructive: true,
           menuContext: menuContext,
-          child: Text(S.of(context).delete_floor),
+          child: const Text("打开帖子管理页面"),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
             bool? lock = await Noticing.showConfirmationDialog(
-                context, "Lock or unlock the hole?",
-                confirmText: "Lock", cancelText: "Unlock");
+                context, "锁定或解锁树洞？",
+                confirmText: "锁定", cancelText: "解锁");
             if (lock != null) {
               int? result = await OpenTreeHoleRepository.getInstance()
                   .adminLockHole(e.hole_id, lock);
@@ -683,12 +609,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           },
           isDestructive: true,
           menuContext: menuContext,
-          child: const Text("Lock/Unlock hole"),
+          child: const Text("锁定/解锁树洞"),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
             bool? hide = await Noticing.showConfirmationDialog(
-                context, "Hide or unhide the hole?",
+                context, "隐藏或显示树洞？",
                 confirmText: "Hide", cancelText: "Unhide");
             if (hide != null) {
               int? result = hide
@@ -704,20 +630,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           },
           isDestructive: true,
           menuContext: menuContext,
-          child: Text(S.of(context).hide_hole),
-        ),
-        PlatformContextMenuItem(
-          onPressed: () => showPlatformModalSheet(
-              context: context,
-              builder: (subMenuContext) => PlatformContextMenu(
-                  actions: buildAdminPenaltyMenu(subMenuContext, e),
-                  cancelButton: CupertinoActionSheetAction(
-                    child: Text(S.of(subMenuContext).cancel),
-                    onPressed: () => Navigator.of(subMenuContext).pop(),
-                  ))),
-          isDestructive: true,
-          menuContext: menuContext,
-          child: Text(S.of(context).add_penalty),
+          child: const Text("隐藏/显示树洞"),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
@@ -862,72 +775,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           child: Text(S.of(context).modify_tag_division),
         ),
-        PlatformContextMenuItem(
-          onPressed: () async {
-            final reason = await Noticing.showInputDialog(
-                context, S.of(context).input_reason);
-            if (reason == null) {
-              return; // Note: don't return if tag is empty string, because user may want to clear the special tag with this
-            }
-            int? result = await OpenTreeHoleRepository.getInstance()
-                .adminFoldFloor(reason.isEmpty ? [] : [reason], e.floor_id);
-            if (result != null && result < 300 && mounted) {
-              Noticing.showMaterialNotice(
-                  context, S.of(context).operation_successful);
-            }
-          },
-          menuContext: menuContext,
-          child: Text(S.of(context).fold_floor),
-        ),
-        PlatformContextMenuItem(
-          onPressed: () async {
-            List<String>? history = await OpenTreeHoleRepository.getInstance()
-                .adminGetPunishmentHistory(e.floor_id!);
-            if (history != null && mounted) {
-              StringBuffer content = StringBuffer();
-              for (int i = 0; i < history.length; i++) {
-                content.writeln(history[i]);
-                if (i < history.length - 1) {
-                  content.writeln("================");
-                }
-              }
-              Noticing.showModalNotice(context,
-                  title: S.of(context).punishment_history_of(e.floor_id ?? "?"),
-                  message: content.toString(),
-                  selectable: true);
-            }
-          },
-          menuContext: menuContext,
-          child: Text(S.of(context).show_punishment_history),
-        ),
-        PlatformContextMenuItem(
-          onPressed: () async {
-            List<OTHistory>? history =
-                await OpenTreeHoleRepository.getInstance()
-                    .getHistory(e.floor_id);
-            if (history != null && mounted) {
-              StringBuffer content = StringBuffer();
-              for (int i = 0; i < history.length; i++) {
-                var record = history[i];
-                content.writeln(
-                    S.of(context).history_time(record.time_updated ?? "?"));
-                content.writeln(
-                    S.of(context).history_altered_by(record.user_id ?? "?"));
-                content.writeln(S.of(context).original_content);
-                content.writeln(record.content);
-                if (i < history.length - 1) {
-                  content.writeln("================");
-                }
-              }
-              Noticing.showModalNotice(context,
-                  title: S.of(context).history_of(e.floor_id ?? "?"),
-                  message: content.toString(),
-                  selectable: true);
-            }
-          },
-          menuContext: menuContext,
-          child: Text(S.of(context).view_history),
-        ),
       ];
     }
 
@@ -1013,6 +860,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         },
         child: Text(S.of(menuContext).report),
       ),
+
       if (OpenTreeHoleRepository.getInstance().isAdmin) ...[
         PlatformContextMenuItem(
           onPressed: () => showPlatformModalSheet(
@@ -1034,8 +882,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   List<Widget> _buildMultiSelectContextMenu(BuildContext menuContext) {
-    Future<void> multiExecution(
-        List<int> floorsList, Future<int?> Function(int floors) action) async {
+    Future<void> multiExecution(List<OTFloor> floorsList,
+        Future<int?> Function(OTFloor floors) action) async {
       final floors = floorsList.toList();
       List<int?> results = await Future.wait(floors.map(action));
 
@@ -1043,9 +891,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       List<int> failedIds = [];
       results.forEachIndexed((index, result) {
         if (result != null && result < 300) {
-          successIds.add(floors[index]);
+          successIds.add(floors[index].floor_id!);
         } else {
-          failedIds.add(floors[index]);
+          failedIds.add(floors[index].floor_id!);
         }
       });
       if (mounted) {
@@ -1067,7 +915,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               await multiExecution(
                   _selectedFloors,
                   (floor) async => await OpenTreeHoleRepository.getInstance()
-                      .adminDeleteFloor(floor, reason));
+                      .adminDeleteFloor(floor.floor_id, reason));
             }
           },
           isDestructive: true,
@@ -1084,7 +932,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             await multiExecution(
                 _selectedFloors,
                 (floor) async => await OpenTreeHoleRepository.getInstance()
-                    .adminAddSpecialTag(tag, floor));
+                    .adminAddSpecialTag(tag, floor.floor_id));
           },
           menuContext: menuContext,
           child: Text(S.of(context).add_special_tag),
@@ -1099,7 +947,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             await multiExecution(
                 _selectedFloors,
                 (floor) async => await OpenTreeHoleRepository.getInstance()
-                    .adminFoldFloor(reason.isEmpty ? [] : [reason], floor));
+                    .adminFoldFloor(
+                        reason.isEmpty ? [] : [reason], floor.floor_id));
           },
           menuContext: menuContext,
           child: Text(S.of(context).fold_floor),
@@ -1191,10 +1040,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           ? () {
               // If we are in multi-select mode, we should (un)select the floor.
               setState(() {
-                if (_selectedFloors.contains(floor.floor_id)) {
-                  _selectedFloors.remove(floor.floor_id);
+                if (_selectedFloors.contains(floor)) {
+                  _selectedFloors.remove(floor);
                 } else if (floor.floor_id != null) {
-                  _selectedFloors.add(floor.floor_id!);
+                  _selectedFloors.add(floor);
                 }
               });
             }
@@ -1237,7 +1086,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       },
     );
 
-    if (_multiSelectMode && _selectedFloors.contains(floor.floor_id)) {
+    if (_multiSelectMode && _selectedFloors.contains(floor)) {
       return Stack(
         children: [
           floorWidget,
