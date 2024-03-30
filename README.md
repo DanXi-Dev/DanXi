@@ -56,10 +56,10 @@ dmg 硬盘映像，挂载拷贝即可。
 
 ```shell
 $ flutter --version
-Flutter 3.19.2 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 7482962148 (8 天前) • 2024-02-27 16:51:22 -0500
-Engine • revision 04817c99c9
-Tools • Dart 3.3.0 • DevTools 2.31.1
+Flutter 3.19.3 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision ba39319843 (5 天前) • 2024-03-07 15:22:21 -0600
+Engine • revision 2e4ba9c6fb
+Tools • Dart 3.3.1 • DevTools 2.31.1
 ```
 
 ## 编译说明
@@ -77,8 +77,10 @@ Tools • Dart 3.3.0 • DevTools 2.31.1
 确定配置正确后，你需要首先在项目根目录下运行 
 
 ```
-dart run build_runner build --delete-conflicting-outputs
+flutter pub get
+flutter pub global activate intl_utils
 dart run intl_utils:generate
+dart run build_runner build --delete-conflicting-outputs
 ```
 
 然后运行  `flutter run [ios/android]`即可运行应用。

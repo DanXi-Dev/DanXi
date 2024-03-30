@@ -77,7 +77,7 @@ final PostInterceptor _kStopWordInterceptor = (context, text) async {
 
 class CourseReviewEditorText with ChangeNotifier {
   int _courseId = -1;
-  CourseGrade _grade = CourseGrade(0, 0, 0, 0, isClientFormat: true);
+  CourseGrade _grade = CourseGrade(0, 0, 0, 0);
   String? _content, _title;
 
   int get courseId => _courseId;
@@ -127,12 +127,6 @@ class CourseReviewEditorText with ChangeNotifier {
         _inRange(_grade.content ?? 0) &&
         _inRange(_grade.workload ?? 0) &&
         _inRange(_grade.assessment ?? 0);
-  }
-
-  // The server and client handles the content and workload scores reversely, the function does the convertion
-  CourseReviewEditorText convertFormat() {
-    return CourseReviewEditorText(
-        _content, _title, _courseId, _grade.convertFormat());
   }
 
   static bool _inRange(int val, [int min = 1, int max = 5]) {
@@ -798,7 +792,7 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
     if (!review.isValid()) return;
 
     if ((await _interceptor?.call(context, review)) ?? true) {
-      Navigator.pop<CourseReviewEditorText>(context, review.convertFormat());
+      Navigator.pop<CourseReviewEditorText>(context, review);
     }
   }
 }

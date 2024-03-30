@@ -616,6 +616,29 @@ class OTFloorMentionWidget extends StatelessWidget {
     required this.hasBackgroundImage,
   });
 
+  /// Jump to the post which has [floor] in a new page.
+  /// If the floor is in the same hole, it will STILL open a new page.
+  static Future<void> jumpToFloorInNewPage(
+    BuildContext context,
+    OTFloor floor,
+  ) async {
+    ProgressFuture progressDialog = showProgressDialog(
+        loadingText: S.of(context).loading, context: context);
+    try {
+      OTHole? hole = await OpenTreeHoleRepository.getInstance()
+          .loadSpecificHole(floor.hole_id!);
+      hole = await prefetchAllFloors(hole!);
+      if (context.mounted) {
+        smartNavigatorPush(context, "/bbs/postDetail",
+            arguments: {"post": hole, "locate": floor});
+      }
+    } catch (e, st) {
+      Noticing.showErrorDialog(context, e, trace: st);
+    } finally {
+      progressDialog.dismiss(showAnim: false);
+    }
+  }
+
   static Future<bool?> showFloorDetail(BuildContext context, OTFloor floor,
       [String? extraTips]) {
     bool inThatFloorPage = false;
@@ -675,26 +698,9 @@ class OTFloorMentionWidget extends StatelessWidget {
                                 pagedListViewController,
                                 floor,
                                 ScrollDirection.UP);
-                            return;
-                          }
-
-                          // If this floor is in another hole
-                          ProgressFuture progressDialog = showProgressDialog(
-                              loadingText: S.of(context).loading,
-                              context: context);
-                          try {
-                            OTHole? hole =
-                                await OpenTreeHoleRepository.getInstance()
-                                    .loadSpecificHole(floor.hole_id!);
-                            smartNavigatorPush(context, "/bbs/postDetail",
-                                arguments: {
-                                  "post": await prefetchAllFloors(hole!),
-                                  "locate": floor,
-                                });
-                          } catch (e, st) {
-                            Noticing.showErrorDialog(context, e, trace: st);
-                          } finally {
-                            progressDialog.dismiss(showAnim: false);
+                          } else {
+                            // If this floor is in another hole
+                            await jumpToFloorInNewPage(context, floor);
                           }
                         },
                         child: Text(S.of(cxt).jump_to_hole),

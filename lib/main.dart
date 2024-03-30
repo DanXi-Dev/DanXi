@@ -1,4 +1,4 @@
- /*
+/*
  *     Copyright (C) 2021  DanXi-Dev
  *
  *     This program is free software: you can redistribute it and/or modify
@@ -66,7 +66,6 @@ import 'package:flutter_fgbg/flutter_fgbg.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:git_info/git_info.dart';
 import 'package:material_color_generator/material_color_generator.dart';
 import 'package:provider/provider.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
@@ -81,8 +80,8 @@ void main() {
 
   // Init Mi push Service.
   if (PlatformX.isAndroid) {
-    unawaited(XiaoMiPushPlugin.init(
-        appId: "2882303761519940685", appKey: "5821994071685"));
+    XiaoMiPushPlugin.init(
+        appId: "2882303761519940685", appKey: "5821994071685");
   }
 
   // Init Feature registration.
@@ -107,7 +106,9 @@ void main() {
   SettingsProvider.getInstance().init().then((_) {
     SettingsProvider.getInstance().isTagSuggestionAvailable().then((value) {
       SettingsProvider.getInstance().tagSuggestionAvailable = value;
-      DeviceIdentity.register().then((value) {
+      final registerDeviceIdentity =
+          PlatformX.isAndroid ? DeviceIdentity.register() : Future.value();
+      registerDeviceIdentity.then((_) {
         // This is the entrypoint of a simple Flutter app.
         // runApp() is a function that takes a [Widget] and makes it the root
         // of the widget tree.
@@ -329,8 +330,7 @@ class DanxiApp extends StatelessWidget {
       child: MultiProvider(providers: [
         ChangeNotifierProvider.value(value: SettingsProvider.getInstance()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
-        ChangeNotifierProvider.value(value: fduHoleProvider),
-        FutureProvider.value(value: GitInfo.get(), initialData: null)
+        ChangeNotifierProvider.value(value: fduHoleProvider)
       ], child: mainApp),
     );
   }

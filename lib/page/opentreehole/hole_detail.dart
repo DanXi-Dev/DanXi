@@ -112,26 +112,29 @@ class BBSPostDetail extends StatefulWidget {
 class BBSPostDetailState extends State<BBSPostDetail> {
   /// Unrelated to the state.
   /// These fields should only be initialized once when created.
-  late OTHole _hole;
-  RenderMode _renderMode = RenderMode.NORMAL;
-  String? _searchKeyword;
+  late RenderModel _renderModel;
   FileImage? _backgroundImage;
 
   /// Fields related to the display states.
-  bool? _isFavored, _isSubscribed;
-  bool _onlyShowDZ = false;
   bool _multiSelectMode = false;
   final List<OTFloor> _selectedFloors = [];
-
   bool shouldScrollToEnd = false;
   OTFloor? locateFloor;
+
+  /// [prefetchedFloors] keep all floors that are prefetched, i.e.
+  /// they are not loaded by [PagedListView], but passed in or loaded by events
+  /// in this page widget, e.g. scrolling to bottom.
+  final List<OTFloor> prefetchedFloors = [];
 
   final PagedListViewController<OTFloor> _listViewController =
       PagedListViewController<OTFloor>();
 
+  /// whether we has "prefetched" all data.
+  /// Note: "Prefetch" means that the data is not loaded by [PagedListView], but passed in or loaded by events.
+  /// That is, even [hasPrefetchedAllData] == false, all floors can be already loaded.
   bool get hasPrefetchedAllData =>
-      shouldScrollToEnd ||
-      (_hole.floors?.prefetch?.length ?? -1) > Constant.POST_COUNT_PER_PAGE;
+      prefetchedFloors.length > Constant.POST_COUNT_PER_PAGE ||
+      shouldScrollToEnd;
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTFloor>?> _loadContent(int page) async {
@@ -147,28 +150,15 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       }
     }
 
-    return switch (_renderMode) {
-      RenderMode.NORMAL => await OpenTreeHoleRepository.getInstance()
-          .loadFloors(_hole, startFloor: page * Constant.POST_COUNT_PER_PAGE),
-      RenderMode.SEARCH_RESULT => await OpenTreeHoleRepository.getInstance()
-          .loadSearchResults(_searchKeyword,
-              startFloor: _listViewController.length()),
-      RenderMode.PUNISHMENT_HISTORY => await loadPunishmentHistory(page),
+    return switch (_renderModel) {
+      Normal(hole: var hole) => await OpenTreeHoleRepository.getInstance()
+          .loadFloors(hole, startFloor: page * Constant.POST_COUNT_PER_PAGE),
+      Search(keyword: var searchKeyword) =>
+        await OpenTreeHoleRepository.getInstance().loadSearchResults(
+            searchKeyword,
+            startFloor: _listViewController.length()),
+      PunishmentHistory() => await loadPunishmentHistory(page),
     };
-  }
-
-  Future<bool?> _isHoleFavorite() async {
-    if (_isFavored != null) return _isFavored;
-    final List<int>? favorites =
-        await (OpenTreeHoleRepository.getInstance().getFavoriteHoleId());
-    return favorites!.any((elementId) => elementId == _hole.hole_id);
-  }
-
-  Future<bool?> _isHoleSubscribed() async {
-    if (_isSubscribed != null) return _isSubscribed;
-    final List<int>? subscriptions =
-        await (OpenTreeHoleRepository.getInstance().getSubscribedHoleId());
-    return subscriptions!.any((elementId) => elementId == _hole.hole_id);
   }
 
   // construct the uri of the floor and copy it to clipboard
@@ -176,7 +166,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     String uri = 'https://www.fduhole.com/floor/$floorId';
     try {
       if (floorId == null) return false;
-      FlutterClipboard.copy(uri);
+      await FlutterClipboard.copy(uri);
     } catch (e) {
       return false;
     }
@@ -188,7 +178,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     String uri = 'https://www.fduhole.com/hole/$holeId';
     try {
       if (holeId == null) return false;
-      FlutterClipboard.copy(uri);
+      await FlutterClipboard.copy(uri);
     } catch (e) {
       return false;
     }
@@ -199,35 +189,26 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   void initState() {
     super.initState();
     if (widget.arguments!.containsKey('post')) {
-      _renderMode = RenderMode.NORMAL;
-      _hole = widget.arguments!['post'];
+      OTHole hole = widget.arguments!['post'];
+      _renderModel = Normal(hole);
+      prefetchedFloors.addAll(hole.floors?.prefetch ?? const []);
       // Cache preloaded floor only when user views the Hole
-      for (var floor
-          in _hole.floors?.prefetch ?? List<OTFloor>.empty(growable: false)) {
+      for (var floor in prefetchedFloors) {
         OpenTreeHoleRepository.getInstance().cacheFloor(floor);
       }
       // Update hole view count
-      if (_hole.hole_id != null) {
+      if (hole.hole_id != null) {
         unawaited(OpenTreeHoleRepository.getInstance()
-            .updateHoleViewCount(_hole.hole_id!));
+            .updateHoleViewCount(hole.hole_id!));
       }
     } else if (widget.arguments!.containsKey('searchKeyword')) {
-      _renderMode = RenderMode.SEARCH_RESULT;
-      _searchKeyword = widget.arguments!['searchKeyword'];
-      // Create a dummy post for displaying search result
-      _hole = OTHole.dummy();
-    } else if (widget.arguments!.containsKey('punishmentHistory') &&
-        widget.arguments!['punishmentHistory'] == true) {
-      _renderMode = RenderMode.PUNISHMENT_HISTORY;
-      // Create a dummy post for displaying punishment history
-      _hole = OTHole.dummy();
+      _renderModel = Search(widget.arguments!['searchKeyword']);
+    } else if (widget.arguments?['punishmentHistory'] == true) {
+      _renderModel = PunishmentHistory();
     }
 
-    shouldScrollToEnd = widget.arguments!.containsKey('scroll_to_end') &&
-        widget.arguments!['scroll_to_end'] == true;
-    if (widget.arguments!.containsKey('locate')) {
-      locateFloor = widget.arguments!["locate"];
-    }
+    shouldScrollToEnd = widget.arguments?['scroll_to_end'] == true;
+    locateFloor = widget.arguments?["locate"];
 
     StateProvider.needScreenshotWarning = true;
   }
@@ -247,10 +228,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       // Reset variable to make [hasPrefetchedAllData] false
       setState(() {
         shouldScrollToEnd = false;
-        _hole.floors?.prefetch =
-            _hole.floors?.prefetch?.take(Constant.POST_COUNT_PER_PAGE).toList();
+        if (_renderModel case Normal()) {
+          prefetchedFloors.removeRange(
+              Constant.POST_COUNT_PER_PAGE, prefetchedFloors.length);
+        }
       });
-
       // Wait build() complete (so `allDataReceiver` has been set to `null`), then trigger a refresh in
       // the list view.
       Completer<void> completer = Completer();
@@ -271,30 +253,38 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        // Replace precached data with updated ones
-        if (_hole.hole_id != -1) {
-          List<OTFloor>? newFloors =
-              await OpenTreeHoleRepository.getInstance().loadFloors(_hole);
-          _listViewController.replaceInitialData(newFloors!);
-          _hole.floors!.prefetch = newFloors;
+        // replace precached data with updated ones. Only normal hole has precached data.
+        if (_renderModel
+            case Normal(hole: var hole, prefetchNeedUpdate: var needUpdate)) {
+          if (needUpdate) {
+            List<OTFloor>? newFloors =
+                await OpenTreeHoleRepository.getInstance().loadFloors(hole);
+            _listViewController.replaceInitialData(newFloors!);
+            prefetchedFloors.replaceRange(0, newFloors.length, newFloors);
+            (_renderModel as Normal).prefetchNeedUpdate = false;
+          }
         }
-      } catch (_) {}
+      } catch (_) {
+        // we don't care if the data is not updated.
+      }
       if (locateFloor != null && mounted) {
         try {
-          // Scroll to the specific floor
+          // scroll to the specific floor.
           await PagedListViewHelper.scrollToItem(
               context, _listViewController, locateFloor, ScrollDirection.DOWN);
           locateFloor = null;
-        } catch (_) {}
+        } catch (_) {
+          // we don't care if we failed to scroll to the floor.
+        }
       }
     });
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     Future<List<OTFloor>>? allDataReceiver;
     if (hasPrefetchedAllData) {
-      allDataReceiver = Future.value(_hole.floors?.prefetch);
+      allDataReceiver = Future.value(prefetchedFloors);
     }
     final pagedListView = PagedListView<OTFloor>(
-      initialData: _hole.floors?.prefetch,
+      initialData: prefetchedFloors,
       pagedController: _listViewController,
       noneItem: OTFloor.dummy(),
       withScrollbar: true,
@@ -312,20 +302,23 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       endBuilder: (context) => Center(
         child: Padding(
           padding: const EdgeInsets.only(bottom: 16),
-          child: Text((_hole.view ?? -1) >= 0
-              ? S.of(context).view_count(_hole.view.toString())
-              : S.of(context).end_reached),
+          child: switch (_renderModel) {
+            Normal(hole: var hole) when (hole.view ?? -1) >= 0 =>
+              Text(S.of(context).view_count(hole.view.toString())),
+            _ => Text(S.of(context).end_reached),
+          },
         ),
       ),
       // Only show empty message when searching, for now.
-      emptyBuilder: _renderMode != RenderMode.NORMAL
-          ? (context) => Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(S.of(context).no_data),
-                ),
-              )
-          : null,
+      emptyBuilder: switch (_renderModel) {
+        Search() => (context) => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(S.of(context).no_data),
+              ),
+            ),
+        _ => null,
+      },
     );
 
     return PlatformScaffold(
@@ -335,15 +328,15 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       appBar: PlatformAppBarX(
         title: TopController(
           controller: PrimaryScrollController.of(context),
-          child: switch (_renderMode) {
-            RenderMode.NORMAL => Text("#${_hole.hole_id}"),
-            RenderMode.SEARCH_RESULT => Text(S.of(context).search_result),
-            RenderMode.PUNISHMENT_HISTORY =>
-              Text(S.of(context).list_my_punishments),
+          child: switch (_renderModel) {
+            Normal(hole: var hole) => Text("#${hole.hole_id}"),
+            Search() => Text(S.of(context).search_result),
+            PunishmentHistory() => Text(S.of(context).list_my_punishments),
           },
         ),
         trailingActions: [
-          if (_renderMode == RenderMode.NORMAL) ...[
+          if (_renderModel
+              case Normal(hole: var hole, onlyShowDZ: var onlyShowDZ)) ...[
             _buildSubscribeActionButton(),
             _buildFavoredActionButton(),
             PlatformIconButton(
@@ -353,7 +346,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   : CupertinoIcons.arrowshape_turn_up_left),
               onPressed: () async {
                 if (await OTEditor.createNewReply(
-                    context, _hole.hole_id, null)) {
+                    context, hole.hole_id, null)) {
                   refreshListView(scrollToEnd: true);
                 }
               },
@@ -364,11 +357,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                     label: S.of(context).scroll_to_end,
                     onTap: _onTapScrollToEnd),
                 PopupMenuOption(
-                    label: _onlyShowDZ
+                    label: onlyShowDZ
                         ? S.of(context).show_all_replies
                         : S.of(context).only_show_dz,
                     onTap: (_) {
-                      setState(() => _onlyShowDZ = !_onlyShowDZ);
+                      setState(() =>
+                          (_renderModel as Normal).onlyShowDZ = !onlyShowDZ);
                       refreshListView(ignorePrefetch: false);
                     }),
                 PopupMenuOption(
@@ -387,7 +381,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 PopupMenuOption(
                   label: S.of(context).share_hole,
                   onTap: (_) async {
-                    if (await _shareHoleAsUri(_hole.hole_id)) {
+                    if (await _shareHoleAsUri(hole.hole_id)) {
                       if (mounted) {
                         Noticing.showMaterialNotice(
                             context, S.of(context).shareHoleSuccess);
@@ -398,7 +392,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 PopupMenuOption(
                   label: S.of(context).copy_hole_id,
                   onTap: (_) async {
-                    FlutterClipboard.copy('#${_hole.hole_id}');
+                    await FlutterClipboard.copy('#${hole.hole_id}');
                     if (mounted) {
                       Noticing.showMaterialNotice(
                           context, S.of(context).copy_hole_id_success);
@@ -413,9 +407,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                           isConfirmDestructive: true);
                       if (result == true) {
                         var list = SettingsProvider.getInstance().hiddenHoles;
-                        if (_hole.hole_id != null &&
-                            !list.contains(_hole.hole_id!)) {
-                          list.add(_hole.hole_id!);
+                        if (hole.hole_id != null &&
+                            !list.contains(hole.hole_id!)) {
+                          list.add(hole.hole_id!);
                           SettingsProvider.getInstance().hiddenHoles = list;
                         }
                         if (mounted) {
@@ -443,18 +437,18 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               : BoxDecoration(
                   image: DecorationImage(
                       image: _backgroundImage!, fit: BoxFit.cover)),
-          child: _renderMode == RenderMode.NORMAL
-              ? RefreshIndicator(
-                  edgeOffset: MediaQuery.of(context).padding.top,
-                  color: Theme.of(context).colorScheme.secondary,
-                  backgroundColor: Theme.of(context).dialogBackgroundColor,
-                  onRefresh: () async {
-                    HapticFeedback.mediumImpact();
-                    await refreshListView();
-                  },
-                  child: pagedListView,
-                )
-              : pagedListView,
+          child: switch (_renderModel) {
+            Normal() => RefreshIndicator(
+                edgeOffset: MediaQuery.of(context).padding.top,
+                color: Theme.of(context).colorScheme.secondary,
+                backgroundColor: Theme.of(context).dialogBackgroundColor,
+                onRefresh: () async {
+                  HapticFeedback.mediumImpact();
+                  await refreshListView();
+                },
+                child: pagedListView),
+            _ => pagedListView,
+          },
         ),
       ),
     );
@@ -465,12 +459,17 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         loadingText: S.of(context).loading, context: context);
     try {
       // If we haven't loaded before, we need to load all floors.
-      if (!shouldScrollToEnd) _hole = await prefetchAllFloors(_hole);
+      if (!hasPrefetchedAllData) {
+        final allFloors = await loadAllFloors((_renderModel as Normal).hole);
+        prefetchedFloors.replaceRange(0, prefetchedFloors.length, allFloors!);
+      }
 
       _listViewController.queueScrollToEnd();
-      _listViewController.replaceDataWith((_hole.floors?.prefetch)!);
-      setState(() {});
-      shouldScrollToEnd = true;
+      _listViewController.replaceDataWith(prefetchedFloors);
+      setState(() {
+        // set shouldScrollToEnd to true to indicate that we have scrolled to the end.
+        shouldScrollToEnd = true;
+      });
     } catch (error, st) {
       Noticing.showErrorDialog(context, error, trace: st);
     } finally {
@@ -485,12 +484,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
     return PlatformIconButton(
       padding: EdgeInsets.zero,
-      icon: FutureWidget<bool?>(
-        future: _isHoleFavorite(),
+      icon: FutureWidget<bool>(
+        future: (_renderModel as Normal).isHoleFavorite(),
         loadingBuilder: notFavoredIcon,
-        successBuilder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
-          _isFavored = snapshot.data;
-          return _isFavored!
+        successBuilder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+          bool? isFavored = snapshot.data;
+          return isFavored!
               ? Icon(PlatformX.isMaterial(context)
                   ? Icons.star
                   : CupertinoIcons.star_fill)
@@ -502,22 +501,26 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
       ),
       onPressed: () async {
-        if (_isFavored == null) return;
-        setState(() => _isFavored = !_isFavored!);
+        final normalModel = _renderModel as Normal;
+        if (normalModel.isFavored == null) return;
+        setState(() => normalModel.isFavored = !normalModel.isFavored!);
         await OpenTreeHoleRepository.getInstance()
-            .setFavorite(_isFavored! ? SetStatusMode.ADD : SetStatusMode.DELETE,
-                _hole.hole_id)
+            .setFavorite(
+                normalModel.isFavored!
+                    ? SetStatusMode.ADD
+                    : SetStatusMode.DELETE,
+                normalModel.hole.hole_id)
             .onError((dynamic error, stackTrace) {
           Noticing.showNotice(context, error.toString(),
               title: S.of(context).operation_failed, useSnackBar: false);
-          setState(() => _isFavored = !_isFavored!);
+          setState(() => normalModel.isFavored = !normalModel.isFavored!);
           return null;
         });
       },
     );
   }
 
-  // TODO: refractor to reduce redundant code
+  // TODO: refactor to reduce redundant code
   Widget _buildSubscribeActionButton() {
     var notSubscribedIcon = Icon(PlatformX.isMaterial(context)
         ? Icons.visibility_off
@@ -525,12 +528,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
     return PlatformIconButton(
       padding: EdgeInsets.zero,
-      icon: FutureWidget<bool?>(
-        future: _isHoleSubscribed(),
+      icon: FutureWidget<bool>(
+        future: (_renderModel as Normal).isHoleSubscribed(),
         loadingBuilder: notSubscribedIcon,
-        successBuilder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
-          _isSubscribed = snapshot.data;
-          return _isSubscribed!
+        successBuilder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+          bool? isSubscribed = snapshot.data;
+          return isSubscribed!
               ? Icon(PlatformX.isMaterial(context)
                   ? Icons.visibility
                   : CupertinoIcons.eye)
@@ -542,16 +545,19 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
       ),
       onPressed: () async {
-        if (_isSubscribed == null) return;
-        setState(() => _isSubscribed = !_isSubscribed!);
+        final normalModel = _renderModel as Normal;
+        if (normalModel.isSubscribed == null) return;
+        setState(() => normalModel.isSubscribed = !normalModel.isSubscribed!);
         await OpenTreeHoleRepository.getInstance()
             .setSubscription(
-                _isSubscribed! ? SetStatusMode.ADD : SetStatusMode.DELETE,
-                _hole.hole_id)
+                normalModel.isSubscribed!
+                    ? SetStatusMode.ADD
+                    : SetStatusMode.DELETE,
+                normalModel.hole.hole_id)
             .onError((dynamic error, stackTrace) {
           Noticing.showNotice(context, error.toString(),
               title: S.of(context).operation_failed, useSnackBar: false);
-          setState(() => _isSubscribed = !_isSubscribed!);
+          setState(() => normalModel.isSubscribed = !normalModel.isSubscribed!);
           return null;
         });
       },
@@ -672,11 +678,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformContextMenuItem(
           onPressed: () async {
+            final hole = (_renderModel as Normal).hole;
             OTDivision selectedDivision = OpenTreeHoleRepository.getInstance()
                 .getDivisions()
                 .firstWhere(
-                    (element) => element.division_id == _hole.division_id,
-                    orElse: () => OTDivision(_hole.division_id, '', '', null));
+                    (element) => element.division_id == hole.division_id,
+                    orElse: () => OTDivision(hole.division_id, '', '', null));
 
             List<Widget> buildDivisionOptionsList(BuildContext cxt) {
               List<Widget> list = [];
@@ -732,7 +739,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                       }
                     }));
 
-            final newTagsList = deepCopyTagList(_hole.tags ?? []);
+            final newTagsList = deepCopyTagList(hole.tags ?? []);
             bool? confirmChanged = await showPlatformDialog<bool>(
               context: context,
               builder: (BuildContext context) => PlatformAlertDialog(
@@ -758,7 +765,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             if (confirmChanged ?? false) {
               int? result = await OpenTreeHoleRepository.getInstance()
                   .adminUpdateTagAndDivision(
-                      newTagsList, _hole.hole_id, selectedDivision.division_id);
+                      newTagsList, hole.hole_id, selectedDivision.division_id);
               if (result != null && result < 300 && mounted) {
                 Noticing.showMaterialNotice(
                     context, S.of(context).operation_successful);
@@ -973,21 +980,24 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   Widget _getListItems(BuildContext context, ListProvider<OTFloor> dataProvider,
       int index, OTFloor floor,
       {bool isNested = false}) {
-    if (_onlyShowDZ &&
-        _hole.floors?.first_floor?.anonyname != floor.anonyname) {
-      return nil;
+    if (_renderModel case Normal(onlyShowDZ: var onlyShowDZ, hole: var hole)) {
+      if (onlyShowDZ &&
+          floor.anonyname != hole.floors?.first_floor?.anonyname) {
+        return nil;
+      }
     }
 
     Future<List<ImageUrlInfo>?> loadPageImage(
         BuildContext pageContext, int pageIndex) async {
-      List<OTFloor>? result = switch (_renderMode) {
-        RenderMode.NORMAL => await OpenTreeHoleRepository.getInstance()
-            .loadFloors(_hole,
+      List<OTFloor>? result = switch (_renderModel) {
+        Normal(hole: var hole) => await OpenTreeHoleRepository.getInstance()
+            .loadFloors(hole,
                 startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
-        RenderMode.SEARCH_RESULT => await OpenTreeHoleRepository.getInstance()
-            .loadSearchResults(_searchKeyword,
-                startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
-        RenderMode.PUNISHMENT_HISTORY =>
+        Search(keyword: var searchKeyword) =>
+          await OpenTreeHoleRepository.getInstance().loadSearchResults(
+              searchKeyword,
+              startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
+        PunishmentHistory() =>
           (await OpenTreeHoleRepository.getInstance().getPunishmentHistory())
               ?.map((e) => e.floor!)
               .toList(),
@@ -1008,9 +1018,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     final floorWidget = OTFloorWidget(
       hasBackgroundImage: _backgroundImage != null,
       floor: floor,
-      index: _renderMode == RenderMode.NORMAL ? index : null,
+      index: _renderModel is Normal ? index : null,
       isInMention: isNested,
-      parentHole: _hole,
+      parentHole: switch (_renderModel) {
+        Normal(hole: var hole) => hole,
+        _ => null,
+      },
       onLongPress: () async {
         showPlatformModalSheet(
             context: context,
@@ -1035,35 +1048,22 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               });
             }
           : () async {
-              if (_renderMode == RenderMode.NORMAL) {
-                int? replyId;
-                // Set the replyId to null when tapping on the first reply.
-                if (_hole.floors!.first_floor!.floor_id != floor.floor_id) {
-                  replyId = floor.floor_id;
-                  OpenTreeHoleRepository.getInstance().cacheFloor(floor);
-                }
-                if (await OTEditor.createNewReply(
-                    context, _hole.hole_id, replyId)) {
-                  await refreshListView(scrollToEnd: true);
-                }
-              } else {
-                // fixme: duplicate of [OTFloorMentionWidget.showFloorDetail].
-                ProgressFuture progressDialog = showProgressDialog(
-                    loadingText: S.of(context).loading, context: context);
-                try {
-                  OTHole? hole = await OpenTreeHoleRepository.getInstance()
-                      .loadSpecificHole(floor.hole_id!);
-                  if (mounted) {
-                    smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-                      "post": await prefetchAllFloors(hole!),
-                      "locate": floor
-                    });
+              switch (_renderModel) {
+                case Normal(hole: var hole):
+                  int? replyId;
+                  // Set the replyId to null when tapping on the first reply.
+                  if (hole.floors?.first_floor?.floor_id != floor.floor_id) {
+                    replyId = floor.floor_id;
+                    OpenTreeHoleRepository.getInstance().cacheFloor(floor);
                   }
-                } catch (e, st) {
-                  Noticing.showErrorDialog(context, e, trace: st);
-                } finally {
-                  progressDialog.dismiss(showAnim: false);
-                }
+                  if (await OTEditor.createNewReply(
+                      context, hole.hole_id, replyId)) {
+                    await refreshListView(scrollToEnd: true);
+                  }
+                  break;
+                default:
+                  await OTFloorMentionWidget.jumpToFloorInNewPage(
+                      context, floor);
               }
             },
       onTapImage: (String? url, Object heroTag) {
@@ -1080,8 +1080,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               : length ~/ Constant.POST_COUNT_PER_PAGE
         });
       },
-      searchKeyWord:
-          _renderMode == RenderMode.SEARCH_RESULT ? _searchKeyword : null,
+      searchKeyWord: switch (_renderModel) {
+        Search(keyword: var keyword) => keyword,
+        _ => null,
+      },
     );
 
     if (_multiSelectMode && _selectedFloors.contains(floor)) {
@@ -1153,4 +1155,35 @@ StatelessWidget smartRender(
   );
 }
 
-enum RenderMode { NORMAL, SEARCH_RESULT, PUNISHMENT_HISTORY }
+sealed class RenderModel {}
+
+class Normal extends RenderModel {
+  OTHole hole;
+  bool? isFavored, isSubscribed;
+  bool onlyShowDZ = false;
+  bool prefetchNeedUpdate = true;
+
+  Normal(this.hole);
+
+  Future<bool> isHoleFavorite() async {
+    if (isFavored != null) return isFavored!;
+    final List<int>? favorites =
+        await (OpenTreeHoleRepository.getInstance().getFavoriteHoleId());
+    return favorites!.any((elementId) => elementId == hole.hole_id);
+  }
+
+  Future<bool> isHoleSubscribed() async {
+    if (isSubscribed != null) return isSubscribed!;
+    final List<int>? subscriptions =
+        await (OpenTreeHoleRepository.getInstance().getSubscribedHoleId());
+    return subscriptions!.any((elementId) => elementId == hole.hole_id);
+  }
+}
+
+class Search extends RenderModel {
+  String keyword;
+
+  Search(this.keyword);
+}
+
+class PunishmentHistory extends RenderModel {}

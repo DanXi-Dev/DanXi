@@ -49,5 +49,6 @@ class FlutterApp {
     Phoenix.rebirth(context);
   }
 
-  static String get versionName => "$major.$minor.$patch";
+  static String get versionName =>
+      "${Pubspec.version.major}.${Pubspec.version.minor}.${Pubspec.version.patch}";
 }

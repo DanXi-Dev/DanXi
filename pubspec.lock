@@ -18,7 +18,7 @@ packages:
     source: hosted
     version: "6.4.1"
   archive:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: archive
       sha256: "22600aa1e926be775fa5fe7e6894e7fb3df9efda8891c73f70fb3262399a432d"
@@ -26,7 +26,7 @@ packages:
     source: hosted
     version: "3.4.10"
   args:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: args
       sha256: eef6c46b622e0494a36c5a12d10d77fb4e855501a91c1b9ef9339326e58f0596
@@ -824,14 +824,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
-  git_info:
-    dependency: "direct main"
+  git:
+    dependency: "direct dev"
     description:
-      name: git_info
-      sha256: f00efd20ff8f084e7910afa071606c025eb4848db40000256cc1996427cf798b
+      name: git
+      sha256: "1982737427ef1ef2bb69027ea0234469774495e86afe202de81ee46d37364e55"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.2"
+    version: "2.2.1"
   glob:
     dependency: transitive
     description:
@@ -1204,7 +1204,7 @@ packages:
     source: hosted
     version: "2.1.0"
   path:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: path
       sha256: "087ce49c3f0dc39180befefc60fdb4acd8f8620e5682fe2476afd0b3688bb4af"
@@ -1761,6 +1761,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  super_sliver_list:
+    dependency: "direct main"
+    description:
+      name: super_sliver_list
+      sha256: a2d96d5cda93ccccd01ec2f470e0b0269776ad9c0df32c3225af8d5780876a33
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.1"
   sync_http:
     dependency: transitive
     description:
