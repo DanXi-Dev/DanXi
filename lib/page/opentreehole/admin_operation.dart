@@ -44,8 +44,7 @@ Future<bool> showAdminOperation(BuildContext context, OTFloor floor) async {
     int? response;
     if (operation.isDelete) {
       response = await OpenTreeHoleRepository.getInstance().adminDeleteFloor(
-          operation.floorId,
-          operation.reason.isEmpty ? "未知原因" : operation.reason);
+          operation.floorId, operation.reason.isEmpty ? "" : operation.reason);
     } else {
       response = await OpenTreeHoleRepository.getInstance().adminFoldFloor(
           operation.reason.isEmpty ? [] : [operation.reason],
@@ -65,8 +64,10 @@ Future<bool> showAdminOperation(BuildContext context, OTFloor floor) async {
       }
     }
   } catch (e, st) {
-    Noticing.showErrorDialog(context, e,
-        trace: st, title: S.of(context).reply_failed);
+    if (context.mounted) {
+      Noticing.showErrorDialog(context, e,
+          trace: st, title: S.of(context).reply_failed);
+    }
     return false;
   }
   return true;
@@ -75,7 +76,7 @@ Future<bool> showAdminOperation(BuildContext context, OTFloor floor) async {
 class AdminOperationPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const AdminOperationPage({Key? key, this.arguments}) : super(key: key);
+  const AdminOperationPage({super.key, this.arguments});
 
   @override
   AdminOperationPageState createState() => AdminOperationPageState();
@@ -83,6 +84,7 @@ class AdminOperationPage extends StatefulWidget {
 
 class AdminOperationPageState extends State<AdminOperationPage> {
   late OTFloor _floor;
+
   // Don't show penalty menu if multi-floor
   late String _title;
   FileImage? _backgroundImage;
@@ -277,6 +279,7 @@ class AdminOperationPageState extends State<AdminOperationPage> {
         isDelete: _deletePost.value,
         reason: _reasonController.text);
 
+    if (!mounted) return;
     Navigator.pop<AdminOperationInfo>(context, op);
   }
 }
@@ -287,6 +290,7 @@ class SpinBoxTile extends StatelessWidget {
   final int? value;
   final Widget? secondary;
   final Widget? title;
+
   // Parameter is
   final void Function(int) onChanged;
 
