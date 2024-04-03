@@ -143,29 +143,28 @@ class LoginDialogState extends State<LoginDialog> {
   }
 
   Future<bool?> showFAQ() {
-    return showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title:Text(S.of(context).welcome_feature,
-            textAlign: TextAlign.center,
-          ),
-          content: Text(S.of(context).welcome_prompt,textAlign: TextAlign.center,),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(S.of(context).have_read),
-            ),
-            TextButton(
-                onPressed: () {
-                  BrowserUtil.openUrl(S.of(context).faq_url, context);
-                },
-                child: Text(S.of(context).i_see))
-          ],
-          scrollable: true,
-        );
-      },
-    );
+    return showPlatformDialog(
+        context: context,
+        builder: (BuildContext context) => PlatformAlertDialog(
+              title: PlatformText(
+                S.of(context).welcome_feature,
+                textAlign: TextAlign.center,
+              ),
+              content: PlatformText(
+                S.of(context).welcome_prompt,
+                textAlign: TextAlign.center,
+              ),
+              actions: <Widget>[
+                PlatformDialogAction(
+                    child: PlatformText(S.of(context).have_read),
+                    onPressed: () => Navigator.pop(context)),
+                PlatformDialogAction(
+                    child: PlatformText(S.of(context).i_see),
+                    onPressed: () {
+                      BrowserUtil.openUrl(S.of(context).faq_url, context);
+                    }),
+              ],
+            ));
   }
 
   void requestInternetAccess() async {
