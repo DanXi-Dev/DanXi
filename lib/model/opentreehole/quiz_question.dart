@@ -13,6 +13,10 @@ class QuizQuestion {
   String? question;
   String? type;
 
+  // Client-side info, disable serialization
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  bool correct = false;
+
   factory QuizQuestion.fromJson(Map<String, dynamic> json) =>
       _$QuizQuestionFromJson(json);
 

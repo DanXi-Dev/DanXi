@@ -372,9 +372,12 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       settingsPageKey.currentState?.setState(() {});
     }
 
-    bool _answered = await OpenTreeHoleRepository.getInstance().hasAnsweredQuestions() ?? false;
-    if(!_answered){
-      throw QuizUnansweredError("User hasn't finished the quiz of forum rules yet. ");
+    bool _answered =
+        await OpenTreeHoleRepository.getInstance().hasAnsweredQuestions() ??
+            false;
+    if (!_answered) {
+      throw QuizUnansweredError(
+          "User hasn't finished the quiz of forum rules yet. ");
     }
 
     switch (_postsType) {
@@ -728,9 +731,8 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
                   arguments: {"info": StateProvider.personInfo.value!});
               onLogin();
             });
-          }else if(error is QuizUnansweredError){
-            return OTQuizWidget();
-            treeholePageKey.currentState?.refreshList();
+          } else if (error is QuizUnansweredError) {
+            return OTQuizWidget(successCallback: refreshSelf);
           }
           return ErrorPageWidget.buildWidget(context, error,
               onTap: refreshSelf);

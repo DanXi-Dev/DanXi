@@ -26,6 +26,7 @@ import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
 import 'package:dan_xi/model/opentreehole/punishment.dart';
+import 'package:dan_xi/model/opentreehole/quiz_answer.dart';
 import 'package:dan_xi/model/opentreehole/quiz_question.dart';
 import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
@@ -843,6 +844,23 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
     assert(questionList?.length == length);
     return questionList.cast<QuizQuestion>();
+  }
+
+  // Empty list means all-correct
+  Future<List<int>?> submitAnswers(List<QuizAnswer> answers) async {
+    final Response<Map<String, dynamic>> response = await dio.post(
+        "$_BASE_AUTH_URL/register/questions/_answer",
+        data: {
+          "answers": answers.map((e) => e.toJson()).toList(),
+          "version": 0
+        },
+        options: Options(headers: _tokenHeader));
+
+    if(response.data?["correct"]){
+      return [];
+    }
+
+    return response.data?["wrong_question_ids"].cast<int>();
   }
 
   @override
