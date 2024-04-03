@@ -53,7 +53,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                           radius: 24.0,
                           backgroundColor: Color(context
                               .read<SettingsProvider>()
-                              .primarySwatch_V2),
+                              .primarySwatch),
                           foregroundColor: Colors.white,
                           child: e == selectedWeekDay
                               ? Icon(PlatformX.isMaterial(context)
@@ -83,7 +83,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                           radius: 24.0,
                           backgroundColor: Color(context
                               .read<SettingsProvider>()
-                              .primarySwatch_V2),
+                              .primarySwatch),
                           foregroundColor: Colors.white,
                           child: selectedSlots[e] == true
                               ? Icon(PlatformX.isMaterial(context)

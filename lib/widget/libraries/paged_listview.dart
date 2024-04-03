@@ -601,6 +601,7 @@ class PagedListViewController<T> implements ListProvider<T> {
   int length() => _state.length();
 }
 
+// HydrogenC: Naming isn't clear enough, should be something like `ListViewFailureException`
 class FatalException implements Exception {}
 
 mixin ListProvider<T> {

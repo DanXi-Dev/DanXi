@@ -33,6 +33,7 @@ class OTUser {
   OTUserConfig? config;
   String? joined_time;
   bool? is_admin;
+  bool? has_answered_questions;
 
   factory OTUser.fromJson(Map<String, dynamic> json) => _$OTUserFromJson(json);
 
@@ -42,8 +43,16 @@ class OTUser {
   bool operator ==(Object other) =>
       (other is OTUser) && user_id == other.user_id;
 
-  OTUser(this.user_id, this.nickname, this.favorites, this.subscriptions, this.is_admin,
-      this.joined_time, this.config, this.permission);
+  OTUser(
+      this.user_id,
+      this.nickname,
+      this.favorites,
+      this.subscriptions,
+      this.joined_time,
+      this.config,
+      this.permission,
+      this.is_admin,
+      this.has_answered_questions);
 
   @override
   int get hashCode => user_id!;

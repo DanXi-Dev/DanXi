@@ -159,7 +159,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                             radius: 15.0,
                             backgroundColor: Color(context
                                 .read<SettingsProvider>()
-                                .primarySwatch_V2),
+                                .primarySwatch),
                             foregroundColor: Colors.white,
                             child: widget.courseAvailableList.contains(e)
                                 ? Icon(PlatformX.isMaterial(context)

@@ -513,5 +513,7 @@
   "copy_floor_id": "拷贝楼层号",
   "copy_floor_id_success": "楼层号成功保存至剪贴板",
   "copy_hole_id": "拷贝洞号",
-  "copy_hole_id_success": "洞号成功保存至剪贴板"
+  "copy_hole_id_success": "洞号成功保存至剪贴板",
+  "start_quiz": "試験を受ける",
+  "quiz_not_answered": "貴方様はコミュニティー公約をまだ読んでいないので、下のリンクを押して読んでください。それから、小さな試験を受けてください。全部の質問が正解したと、ツリーホールを利用できるようになる。"
 }

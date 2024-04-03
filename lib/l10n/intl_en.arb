@@ -530,5 +530,7 @@
   "manually_add_course_message": "If there is a class that is not included in the class schedule, but you want to check it, add it manually yourself.",
   "start_date_select": "Semester start date query",
   "start_date_select_message": "You must select the start date of the semester to view your class schedule. Not selecting will result in a date error. \nTip: Start date is the Monday of the first week.",
-  "empty_classroom_warning": "Not connected to the campus intranet, so classroom usage information may not be accurate.\nPlease connect to the campus intranet for accurate information."
+  "empty_classroom_warning": "Not connected to the campus intranet, so classroom usage information may not be accurate.\nPlease connect to the campus intranet for accurate information.",
+  "start_quiz": "Start quiz",
+  "quiz_not_answered": "You haven't read the community convention yet. Click the link below to read and then finish a mini-quiz. After answering all the questions correctly, you may continue to the treehole."
 }

@@ -29,6 +29,7 @@ import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
+import 'package:dan_xi/page/opentreehole/quiz.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -369,6 +370,11 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       context.read<FDUHoleProvider>().currentDivision =
           OpenTreeHoleRepository.getInstance().getDivisions().firstOrNull;
       settingsPageKey.currentState?.setState(() {});
+    }
+
+    bool _answered = await OpenTreeHoleRepository.getInstance().hasAnsweredQuestions() ?? false;
+    if(!_answered){
+      throw QuizUnansweredError("User hasn't finished the quiz of forum rules yet. ");
     }
 
     switch (_postsType) {
@@ -722,6 +728,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
                   arguments: {"info": StateProvider.personInfo.value!});
               onLogin();
             });
+          }else if(error is QuizUnansweredError){
+            return OTQuizWidget();
+            treeholePageKey.currentState?.refreshList();
           }
           return ErrorPageWidget.buildWidget(context, error,
               onTap: refreshSelf);

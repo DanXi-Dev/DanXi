@@ -460,13 +460,13 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                 builder: (_) => SwatchPickerDialog(
                                   initialSelectedColor: context
                                       .read<SettingsProvider>()
-                                      .primarySwatch_V2,
+                                      .primarySwatch,
                                 ),
                               );
                               if (result != null && mounted) {
                                 context
                                     .read<SettingsProvider>()
-                                    .setPrimarySwatch_V2(result.value);
+                                    .setPrimarySwatch(result.value);
                                 FlutterApp.restartApp(context);
                               }
                             },

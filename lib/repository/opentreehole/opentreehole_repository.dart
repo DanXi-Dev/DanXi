@@ -26,6 +26,7 @@ import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
 import 'package:dan_xi/model/opentreehole/punishment.dart';
+import 'package:dan_xi/model/opentreehole/quiz_question.dart';
 import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
@@ -536,6 +537,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return (await getUserProfile())!.is_admin;
   }
 
+  Future<bool?> hasAnsweredQuestions() async {
+    return (await getUserProfile())!.has_answered_questions;
+  }
+
   /// Get silence date for division, return [null] if not silenced or not initialized
   DateTime? getSilenceDateForDivision(int divisionId) {
     return DateTime.tryParse(
@@ -829,6 +834,17 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return resp.statusCode;
   }
 
+  Future<List<QuizQuestion>?> getPostRegisterQuestions() async {
+    final Response<Map<String, dynamic>> response = await dio.get(
+        "$_BASE_AUTH_URL/register/questions",
+        options: Options(headers: _tokenHeader));
+    final questionList = response.data?["questions"].map((e)=> QuizQuestion.fromJson(e)).toList();
+    final length = response.data?["spec"]["number_of_questions"] as int;
+
+    assert(questionList?.length == length);
+    return questionList.cast<QuizQuestion>();
+  }
+
   @override
   String get linkHost => "api.fduhole.com";
 }
@@ -854,6 +870,12 @@ class NotLoginError implements FatalException {
   final String errorMessage;
 
   NotLoginError(this.errorMessage);
+}
+
+class QuizUnansweredError implements FatalException {
+  final String errorMessage;
+
+  QuizUnansweredError(this.errorMessage);
 }
 
 class LoginExpiredError implements Exception {}
