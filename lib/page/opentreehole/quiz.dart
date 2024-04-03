@@ -28,7 +28,7 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
   @override
   Widget build(BuildContext context) {
     if (questionIndex >= 0 && questions != null) {
-      final elapsed = UniqueKey();
+      final elapsed = ValueKey(questionIndex);
       final questionWidget = QuestionWidget(
           key: elapsed,
           question: questions![questionIndex],
@@ -40,16 +40,16 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
           });
 
       return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 500),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+          duration: const Duration(milliseconds: 250),
           transitionBuilder: (child, animation) {
-            final inAnimation =
-            Tween<Offset>(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
+            final inAnimation = Tween<Offset>(begin: const Offset(1.0, 0.0), end: Offset.zero)
                 .animate(animation);
-            final outAnimation =
-            Tween<Offset>(begin: Offset(-1.0, 0.0), end: Offset(0.0, 0.0))
+            final outAnimation = Tween<Offset>(begin: const Offset(-1.0, 0.0), end: Offset.zero)
                 .animate(animation);
 
-            if (child.key == ValueKey(elapsed)) {
+            if (child.key == ValueKey(questionIndex)) {
               return ClipRect(
                 child: SlideTransition(
                   position: inAnimation,
@@ -170,7 +170,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Wrap(children: [
+                  Column(children: [
                     RoundChip(
                         label: "单选",
                         color: Color(
