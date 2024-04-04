@@ -839,7 +839,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_AUTH_URL/register/questions",
         options: Options(headers: _tokenHeader));
-    final questionList = response.data?["questions"].map((e)=> QuizQuestion.fromJson(e)).toList();
+    final questionList = response.data?["questions"]
+        .map((e) => QuizQuestion.fromJson(e))
+        .toList();
     final length = response.data?["spec"]["number_of_questions"] as int;
 
     assert(questionList?.length == length);
@@ -856,7 +858,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         },
         options: Options(headers: _tokenHeader));
 
-    if(response.data?["correct"]){
+    if (response.data?["correct"]) {
+      provider.token = SettingsProvider.getInstance().fduholeToken =
+          JWToken.fromJson(response.data!);
       return [];
     }
 
