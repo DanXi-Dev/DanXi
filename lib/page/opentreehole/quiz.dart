@@ -101,19 +101,26 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
             padding: const EdgeInsets.all(20.0),
             onPressed: () {
               setState(() {
-                questionIndex = 0;
+                // Find the first incorrect question
+                questionIndex = questions!.indexWhere((e) => !e.correct);
                 displayType = OTQuizDisplayTypes.ONGOING;
               });
             },
-            child: const Text("重做错题"),
+            child: Text(S.of(context).redo_incorrect_questions),
           )
         : PlatformElevatedButton(
             padding: const EdgeInsets.all(20.0),
             onPressed: () {
               widget.successCallback();
             },
-            child: const Text("进入树洞"),
+            child: Text(S.of(context).enter_treehole),
           );
+
+    final text = hasErrors
+        ? S.of(context).quiz_has_errors(questions!
+            .map((e) => e.correct ? 0 : 1)
+            .reduce((value, e) => value + e))
+        : S.of(context).quiz_completed;
 
     return Center(
       child: Padding(
@@ -128,9 +135,9 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
                 child: Image.asset("assets/graphics/ot_logo.png"),
               ),
             ),
-            const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text("恭喜完成测试", textAlign: TextAlign.center)),
+            Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(text, textAlign: TextAlign.center)),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: button,
@@ -139,6 +146,44 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
         ),
       ),
     );
+  }
+
+  void submitAnswer(List<String> ans) async {
+    answers![questionIndex].answer = ans;
+
+    // Find next incorrect question
+    do {
+      questionIndex++;
+    } while (questionIndex < questions!.length &&
+        questions![questionIndex].correct);
+
+    // If all questions are answered
+    if (questionIndex < questions!.length) {
+      setState(() {});
+      return;
+    } else {
+      final errorList = await OpenTreeHoleRepository.getInstance()
+          .submitAnswers(answers!);
+
+      // Have trouble submitting
+      if (errorList == null) {
+        return;
+      }
+
+      if (errorList.isEmpty) {
+        setState(() {
+          displayType = OTQuizDisplayTypes.FINISHED;
+        });
+      } else {
+        for (var ques in questions!) {
+          ques.correct = !errorList.contains(ques.id);
+        }
+
+        setState(() {
+          displayType = OTQuizDisplayTypes.FINISHED_WITH_ERRORS;
+        });
+      }
+    }
   }
 
   @override
@@ -154,42 +199,7 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
         final questionWidget = QuestionWidget(
             key: ValueKey(questionIndex),
             question: questions![questionIndex],
-            answerCallback: (ans) async {
-              answers![questionIndex].answer = ans;
-
-              do {
-                questionIndex++;
-              } while (questionIndex < questions!.length &&
-                  questions![questionIndex].correct);
-
-              // If all questions are answered
-              if (questionIndex < questions!.length) {
-                setState(() {});
-                return;
-              } else {
-                final errorList = await OpenTreeHoleRepository.getInstance()
-                    .submitAnswers(answers!);
-
-                // Have trouble submitting
-                if (errorList == null) {
-                  return;
-                }
-
-                if (errorList.isEmpty) {
-                  setState(() {
-                    displayType = OTQuizDisplayTypes.FINISHED;
-                  });
-                } else {
-                  for (var ques in questions!) {
-                    ques.correct = !errorList.contains(ques.id);
-                  }
-
-                  setState(() {
-                    displayType = OTQuizDisplayTypes.FINISHED_WITH_ERRORS;
-                  });
-                }
-              }
-            });
+            answerCallback: submitAnswer);
 
         return AnimatedSwitcher(
             switchInCurve: Curves.easeOutCubic,
@@ -269,7 +279,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
   Widget build(BuildContext context) {
     final options = widget.question.options!;
     const largerText = TextStyle(fontSize: 16);
-    // Since the questions don't have locales, it isn't necessary to have a locale here
+    // Since the questions don't have i18n, I believe it isn't necessary to have a i18n here
     final typeField = multiSelect ? "多选" : "单选";
 
     return Center(
@@ -355,7 +365,7 @@ class OptionWidget extends StatelessWidget {
               border:
                   Border.all(color: Theme.of(context).highlightColor, width: 2),
               shape: BoxShape.circle,
-              color: active ? highlightColor : Theme.of(context).primaryColor,
+              color: active ? highlightColor : Colors.transparent,
             ),
             duration: const Duration(milliseconds: 100),
             child: Center(

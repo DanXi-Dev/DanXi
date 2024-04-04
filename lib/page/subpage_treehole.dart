@@ -372,9 +372,10 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       settingsPageKey.currentState?.setState(() {});
     }
 
-    bool _answered =
-        await OpenTreeHoleRepository.getInstance().hasAnsweredQuestions() ?? true;
-    if (true) {
+    bool answered =
+        await OpenTreeHoleRepository.getInstance().hasAnsweredQuestions() ??
+            true;
+    if (!answered) {
       throw QuizUnansweredError(
           "User hasn't finished the quiz of forum rules yet. ");
     }
@@ -731,8 +732,11 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
               onLogin();
             });
           } else if (error is QuizUnansweredError) {
-            return OTQuizWidget(successCallback: (){
-              setState(() { });
+            return OTQuizWidget(successCallback: () async {
+              // Update user data
+              await OpenTreeHoleRepository.getInstance()
+                  .getUserProfile(forceUpdate: true);
+              refreshList();
             });
           }
           return ErrorPageWidget.buildWidget(context, error,
