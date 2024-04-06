@@ -528,5 +528,7 @@
   "quiz_completed": "您已完成社区公约的学习，请在使用树洞期间牢记并遵守",
   "quiz_has_errors": "此次测试中，有 {count} 道题未能正确回答，请点击按钮重做错题",
   "redo_incorrect_questions": "重做错题",
-  "enter_treehole": "开始树洞之旅"
+  "enter_treehole": "开始树洞之旅",
+  "next_question": "下一题",
+  "prev_question": "上一题"
 }

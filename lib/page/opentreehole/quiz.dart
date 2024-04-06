@@ -33,7 +33,8 @@ class OTQuizWidget extends StatefulWidget {
 }
 
 class OTQuizWidgetState extends State<OTQuizWidget> {
-  int questionIndex = 0;
+  // Prev question index is for determining the animation direction
+  int questionIndex = 0, prevQuestionIndex = 0;
   late List<QuizQuestion>? questions;
   late List<int>? indexes;
   List<QuizAnswer>? answers;
@@ -148,22 +149,37 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
     );
   }
 
-  void submitAnswer(List<String> ans) async {
-    answers![questionIndex].answer = ans;
+  void submitAnswer(bool advanceForward, List<String>? ans) async {
+    if (ans != null) {
+      answers![questionIndex].answer = ans;
+    }
 
-    // Find next incorrect question
-    do {
-      questionIndex++;
-    } while (questionIndex < questions!.length &&
-        questions![questionIndex].correct);
+    if (advanceForward) {
+      // Find next incorrect question
+      do {
+        questionIndex++;
+      } while (questionIndex < questions!.length &&
+          questions![questionIndex].correct);
+    } else {
+      // Back to previous
+      final questionIndexTmp = questionIndex;
+      do {
+        questionIndex--;
+      } while (questionIndex >= 0 && questions![questionIndex].correct);
+
+      // No previous, then go back to the original question
+      if (questionIndex < 0) {
+        questionIndex = questionIndexTmp;
+      }
+    }
 
     // If all questions are answered
     if (questionIndex < questions!.length) {
       setState(() {});
       return;
     } else {
-      final errorList = await OpenTreeHoleRepository.getInstance()
-          .submitAnswers(answers!);
+      final errorList =
+          await OpenTreeHoleRepository.getInstance().submitAnswers(answers!);
 
       // Have trouble submitting
       if (errorList == null) {
@@ -175,8 +191,15 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
           displayType = OTQuizDisplayTypes.FINISHED;
         });
       } else {
-        for (var ques in questions!) {
-          ques.correct = !errorList.contains(ques.id);
+        for (var elem in questions!) {
+          elem.correct = !errorList.contains(elem.id);
+        }
+
+        // Clear wrong answers
+        for (var elem in answers!) {
+          if(errorList.contains(elem.id)){
+            elem.answer = null;
+          }
         }
 
         setState(() {
@@ -199,8 +222,11 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
         final questionWidget = QuestionWidget(
             key: ValueKey(questionIndex),
             question: questions![questionIndex],
-            answerCallback: submitAnswer);
+            answerCallback: submitAnswer,
+            initialSelection: answers![questionIndex].answer);
 
+        bool isForward = questionIndex > prevQuestionIndex;
+        prevQuestionIndex = questionIndex;
         return AnimatedSwitcher(
             switchInCurve: Curves.easeOutCubic,
             switchOutCurve: Curves.easeInCubic,
@@ -216,7 +242,7 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
               if (child.key == ValueKey(questionIndex)) {
                 return ClipRect(
                   child: SlideTransition(
-                    position: inAnimation,
+                    position: isForward ? inAnimation : outAnimation,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: child,
@@ -226,7 +252,7 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
               } else {
                 return ClipRect(
                   child: SlideTransition(
-                    position: outAnimation,
+                    position: isForward ? outAnimation : inAnimation,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: child,
@@ -242,10 +268,16 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
 
 class QuestionWidget extends StatefulWidget {
   final QuizQuestion question;
-  final void Function(List<String>) answerCallback;
+  final List<String>? initialSelection;
+
+  // True to jump to next question, false to return to previous
+  final void Function(bool, List<String>?) answerCallback;
 
   const QuestionWidget(
-      {super.key, required this.question, required this.answerCallback});
+      {super.key,
+      required this.question,
+      required this.answerCallback,
+      this.initialSelection});
 
   @override
   QuestionWidgetState createState() => QuestionWidgetState();
@@ -257,7 +289,14 @@ class QuestionWidgetState extends State<QuestionWidget> {
   static const labelChars = "ABCDEFGH";
 
   void resetState() {
-    selectionState = List.filled(widget.question.options!.length, false);
+    if (widget.initialSelection == null) {
+      selectionState = List.filled(widget.question.options!.length, false);
+    } else {
+      // This isn't a performant approach, but since the length is small, it's OK
+      selectionState = widget.question.options!
+          .map((e) => widget.initialSelection!.contains(e))
+          .toList();
+    }
     // TODO: handle more possible types
     multiSelect = widget.question.type == "multi-selection";
   }
@@ -309,31 +348,62 @@ class QuestionWidgetState extends State<QuestionWidget> {
                             content: options[index],
                             tapCallback: () {
                               setState(() {
-                                if (!multiSelect) {
-                                  selectionState =
-                                      List.filled(options.length, false);
-                                  selectionState[index] = true;
-                                } else {
+                                if (multiSelect) {
                                   // Revert if multi-selection
                                   selectionState[index] =
                                       !selectionState[index];
+                                } else {
+                                  // We still have to set this to make the animation play
+                                  selectionState =
+                                      List.filled(options.length, false);
+                                  selectionState[index] = true;
+                                  // Submit answer and advance to next
+                                  widget.answerCallback(true, [options[index]]);
                                 }
                               });
                             }))
                   ]),
-                  PlatformElevatedButton(
-                    padding: const EdgeInsets.all(20.0),
-                    onPressed: () {
-                      final answers = Iterable<int>.generate(options.length)
-                          .toList()
-                          .filter((e) => selectionState[e])
-                          .map((e) => options[e]);
-                      if (answers.isNotEmpty) {
-                        widget.answerCallback(answers.toList());
-                      }
-                    },
-                    child: Text(S.of(context).next, style: largerText),
-                  )
+                  if (multiSelect)
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          PlatformElevatedButton(
+                            padding: const EdgeInsets.all(20.0),
+                            onPressed: () {
+                              // Discard and return to previous
+                              widget.answerCallback(false, null);
+                            },
+                            child: Text(S.of(context).prev_question,
+                                style: largerText),
+                          ),
+                          PlatformElevatedButton(
+                            padding: const EdgeInsets.all(20.0),
+                            onPressed: () {
+                              // Submit answer and advance to next
+                              final answers =
+                                  Iterable<int>.generate(options.length)
+                                      .toList()
+                                      .filter((e) => selectionState[e])
+                                      .map((e) => options[e]);
+                              if (answers.isNotEmpty) {
+                                widget.answerCallback(true, answers.toList());
+                              }
+                            },
+                            child: Text(S.of(context).next_question,
+                                style: largerText),
+                          )
+                        ])
+                  else
+                    // We only need a discard if not multi-select
+                    PlatformElevatedButton(
+                      padding: const EdgeInsets.all(20.0),
+                      onPressed: () {
+                        // Discard and return to previous
+                        widget.answerCallback(false, null);
+                      },
+                      child:
+                          Text(S.of(context).prev_question, style: largerText),
+                    )
                 ])));
   }
 }

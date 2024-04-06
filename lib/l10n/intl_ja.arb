@@ -519,5 +519,7 @@
   "quiz_completed": "コミュニティー公約の学習は完了しました。ホールを利用する時は、この約束を忘れずに遵守してください",
   "quiz_has_errors": "この試験で，間違った質問が{count}個あります。バートンを押して、間違った質問をやり直してください",
   "redo_incorrect_questions": "再試験",
-  "enter_treehole": "ホールへの旅を始めよう"
+  "enter_treehole": "ホールへの旅を始めよう",
+  "next_question": "次へ",
+  "prev_question": "前へ"
 }

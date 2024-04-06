@@ -536,5 +536,7 @@
   "quiz_completed": "You have finished studying the community convention. Please keep observing it while using the treehole.",
   "quiz_has_errors": "In the quiz, you've answered {count} questions wrong. Please press he button to redo. ",
   "redo_incorrect_questions": "Redo the questions",
-  "enter_treehole": "Go on to the treehole"
+  "enter_treehole": "Go on to the treehole",
+  "next_question": "Next",
+  "prev_question": "Previous"
 }
