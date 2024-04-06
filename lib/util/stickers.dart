@@ -18,7 +18,7 @@
 enum Stickers {
   danxi_angry,
   danxi_call,
-  danxi_cat,
+  danxi_cate,
   danxi_dying,
   danxi_egg,
   danxi_fright,
