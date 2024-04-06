@@ -75,16 +75,12 @@ final PostInterceptor _kStopWordInterceptor = (context, text) async {
   stopWordList = stopWordList.map((e) => e.trim().toLowerCase()).toList();
   try {
     var checkedStopWord = stopWordList.firstWhere((element) =>
-    element.isNotEmpty && (regularText?.contains(element) ?? false));
+        element.isNotEmpty && (regularText?.contains(element) ?? false));
     return await Noticing.showConfirmationDialog(
-        context, S.of(context).has_stop_words(checkedStopWord.trim()),
-        title: S
-            .of(context)
-            .has_stop_words_title,
-        confirmText: S
-            .of(context)
-            .continue_sending,
-        isConfirmDestructive: true) ??
+            context, S.of(context).has_stop_words(checkedStopWord.trim()),
+            title: S.of(context).has_stop_words_title,
+            confirmText: S.of(context).continue_sending,
+            isConfirmDestructive: true) ??
         false;
   } catch (_) {}
   return true;
@@ -95,9 +91,7 @@ class OTEditor {
       {OTEditorType? editorType, PostInterceptor? interceptor}) async {
     final object = EditorObject(0, EditorObjectType.NEW_POST);
     final PostEditorText? content = await _showEditor(
-        context, S
-        .of(context)
-        .new_post,
+        context, S.of(context).new_post,
         allowTags: true,
         editorType: editorType,
         object: object,
@@ -108,9 +102,7 @@ class OTEditor {
     }
 
     ProgressFuture progressDialog = showProgressDialog(
-        loadingText: S
-            .of(context)
-            .posting, context: context);
+        loadingText: S.of(context).posting, context: context);
     try {
       await OpenTreeHoleRepository.getInstance()
           .newHole(divisionId, content!.text, tags: content.tags);
@@ -120,34 +112,29 @@ class OTEditor {
     } finally {
       progressDialog.dismiss(showAnim: false);
     }
-    context
-        .read<FDUHoleProvider>()
-        .editorCache
-        .remove(object);
+    context.read<FDUHoleProvider>().editorCache.remove(object);
     return true;
   }
 
-  static Future<bool> createNewReply(BuildContext context, int? discussionId,
-      int? floorId,
+  static Future<bool> createNewReply(
+      BuildContext context, int? discussionId, int? floorId,
       {OTEditorType? editorType, PostInterceptor? interceptor}) async {
     final object = (floorId == null
         ? EditorObject(discussionId, EditorObjectType.REPLY_TO_HOLE)
         : EditorObject(floorId, EditorObjectType.REPLY_TO_FLOOR));
     final String? content = (await _showEditor(
-        context,
-        floorId == null
-            ? S.of(context).reply_to(discussionId ?? "?")
-            : S.of(context).reply_to_floor(floorId),
-        editorType: editorType,
-        object: object,
-        placeholder: floorId == null ? "" : "##$floorId\n",
-        interceptor: _kStopWordInterceptor.mergeWith(interceptor)))
+            context,
+            floorId == null
+                ? S.of(context).reply_to(discussionId ?? "?")
+                : S.of(context).reply_to_floor(floorId),
+            editorType: editorType,
+            object: object,
+            placeholder: floorId == null ? "" : "##$floorId\n",
+            interceptor: _kStopWordInterceptor.mergeWith(interceptor)))
         ?.text;
     if (content == null || content.trim() == "") return false;
     ProgressFuture progressDialog = showProgressDialog(
-        loadingText: S
-            .of(context)
-            .posting, context: context);
+        loadingText: S.of(context).posting, context: context);
     try {
       await OpenTreeHoleRepository.getInstance()
           .newFloor(discussionId, content);
@@ -157,10 +144,7 @@ class OTEditor {
     } finally {
       progressDialog.dismiss(showAnim: false);
     }
-    context
-        .read<FDUHoleProvider>()
-        .editorCache
-        .remove(object);
+    context.read<FDUHoleProvider>().editorCache.remove(object);
     return true;
   }
 
@@ -169,37 +153,28 @@ class OTEditor {
       {OTEditorType? editorType, PostInterceptor? interceptor}) async {
     final object = EditorObject(floorId, EditorObjectType.MODIFY_FLOOR);
     final String? content = (await _showEditor(
-        context,
-        floorId == null
-            ? S.of(context).modify_to(discussionId ?? "?")
-            : S.of(context).modify_to_floor(floorId),
-        editorType: editorType,
-        object: object,
-        placeholder: originalContent ?? "",
-        interceptor: _kStopWordInterceptor.mergeWith(interceptor)))
+            context,
+            floorId == null
+                ? S.of(context).modify_to(discussionId ?? "?")
+                : S.of(context).modify_to_floor(floorId),
+            editorType: editorType,
+            object: object,
+            placeholder: originalContent ?? "",
+            interceptor: _kStopWordInterceptor.mergeWith(interceptor)))
         ?.text;
-    if (content == null || content
-        .trim()
-        .isEmpty) return false;
+    if (content == null || content.trim().isEmpty) return false;
     ProgressFuture progressDialog = showProgressDialog(
-        loadingText: S
-            .of(context)
-            .posting, context: context);
+        loadingText: S.of(context).posting, context: context);
     try {
       await OpenTreeHoleRepository.getInstance().modifyFloor(content, floorId);
     } catch (e, st) {
       Noticing.showErrorDialog(context, e,
-          trace: st, title: S
-              .of(context)
-              .reply_failed);
+          trace: st, title: S.of(context).reply_failed);
       return false;
     } finally {
       progressDialog.dismiss(showAnim: false);
     }
-    context
-        .read<FDUHoleProvider>()
-        .editorCache
-        .remove(object);
+    context.read<FDUHoleProvider>().editorCache.remove(object);
     return true;
   }
 
@@ -210,16 +185,12 @@ class OTEditor {
     if (content == null || content.trim() == "") return false;
 
     ProgressFuture progressDialog =
-    showProgressDialog(loadingText: S
-        .of(context)
-        .report, context: context);
+        showProgressDialog(loadingText: S.of(context).report, context: context);
     try {
       await OpenTreeHoleRepository.getInstance().reportPost(floorId, content);
     } catch (error, st) {
       Noticing.showErrorDialog(context, error,
-          trace: st, title: S
-              .of(context)
-              .report_failed);
+          trace: st, title: S.of(context).report_failed);
       return false;
     } finally {
       progressDialog.dismiss(showAnim: false);
@@ -229,38 +200,29 @@ class OTEditor {
 
   static Future<PostEditorText?> _showEditor(BuildContext context, String title,
       {bool allowTags = false,
-        required OTEditorType? editorType,
-        required EditorObject object,
-        String placeholder = "",
-        bool hasTip = true,
-        PostInterceptor? interceptor}) async {
+      required OTEditorType? editorType,
+      required EditorObject object,
+      String placeholder = "",
+      bool hasTip = true,
+      PostInterceptor? interceptor}) async {
     final String randomTip = await Constant.randomFDUHoleTip;
 
     switch (editorType ?? OTEditorType.PAGE) {
       case OTEditorType.DIALOG:
-        if (!context
-            .read<FDUHoleProvider>()
-            .editorCache
-            .containsKey(object)) {
-          context
-              .read<FDUHoleProvider>()
-              .editorCache[object] =
+        if (!context.read<FDUHoleProvider>().editorCache.containsKey(object)) {
+          context.read<FDUHoleProvider>().editorCache[object] =
               PostEditorText.newInstance(withText: placeholder);
         }
         final textController = TextEditingController(
-            text: context
-                .read<FDUHoleProvider>()
-                .editorCache[object]!.text);
-        textController.addListener(() =>
-        context
+            text: context.read<FDUHoleProvider>().editorCache[object]!.text);
+        textController.addListener(() => context
             .read<FDUHoleProvider>()
             .editorCache[object]!
             .text = textController.text);
         final value = await showPlatformDialog<PostEditorText>(
             barrierDismissible: false,
             context: context,
-            builder: (BuildContext context) =>
-                PlatformAlertDialog(
+            builder: (BuildContext context) => PlatformAlertDialog(
                   title: Text(title),
                   content: BBSEditorWidget(
                     controller: textController,
@@ -270,9 +232,7 @@ class OTEditor {
                   ),
                   actions: [
                     PlatformDialogAction(
-                        child: Text(S
-                            .of(context)
-                            .cancel),
+                        child: Text(S.of(context).cancel),
                         onPressed: () {
                           context
                               .read<FDUHoleProvider>()
@@ -284,9 +244,7 @@ class OTEditor {
                         child: Text(S.of(context).add_image),
                         onPressed: () => uploadImage(context, textController)),*/
                     PlatformDialogAction(
-                        child: Text(S
-                            .of(context)
-                            .submit),
+                        child: Text(S.of(context).submit),
                         onPressed: () async {
                           Navigator.of(context).pop<PostEditorText>(
                               PostEditorText(
@@ -301,7 +259,7 @@ class OTEditor {
         textController.dispose();
         return value;
       case OTEditorType.PAGE:
-      // Receive the value with **dynamic** variable to prevent automatic type inference
+        // Receive the value with **dynamic** variable to prevent automatic type inference
         final dynamic result = await smartNavigatorPush(
             context, '/bbs/fullScreenEditor',
             arguments: {
@@ -317,28 +275,24 @@ class OTEditor {
   }
 
   @protected
-  static Future<void> uploadImage(BuildContext context,
-      TextEditingController controller) async {
+  static Future<void> uploadImage(
+      BuildContext context, TextEditingController controller) async {
     final ImagePickerProxy picker = ImagePickerProxy.createPicker();
     final String? file = await picker.pickImage();
     if (file == null) return;
 
     ProgressFuture progressDialog = showProgressDialog(
-        loadingText: S
-            .of(context)
-            .uploading_image, context: context);
+        loadingText: S.of(context).uploading_image, context: context);
     try {
       String? url =
-      await OpenTreeHoleRepository.getInstance().uploadImage(File(file));
+          await OpenTreeHoleRepository.getInstance().uploadImage(File(file));
       if (url != null) controller.text += "![]($url)";
       // "showAnim: true" makes it crash. Don't know the reason.
       progressDialog.dismiss(showAnim: false);
     } catch (error) {
       Noticing.showNotice(context,
           ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error),
-          title: S
-              .of(context)
-              .uploading_image_failed);
+          title: S.of(context).uploading_image_failed);
     } finally {
       progressDialog.dismiss(showAnim: false);
     }
@@ -352,12 +306,13 @@ class BBSEditorWidget extends StatefulWidget {
   final bool fullscreen;
   final String? tip;
 
-  const BBSEditorWidget({super.key,
-    required this.controller,
-    this.allowTags,
-    this.editorObject,
-    this.fullscreen = false,
-    this.tip});
+  const BBSEditorWidget(
+      {super.key,
+      required this.controller,
+      this.allowTags,
+      this.editorObject,
+      this.fullscreen = false,
+      this.tip});
 
   @override
   BBSEditorWidgetState createState() => BBSEditorWidgetState();
@@ -370,7 +325,7 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
   }
 
   final GlobalKey<OTTagSelectorState> _tagSelectorKey =
-  GlobalKey<OTTagSelectorState>();
+      GlobalKey<OTTagSelectorState>();
 
   Future _buildStickersSheet(BuildContext context) {
     return showPlatformModalSheet(
@@ -384,93 +339,78 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const ListTile(
-                        leading: Icon(Icons.emoji_emotions),
-                        title: Text("表情")),
+                        leading: Icon(Icons.emoji_emotions), title: Text("表情")),
                     // const Divider(),
                     Wrap(
                       children: Stickers.values
-                          .map((e) =>
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 4, horizontal: 4),
-                            child: InkWell(
-                              onTap: () {
-                                // insert sticker into the current cursor position
-                                var cursorPosition = widget.controller.selection
-                                    .base.offset;
-                                widget.controller.text =
-                                "${widget.controller.text.substring(
-                                    0, cursorPosition)}![](${e.name})${widget
-                                    .controller.text.substring(
-                                    cursorPosition)}";
-                                // close the modal sheet
-                                Navigator.of(context).pop();
-                              },
-                              child: Image.asset(
-                                getStickerAssetPath(e.name)!,
-                                width: 60,
-                                height: 60,
-                              ),
-                            ),
-                          ))
+                          .map((e) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 4, horizontal: 4),
+                                child: InkWell(
+                                  onTap: () {
+                                    // insert sticker into the current cursor position
+                                    var cursorPosition =
+                                        widget.controller.selection.base.offset;
+                                    widget.controller.text =
+                                        "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
+                                    // close the modal sheet
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Image.asset(
+                                    getStickerAssetPath(e.name)!,
+                                    width: 60,
+                                    height: 60,
+                                  ),
+                                ),
+                              ))
                           .toList(),
                     ),
                   ]),
             ),
           );
-          return PlatformX.isCupertino(context)
-              ? Card(child: body)
-              : body;
+          return PlatformX.isCupertino(context) ? Card(child: body) : body;
         });
   }
 
-
   Widget _buildIntroButton(BuildContext context, IconData iconData,
-      String title, String description) =>
+          String title, String description) =>
       PlatformIconButton(
-          icon: Icon(iconData, color: Theme
-              .of(context)
-              .colorScheme
-              .secondary),
-          onPressed: () =>
-              showPlatformModalSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    final Widget body = SafeArea(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ListTile(
-                                  leading: Icon(iconData), title: Text(title)),
-                              const Divider(),
-                              Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: LinkifyX(
-                                    text: description,
-                                    onOpen: (element) =>
-                                        BrowserUtil.openUrl(
-                                            element.url, context),
-                                  )),
-                            ]),
-                      ),
-                    );
-                    return PlatformX.isCupertino(context)
-                        ? Card(child: body)
-                        : body;
-                  }));
+          icon: Icon(iconData, color: Theme.of(context).colorScheme.secondary),
+          onPressed: () => showPlatformModalSheet(
+              context: context,
+              builder: (BuildContext context) {
+                final Widget body = SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(leading: Icon(iconData), title: Text(title)),
+                          const Divider(),
+                          Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: LinkifyX(
+                                text: description,
+                                onOpen: (element) =>
+                                    BrowserUtil.openUrl(element.url, context),
+                              )),
+                        ]),
+                  ),
+                );
+                return PlatformX.isCupertino(context)
+                    ? Card(child: body)
+                    : body;
+              }));
 
   @override
   Widget build(BuildContext context) {
     final Widget textField = PlatformTextField(
       hintText: widget.tip,
-      material: (_, __) =>
-          MaterialTextFieldData(
-              decoration: widget.fullscreen
-                  ? const InputDecoration(border: InputBorder.none)
-                  : const InputDecoration(
+      material: (_, __) => MaterialTextFieldData(
+          decoration: widget.fullscreen
+              ? const InputDecoration(border: InputBorder.none)
+              : const InputDecoration(
                   border: OutlineInputBorder(gapPadding: 2.0))),
       controller: widget.controller,
       keyboardType: TextInputType.multiline,
@@ -498,16 +438,12 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                         .tags),
               ),
             if (widget.allowTags! &&
-                SettingsProvider
-                    .getInstance()
-                    .tagSuggestionAvailable) ...[
+                SettingsProvider.getInstance().tagSuggestionAvailable) ...[
               Padding(
                 padding: const EdgeInsets.only(top: 4, left: 8, right: 8),
                 child: Row(
                   children: [
-                    Text(S
-                        .of(context)
-                        .recommended_tags),
+                    Text(S.of(context).recommended_tags),
                     ScaleTransform(
                       scale: 0.75,
                       child: PlatformIconButton(
@@ -516,12 +452,8 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                         onPressed: () {
                           Noticing.showModalNotice(context,
                               message:
-                              S
-                                  .of(context)
-                                  .recommended_tags_description,
-                              title: S
-                                  .of(context)
-                                  .recommended_tags);
+                                  S.of(context).recommended_tags_description,
+                              title: S.of(context).recommended_tags);
                         },
                       ),
                     ),
@@ -530,22 +462,17 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                           if (!value) {
                             return PlatformTextButton(
                               padding: EdgeInsets.zero,
-                              child: Text(S
-                                  .of(context)
-                                  .enable),
+                              child: Text(S.of(context).enable),
                               onPressed: () async {
                                 if (await Noticing.showConfirmationDialog(
-                                    context,
-                                    S
-                                        .of(context)
-                                        .recommended_tags_description,
-                                    title:
-                                    S
-                                        .of(context)
-                                        .recommended_tags) ==
+                                        context,
+                                        S
+                                            .of(context)
+                                            .recommended_tags_description,
+                                        title:
+                                            S.of(context).recommended_tags) ==
                                     true) {
-                                  SettingsProvider
-                                      .getInstance()
+                                  SettingsProvider.getInstance()
                                       .isTagSuggestionEnabled = true;
                                 }
                               },
@@ -562,13 +489,13 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                     if (value) {
                       return Padding(
                         padding:
-                        const EdgeInsets.only(bottom: 4, left: 4, right: 4),
+                            const EdgeInsets.only(bottom: 4, left: 4, right: 4),
                         child: ValueListenableBuilder<TextEditingValue>(
                           builder: (context, value, child) =>
                               TagSuggestionWidget(
-                                content: value.text,
-                                tagSelectorKey: _tagSelectorKey,
-                              ),
+                            content: value.text,
+                            tagSelectorKey: _tagSelectorKey,
+                          ),
                           valueListenable: widget.controller,
                         ),
                       );
@@ -583,50 +510,34 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                 _buildIntroButton(
                     context,
                     IconFont.markdown,
-                    S
-                        .of(context)
-                        .markdown_enabled,
-                    S
-                        .of(context)
-                        .markdown_description),
+                    S.of(context).markdown_enabled,
+                    S.of(context).markdown_description),
                 _buildIntroButton(
                     context,
                     IconFont.tex,
-                    S
-                        .of(context)
-                        .latex_enabled,
-                    S
-                        .of(context)
-                        .latex_description),
+                    S.of(context).latex_enabled,
+                    S.of(context).latex_description),
                 PlatformTextButton(
-                  child: Text(S
-                      .of(context)
-                      .community_convention),
-                  onPressed: () =>
-                      BrowserUtil.openUrl(
-                          "https://www.fduhole.com/#/licence", context),
+                  child: Text(S.of(context).community_convention),
+                  onPressed: () => BrowserUtil.openUrl(
+                      "https://www.fduhole.com/#/licence", context),
                 ),
                 PlatformTextButton(
-                  child: const Text("表情"),
+                  child: Text("表情"),
                   onPressed: () => _buildStickersSheet(context),
                 )
               ],
             ),
             textField,
             const Divider(),
-            Text(S
-                .of(context)
-                .preview,
-                style: TextStyle(color: Theme
-                    .of(context)
-                    .hintColor)),
+            Text(S.of(context).preview,
+                style: TextStyle(color: Theme.of(context).hintColor)),
             Padding(
               padding: const EdgeInsets.only(top: 4.0),
               child: ValueListenableBuilder<TextEditingValue>(
-                builder: (context, value, child) =>
-                    smartRender(
-                        context, value.text, null, null, false,
-                        preview: true),
+                builder: (context, value, child) => smartRender(
+                    context, value.text, null, null, false,
+                    preview: true),
                 valueListenable: widget.controller,
               ),
             ),
@@ -634,7 +545,6 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
     );
   }
 }
-
 
 class TagSuggestionWidget extends StatefulWidget {
   const TagSuggestionWidget(
@@ -687,27 +597,27 @@ class TagSuggestionWidgetState extends State<TagSuggestionWidget> {
       constraints: const BoxConstraints(minHeight: 32),
       child: Wrap(
           children: _suggestions
-              ?.map((e) =>
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 4, horizontal: 4),
-                child: RoundChip(
-                    label: e,
-                    color: (e.hashColor()),
-                    onTap: () {
-                      widget.tagSelectorKey.currentState?.setState(() {
-                        if (widget.tagSelectorKey.currentState?.widget
-                            .initialTags
-                            .any((element) => element.name == e) ==
-                            true) {} else {
-                          widget.tagSelectorKey.currentState!.widget
-                              .initialTags
-                              .add(OTTag(0, 0, e));
-                        }
-                      });
-                    }),
-              ))
-              .toList() ??
+                  ?.map((e) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 4),
+                        child: RoundChip(
+                            label: e,
+                            color: (e.hashColor()),
+                            onTap: () {
+                              widget.tagSelectorKey.currentState?.setState(() {
+                                if (widget.tagSelectorKey.currentState?.widget
+                                        .initialTags
+                                        .any((element) => element.name == e) ==
+                                    true) {
+                                } else {
+                                  widget.tagSelectorKey.currentState!.widget
+                                      .initialTags
+                                      .add(OTTag(0, 0, e));
+                                }
+                              });
+                            }),
+                      ))
+                  .toList() ??
               []),
     );
   }
@@ -763,9 +673,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
     super.initState();
 
     _controller.addListener(() {
-      context
-          .read<FDUHoleProvider>()
-          .editorCache[_object]!.text =
+      context.read<FDUHoleProvider>().editorCache[_object]!.text =
           _controller.text;
     });
   }
@@ -782,23 +690,14 @@ class BBSEditorPageState extends State<BBSEditorPage> {
     _tip = widget.arguments!['tip'];
     _supportTags = widget.arguments!['tags'] ?? false;
     _title =
-        widget.arguments!['title'] ?? S
-            .of(context)
-            .forum_post_enter_content;
+        widget.arguments!['title'] ?? S.of(context).forum_post_enter_content;
     _object = widget.arguments!['object'];
     _placeholder = widget.arguments!['placeholder'];
-    if (context
-        .read<FDUHoleProvider>()
-        .editorCache
-        .containsKey(_object)) {
+    if (context.read<FDUHoleProvider>().editorCache.containsKey(_object)) {
       _controller.text =
-      context
-          .read<FDUHoleProvider>()
-          .editorCache[_object]!.text!;
+          context.read<FDUHoleProvider>().editorCache[_object]!.text!;
     } else {
-      context
-          .read<FDUHoleProvider>()
-          .editorCache[_object] =
+      context.read<FDUHoleProvider>().editorCache[_object] =
           PostEditorText.newInstance(withText: _placeholder);
       _controller.text = _placeholder;
     }
@@ -809,17 +708,15 @@ class BBSEditorPageState extends State<BBSEditorPage> {
   Widget build(BuildContext context) {
     Icon fullScreenIcon = _isFullscreen
         ? (PlatformX.isMaterial(context)
-        ? const Icon(Icons.close_fullscreen)
-        : const Icon(CupertinoIcons.fullscreen_exit))
+            ? const Icon(Icons.close_fullscreen)
+            : const Icon(CupertinoIcons.fullscreen_exit))
         : (PlatformX.isMaterial(context)
-        ? const Icon(Icons.fullscreen)
-        : const Icon(CupertinoIcons.fullscreen));
+            ? const Icon(Icons.fullscreen)
+            : const Icon(CupertinoIcons.fullscreen));
     return PlatformScaffold(
       iosContentBottomPadding: false,
       iosContentPadding: false,
-      backgroundColor: Theme
-          .of(context)
-          .scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
         title: Text(_title),
         trailingActions: [
@@ -840,19 +737,19 @@ class BBSEditorPageState extends State<BBSEditorPage> {
                 : const Icon(CupertinoIcons.paperplane),
             onPressed: _canSend
                 ? () async {
-              bool isCareWordsDetected =
-              await detectCareWords(_controller.text);
-              // only show once
-              if (context.mounted == true &&
-                  isCareWordsDetected == true &&
-                  _confirmCareWords == false) {
-                await showPlatformDialog(
-                    context: context, builder: (_) => const CareDialog());
-                _confirmCareWords = true;
-                return;
-              }
-              _sendDocument(_object);
-            }
+                    bool isCareWordsDetected =
+                        await detectCareWords(_controller.text);
+                    // only show once
+                    if (context.mounted == true &&
+                        isCareWordsDetected == true &&
+                        _confirmCareWords == false) {
+                      await showPlatformDialog(
+                          context: context, builder: (_) => const CareDialog());
+                      _confirmCareWords = true;
+                      return;
+                    }
+                    _sendDocument(_object);
+                  }
                 : null,
           ),
         ],
@@ -875,9 +772,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
     String text = _controller.text;
     if (text.isEmpty) return;
     final editorText = PostEditorText(
-        text, context
-        .read<FDUHoleProvider>()
-        .editorCache[object]!.tags);
+        text, context.read<FDUHoleProvider>().editorCache[object]!.tags);
 
     if ((await _interceptor?.call(context, editorText)) ?? true) {
       Navigator.pop<PostEditorText>(context, editorText);
