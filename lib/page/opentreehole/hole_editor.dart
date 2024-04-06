@@ -478,7 +478,7 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                       "https://www.fduhole.com/#/licence", context),
                 ),
                 PlatformTextButton(
-                  child: Text("表情"),
+                  child: const Text("表情"),
                   onPressed: () => showPlatformModalSheet(
                       context: context,
                       builder: (BuildContext context) {
@@ -489,8 +489,8 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  ListTile(
-                                      leading: const Icon(Icons.emoji_emotions),
+                                  const ListTile(
+                                      leading: Icon(Icons.emoji_emotions),
                                       title: Text("表情")),
                                   // const Divider(),
                                   Wrap(
@@ -500,8 +500,9 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                                                   vertical: 4, horizontal: 4),
                                               child: InkWell(
                                                 onTap: () {
-                                                  widget.controller.text +=
-                                                      "![](${e.name})";
+                                                  // insert sticker into the current cursor position
+                                                  var cursorPosition = widget.controller.selection.base.offset;
+                                                  widget.controller.text = "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
                                                   // close the modal sheet
                                                   Navigator.of(context).pop();
                                                 },
