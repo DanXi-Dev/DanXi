@@ -110,7 +110,7 @@ final BaseRender kMarkdownRender = (BuildContext context,
       // render stickers first
       if (uri.toString().contains("danxi_")) {
         var asset = getStickerAssetPath(uri.toString());
-        print(asset);
+        // print(asset);
         if (asset != null) {
           return Image.asset(
             asset,
