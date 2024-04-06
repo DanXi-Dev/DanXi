@@ -337,8 +337,8 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const ListTile(
-                        leading: Icon(Icons.emoji_emotions), title: Text("表情")),
+                    ListTile(
+                        leading: const Icon(Icons.emoji_emotions), title: Text(S.of(context).sticker)),
                     // const Divider(),
                     Wrap(
                       children: Stickers.values
@@ -521,7 +521,7 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                       "https://www.fduhole.com/#/licence", context),
                 ),
                 PlatformTextButton(
-                  child: Text("表情"),
+                  child: Text(S.of(context).sticker),
                   onPressed: () => _buildStickersSheet(context),
                 )
               ],
