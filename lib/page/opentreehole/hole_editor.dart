@@ -49,6 +49,8 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
 
+import '../../util/stickers.dart';
+
 enum OTEditorType { DIALOG, PAGE }
 
 typedef PostInterceptor = Future<bool> Function(
@@ -474,6 +476,51 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                   child: Text(S.of(context).community_convention),
                   onPressed: () => BrowserUtil.openUrl(
                       "https://www.fduhole.com/#/licence", context),
+                ),
+                PlatformTextButton(
+                  child: Text("表情"),
+                  onPressed: () => showPlatformModalSheet(
+                      context: context,
+                      builder: (BuildContext context) {
+                        final Widget body = SafeArea(
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ListTile(
+                                      leading: const Icon(Icons.emoji_emotions),
+                                      title: Text("表情")),
+                                  // const Divider(),
+                                  Wrap(
+                                    children: Stickers.values
+                                        .map((e) => Padding(
+                                              padding: const EdgeInsets.symmetric(
+                                                  vertical: 4, horizontal: 4),
+                                              child: InkWell(
+                                                onTap: () {
+                                                  widget.controller.text +=
+                                                      "![](${e.name})";
+                                                  // close the modal sheet
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Image.asset(
+                                                  getStickerAssetPath(e.name)!,
+                                                  width: 60,
+                                                  height: 60,
+                                                ),
+                                              ),
+                                            ))
+                                        .toList(),
+                                  ),
+                                ]),
+                          ),
+                        );
+                        return PlatformX.isCupertino(context)
+                            ? Card(child: body)
+                            : body;
+                      }),
                 )
               ],
             ),
