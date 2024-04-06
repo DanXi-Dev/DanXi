@@ -331,8 +331,7 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
     return showPlatformModalSheet(
         context: context,
         builder: (BuildContext context) {
-          final Widget body = SafeArea(
-            child: Padding(
+          final Widget body = Padding(
               padding: const EdgeInsets.all(12.0),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,8 +365,7 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                           .toList(),
                     ),
                   ]),
-            ),
-          );
+            );
           return PlatformX.isCupertino(context) ? Card(child: body) : body;
         });
   }
