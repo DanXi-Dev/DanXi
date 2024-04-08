@@ -607,6 +607,24 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformContextMenuItem(
           onPressed: () async {
+            bool? sens = await Noticing.showConfirmationDialog(
+                context, "标记或取消树洞敏感状态？",
+                confirmText: "标记敏感", cancelText: "取消敏感");
+            if (sens != null) {
+              int? result = await OpenTreeHoleRepository.getInstance()
+                  .adminSetAuditFloor(e.floor_id!, sens);
+              if (result != null && result < 300 && mounted) {
+                Noticing.showMaterialNotice(
+                    context, S.of(context).operation_successful);
+              }
+            }
+          },
+          isDestructive: true,
+          menuContext: menuContext,
+          child: const Text("标记/取消敏感"),
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
             bool? confirmed = await Noticing.showConfirmationDialog(
                 context, S.of(context).are_you_sure_pin_unpin,
                 isConfirmDestructive: true);
