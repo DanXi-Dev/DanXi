@@ -30,7 +30,6 @@ import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/human_duration.dart';
-import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
@@ -319,10 +318,8 @@ class OTHoleWidget extends StatelessWidget {
           ProgressFuture dialog = showProgressDialog(
               loadingText: S.of(context).loading, context: context);
           try {
-            smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-              "post": await prefetchAllFloors(postElement),
-              "scroll_to_end": true
-            });
+            smartNavigatorPush(context, "/bbs/postDetail",
+                arguments: {"post": postElement, "scroll_to_end": true});
           } catch (error, st) {
             Noticing.showErrorDialog(context, error, trace: st);
           } finally {
@@ -627,7 +624,6 @@ class OTFloorMentionWidget extends StatelessWidget {
     try {
       OTHole? hole = await OpenTreeHoleRepository.getInstance()
           .loadSpecificHole(floor.hole_id!);
-      hole = await prefetchAllFloors(hole!);
       if (context.mounted) {
         smartNavigatorPush(context, "/bbs/postDetail",
             arguments: {"post": hole, "locate": floor});
@@ -693,11 +689,10 @@ class OTFloorMentionWidget extends StatelessWidget {
                           if (inThatFloorPage &&
                               pagedListViewController != null) {
                             // Scroll to the corresponding post
-                            await PagedListViewHelper.scrollToItem(
-                                context,
-                                pagedListViewController,
-                                floor,
-                                ScrollDirection.UP);
+                            pagedListViewController.scheduleLoadedCallback(
+                                () async => await pagedListViewController!
+                                    .scrollToItem(floor),
+                                rebuild: true);
                           } else {
                             // If this floor is in another hole
                             await jumpToFloorInNewPage(context, floor);

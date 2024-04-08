@@ -26,12 +26,11 @@ part 'floors.g.dart';
 class OTFloors {
   OTFloor? first_floor;
   OTFloor? last_floor;
-  List<OTFloor>? prefetch;
 
   factory OTFloors.fromJson(Map<String, dynamic> json) =>
       _$OTFloorsFromJson(json);
 
   Map<String, dynamic> toJson() => _$OTFloorsToJson(this);
 
-  OTFloors(this.first_floor, this.last_floor, this.prefetch);
+  OTFloors(this.first_floor, this.last_floor);
 }

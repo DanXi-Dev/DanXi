@@ -134,17 +134,6 @@ String renderText(
   }
 }
 
-/// Return [OTHole] with all floors prefetched for increased performance when scrolling to the end.
-Future<OTHole> prefetchAllFloors(OTHole hole) async {
-  if (hole.reply != null && hole.reply! < Constant.POST_COUNT_PER_PAGE) {
-    return hole;
-  }
-  List<OTFloor>? floors = await loadAllFloors(hole);
-
-  OTHole holeClone = OTHole.fromJson(jsonDecode(jsonEncode(hole)));
-  return holeClone..floors?.prefetch = floors;
-}
-
 /// Return all floors of a [OTHole].
 Future<List<OTFloor>?> loadAllFloors(OTHole hole) async {
   return await OpenTreeHoleRepository.getInstance()
@@ -421,6 +410,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
         // If not more posts, notify ListView that we reached the end.
         if (loadedPost?.isEmpty ?? false) return [];
+
+        // Remove posts of which the first floor is empty (aka hidden)
+        loadedPost?.removeWhere((element) => element.floors?.first_floor?.content?.isEmpty ?? true);
 
         // Filter blocked posts
         List<OTTag> hiddenTags =

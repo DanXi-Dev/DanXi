@@ -311,7 +311,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<List<OTHole>?> loadHoles(DateTime startTime, int divisionId,
       {int length = Constant.POST_COUNT_PER_PAGE,
-      int prefetchLength = Constant.POST_COUNT_PER_PAGE,
       String? tag,
       SortOrder? sortOrder}) async {
     sortOrder ??= SortOrder.LAST_REPLIED;
@@ -320,7 +319,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           "start_time": startTime.toUtc().toIso8601String(),
           "division_id": divisionId,
           "length": length,
-          "prefetch_length": prefetchLength,
           "tag": tag,
           "order": sortOrder.getInternalString()
         },
@@ -342,17 +340,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
+  // NEVER USED
   Future<OTHole?> loadSpecificHole(int holeId) async {
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_URL/holes/$holeId",
         options: Options(headers: _tokenHeader));
     final hole = OTHole.fromJson(response.data!);
-    for (var floor in hole.floors!.prefetch!) {
-      cacheFloor(floor);
-      floor.mention?.forEach((mention) {
-        cacheFloor(mention);
-      });
-    }
     return hole;
   }
 

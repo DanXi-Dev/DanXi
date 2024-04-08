@@ -92,12 +92,13 @@ class HoleLoginPageState extends State<HoleLoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (_) async {
         if (_widgetStack.isNotEmpty && !_widgetStack.last.backable) {
-          return false;
+          return;
         }
-        return !jumpBackIgnoringBackable();
+        jumpBackIgnoringBackable();
       },
       child: Provider<LoginInfoModel>(
         create: (BuildContext context) => model,
