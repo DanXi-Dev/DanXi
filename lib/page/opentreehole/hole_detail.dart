@@ -229,11 +229,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             }
 
             final floorToJump = locateFloor!;
-            _listViewController.scheduleLoadedCallback(
-                () async {
-                    await _listViewController.scrollToItem(floorToJump);
-                },
-                rebuild: true);
+            _listViewController.scheduleLoadedCallback(() async {
+              await _listViewController.scrollToItem(floorToJump);
+            }, rebuild: true);
             locateFloor = null;
           } catch (_) {
             // we don't care if we failed to scroll to the floor.
@@ -433,7 +431,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     }
 
     allFloors.removeWhere((element) => element.content?.isEmpty ?? true);
-    _listViewController.replaceDataWith(allFloors);
+    _listViewController.replaceAllDataWith(allFloors);
     _allDataLoaded = true;
   }
 
@@ -766,6 +764,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 context, e.hole_id, e.floor_id, e.content)) {
               Noticing.showMaterialNotice(
                   context, S.of(context).request_success);
+              OpenTreeHoleRepository.getInstance().invalidateFloorCache(e.floor_id!);
+              final newFloor = await OpenTreeHoleRepository.getInstance()
+                  .loadSpecificFloor(e.floor_id!);
+              _listViewController.replaceDatumWith(e, newFloor!);
             }
             // await refreshListView();
             // // Set duration to 0 to execute [jumpTo] to the top.
@@ -993,6 +995,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     final floorWidget = OTFloorWidget(
       hasBackgroundImage: _backgroundImage != null,
       floor: floor,
+      // Refresh single floor when modified or deleted
+      onOperation: () async {
+        OpenTreeHoleRepository.getInstance().invalidateFloorCache(floor.floor_id!);
+        final newFloor = await OpenTreeHoleRepository.getInstance()
+            .loadSpecificFloor(floor.floor_id!);
+        _listViewController.replaceDatumWith(floor, newFloor!);
+      },
       index: _renderModel is Normal ? index : null,
       isInMention: isNested,
       parentHole: switch (_renderModel) {

@@ -422,7 +422,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   ///
   /// Note: [_futureData] will be discarded after called. Call [notifyUpdate] to rebuild it and go back
   /// to normal mode.
-  replaceDataWith(List<T> data) {
+  replaceAllDataWith(List<T> data) {
     setState(() {
       // @w568w (2022-1-25): NEVER USE A REFERENCE-ONLY COPY OF LIST.
       // `_data = data;` makes me struggle with a weird bug
@@ -445,6 +445,12 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   replaceDataInRangeWith(Iterable<T> data, int start) {
     setState(() {
       _data.setAll(start, data);
+    });
+  }
+
+  replaceDatumWith(T data, int index){
+    setState(() {
+      _data[index] = data;
     });
   }
 
@@ -579,12 +585,16 @@ class PagedListViewController<T> implements ListProvider<T> {
 
   /// Replace all data, either loaded with [initialData] or [dataReceiver], with the provided data
   /// Will no longer load content on scroll after this is called.
-  void replaceDataWith(List<T> data) {
-    _state.replaceDataWith(data);
+  void replaceAllDataWith(List<T> data) {
+    _state.replaceAllDataWith(data);
   }
 
   replaceDataInRangeWith(Iterable<T> data, int start) {
     _state.replaceDataInRangeWith(data, start);
+  }
+
+  replaceDatumWith(T oldData, T newData) {
+    _state.replaceDatumWith(newData, _state._data.indexOf(oldData));
   }
 
   replaceInitialData(Iterable<T> data) {

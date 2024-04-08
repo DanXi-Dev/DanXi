@@ -120,6 +120,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     _floorCache.removeWhere((key, value) => key % factor == 0);
   }
 
+  void invalidateFloorCache(int floor_id){
+    _floorCache.remove(floor_id);
+  }
+
   OpenTreeHoleRepository._() {
     // Override the options set in parent class.
     dio.options = BaseOptions(

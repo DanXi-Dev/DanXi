@@ -340,6 +340,7 @@ class OTFloorWidget extends StatelessWidget {
   final int? index;
   final void Function()? onTap;
   final void Function()? onLongPress;
+  final Function()? onOperation;
   final ImageTapCallback? onTapImage;
   final String? searchKeyWord;
 
@@ -354,7 +355,7 @@ class OTFloorWidget extends StatelessWidget {
     this.parentHole,
     required this.hasBackgroundImage,
     this.onTapImage,
-    this.searchKeyWord,
+    this.searchKeyWord, this.onOperation,
   });
 
   @override
@@ -516,8 +517,8 @@ class OTFloorWidget extends StatelessWidget {
                         onLinkTap,
                         onTapImage ?? defaultOnImageTap,
                         hasBackgroundImage)),
-            if (showBottomBar)
-              OTFloorWidgetBottomBar(floor: floor, index: index),
+            if (showBottomBar && !floor.deleted!)
+              OTFloorWidgetBottomBar(floor: floor, index: index, onOperation: onOperation),
           ],
         ),
       ),
@@ -729,6 +730,9 @@ class OTFloorMentionWidget extends StatelessWidget {
         future: future,
         successBuilder:
             (BuildContext context, AsyncSnapshot<OTFloor?> snapshot) {
+          if (snapshot.data!.content?.isEmpty ?? true) {
+            return nil;
+          }
           return OTFloorWidget(
             hasBackgroundImage: hasBackgroundImage,
             floor: snapshot.data!,
@@ -756,9 +760,11 @@ class OTFloorMentionWidget extends StatelessWidget {
 class OTFloorWidgetBottomBar extends StatefulWidget {
   final OTFloor floor;
   final int? index;
+  // The callback when modify or delete is invoked
+  final Function()? onOperation;
 
   const OTFloorWidgetBottomBar(
-      {super.key, required this.floor, required this.index});
+      {super.key, required this.floor, required this.index, this.onOperation});
 
   @override
   OTFloorWidgetBottomBarState createState() => OTFloorWidgetBottomBarState();
@@ -908,6 +914,11 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                         try {
                           await OpenTreeHoleRepository.getInstance()
                               .deleteFloor(floor.floor_id!);
+                          Noticing.showMaterialNotice(
+                              context, S.of(context).request_success);
+                          if (widget.onOperation != null) {
+                            widget.onOperation!();
+                          }
                         } catch (e, st) {
                           if (!context.mounted) return;
                           Noticing.showErrorDialog(context, e, trace: st);
@@ -921,6 +932,9 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                         if (!context.mounted) return;
                         Noticing.showMaterialNotice(
                             context, S.of(context).request_success);
+                        if (widget.onOperation != null) {
+                          widget.onOperation!();
+                        }
                       }
                       break;
                     default:
