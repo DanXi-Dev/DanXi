@@ -513,5 +513,6 @@
   "copy_floor_id": "拷贝楼层号",
   "copy_floor_id_success": "楼层号成功保存至剪贴板",
   "copy_hole_id": "拷贝洞号",
-  "copy_hole_id_success": "洞号成功保存至剪贴板"
+  "copy_hole_id_success": "洞号成功保存至剪贴板",
+  "sticker": "表情"
 }

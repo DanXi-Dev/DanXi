@@ -18,6 +18,8 @@
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/opentreehole/auto_bbs_image.dart';
+import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/stickers.dart';
 import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/material.dart';
@@ -25,8 +27,6 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:nil/nil.dart';
-
-import '../../../util/platform_universal.dart';
 
 const double kFontSize = 16.0;
 const double kFontLargerSize = 24.0;
@@ -106,6 +106,19 @@ final BaseRender kMarkdownRender = (BuildContext context,
           MarkdownHoleMentionSupport(translucentCard, isPreviewWidget),
     },
     imageBuilder: (Uri uri, String? title, String? alt) {
+      // render stickers first
+      if (uri.toString().contains("danxi_")) {
+        var asset = getStickerAssetPath(uri.toString());
+        // print(asset);
+        if (asset != null) {
+          return Image.asset(
+            asset,
+            width: 50,
+            height: 50,
+          );
+        }
+      }
+
       return Center(
         child: AutoBBSImage(
             key: UniqueKey(),
@@ -122,11 +135,11 @@ final BaseRender kPlainRender = (BuildContext context,
     ImageTapCallback? onTapImage,
     LinkTapCallback? onTapLink,
     bool translucentCard,
-    bool isPreviewWidget){
+    bool isPreviewWidget) {
   return Column(
     mainAxisSize: MainAxisSize.min,
     crossAxisAlignment: CrossAxisAlignment.start,
-    children: [Text(content??"")],
+    children: [Text(content ?? "")],
   );
 };
 
