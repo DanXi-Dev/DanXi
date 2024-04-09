@@ -98,7 +98,10 @@ class HoleLoginPageState extends State<HoleLoginPage> {
         if (_widgetStack.isNotEmpty && !_widgetStack.last.backable) {
           return;
         }
-        jumpBackIgnoringBackable();
+        // If there is no more widgets to jump, then pop self
+        if(!jumpBackIgnoringBackable()){
+          Navigator.of(context).pop();
+        }
       },
       child: Provider<LoginInfoModel>(
         create: (BuildContext context) => model,

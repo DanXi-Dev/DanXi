@@ -36,9 +36,9 @@ class PlatformMasterDetailApp extends StatelessWidget {
     if (PlatformX.isCupertino(context)) {
       return buildView(context);
     } else {
-      return WillPopScope(
-          child: buildView(context),
-          onWillPop: () async {
+      return PopScope(
+          canPop: false,
+          onPopInvoked: (_) async {
             if (isTablet(context) && detailNavigatorKey.currentState != null) {
               // DO NOT use pop(), which pops the current route without asking
               // for others' thoughts.
@@ -48,15 +48,14 @@ class PlatformMasterDetailApp extends StatelessWidget {
               // pop the page, and it returns false.
               bool processed =
                   await detailNavigatorKey.currentState!.maybePop();
-              if (processed) return false;
+              if (processed) return;
             }
 
             if (navigatorKey?.currentState != null) {
-              bool processed = await navigatorKey!.currentState!.maybePop();
-              if (processed) return false;
+              await navigatorKey!.currentState!.maybePop();
             }
-            return true;
-          });
+          },
+          child: buildView(context));
     }
   }
 
