@@ -42,7 +42,6 @@ import 'package:dan_xi/page/opentreehole/hole_reports.dart';
 import 'package:dan_xi/page/opentreehole/hole_search.dart';
 import 'package:dan_xi/page/opentreehole/hole_tags.dart';
 import 'package:dan_xi/page/opentreehole/image_viewer.dart';
-import 'package:dan_xi/page/opentreehole/quiz.dart';
 import 'package:dan_xi/page/opentreehole/text_selector.dart';
 import 'package:dan_xi/page/settings/diagnostic_console.dart';
 import 'package:dan_xi/page/settings/hidden_tags_preference.dart';

@@ -28,10 +28,14 @@ class OTQuizWidget extends StatefulWidget {
 class OTQuizWidgetState extends State<OTQuizWidget> {
   // Prev question index is for determining the animation direction
   int questionIndex = 0, prevQuestionIndex = 0;
+  int displayIndex = 1, displayTotalIndex = 1;
   late List<QuizQuestion>? questions;
   late List<int>? indexes;
   List<QuizAnswer>? answers;
   OTQuizDisplayTypes displayType = OTQuizDisplayTypes.WELCOME_PAGE;
+
+  int _getIncorrectCount() =>
+      questions!.map((e) => e.correct ? 0 : 1).reduce((value, e) => value + e);
 
   Widget _buildWelcomePage() {
     return Center(
@@ -76,6 +80,8 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
                         questions!.map((e) => QuizAnswer(null, e.id)).toList();
                     setState(() {
                       questionIndex = 0;
+                      displayIndex = 1;
+                      displayTotalIndex = questions!.length;
                       displayType = OTQuizDisplayTypes.ONGOING;
                     });
                   }
@@ -97,6 +103,8 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
               setState(() {
                 // Find the first incorrect question
                 questionIndex = questions!.indexWhere((e) => !e.correct);
+                displayIndex = 1;
+                displayTotalIndex = _getIncorrectCount();
                 displayType = OTQuizDisplayTypes.ONGOING;
               });
             },
@@ -111,9 +119,7 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
           );
 
     final text = hasErrors
-        ? S.of(context).quiz_has_errors(questions!
-            .map((e) => e.correct ? 0 : 1)
-            .reduce((value, e) => value + e))
+        ? S.of(context).quiz_has_errors(_getIncorrectCount())
         : S.of(context).quiz_completed;
 
     return Center(
@@ -153,6 +159,8 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
         questionIndex++;
       } while (questionIndex < questions!.length &&
           questions![questionIndex].correct);
+
+      displayIndex++;
     } else {
       // Back to previous
       final questionIndexTmp = questionIndex;
@@ -163,6 +171,8 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
       // No previous, then go back to the original question
       if (questionIndex < 0) {
         questionIndex = questionIndexTmp;
+      } else {
+        displayIndex--;
       }
     }
 
@@ -190,7 +200,7 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
 
         // Clear wrong answers
         for (var elem in answers!) {
-          if(errorList.contains(elem.id)){
+          if (errorList.contains(elem.id)) {
             elem.answer = null;
           }
         }
@@ -216,7 +226,8 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
             key: ValueKey(questionIndex),
             question: questions![questionIndex],
             answerCallback: submitAnswer,
-            initialSelection: answers![questionIndex].answer);
+            initialSelection: answers![questionIndex].answer,
+            progressHint: "$displayIndex / $displayTotalIndex");
 
         bool isForward = questionIndex > prevQuestionIndex;
         prevQuestionIndex = questionIndex;
@@ -261,6 +272,7 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
 
 class QuestionWidget extends StatefulWidget {
   final QuizQuestion question;
+  final String? progressHint;
   final List<String>? initialSelection;
 
   // True to jump to next question, false to return to previous
@@ -270,7 +282,8 @@ class QuestionWidget extends StatefulWidget {
       {super.key,
       required this.question,
       required this.answerCallback,
-      this.initialSelection});
+      this.initialSelection,
+      this.progressHint});
 
   @override
   QuestionWidgetState createState() => QuestionWidgetState();
@@ -296,7 +309,6 @@ class QuestionWidgetState extends State<QuestionWidget> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     resetState();
   }
@@ -321,6 +333,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  if (widget.progressHint != null) Text(widget.progressHint!),
                   Text.rich(TextSpan(
                     children: <InlineSpan>[
                       WidgetSpan(
