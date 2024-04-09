@@ -18,6 +18,8 @@
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/opentreehole/auto_bbs_image.dart';
+import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/stickers.dart';
 import 'package:dan_xi/widget/opentreehole/render/base_render.dart';
 import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/material.dart';
@@ -25,9 +27,6 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:nil/nil.dart';
-
-import '../../../util/platform_universal.dart';
-import '../../../util/stickers.dart';
 
 const double kFontSize = 16.0;
 const double kFontLargerSize = 24.0;

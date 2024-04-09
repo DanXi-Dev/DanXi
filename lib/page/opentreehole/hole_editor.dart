@@ -34,6 +34,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/editor_object.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/stickers.dart';
 import 'package:dan_xi/widget/dialogs/care_dialog.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
@@ -48,8 +49,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
-
-import '../../util/stickers.dart';
 
 enum OTEditorType { DIALOG, PAGE }
 
