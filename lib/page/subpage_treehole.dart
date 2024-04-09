@@ -177,8 +177,10 @@ class OTTitle extends StatelessWidget {
           singleChoice: true,
           defaultChoice: currentIndex,
           onChoice: (Tag tag, list) {
-            division = context.read<FDUHoleProvider>().currentDivision =
+            division =
                 divisions.firstWhere((element) => element.name == tag.tagTitle);
+            context.read<FDUHoleProvider>().currentDivisionId =
+                division?.division_id;
             ChangeDivisionEvent(division!).fire();
           },
           tagList: divisions
@@ -366,8 +368,11 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     // If no token, NotLoginError will be thrown.
     if (!context.read<FDUHoleProvider>().isUserInitialized) {
       await OpenTreeHoleRepository.getInstance().initializeRepo();
-      context.read<FDUHoleProvider>().currentDivision =
-          OpenTreeHoleRepository.getInstance().getDivisions().firstOrNull;
+      context.read<FDUHoleProvider>().currentDivisionId =
+          OpenTreeHoleRepository.getInstance()
+              .getDivisions()
+              .firstOrNull
+              ?.division_id;
       settingsPageKey.currentState?.setState(() {});
     }
 

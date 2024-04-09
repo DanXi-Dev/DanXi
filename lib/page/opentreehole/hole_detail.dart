@@ -640,6 +640,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             if (confirmed != true || !mounted) return;
 
             FDUHoleProvider provider = context.read<FDUHoleProvider>();
+            int divisionId = provider.currentDivision!.division_id!;
             List<int> pinned = provider.currentDivision!.pinned!
                 .map((hole) => hole.hole_id!)
                 .toList();
@@ -649,11 +650,15 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               pinned.add(e.hole_id!);
             }
             int? result = await OpenTreeHoleRepository.getInstance()
-                .adminModifyDivision(
-                    provider.currentDivision!.division_id!, null, null, pinned);
-            if (result != null && result < 300 && mounted) {
-              Noticing.showMaterialNotice(
-                  context, S.of(context).operation_successful);
+                .adminModifyDivision(divisionId, null, null, pinned);
+            if (result != null && result < 300) {
+              // refresh the division's pinned holes
+              final _ = await OpenTreeHoleRepository.getInstance()
+                  .loadSpecificDivision(divisionId, useCache: false);
+              if (mounted) {
+                Noticing.showMaterialNotice(
+                    context, S.of(context).operation_successful);
+              }
             }
           },
           menuContext: menuContext,
