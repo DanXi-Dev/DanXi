@@ -37,7 +37,7 @@ class StateProvider {
 
   static void initialize(BuildContext context) {
     FDUHoleProvider provider = context.read<FDUHoleProvider>();
-    provider.currentDivision = null;
+    provider.currentDivisionId = null;
     personInfo.value = null;
     isForeground = true;
     needScreenshotWarning = showingScreenshotWarning = false;

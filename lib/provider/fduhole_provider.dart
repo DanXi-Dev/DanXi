@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:collection/collection.dart';
 import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
@@ -44,13 +45,14 @@ class FDUHoleProvider with ChangeNotifier {
 
   final Map<String?, CourseReviewEditorText> courseReviewEditorCache = {};
 
-  /// The current division.
-  OTDivision? _currentDivision;
+  /// The current division id;
+  int? divisionId;
 
-  OTDivision? get currentDivision => _currentDivision;
+  OTDivision? get currentDivision => _divisionCache
+      .firstWhereOrNull((element) => element.division_id == divisionId);
 
-  set currentDivision(OTDivision? currentDivision) {
-    _currentDivision = currentDivision;
+  set currentDivisionId(int? divisionId) {
+    this.divisionId = divisionId;
     notifyListeners();
   }
 
