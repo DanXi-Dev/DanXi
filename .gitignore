@@ -64,3 +64,4 @@ ios/fastlane/Matchfile
 
 # FVM Version Cache
 .fvm/
+.fvmrc
