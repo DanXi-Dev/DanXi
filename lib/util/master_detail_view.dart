@@ -19,6 +19,7 @@ import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/util/master_detail_utils.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 GlobalKey<NavigatorState>? navigatorGlobalKey;
@@ -52,8 +53,11 @@ class PlatformMasterDetailApp extends StatelessWidget {
             }
 
             if (navigatorKey?.currentState != null) {
-              await navigatorKey!.currentState!.maybePop();
+              bool processed = await navigatorKey!.currentState!.maybePop();
+              if (processed) return;
             }
+
+            SystemNavigator.pop();
           },
           child: buildView(context));
     }
