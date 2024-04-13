@@ -86,6 +86,9 @@ class Constant {
   static const String IMAGE_BASE_URL = "https://image.fduhole.com";
   static const String DANKE_BASE_URL = "https://danke.fduhole.com/api";
 
+  /// An link to the FAQ page of Danxi.
+  static const String FAQ_URL = "https://danxi-dev.feishu.cn/wiki/wikcnrPPGDCiTODBYRkdwLlHH65";
+
   static const LINKIFY_THEME =
       TextStyle(color: Colors.blue, decoration: TextDecoration.none);
 

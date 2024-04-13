@@ -156,12 +156,12 @@ class LoginDialogState extends State<LoginDialog> {
               ),
               actions: <Widget>[
                 PlatformDialogAction(
-                    child: PlatformText(S.of(context).have_read),
+                    child: PlatformText(S.of(context).skip),
                     onPressed: () => Navigator.pop(context)),
                 PlatformDialogAction(
                     child: PlatformText(S.of(context).i_see),
                     onPressed: () {
-                      BrowserUtil.openUrl(S.of(context).faq_url, context);
+                      BrowserUtil.openUrl(Constant.FAQ_URL, context);
                     }),
               ],
             ));

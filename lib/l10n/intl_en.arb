@@ -531,9 +531,5 @@
   "start_date_select": "Semester start date query",
   "start_date_select_message": "You must select the start date of the semester to view your class schedule. Not selecting will result in a date error. \nTip: Start date is the Monday of the first week.",
   "empty_classroom_warning": "Not connected to the campus intranet, so classroom usage information may not be accurate.\nPlease connect to the campus intranet for accurate information.",
-  "welcome_prompt":"If you are using DanXi for the first time, perhaps you would like to take a look at the FAQ section? \n\nWelcome to the DanXi!",
-  "have_read":"have read",
-  "read":"read",
-  "faq_url":"https://danxi-dev.feishu.cn/wiki/wikcnrPPGDCiTODBYRkdwLlHH65"
-
+  "welcome_prompt":"Welcome to DanXi!\n\nIf you are using DanXi for the first time, perhaps you would like to take a look at the FAQ section? "
 }
