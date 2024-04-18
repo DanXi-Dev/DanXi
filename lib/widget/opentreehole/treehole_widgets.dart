@@ -519,7 +519,7 @@ class OTFloorWidget extends StatelessWidget {
                         onLinkTap,
                         onTapImage ?? defaultOnImageTap,
                         hasBackgroundImage)),
-            if (showBottomBar)
+            if (showBottomBar && !floor.deleted!)
               OTFloorWidgetBottomBar(floor: floor, index: index),
           ],
         ),
@@ -734,6 +734,9 @@ class OTFloorMentionWidget extends StatelessWidget {
         future: future,
         successBuilder:
             (BuildContext context, AsyncSnapshot<OTFloor?> snapshot) {
+          if (snapshot.data!.content?.isEmpty ?? true) {
+            return nil;
+          }
           return OTFloorWidget(
             hasBackgroundImage: hasBackgroundImage,
             floor: snapshot.data!,

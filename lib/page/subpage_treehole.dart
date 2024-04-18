@@ -140,14 +140,22 @@ Future<OTHole> prefetchAllFloors(OTHole hole) async {
   }
   List<OTFloor>? floors = await loadAllFloors(hole);
 
+  
+
+
   OTHole holeClone = OTHole.fromJson(jsonDecode(jsonEncode(hole)));
   return holeClone..floors?.prefetch = floors;
 }
 
 /// Return all floors of a [OTHole].
 Future<List<OTFloor>?> loadAllFloors(OTHole hole) async {
-  return await OpenTreeHoleRepository.getInstance()
+  final allFloors = await OpenTreeHoleRepository.getInstance()
       .loadFloors(hole, startFloor: 0, length: 0);
+
+  // Remove posts of which the first floor is empty (aka hidden)
+  allFloors?.removeWhere((element) => element.content?.isEmpty ?? true);
+
+  return allFloors;
 }
 
 const String KEY_NO_TAG = "默认";
@@ -396,6 +404,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         }).call(page);
         // If not more posts, notify ListView that we reached the end.
         if (loadedPost?.isEmpty ?? false) return [];
+
+        // Remove posts of which the first floor is empty (aka hidden)
+        loadedPost?.removeWhere((element) => element.floors?.first_floor?.content?.isEmpty ?? true);
 
         // About this line, see [PagedListView].
         return loadedPost == null || loadedPost.isEmpty
