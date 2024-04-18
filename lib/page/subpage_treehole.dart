@@ -140,9 +140,6 @@ Future<OTHole> prefetchAllFloors(OTHole hole) async {
   }
   List<OTFloor>? floors = await loadAllFloors(hole);
 
-  
-
-
   OTHole holeClone = OTHole.fromJson(jsonDecode(jsonEncode(hole)));
   return holeClone..floors?.prefetch = floors;
 }
