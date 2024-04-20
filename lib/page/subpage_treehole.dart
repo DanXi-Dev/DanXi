@@ -133,12 +133,6 @@ String renderText(
   }
 }
 
-/// Return all floors of a [OTHole].
-Future<List<OTFloor>?> loadAllFloors(OTHole hole) async {
-  return await OpenTreeHoleRepository.getInstance()
-      .loadFloors(hole, startFloor: 0, length: 0);
-}
-
 const String KEY_NO_TAG = "默认";
 
 /// The tab bar for switching divisions.
@@ -416,7 +410,8 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         if (loadedPost?.isEmpty ?? false) return [];
 
         // Remove posts of which the first floor is empty (aka hidden)
-        loadedPost?.removeWhere((element) => element.floors?.first_floor?.content?.isEmpty ?? true);
+        loadedPost?.removeWhere(
+            (element) => element.floors?.first_floor?.content?.isEmpty ?? true);
 
         // Filter blocked posts
         List<OTTag> hiddenTags =

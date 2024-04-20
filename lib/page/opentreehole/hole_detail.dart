@@ -424,7 +424,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   // Load all floors, in case we have to scroll to end or to a specific floor
   Future<void> _loadAllContent() async {
     // If we haven't loaded before, we need to load all floors.
-    final allFloors = await loadAllFloors((_renderModel as Normal).hole);
+    final allFloors = await OpenTreeHoleRepository.getInstance()
+        .loadFloors((_renderModel as Normal).hole, startFloor: 0, length: 0);
 
     if (allFloors == null) {
       throw Exception("Failed to fetch all floors");
@@ -787,7 +788,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 context, e.hole_id, e.floor_id, e.content)) {
               Noticing.showMaterialNotice(
                   context, S.of(context).request_success);
-              OpenTreeHoleRepository.getInstance().invalidateFloorCache(e.floor_id!);
+              OpenTreeHoleRepository.getInstance()
+                  .invalidateFloorCache(e.floor_id!);
               final newFloor = await OpenTreeHoleRepository.getInstance()
                   .loadSpecificFloor(e.floor_id!);
               _listViewController.replaceDatumWith(e, newFloor!);
@@ -1020,7 +1022,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       floor: floor,
       // Refresh single floor when modified or deleted
       onOperation: () async {
-        OpenTreeHoleRepository.getInstance().invalidateFloorCache(floor.floor_id!);
+        OpenTreeHoleRepository.getInstance()
+            .invalidateFloorCache(floor.floor_id!);
         final newFloor = await OpenTreeHoleRepository.getInstance()
             .loadSpecificFloor(floor.floor_id!);
         _listViewController.replaceDatumWith(floor, newFloor!);
