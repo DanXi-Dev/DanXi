@@ -450,8 +450,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   Text((event.course.teacherNames ?? []).join(",")),
-                  Text(event.course.roomName!),
-                  Text(event.course.courseId!),
+                  Text(event.course.roomName ?? S.of(context).noClassroom),
+                  Text(event.course.courseId ?? S.of(context).noCourseId),
                 ],
               )),
               if (event.course.roomId == "999999") ...[
