@@ -103,10 +103,10 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   static const _IGNORE_KEYS = ["password"];
 
   Future<void> diagnoseUrl() async {
-    _console
-        .writeln("Base URL: ${SettingsProvider.getInstance().fduholeBaseUrl}");
     _console.writeln(
         "Base Auth URL: ${SettingsProvider.getInstance().authBaseUrl}");
+    _console
+        .writeln("Hole Base URL: ${SettingsProvider.getInstance().fduholeBaseUrl}");
     _console.writeln(
         "Image Base URL: ${SettingsProvider.getInstance().imageBaseUrl}");
     _console.writeln(
@@ -152,7 +152,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     }
   }
 
-  Future<void> changeBaseUrl() async {
+  Future<void> changeHoleBaseUrl() async {
     String? fduholeBaseUrl = await Noticing.showInputDialog(context,
         "Input new base url (leave empty to reset to ${Constant.FDUHOLE_BASE_URL})");
     if (fduholeBaseUrl == null || !mounted) return;
@@ -288,7 +288,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
                 PlatformElevatedButton(
                   child: const Text("Set _BASE_URL"),
                   onPressed: () async {
-                    await changeBaseUrl();
+                    await changeHoleBaseUrl();
                   },
                 ),
                 PlatformElevatedButton(
