@@ -30,7 +30,6 @@ import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/opentreehole/human_duration.dart';
-import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
@@ -319,10 +318,8 @@ class OTHoleWidget extends StatelessWidget {
           ProgressFuture dialog = showProgressDialog(
               loadingText: S.of(context).loading, context: context);
           try {
-            smartNavigatorPush(context, "/bbs/postDetail", arguments: {
-              "post": await prefetchAllFloors(postElement),
-              "scroll_to_end": true
-            });
+            smartNavigatorPush(context, "/bbs/postDetail",
+                arguments: {"post": postElement, "scroll_to_end": true});
           } catch (error, st) {
             Noticing.showErrorDialog(context, error, trace: st);
           } finally {
@@ -343,6 +340,7 @@ class OTFloorWidget extends StatelessWidget {
   final int? index;
   final void Function()? onTap;
   final void Function()? onLongPress;
+  final Function()? onOperation;
   final ImageTapCallback? onTapImage;
   final String? searchKeyWord;
 
@@ -357,7 +355,7 @@ class OTFloorWidget extends StatelessWidget {
     this.parentHole,
     required this.hasBackgroundImage,
     this.onTapImage,
-    this.searchKeyWord,
+    this.searchKeyWord, this.onOperation,
   });
 
   @override
@@ -519,8 +517,8 @@ class OTFloorWidget extends StatelessWidget {
                         onLinkTap,
                         onTapImage ?? defaultOnImageTap,
                         hasBackgroundImage)),
-            if (showBottomBar)
-              OTFloorWidgetBottomBar(floor: floor, index: index),
+            if (showBottomBar && !floor.deleted!)
+              OTFloorWidgetBottomBar(floor: floor, index: index, onOperation: onOperation),
           ],
         ),
       ),
@@ -627,7 +625,6 @@ class OTFloorMentionWidget extends StatelessWidget {
     try {
       OTHole? hole = await OpenTreeHoleRepository.getInstance()
           .loadSpecificHole(floor.hole_id!);
-      hole = await prefetchAllFloors(hole!);
       if (context.mounted) {
         smartNavigatorPush(context, "/bbs/postDetail",
             arguments: {"post": hole, "locate": floor});
@@ -693,11 +690,10 @@ class OTFloorMentionWidget extends StatelessWidget {
                           if (inThatFloorPage &&
                               pagedListViewController != null) {
                             // Scroll to the corresponding post
-                            await PagedListViewHelper.scrollToItem(
-                                context,
-                                pagedListViewController,
-                                floor,
-                                ScrollDirection.UP);
+                            pagedListViewController.scheduleLoadedCallback(
+                                () async => await pagedListViewController!
+                                    .scrollToItem(floor),
+                                rebuild: true);
                           } else {
                             // If this floor is in another hole
                             await jumpToFloorInNewPage(context, floor);
@@ -734,6 +730,9 @@ class OTFloorMentionWidget extends StatelessWidget {
         future: future,
         successBuilder:
             (BuildContext context, AsyncSnapshot<OTFloor?> snapshot) {
+          if (snapshot.data!.content?.isEmpty ?? true) {
+            return nil;
+          }
           return OTFloorWidget(
             hasBackgroundImage: hasBackgroundImage,
             floor: snapshot.data!,
@@ -761,9 +760,11 @@ class OTFloorMentionWidget extends StatelessWidget {
 class OTFloorWidgetBottomBar extends StatefulWidget {
   final OTFloor floor;
   final int? index;
+  // The callback when modify or delete is invoked
+  final Function()? onOperation;
 
   const OTFloorWidgetBottomBar(
-      {super.key, required this.floor, required this.index});
+      {super.key, required this.floor, required this.index, this.onOperation});
 
   @override
   OTFloorWidgetBottomBarState createState() => OTFloorWidgetBottomBarState();
@@ -913,6 +914,11 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                         try {
                           await OpenTreeHoleRepository.getInstance()
                               .deleteFloor(floor.floor_id!);
+                          Noticing.showMaterialNotice(
+                              context, S.of(context).request_success);
+                          if (widget.onOperation != null) {
+                            widget.onOperation!();
+                          }
                         } catch (e, st) {
                           if (!context.mounted) return;
                           Noticing.showErrorDialog(context, e, trace: st);
@@ -926,6 +932,9 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                         if (!context.mounted) return;
                         Noticing.showMaterialNotice(
                             context, S.of(context).request_success);
+                        if (widget.onOperation != null) {
+                          widget.onOperation!();
+                        }
                       }
                       break;
                     default:

@@ -26,7 +26,6 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
@@ -88,6 +87,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   CourseReview? locateReview;
   Future<CourseGroup?>? _courseGroupFuture;
   Future<List<CourseReview>?>? _reviewListFuture;
+  bool shouldScrollToEnd = false;
 
   /// Reload/load the (new) content
   Future<List<CourseReview>?> _loadContent() async {
@@ -110,15 +110,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
         });
       }
     }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (locateReview != null && mounted) {
-        // Scroll to the specific floor
-        await PagedListViewHelper.scrollToItem(
-            context, _listViewController, locateReview, ScrollDirection.DOWN);
-        locateReview = null;
-      }
-    });
 
     return result;
   }
@@ -158,9 +149,15 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
 
     await _courseGroupFuture;
     await refreshSelf();
-    if (scrollToEnd) _listViewController.queueScrollToEnd();
-    return _listViewController.notifyUpdate(
+
+    await _listViewController.notifyUpdate(
         useInitialData: false, queueDataClear: true);
+
+    if (scrollToEnd) {
+      setState(() {
+        shouldScrollToEnd = true;
+      });
+    }
   }
 
   Future<CourseGroup?> _fetchCourseGroup({bool forceRefetch = false}) async {
@@ -208,6 +205,31 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     _courseGroupFuture ??= _fetchCourseGroup();
     _reviewListFuture ??= _loadContent();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (mounted) {
+        if (locateReview != null) {
+          // Scroll to the specific floor.
+          final floorToJump = locateReview!;
+          _listViewController.scheduleLoadedCallback(
+              () async => await _listViewController.scrollToItem(floorToJump),
+              rebuild: true);
+          locateReview = null;
+        }
+
+        if (shouldScrollToEnd) {
+          try {
+            // Scroll to end.
+            _listViewController.scheduleLoadedCallback(
+                () async => await _listViewController.scrollToEnd(),
+                rebuild: true);
+            shouldScrollToEnd = false;
+          } catch (_) {
+            // we don't care if we failed to scroll to the end.
+          }
+        }
+      }
+    });
 
     return PlatformScaffold(
       iosContentPadding: false,
@@ -401,9 +423,9 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
 
   Future<void> _onTapScrollToEnd(_) async {
     try {
-      _listViewController.queueScrollToEnd();
-      _listViewController.notifyUpdate(
-          useInitialData: false, queueDataClear: false);
+      setState(() {
+        shouldScrollToEnd = true;
+      });
     } catch (error, st) {
       Noticing.showErrorDialog(context, error, trace: st);
     }

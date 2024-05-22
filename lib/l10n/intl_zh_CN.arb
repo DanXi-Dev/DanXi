@@ -523,6 +523,14 @@
   "start_date_select": "学期开始日期查询：",
   "start_date_select_message": "必须先正确选择学期的开始日期，否则导致日期错误。\n提示：开始日期是第一周的周一。",
   "empty_classroom_warning": "未连接到校园内网，教室使用情况可能不准确。\n请连接到校园内网以获取准确的信息。",
+  "start_quiz": "进入答题",
+  "quiz_not_answered": "您还未查看过社区公约，请点击下方链接阅读后答题，全部正确后方可进入树洞",
+  "quiz_completed": "您已完成社区公约的学习，请在使用树洞期间牢记并遵守",
+  "quiz_has_errors": "此次测试中，有 {count} 道题未能正确回答，请点击按钮重做错题",
+  "redo_incorrect_questions": "重做错题",
+  "enter_treehole": "开始树洞之旅",
+  "next_question": "下一题",
+  "prev_question": "上一题",
   "welcome_prompt":"欢迎来到旦夕！\n\n如果你是第一次使用旦夕，或许你想看看FAQ板块？",
   "sticker": "表情"
 }

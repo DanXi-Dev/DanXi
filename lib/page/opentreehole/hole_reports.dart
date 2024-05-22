@@ -295,7 +295,7 @@ class AuditListState extends State<AuditList> {
       [
         PlatformContextMenuItem(
           menuContext: menuContext,
-          child: const Text("Mark as sensitive"),
+          child: const Text("标记为敏感"),
           onPressed: () async {
             int? result = await OpenTreeHoleRepository.getInstance()
                 .adminSetAuditFloor(e.id, true);
@@ -309,7 +309,7 @@ class AuditListState extends State<AuditList> {
         ),
         PlatformContextMenuItem(
           menuContext: menuContext,
-          child: const Text("Mark as not sensitive"),
+          child: const Text("标记为不敏感"),
           onPressed: () async {
             int? result = await OpenTreeHoleRepository.getInstance()
                 .adminSetAuditFloor(e.id, false);

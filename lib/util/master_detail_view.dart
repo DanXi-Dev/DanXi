@@ -19,6 +19,7 @@ import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/util/master_detail_utils.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 GlobalKey<NavigatorState>? navigatorGlobalKey;
@@ -36,9 +37,9 @@ class PlatformMasterDetailApp extends StatelessWidget {
     if (PlatformX.isCupertino(context)) {
       return buildView(context);
     } else {
-      return WillPopScope(
-          child: buildView(context),
-          onWillPop: () async {
+      return PopScope(
+          canPop: false,
+          onPopInvoked: (_) async {
             if (isTablet(context) && detailNavigatorKey.currentState != null) {
               // DO NOT use pop(), which pops the current route without asking
               // for others' thoughts.
@@ -48,15 +49,17 @@ class PlatformMasterDetailApp extends StatelessWidget {
               // pop the page, and it returns false.
               bool processed =
                   await detailNavigatorKey.currentState!.maybePop();
-              if (processed) return false;
+              if (processed) return;
             }
 
             if (navigatorKey?.currentState != null) {
               bool processed = await navigatorKey!.currentState!.maybePop();
-              if (processed) return false;
+              if (processed) return;
             }
-            return true;
-          });
+
+            SystemNavigator.pop();
+          },
+          child: buildView(context));
     }
   }
 

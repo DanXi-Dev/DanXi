@@ -36,7 +36,6 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
@@ -89,7 +88,6 @@ String preprocessContentForDisplay(String content) {
 /// Arguments:
 /// [OTHole] or [Future<List<OTFloor>>] post: if [post] is [OTHole], show the page as a post.
 /// Otherwise as a list of search result.
-/// When [post] is [OTHole] and its [prefetch] is more than [Constant.POST_COUNT_PER_PAGE], it supposes *all* the floors has been prefetched.
 ///
 /// [String] searchKeyword: if set, the page will show the result of searching [searchKeyword].
 ///
@@ -117,24 +115,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   /// Fields related to the display states.
   bool _multiSelectMode = false;
+  bool _allDataLoaded = false;
   final List<OTFloor> _selectedFloors = [];
   bool shouldScrollToEnd = false;
   OTFloor? locateFloor;
 
-  /// [prefetchedFloors] keep all floors that are prefetched, i.e.
-  /// they are not loaded by [PagedListView], but passed in or loaded by events
-  /// in this page widget, e.g. scrolling to bottom.
-  final List<OTFloor> prefetchedFloors = [];
-
   final PagedListViewController<OTFloor> _listViewController =
       PagedListViewController<OTFloor>();
-
-  /// whether we has "prefetched" all data.
-  /// Note: "Prefetch" means that the data is not loaded by [PagedListView], but passed in or loaded by events.
-  /// That is, even [hasPrefetchedAllData] == false, all floors can be already loaded.
-  bool get hasPrefetchedAllData =>
-      prefetchedFloors.length > Constant.POST_COUNT_PER_PAGE ||
-      shouldScrollToEnd;
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTFloor>?> _loadContent(int page) async {
@@ -150,7 +137,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       }
     }
 
-    return switch (_renderModel) {
+    final results = switch (_renderModel) {
       Normal(hole: var hole) => await OpenTreeHoleRepository.getInstance()
           .loadFloors(hole, startFloor: page * Constant.POST_COUNT_PER_PAGE),
       Search(keyword: var searchKeyword) =>
@@ -159,6 +146,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             startFloor: _listViewController.length()),
       PunishmentHistory() => await loadPunishmentHistory(page),
     };
+
+    return results;
   }
 
   // construct the uri of the floor and copy it to clipboard
@@ -191,11 +180,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     if (widget.arguments!.containsKey('post')) {
       OTHole hole = widget.arguments!['post'];
       _renderModel = Normal(hole);
-      prefetchedFloors.addAll(hole.floors?.prefetch ?? const []);
-      // Cache preloaded floor only when user views the Hole
-      for (var floor in prefetchedFloors) {
-        OpenTreeHoleRepository.getInstance().cacheFloor(floor);
-      }
+
       // Update hole view count
       if (hole.hole_id != null) {
         unawaited(OpenTreeHoleRepository.getInstance()
@@ -214,33 +199,15 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   /// Refresh the list view.
-  ///
-  /// if [ignorePrefetch] and [hasPrefetchedAllData], it will discard the prefetched data first.
-  Future<void> refreshListView(
-      {bool scrollToEnd = false, bool ignorePrefetch = true}) async {
-    Future<void> realRefresh() async {
-      if (scrollToEnd) _listViewController.queueScrollToEnd();
-      await _listViewController.notifyUpdate(
-          useInitialData: false, queueDataClear: true);
-    }
+  Future<void> refreshListView({bool scrollToEnd = false}) async {
+    _allDataLoaded = false;
+    await _listViewController.notifyUpdate(queueDataClear: true);
 
-    if (ignorePrefetch && hasPrefetchedAllData) {
-      // Reset variable to make [hasPrefetchedAllData] false
+    if (scrollToEnd) {
       setState(() {
-        shouldScrollToEnd = false;
-        if (_renderModel case Normal()) {
-          prefetchedFloors.removeRange(
-              Constant.POST_COUNT_PER_PAGE, prefetchedFloors.length);
-        }
+        shouldScrollToEnd = true;
       });
-      // Wait build() complete (so `allDataReceiver` has been set to `null`), then trigger a refresh in
-      // the list view.
-      Completer<void> completer = Completer();
-      WidgetsBinding.instance.addPostFrameCallback((_) => realRefresh()
-          .then(completer.complete, onError: completer.completeError));
-      return completer.future;
     }
-    return realRefresh();
   }
 
   @override
@@ -252,48 +219,46 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      try {
-        // replace precached data with updated ones. Only normal hole has precached data.
-        if (_renderModel
-            case Normal(hole: var hole, prefetchNeedUpdate: var needUpdate)) {
-          if (needUpdate) {
-            List<OTFloor>? newFloors =
-                await OpenTreeHoleRepository.getInstance().loadFloors(hole);
-            _listViewController.replaceInitialData(newFloors!);
-            prefetchedFloors.replaceRange(0, newFloors.length, newFloors);
-            (_renderModel as Normal).prefetchNeedUpdate = false;
+      if (mounted) {
+        if (locateFloor != null) {
+          try {
+            if (!_allDataLoaded) {
+              await _loadAllContent();
+            }
+
+            final floorToJump = locateFloor!;
+            _listViewController.scheduleLoadedCallback(() async {
+              await _listViewController.scrollToItem(floorToJump);
+            }, rebuild: true);
+            locateFloor = null;
+          } catch (_) {
+            // we don't care if we failed to scroll to the floor.
           }
         }
-      } catch (_) {
-        // we don't care if the data is not updated.
-      }
-      if (locateFloor != null && mounted) {
-        try {
-          // scroll to the specific floor.
-          await PagedListViewHelper.scrollToItem(
-              context, _listViewController, locateFloor, ScrollDirection.DOWN);
-          locateFloor = null;
-        } catch (_) {
-          // we don't care if we failed to scroll to the floor.
+
+        if (shouldScrollToEnd) {
+          try {
+            if (!_allDataLoaded) {
+              await _loadAllContent();
+            }
+            // scroll to end.
+            _listViewController.scheduleLoadedCallback(
+                () async => await _listViewController.scrollToEnd(),
+                rebuild: true);
+            shouldScrollToEnd = false;
+          } catch (_) {
+            // we don't care if we failed to scroll to the end.
+          }
         }
       }
     });
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
-    Future<List<OTFloor>>? allDataReceiver;
-    if (hasPrefetchedAllData) {
-      allDataReceiver = Future.value(prefetchedFloors);
-    }
     final pagedListView = PagedListView<OTFloor>(
-      initialData: prefetchedFloors,
       pagedController: _listViewController,
       noneItem: OTFloor.dummy(),
       withScrollbar: true,
       scrollController: PrimaryScrollController.of(context),
       dataReceiver: _loadContent,
-      // If we need to scroll to the end, we should prefetch all the data beforehand.
-      // See also [prefetchAllFloors] in [TreeHoleSubpageState].
-      allDataReceiver: allDataReceiver,
-      shouldScrollToEnd: shouldScrollToEnd,
       builder: _getListItems,
       loadingBuilder: (BuildContext context) => Container(
         padding: const EdgeInsets.all(8),
@@ -363,7 +328,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                     onTap: (_) {
                       setState(() =>
                           (_renderModel as Normal).onlyShowDZ = !onlyShowDZ);
-                      refreshListView(ignorePrefetch: false);
+                      refreshListView();
                     }),
                 PopupMenuOption(
                     label: _multiSelectMode
@@ -454,20 +419,26 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     );
   }
 
+  // Load all floors, in case we have to scroll to end or to a specific floor
+  Future<void> _loadAllContent() async {
+    // If we haven't loaded before, we need to load all floors.
+    final allFloors = await OpenTreeHoleRepository.getInstance()
+        .loadFloors((_renderModel as Normal).hole, startFloor: 0, length: 0);
+
+    if (allFloors == null) {
+      throw Exception("Failed to fetch all floors");
+    }
+
+    _listViewController.replaceAllDataWith(allFloors);
+    _allDataLoaded = true;
+  }
+
   Future<void> _onTapScrollToEnd(_) async {
     ProgressFuture dialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
     try {
-      // If we haven't loaded before, we need to load all floors.
-      if (!hasPrefetchedAllData) {
-        final allFloors = await loadAllFloors((_renderModel as Normal).hole);
-        prefetchedFloors.replaceRange(0, prefetchedFloors.length, allFloors!);
-      }
-
-      _listViewController.queueScrollToEnd();
-      _listViewController.replaceDataWith(prefetchedFloors);
+      // The scrolling is actually performed in the post-build binding
       setState(() {
-        // set shouldScrollToEnd to true to indicate that we have scrolled to the end.
         shouldScrollToEnd = true;
       });
     } catch (error, st) {
@@ -634,6 +605,24 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformContextMenuItem(
           onPressed: () async {
+            bool? sens = await Noticing.showConfirmationDialog(
+                context, "标记或取消树洞敏感状态？",
+                confirmText: "标记敏感", cancelText: "取消敏感");
+            if (sens != null) {
+              int? result = await OpenTreeHoleRepository.getInstance()
+                  .adminSetAuditFloor(e.floor_id!, sens);
+              if (result != null && result < 300 && mounted) {
+                Noticing.showMaterialNotice(
+                    context, S.of(context).operation_successful);
+              }
+            }
+          },
+          isDestructive: true,
+          menuContext: menuContext,
+          child: const Text("标记/取消敏感"),
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
             bool? confirmed = await Noticing.showConfirmationDialog(
                 context, S.of(context).are_you_sure_pin_unpin,
                 isConfirmDestructive: true);
@@ -796,6 +785,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 context, e.hole_id, e.floor_id, e.content)) {
               Noticing.showMaterialNotice(
                   context, S.of(context).request_success);
+              OpenTreeHoleRepository.getInstance()
+                  .invalidateFloorCache(e.floor_id!);
+              final newFloor = await OpenTreeHoleRepository.getInstance()
+                  .loadSpecificFloor(e.floor_id!);
+              _listViewController.replaceDatumWith(e, newFloor!);
             }
             // await refreshListView();
             // // Set duration to 0 to execute [jumpTo] to the top.
@@ -1023,6 +1017,14 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     final floorWidget = OTFloorWidget(
       hasBackgroundImage: _backgroundImage != null,
       floor: floor,
+      // Refresh single floor when modified or deleted
+      onOperation: () async {
+        OpenTreeHoleRepository.getInstance()
+            .invalidateFloorCache(floor.floor_id!);
+        final newFloor = await OpenTreeHoleRepository.getInstance()
+            .loadSpecificFloor(floor.floor_id!);
+        _listViewController.replaceDatumWith(floor, newFloor!);
+      },
       index: _renderModel is Normal ? index : null,
       isInMention: isNested,
       parentHole: switch (_renderModel) {
@@ -1166,7 +1168,6 @@ class Normal extends RenderModel {
   OTHole hole;
   bool? isFavored, isSubscribed;
   bool onlyShowDZ = false;
-  bool prefetchNeedUpdate = true;
 
   Normal(this.hole);
 

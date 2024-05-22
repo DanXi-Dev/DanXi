@@ -16,7 +16,6 @@
  */
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
@@ -29,6 +28,7 @@ import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/opentreehole/hole_editor.dart';
+import 'package:dan_xi/page/opentreehole/quiz.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -131,23 +131,6 @@ String renderText(
   } else {
     return result;
   }
-}
-
-/// Return [OTHole] with all floors prefetched for increased performance when scrolling to the end.
-Future<OTHole> prefetchAllFloors(OTHole hole) async {
-  if (hole.reply != null && hole.reply! < Constant.POST_COUNT_PER_PAGE) {
-    return hole;
-  }
-  List<OTFloor>? floors = await loadAllFloors(hole);
-
-  OTHole holeClone = OTHole.fromJson(jsonDecode(jsonEncode(hole)));
-  return holeClone..floors?.prefetch = floors;
-}
-
-/// Return all floors of a [OTHole].
-Future<List<OTFloor>?> loadAllFloors(OTHole hole) async {
-  return await OpenTreeHoleRepository.getInstance()
-      .loadFloors(hole, startFloor: 0, length: 0);
 }
 
 const String KEY_NO_TAG = "默认";
@@ -376,6 +359,14 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       settingsPageKey.currentState?.setState(() {});
     }
 
+    bool answered =
+        await OpenTreeHoleRepository.getInstance().hasAnsweredQuestions() ??
+            true;
+    if (!answered) {
+      throw QuizUnansweredError(
+          "User hasn't finished the quiz of forum rules yet. ");
+    }
+
     switch (_postsType) {
       case PostsType.FAVORED_DISCUSSION:
         // Favored discussion has only one page.
@@ -417,6 +408,10 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
 
         // If not more posts, notify ListView that we reached the end.
         if (loadedPost?.isEmpty ?? false) return [];
+
+        // Remove posts of which the first floor is empty (aka hidden)
+        loadedPost?.removeWhere(
+            (element) => element.floors?.first_floor?.content?.isEmpty ?? true);
 
         // Filter blocked posts
         List<OTTag> hiddenTags =
@@ -726,6 +721,13 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
               await smartNavigatorPush(context, "/bbs/login",
                   arguments: {"info": StateProvider.personInfo.value!});
               onLogin();
+            });
+          } else if (error is QuizUnansweredError) {
+            return OTQuizWidget(successCallback: () async {
+              // Update user data
+              await OpenTreeHoleRepository.getInstance()
+                  .getUserProfile(forceUpdate: true);
+              refreshList();
             });
           }
           return ErrorPageWidget.buildWidget(context, error,

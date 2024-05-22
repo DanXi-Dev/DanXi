@@ -72,8 +72,7 @@ class OTMessagesPageState extends State<OTMessagesPage> {
   }
 
   /// Rebuild everything and refresh itself.
-  Future<void> refreshSelf({scrollToEnd = false}) async {
-    if (scrollToEnd) _listViewController.queueScrollToEnd();
+  Future<void> refreshSelf() async {
     await _listViewController.notifyUpdate(
         useInitialData: false, queueDataClear: true);
   }

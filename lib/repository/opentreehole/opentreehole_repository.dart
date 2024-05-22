@@ -26,6 +26,8 @@ import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
 import 'package:dan_xi/model/opentreehole/punishment.dart';
+import 'package:dan_xi/model/opentreehole/quiz_answer.dart';
+import 'package:dan_xi/model/opentreehole/quiz_question.dart';
 import 'package:dan_xi/model/opentreehole/report.dart';
 import 'package:dan_xi/model/opentreehole/tag.dart';
 import 'package:dan_xi/model/opentreehole/user.dart';
@@ -116,6 +118,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   /// Reduce the floor cache by a factor.
   void reduceFloorCache({int factor = 2}) {
     _floorCache.removeWhere((key, value) => key % factor == 0);
+  }
+
+  void invalidateFloorCache(int floor_id){
+    _floorCache.remove(floor_id);
   }
 
   OpenTreeHoleRepository._() {
@@ -309,7 +315,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<List<OTHole>?> loadHoles(DateTime startTime, int divisionId,
       {int length = Constant.POST_COUNT_PER_PAGE,
-      int prefetchLength = Constant.POST_COUNT_PER_PAGE,
       String? tag,
       SortOrder? sortOrder}) async {
     sortOrder ??= SortOrder.LAST_REPLIED;
@@ -318,7 +323,6 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
           "start_time": startTime.toUtc().toIso8601String(),
           "division_id": divisionId,
           "length": length,
-          "prefetch_length": prefetchLength,
           "tag": tag,
           "order": sortOrder.getInternalString()
         },
@@ -340,17 +344,12 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
+  // NEVER USED
   Future<OTHole?> loadSpecificHole(int holeId) async {
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_URL/holes/$holeId",
         options: Options(headers: _tokenHeader));
     final hole = OTHole.fromJson(response.data!);
-    for (var floor in hole.floors!.prefetch!) {
-      cacheFloor(floor);
-      floor.mention?.forEach((mention) {
-        cacheFloor(mention);
-      });
-    }
     return hole;
   }
 
@@ -534,6 +533,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   Future<bool?> isUserAdmin() async {
     return (await getUserProfile())!.is_admin;
+  }
+
+  Future<bool?> hasAnsweredQuestions() async {
+    return (await getUserProfile())!.has_answered_questions;
   }
 
   /// Get silence date for division, return [null] if not silenced or not initialized
@@ -829,6 +832,38 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     return resp.statusCode;
   }
 
+  Future<List<QuizQuestion>?> getPostRegisterQuestions() async {
+    final Response<Map<String, dynamic>> response = await dio.get(
+        "$_BASE_AUTH_URL/register/questions",
+        options: Options(headers: _tokenHeader));
+    final questionList = response.data?["questions"]
+        .map((e) => QuizQuestion.fromJson(e))
+        .toList();
+    final length = response.data?["spec"]["number_of_questions"] as int;
+
+    assert(questionList?.length == length);
+    return questionList.cast<QuizQuestion>();
+  }
+
+  // Empty list means all-correct
+  Future<List<int>?> submitAnswers(List<QuizAnswer> answers) async {
+    final Response<Map<String, dynamic>> response = await dio.post(
+        "$_BASE_AUTH_URL/register/questions/_answer",
+        data: {
+          "answers": answers.map((e) => e.toJson()).toList(),
+          "version": 0
+        },
+        options: Options(headers: _tokenHeader));
+
+    if (response.data?["correct"]) {
+      provider.token = SettingsProvider.getInstance().fduholeToken =
+          JWToken.fromJson(response.data!);
+      return [];
+    }
+
+    return response.data?["wrong_question_ids"].cast<int>();
+  }
+
   @override
   String get linkHost => "api.fduhole.com";
 }
@@ -854,6 +889,12 @@ class NotLoginError implements FatalException {
   final String errorMessage;
 
   NotLoginError(this.errorMessage);
+}
+
+class QuizUnansweredError implements FatalException {
+  final String errorMessage;
+
+  QuizUnansweredError(this.errorMessage);
 }
 
 class LoginExpiredError implements Exception {}

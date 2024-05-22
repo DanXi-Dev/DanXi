@@ -233,7 +233,7 @@ class DanxiApp extends StatelessWidget {
       builder: (BuildContext context) {
         MaterialColor primarySwatch =
             context.select<SettingsProvider, MaterialColor>((value) =>
-                generateMaterialColor(color: Color(value.primarySwatch_V2)));
+                generateMaterialColor(color: Color(value.primarySwatch)));
         return DynamicThemeController(
           lightTheme: Constant.lightTheme(
               PlatformX.isCupertino(context), primarySwatch),
