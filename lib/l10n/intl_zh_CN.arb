@@ -531,5 +531,6 @@
   "enter_treehole": "开始树洞之旅",
   "next_question": "下一题",
   "prev_question": "上一题",
+  "welcome_prompt":"欢迎来到旦夕！\n\n如果你是第一次使用旦夕，或许你想看看FAQ板块？",
   "sticker": "表情"
 }
