@@ -539,5 +539,6 @@
   "enter_treehole": "Go on to the treehole",
   "next_question": "Next",
   "prev_question": "Previous",
-  "sticker": "Stickers"
+  "sticker": "Stickers",
+  "welcome_prompt":"Welcome to DanXi!\n\nIf you are using DanXi for the first time, perhaps you would like to take a look at the FAQ section?"
 }
