@@ -147,8 +147,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       PunishmentHistory() => await loadPunishmentHistory(page),
     };
 
-    // Remove empty results
-    results?.removeWhere((element) => element.content?.isEmpty ?? true);
     return results;
   }
 
@@ -431,7 +429,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       throw Exception("Failed to fetch all floors");
     }
 
-    allFloors.removeWhere((element) => element.content?.isEmpty ?? true);
     _listViewController.replaceAllDataWith(allFloors);
     _allDataLoaded = true;
   }
