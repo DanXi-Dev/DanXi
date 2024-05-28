@@ -74,7 +74,7 @@ class PlatformMasterDetailApp extends StatelessWidget {
       return masterNavigatorWidget;
     }
     return Container(
-      color: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.surface,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[

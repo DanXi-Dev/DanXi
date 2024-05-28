@@ -45,15 +45,15 @@ class JWTInterceptor extends QueuedInterceptor {
 
   void _throwOrBuildDioError(
       ErrorInterceptorHandler handler, RequestOptions options, dynamic error) {
-    if (error is DioError) {
+    if (error is DioException) {
       handler.reject(error);
     } else {
-      handler.reject(DioError(requestOptions: options, error: error));
+      handler.reject(DioException(requestOptions: options, error: error));
     }
   }
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) async {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
     debugPrint("Huston, we have troubles: $err");
 
     if (err.response?.statusCode == HttpStatus.unauthorized) {
@@ -67,7 +67,7 @@ class JWTInterceptor extends QueuedInterceptor {
         try {
           response = await _dio.fetch(options);
         } catch (e) {
-          if (e is DioError &&
+          if (e is DioException &&
               e.response?.statusCode == HttpStatus.unauthorized) {
             // Oh, we cannot get a token here! Maybe the refresh token we hold has gone invalid.
             // Clear old token, so the next request will definitely generate a [NotLoginError].

@@ -109,7 +109,7 @@ class ErrorPageWidget extends StatelessWidget {
   static String generateErrorDetails(dynamic error, StackTrace? trace) {
     String errorInfo = error.toString();
     // DioError will insert its stack trace in the result of [toString] method.
-    if (trace != null && error is! DioError) {
+    if (trace != null && error is! DioException) {
       errorInfo += ("\n$trace");
     }
     return errorInfo;

@@ -257,7 +257,7 @@ Future<void> goToPIDResultPage(BuildContext context, int pid) async {
       "post": post!,
     });
   } catch (error, st) {
-    if (error is DioError &&
+    if (error is DioException &&
         error.response?.statusCode == HttpStatus.notFound) {
       Noticing.showNotice(context, S.of(context).post_does_not_exist,
           title: S.of(context).fatal_error, useSnackBar: false);
@@ -277,7 +277,7 @@ Future<void> goToFloorIdResultPage(BuildContext context, int floorId) async {
         .loadSpecificFloor(floorId))!;
     OTFloorMentionWidget.showFloorDetail(context, floor);
   } catch (error, st) {
-    if (error is DioError &&
+    if (error is DioException &&
         error.response?.statusCode == HttpStatus.notFound) {
       Noticing.showNotice(context, S.of(context).post_does_not_exist,
           title: S.of(context).fatal_error, useSnackBar: false);

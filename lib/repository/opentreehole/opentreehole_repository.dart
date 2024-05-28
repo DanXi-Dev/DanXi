@@ -22,6 +22,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/opentreehole/audit.dart';
 import 'package:dan_xi/model/opentreehole/division.dart';
 import 'package:dan_xi/model/opentreehole/floor.dart';
+import 'package:dan_xi/model/opentreehole/history.dart';
 import 'package:dan_xi/model/opentreehole/hole.dart';
 import 'package:dan_xi/model/opentreehole/jwt.dart';
 import 'package:dan_xi/model/opentreehole/message.dart';
@@ -41,8 +42,6 @@ import 'package:dan_xi/util/opentreehole/jwt_interceptor.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/dio.dart';
-
-import 'package:dan_xi/model/opentreehole/history.dart';
 
 /// The repository for OpenTreeHole.
 ///
@@ -120,8 +119,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     _floorCache.removeWhere((key, value) => key % factor == 0);
   }
 
-  void invalidateFloorCache(int floor_id){
-    _floorCache.remove(floor_id);
+  void invalidateFloorCache(int floorId) {
+    _floorCache.remove(floorId);
   }
 
   OpenTreeHoleRepository._() {

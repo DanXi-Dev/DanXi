@@ -115,7 +115,7 @@ class LoginDialogState extends State<LoginDialog> {
           Navigator.of(context).pop();
           showFAQ();
         } catch (e) {
-          if (e is DioError) {
+          if (e is DioException) {
             progressDialog.dismiss(showAnim: false);
             rethrow;
           }
