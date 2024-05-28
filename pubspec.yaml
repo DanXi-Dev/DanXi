@@ -96,7 +96,7 @@ dependencies:
   encrypt_shared_preferences: ^0.3.5
   device_identity: ^1.0.0
   tutorial_coach_mark: ^1.2.9
-  flutter_platform_widgets: any
+  flutter_platform_widgets: ^7.0.0
   intl: any
   json_annotation: any
   flutter_cache_manager: any
@@ -114,10 +114,6 @@ dependency_overrides:
     git:
       url: https://github.com/singularity-s0/linkify.git
       ref: master
-
-  # Temporary override version for flutter_progress_dialog.
-  # Should be removed if the dependency is updated.
-  flutter_platform_widgets: ^6.0.2
 
 dev_dependencies:
   build_runner: ^2.1.2
