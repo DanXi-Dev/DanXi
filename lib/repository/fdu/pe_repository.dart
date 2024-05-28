@@ -42,7 +42,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
     String token = "";
     await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, info, true)
         .catchError((e) {
-      if (e is DioError && e.type == DioErrorType.response) {
+      if (e is DioException && e.type == DioExceptionType.badResponse) {
         String url = e.response!.requestOptions.path;
         token = Uri.tryParse(url)!.queryParameters['token']!;
       }

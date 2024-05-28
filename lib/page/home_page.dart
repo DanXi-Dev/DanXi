@@ -51,7 +51,7 @@ import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/platform_nav_bar_m3.dart';
 import 'package:dan_xi/widget/opentreehole/post_render.dart';
 import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
-import 'package:dio_log/overlay_draggable_button.dart';
+import 'package:dio5_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -657,7 +657,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget _buildBody(Widget title) {
     // Show debug button for [Dio].
     if (PlatformX.isDebugMode(SettingsProvider.getInstance().preferences)) {
-      showDebugBtn(context);
+      showDebugBtn(context, btnSize: 50);
     }
 
     return MultiProvider(

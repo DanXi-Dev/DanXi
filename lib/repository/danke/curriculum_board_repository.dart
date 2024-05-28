@@ -44,9 +44,9 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
     // First fetch of the course list is VERY SLOW
     dio.options = BaseOptions(
         receiveDataWhenStatusError: true,
-        connectTimeout: 30000,
-        receiveTimeout: 30000,
-        sendTimeout: 10000);
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        sendTimeout: const Duration(seconds: 10));
   }
 
   /// Short name for the provider singleton

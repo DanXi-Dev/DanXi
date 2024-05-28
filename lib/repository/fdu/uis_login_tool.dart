@@ -29,8 +29,8 @@ import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
+import 'package:dio5_log/dio_log.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:dio_log/dio_log.dart';
 import 'package:mutex/mutex.dart';
 
 class UISLoginTool {
@@ -77,13 +77,9 @@ class UISLoginTool {
       [bool forceRelogin = false]) async {
     _mutexMap.putIfAbsent(jar, () => Mutex());
     await _mutexMap[jar]!.acquire();
-    dio.interceptors.requestLock.lock();
     Response<dynamic>? result =
         await _loginUIS(dio, serviceUrl, jar, info, forceRelogin)
             .whenComplete(() {
-      if (dio.interceptors.requestLock.locked) {
-        dio.interceptors.requestLock.unlock();
-      }
       _mutexMap[jar]!.release();
     });
     return result;
@@ -96,9 +92,9 @@ class UISLoginTool {
     Dio workDio = Dio();
     workDio.options = BaseOptions(
         receiveDataWhenStatusError: true,
-        connectTimeout: 5000,
-        receiveTimeout: 5000,
-        sendTimeout: 5000);
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 5),
+        sendTimeout: const Duration(seconds: 5));
     IndependentCookieJar workJar = IndependentCookieJar.createFrom(jar);
     workDio.interceptors.add(LimitedQueuedInterceptor.getInstance());
     workDio.interceptors.add(UserAgentInterceptor(
@@ -148,7 +144,6 @@ class UISLoginTool {
     }
 
     jar.cloneFrom(workJar);
-    dio.interceptors.requestLock.unlock();
     return response;
   }
 }
