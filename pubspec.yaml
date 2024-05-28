@@ -17,7 +17,7 @@ dependencies:
   dio_cookie_manager: ^2.0.0
   flutter_progress_dialog:
     git:
-      url: https://github.com/Boreas618/flutter_progress_dialog.git
+      url: https://github.com/w568w/flutter_progress_dialog.git
       ref: master
   xiao_mi_push_plugin:
     git:
@@ -96,7 +96,13 @@ dependencies:
   encrypt_shared_preferences: ^0.3.5
   device_identity: ^1.0.0
   tutorial_coach_mark: ^1.2.9
-
+  flutter_platform_widgets: any
+  intl: any
+  json_annotation: any
+  flutter_cache_manager: any
+  html: any
+  cookie_jar: any
+  ffi: any
 
 dependency_overrides:
   intl: ^0.18.1
