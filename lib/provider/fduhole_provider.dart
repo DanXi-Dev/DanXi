@@ -16,13 +16,13 @@
  */
 
 import 'package:collection/collection.dart';
-import 'package:dan_xi/model/opentreehole/division.dart';
-import 'package:dan_xi/model/opentreehole/jwt.dart';
-import 'package:dan_xi/model/opentreehole/user.dart';
+import 'package:dan_xi/model/forum/division.dart';
+import 'package:dan_xi/model/forum/jwt.dart';
+import 'package:dan_xi/model/forum/user.dart';
 import 'package:dan_xi/page/danke/course_review_editor.dart';
-import 'package:dan_xi/page/opentreehole/hole_editor.dart';
+import 'package:dan_xi/page/forum/hole_editor.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/util/opentreehole/editor_object.dart';
+import 'package:dan_xi/util/forum/editor_object.dart';
 import 'package:flutter/foundation.dart';
 
 /// A [ChangeNotifier] that exports some global states about FDUHole to the app.

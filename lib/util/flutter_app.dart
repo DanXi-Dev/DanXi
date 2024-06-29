@@ -20,7 +20,7 @@ import 'dart:io';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';

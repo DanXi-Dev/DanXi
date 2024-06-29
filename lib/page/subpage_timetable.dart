@@ -31,7 +31,7 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/repository/fdu/postgraduate_timetable_repository.dart';
 import 'package:dan_xi/repository/fdu/time_table_repository.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';

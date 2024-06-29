@@ -24,7 +24,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -106,7 +106,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     _console.writeln(
         "Base Auth URL: ${SettingsProvider.getInstance().authBaseUrl}");
     _console
-        .writeln("Hole Base URL: ${SettingsProvider.getInstance().fduholeBaseUrl}");
+        .writeln("Hole Base URL: ${SettingsProvider.getInstance().forumBaseUrl}");
     _console.writeln(
         "Image Base URL: ${SettingsProvider.getInstance().imageBaseUrl}");
     _console.writeln(
@@ -154,12 +154,12 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
 
   Future<void> changeHoleBaseUrl() async {
     String? fduholeBaseUrl = await Noticing.showInputDialog(context,
-        "Input new base url (leave empty to reset to ${Constant.FDUHOLE_BASE_URL})");
+        "Input new base url (leave empty to reset to ${Constant.FORUM_BASE_URL})");
     if (fduholeBaseUrl == null || !mounted) return;
     if (fduholeBaseUrl.isEmpty) {
-      SettingsProvider.getInstance().fduholeBaseUrl = Constant.FDUHOLE_BASE_URL;
+      SettingsProvider.getInstance().forumBaseUrl = Constant.FORUM_BASE_URL;
     } else {
-      SettingsProvider.getInstance().fduholeBaseUrl = fduholeBaseUrl;
+      SettingsProvider.getInstance().forumBaseUrl = fduholeBaseUrl;
     }
     Noticing.showNotice(context, "Restart app to take effects");
   }

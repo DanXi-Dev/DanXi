@@ -24,7 +24,7 @@ import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/dashboard/dashboard_reorder.dart';
-import 'package:dan_xi/page/opentreehole/hole_editor.dart';
+import 'package:dan_xi/page/forum/hole_editor.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
@@ -81,7 +81,8 @@ class Constant {
 
   /// The default URLs of [OpenTreeHoleRepository] and [CurriculumBoardHoleRepository].
   ///
-  static const String FDUHOLE_BASE_URL = "https://www.fduhole.com/api";
+  static const String FORUM_BASE_URL_LEGACY = "https://www.fduhole.com/api";
+  static const String FORUM_BASE_URL = "https://fduhole-admin.fduhole.com/api";
   static const String AUTH_BASE_URL = "https://auth.fduhole.com/api";
   static const String IMAGE_BASE_URL = "https://image.fduhole.com";
   static const String DANKE_BASE_URL = "https://danke.fduhole.com/api";

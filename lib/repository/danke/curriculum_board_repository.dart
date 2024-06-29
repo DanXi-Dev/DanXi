@@ -23,9 +23,9 @@ import 'package:dan_xi/page/danke/course_review_editor.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
-import 'package:dan_xi/util/opentreehole/jwt_interceptor.dart';
+import 'package:dan_xi/util/forum/jwt_interceptor.dart';
 import 'package:dio/dio.dart';
 
 class CurriculumBoardRepository extends BaseRepositoryWithDio {

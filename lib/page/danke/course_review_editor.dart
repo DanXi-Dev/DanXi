@@ -24,7 +24,7 @@ import 'package:dan_xi/model/danke/course.dart';
 import 'package:dan_xi/model/danke/course_grade.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
-import 'package:dan_xi/page/opentreehole/hole_detail.dart';
+import 'package:dan_xi/page/forum/hole_detail.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';

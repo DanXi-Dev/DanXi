@@ -16,49 +16,44 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/forum/tag.dart';
-import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/forum/ottag_selector.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:dan_xi/widget/forum/post_render.dart';
+import 'package:dan_xi/widget/forum/render/render_impl.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-/// A list page allowing user to configure his/her blocking list of tags.
-class BBSHiddenTagsPreferencePage extends StatefulWidget {
+/// A full-screen page to allow user to select text with a larger font size, using
+/// selectable markdown render [kMarkdownSelectorRender].
+///
+/// Arguments:
+/// [String] text: the text to display.
+class TextSelectorPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
   @override
-  BBSHiddenTagsPreferencePageState createState() =>
-      BBSHiddenTagsPreferencePageState();
+  TextSelectorPageState createState() => TextSelectorPageState();
 
-  const BBSHiddenTagsPreferencePage({super.key, this.arguments});
+  const TextSelectorPage({super.key, this.arguments});
 }
 
-class BBSHiddenTagsPreferencePageState
-    extends State<BBSHiddenTagsPreferencePage> {
-  late List<OTTag> tags;
-
+class TextSelectorPageState extends State<TextSelectorPage> {
   @override
   void initState() {
     super.initState();
-    tags = SettingsProvider.getInstance().hiddenTags ?? [];
   }
 
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
-      iosContentBottomPadding: false,
-      iosContentPadding: false,
-      appBar: PlatformAppBarX(
-        title: Text(S.of(context).fduhole_hidden_tags_title),
-      ),
-      body: SafeArea(
-        child: OTTagSelector(
-          initialTags: tags,
-          onChanged: () => SettingsProvider.getInstance().hiddenTags = tags,
+        iosContentBottomPadding: false,
+        iosContentPadding: true,
+        appBar: PlatformAppBarX(
+          title: Text(S.of(context).free_select),
         ),
-      ),
-    );
+        body: PostRenderWidget(
+          render: kMarkdownSelectorRender,
+          content: widget.arguments!['text'],
+          hasBackgroundImage: false,
+        ));
   }
 }

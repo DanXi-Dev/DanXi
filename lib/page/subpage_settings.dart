@@ -20,20 +20,20 @@ import 'dart:io';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/opentreehole/user.dart';
+import 'package:dan_xi/model/forum/user.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
-import 'package:dan_xi/page/subpage_treehole.dart';
+import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/provider/fduhole_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/opentreehole/clean_mode_filter.dart';
+import 'package:dan_xi/util/forum/clean_mode_filter.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
@@ -45,8 +45,8 @@ import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
-import 'package:dan_xi/widget/opentreehole/post_render.dart';
-import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
+import 'package:dan_xi/widget/forum/post_render.dart';
+import 'package:dan_xi/widget/forum/render/render_impl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -279,7 +279,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
       context.read<FDUHoleProvider>().userInfo!.config!.show_folded =
           value.internalString();
       updateOTUserProfile(context);
-      treeholePageKey.currentState?.setState(() {});
+      forumPageKey.currentState?.setState(() {});
       refreshSelf();
     }
 
@@ -443,7 +443,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                             onChanged: (bool value) {
                               SettingsProvider.getInstance()
                                   .useAccessibilityColoring = value;
-                              treeholePageKey.currentState?.setState(() {});
+                              forumPageKey.currentState?.setState(() {});
                             },
                           ),
                         ),
@@ -726,7 +726,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                   subtitle: Text(S.of(context).fduhole_hidden_tags_description),
                   onTap: () async {
                     await smartNavigatorPush(context, '/bbs/tags/blocklist');
-                    treeholePageKey.currentState?.setState(() {});
+                    forumPageKey.currentState?.setState(() {});
                   },
                 ),
                 ListTile(
@@ -747,7 +747,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       await file.copy(imagePath);
                       SettingsProvider.getInstance().backgroundImagePath =
                           imagePath;
-                      treeholePageKey.currentState?.setState(() {});
+                      forumPageKey.currentState?.setState(() {});
                     } else {
                       if (await Noticing.showConfirmationDialog(context,
                               S.of(context).background_image_already_set,
@@ -761,7 +761,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         }
                         SettingsProvider.getInstance().backgroundImagePath =
                             null;
-                        treeholePageKey.currentState?.setState(() {});
+                        forumPageKey.currentState?.setState(() {});
                       }
                     }
                   },
@@ -849,7 +849,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         auxiliaryNavigatorState?.pop();
                       }
                       settingsPageKey.currentState?.setState(() {});
-                      treeholePageKey.currentState?.listViewController
+                      forumPageKey.currentState?.listViewController
                           .notifyUpdate();
                     } finally {
                       progressDialog.dismiss(showAnim: false);

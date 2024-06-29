@@ -25,10 +25,10 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/model/extra.dart';
-import 'package:dan_xi/model/opentreehole/jwt.dart';
-import 'package:dan_xi/model/opentreehole/tag.dart';
+import 'package:dan_xi/model/forum/jwt.dart';
+import 'package:dan_xi/model/forum/tag.dart';
 import 'package:dan_xi/model/time_table.dart';
-import 'package:dan_xi/page/opentreehole/hole_editor.dart';
+import 'package:dan_xi/page/forum/hole_editor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:flutter/material.dart';
@@ -79,7 +79,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_THEME_TYPE = "theme_type";
   static const String KEY_MARKDOWN_ENABLED = "markdown_rendering_enabled";
   static const String KEY_VISITED_TIMETABLE = "visited_timetable";
-  static const String KEY_FDUHOLE_BASE_URL = "fduhole_base_url";
+  static const String KEY_FORUM_BASE_URL = "fduhole_base_url";
   static const String KEY_AUTH_BASE_URL = "auth_base_url";
   static const String KEY_IMAGE_BASE_URL = "image_base_url";
   static const String KEY_DANKE_BASE_URL = "danke_base_url";
@@ -134,21 +134,28 @@ class SettingsProvider with ChangeNotifier {
   }
 
   /// Set and get _BASE_URL, _BASE_AUTH_URL, _IMAGE_BASE_URL, _DANKE_BASE_URL for debug
-  String get fduholeBaseUrl {
-    if (preferences!.containsKey(KEY_FDUHOLE_BASE_URL)) {
-      String? fduholeBaseUrl = preferences!.getString(KEY_FDUHOLE_BASE_URL);
-      if (fduholeBaseUrl != null) {
-        return fduholeBaseUrl;
+  String get forumBaseUrl {
+    if (preferences!.containsKey(KEY_FORUM_BASE_URL)) {
+      String? url = preferences!.getString(KEY_FORUM_BASE_URL);
+      
+      // Override the legacy server address
+      if (url == Constant.FORUM_BASE_URL_LEGACY){
+        preferences!.setString(KEY_FORUM_BASE_URL, Constant.FORUM_BASE_URL);
+        return Constant.FORUM_BASE_URL;
+      }
+      
+      if (url != null) {
+        return url;
       }
     }
-    return Constant.FDUHOLE_BASE_URL;
+    return Constant.FORUM_BASE_URL;
   }
 
-  set fduholeBaseUrl(String? value) {
+  set forumBaseUrl(String? value) {
     if (value != null) {
-      preferences!.setString(KEY_FDUHOLE_BASE_URL, value);
+      preferences!.setString(KEY_FORUM_BASE_URL, value);
     } else {
-      preferences!.setString(KEY_FDUHOLE_BASE_URL, Constant.FDUHOLE_BASE_URL);
+      preferences!.setString(KEY_FORUM_BASE_URL, Constant.FORUM_BASE_URL);
     }
     notifyListeners();
   }
