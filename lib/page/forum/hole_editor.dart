@@ -204,7 +204,7 @@ class OTEditor {
       String placeholder = "",
       bool hasTip = true,
       PostInterceptor? interceptor}) async {
-    final String randomTip = await Constant.randomFDUHoleTip;
+    final String randomTip = await Constant.randomForumTip;
 
     switch (editorType ?? OTEditorType.PAGE) {
       case OTEditorType.DIALOG:

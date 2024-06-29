@@ -108,7 +108,7 @@ class Constant {
   }
 
   /// The tips to be shown as hints in the [BBSEditorWidget].
-  static List<String> fduHoleTips = [];
+  static List<String> forumTips = [];
 
   /// Load in the tips in the [BBSEditorWidget].
   static Future<List<String>> _loadTips() async {
@@ -192,13 +192,13 @@ class Constant {
   /// Get a random tip from [_loadTips].
   ///
   /// If failed to get, return an empty string.
-  static Future<String> get randomFDUHoleTip async {
-    if (fduHoleTips.isEmpty) fduHoleTips = await _loadTips();
+  static Future<String> get randomForumTip async {
+    if (forumTips.isEmpty) forumTips = await _loadTips();
 
-    if (fduHoleTips.isEmpty) {
+    if (forumTips.isEmpty) {
       return '';
     } else {
-      return fduHoleTips[Random().nextInt(fduHoleTips.length)];
+      return forumTips[Random().nextInt(forumTips.length)];
     }
   }
 
