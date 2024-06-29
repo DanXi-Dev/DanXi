@@ -82,7 +82,7 @@ class Constant {
   /// The default URLs of [ForumRepository] and [CurriculumBoardHoleRepository].
   ///
   static const String FORUM_BASE_URL_LEGACY = "https://www.fduhole.com/api";
-  static const String FORUM_BASE_URL = "https://fduhole-admin.fduhole.com/api";
+  static const String FORUM_BASE_URL = "https://forum.fduhole.com/api";
   static const String AUTH_BASE_URL = "https://auth.fduhole.com/api";
   static const String IMAGE_BASE_URL = "https://image.fduhole.com";
   static const String DANKE_BASE_URL = "https://danke.fduhole.com/api";
