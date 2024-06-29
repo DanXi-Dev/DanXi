@@ -20,7 +20,7 @@ import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/model/danke/search_results.dart';
 import 'package:dan_xi/page/danke/course_review_editor.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
@@ -37,7 +37,7 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
         "$_BASE_AUTH_URL/refresh",
         () => provider.token,
         (token) => provider.token =
-            SettingsProvider.getInstance().fduholeToken = token));
+            SettingsProvider.getInstance().forumToken = token));
     dio.interceptors.add(
         UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
 
@@ -131,7 +131,7 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
   }
 
   Future<CourseReview?> getRandomReview() async {
-    // debugPrint(SettingsProvider.getInstance().fduholeToken!.access!);
+    // debugPrint(SettingsProvider.getInstance().forumToken!.access!);
     Response<dynamic> response = await dio.get("$_BASE_URL/reviews/random",
         options: Options(headers: _tokenHeader));
     return CourseReview.fromJson(response.data ?? "");

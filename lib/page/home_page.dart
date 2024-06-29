@@ -30,7 +30,7 @@ import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
@@ -67,10 +67,10 @@ import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin_listener.dart';
 
-const fduholeChannel = MethodChannel('fduhole');
+const forumChannel = MethodChannel('fduhole');
 
 void sendFduholeTokenToWatch(String? token) {
-  fduholeChannel.invokeMethod("send_token", token);
+  forumChannel.invokeMethod("send_token", token);
 }
 
 GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
@@ -483,9 +483,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     // Configure watch listeners on iOS.
     if (_needSendToWatch &&
-        SettingsProvider.getInstance().fduholeToken != null) {
+        SettingsProvider.getInstance().forumToken != null) {
       sendFduholeTokenToWatch(
-          SettingsProvider.getInstance().fduholeToken!.access!);
+          SettingsProvider.getInstance().forumToken!.access!);
       // Only send once.
       _needSendToWatch = false;
     }
@@ -498,7 +498,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             icon: 'ic_launcher'),
       ]);
     }
-    fduholeChannel.setMethodCallHandler((MethodCall call) async {
+    forumChannel.setMethodCallHandler((MethodCall call) async {
       switch (call.method) {
         case "launch_from_notification":
           Map<String, dynamic> map =
@@ -532,9 +532,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           }
           break;
         case 'get_token':
-          if (SettingsProvider.getInstance().fduholeToken != null) {
+          if (SettingsProvider.getInstance().forumToken != null) {
             sendFduholeTokenToWatch(
-                SettingsProvider.getInstance().fduholeToken!.access!);
+                SettingsProvider.getInstance().forumToken!.access!);
           } else {
             // Notify that we should send the token to watch later
             _needSendToWatch = true;

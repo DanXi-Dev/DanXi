@@ -21,7 +21,7 @@ import 'dart:convert';
 import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
@@ -82,7 +82,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     _console.writeln(
         "FDUHole Push Token last uploaded on this device: ${OpenTreeHoleRepository.getInstance().lastUploadToken}");
     _console.writeln(
-        "FDUHole Token stored: ${context.read<SettingsProvider>().fduholeToken}");
+        "FDUHole Token stored: ${context.read<SettingsProvider>().forumToken}");
 
     String? deviceId;
     try {
@@ -153,13 +153,13 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   }
 
   Future<void> changeHoleBaseUrl() async {
-    String? fduholeBaseUrl = await Noticing.showInputDialog(context,
+    String? forumBaseUrl = await Noticing.showInputDialog(context,
         "Input new base url (leave empty to reset to ${Constant.FORUM_BASE_URL})");
-    if (fduholeBaseUrl == null || !mounted) return;
-    if (fduholeBaseUrl.isEmpty) {
+    if (forumBaseUrl == null || !mounted) return;
+    if (forumBaseUrl.isEmpty) {
       SettingsProvider.getInstance().forumBaseUrl = Constant.FORUM_BASE_URL;
     } else {
-      SettingsProvider.getInstance().forumBaseUrl = fduholeBaseUrl;
+      SettingsProvider.getInstance().forumBaseUrl = forumBaseUrl;
     }
     Noticing.showNotice(context, "Restart app to take effects");
   }

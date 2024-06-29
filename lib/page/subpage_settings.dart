@@ -25,7 +25,7 @@ import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
@@ -826,7 +826,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       ),
                 onTap: () async {
                   if (!context.read<FDUHoleProvider>().isUserInitialized) {
-                    if (SettingsProvider.getInstance().fduholeToken == null) {
+                    if (SettingsProvider.getInstance().forumToken == null) {
                       Noticing.showNotice(
                           context, S.of(context).login_from_treehole_page,
                           title: S.of(context).login);

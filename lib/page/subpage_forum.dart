@@ -29,7 +29,7 @@ import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/forum/hole_editor.dart';
 import 'package:dan_xi/page/forum/quiz.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
@@ -202,7 +202,7 @@ class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) {
         void onChangeSortOrder(BuildContext context, SortOrder newSortOrder) {
-          context.read<SettingsProvider>().fduholeSortOrder = newSortOrder;
+          context.read<SettingsProvider>().forumSortOrder = newSortOrder;
           RefreshListEvent().fire();
         }
 
@@ -402,7 +402,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           return OpenTreeHoleRepository.getInstance().loadHoles(
               time, getDivisionId(context),
               tag: _tagFilter,
-              sortOrder: context.read<SettingsProvider>().fduholeSortOrder);
+              sortOrder: context.read<SettingsProvider>().forumSortOrder);
         }).call(page);
 
         // If not more posts, notify ListView that we reached the end.

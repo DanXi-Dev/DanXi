@@ -32,7 +32,7 @@ import 'package:dan_xi/model/forum/report.dart';
 import 'package:dan_xi/model/forum/tag.dart';
 import 'package:dan_xi/model/forum/user.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
@@ -83,10 +83,10 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   /// It also unregisters the push notification token.
   Future<void> logout() async {
     if (!provider.isUserInitialized) {
-      if (SettingsProvider.getInstance().fduholeToken == null) {
+      if (SettingsProvider.getInstance().forumToken == null) {
         return;
       } else {
-        provider.token = SettingsProvider.getInstance().fduholeToken;
+        provider.token = SettingsProvider.getInstance().forumToken;
       }
     }
     await deletePushNotificationToken(await PlatformX.getUniqueDeviceId());
@@ -136,7 +136,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         "$_BASE_AUTH_URL/refresh",
         () => provider.token,
         (token) => provider.token =
-            SettingsProvider.getInstance().fduholeToken = token));
+            SettingsProvider.getInstance().forumToken = token));
     dio.interceptors.add(
         UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
   }
@@ -147,8 +147,8 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   ///
   /// If the token is not valid, it will throw a [NotLoginError].
   void initializeToken() {
-    if (SettingsProvider.getInstance().fduholeToken != null) {
-      provider.token = SettingsProvider.getInstance().fduholeToken;
+    if (SettingsProvider.getInstance().forumToken != null) {
+      provider.token = SettingsProvider.getInstance().forumToken;
     } else {
       throw NotLoginError("No token");
     }
@@ -245,7 +245,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       "email": email,
       "verification": int.parse(verifyCode),
     });
-    return SettingsProvider.getInstance().fduholeToken =
+    return SettingsProvider.getInstance().forumToken =
         JWToken.fromJsonWithVerification(response.data!);
   }
 
@@ -256,7 +256,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
       'email': username,
       'password': password,
     });
-    return SettingsProvider.getInstance().fduholeToken =
+    return SettingsProvider.getInstance().forumToken =
         JWToken.fromJsonWithVerification(response.data!);
   }
 
@@ -856,7 +856,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
         options: Options(headers: _tokenHeader));
 
     if (response.data?["correct"]) {
-      provider.token = SettingsProvider.getInstance().fduholeToken =
+      provider.token = SettingsProvider.getInstance().forumToken =
           JWToken.fromJson(response.data!);
       return [];
     }

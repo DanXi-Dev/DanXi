@@ -46,7 +46,7 @@ class Constant {
   static const SUPPORT_QQ_GROUP = "941342818";
 
   /// The division name of the curriculum page. We use this to determine whether
-  /// we should show the curriculum page (instead of a normal treehole division).
+  /// we should show the curriculum page (instead of a normal forum division).
   ///
   /// See also:
   ///
@@ -58,7 +58,7 @@ class Constant {
   /// The default user agent used by the app.
   ///
   /// Note that this is not the same as the user agent used by the WebView, or the
-  /// treehole's [Dio]. Those two are set by WebView and [OpenTreeHoleRepository].
+  /// forum's [Dio]. Those two are set by WebView and [OpenTreeHoleRepository].
   static const String DEFAULT_USER_AGENT =
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36";
 
@@ -119,7 +119,7 @@ class Constant {
   /// The stop words to be determined in the [BBSEditorWidget].
   ///
   /// Stop words are used to warn the user when he/she is about to post
-  /// something that is not encouraged by the treehole community.
+  /// something that is not encouraged by the community.
   static List<String> _stopWords = [];
 
   /// The care words to be determined in the [BBSEditorWidget] and [OTSearchPage].

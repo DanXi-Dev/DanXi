@@ -17,7 +17,7 @@
 
 import 'dart:math';
 
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

@@ -18,7 +18,7 @@
 import 'dart:io';
 
 import 'package:dan_xi/model/forum/jwt.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 

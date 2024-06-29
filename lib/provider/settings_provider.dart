@@ -46,11 +46,11 @@ class SettingsProvider with ChangeNotifier {
   //static const String KEY_AUTOTICK_LAST_CANCEL_DATE =
   //    "autotick_last_cancel_date";
   //static const String KEY_PREFERRED_THEME = "theme";
-  static const String KEY_FDUHOLE_TOKEN = "fduhole_token_v3";
-  static const String KEY_FDUHOLE_SORTORDER = "fduhole_sortorder";
+  static const String KEY_FORUM_TOKEN = "fduhole_token_v3";
+  static const String KEY_FORUM_SORTORDER = "fduhole_sortorder";
   static const String KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE =
       "ec_last_choice";
-  static const String KEY_FDUHOLE_FOLDBEHAVIOR = "fduhole_foldbehavior";
+  static const String KEY_FORUM_FOLDBEHAVIOR = "fduhole_foldbehavior";
   static const String KEY_DASHBOARD_WIDGETS = "dashboard_widgets_json";
   static const String KEY_THIS_SEMESTER_START_DATE = "this_semester_start_date";
   static const String KEY_SEMESTER_START_DATES = "semester_start_dates";
@@ -423,30 +423,30 @@ class SettingsProvider with ChangeNotifier {
       preferences!.setString(KEY_LAST_PUSH_TOKEN, value!);*/
 
   // Token. If token is invalid, return null.
-  JWToken? get fduholeToken {
-    if (preferences!.containsKey(KEY_FDUHOLE_TOKEN)) {
+  JWToken? get forumToken {
+    if (preferences!.containsKey(KEY_FORUM_TOKEN)) {
       try {
         return JWToken.fromJsonWithVerification(
-            jsonDecode(preferences!.getString(KEY_FDUHOLE_TOKEN)!));
+            jsonDecode(preferences!.getString(KEY_FORUM_TOKEN)!));
       } catch (_) {}
     }
     return null;
   }
 
-  set fduholeToken(JWToken? value) {
+  set forumToken(JWToken? value) {
     if (value != null) {
-      preferences!.setString(KEY_FDUHOLE_TOKEN, jsonEncode(value));
+      preferences!.setString(KEY_FORUM_TOKEN, jsonEncode(value));
     } else {
-      preferences!.remove(KEY_FDUHOLE_TOKEN);
+      preferences!.remove(KEY_FORUM_TOKEN);
     }
     notifyListeners();
   }
 
   void deleteAllFduholeData() {
-    preferences!.remove(KEY_FDUHOLE_TOKEN);
+    preferences!.remove(KEY_FORUM_TOKEN);
     //preferences!.remove(KEY_LAST_PUSH_TOKEN);
-    preferences!.remove(KEY_FDUHOLE_FOLDBEHAVIOR);
-    preferences!.remove(KEY_FDUHOLE_SORTORDER);
+    preferences!.remove(KEY_FORUM_FOLDBEHAVIOR);
+    preferences!.remove(KEY_FORUM_SORTORDER);
     preferences!.remove(KEY_HIDDEN_TREEHOLE);
     preferences!.remove(KEY_HIDDEN_TAGS);
   }
@@ -466,9 +466,9 @@ class SettingsProvider with ChangeNotifier {
   }
 
   //FDUHOLE Default Sorting Order
-  SortOrder? get fduholeSortOrder {
-    if (preferences!.containsKey(KEY_FDUHOLE_SORTORDER)) {
-      String? str = preferences!.getString(KEY_FDUHOLE_SORTORDER);
+  SortOrder? get forumSortOrder {
+    if (preferences!.containsKey(KEY_FORUM_SORTORDER)) {
+      String? str = preferences!.getString(KEY_FORUM_SORTORDER);
       if (str == SortOrder.LAST_CREATED.getInternalString()) {
         return SortOrder.LAST_CREATED;
       } else if (str == SortOrder.LAST_REPLIED.getInternalString()) {
@@ -478,17 +478,17 @@ class SettingsProvider with ChangeNotifier {
     return null;
   }
 
-  set fduholeSortOrder(SortOrder? value) {
-    preferences!.setString(KEY_FDUHOLE_SORTORDER, value.getInternalString()!);
+  set forumSortOrder(SortOrder? value) {
+    preferences!.setString(KEY_FORUM_SORTORDER, value.getInternalString()!);
     notifyListeners();
   }
 
   /// FDUHOLE Folded Post Behavior
 
   /// NOTE: This getter defaults to a FOLD and won't return [null]
-  FoldBehavior get fduholeFoldBehavior {
-    if (preferences!.containsKey(KEY_FDUHOLE_FOLDBEHAVIOR)) {
-      int? savedPref = preferences!.getInt(KEY_FDUHOLE_FOLDBEHAVIOR);
+  FoldBehavior get forumFoldBehavior {
+    if (preferences!.containsKey(KEY_FORUM_FOLDBEHAVIOR)) {
+      int? savedPref = preferences!.getInt(KEY_FORUM_FOLDBEHAVIOR);
       return FoldBehavior.values.firstWhere(
         (element) => element.index == savedPref,
         orElse: () => FoldBehavior.FOLD,
@@ -497,8 +497,8 @@ class SettingsProvider with ChangeNotifier {
     return FoldBehavior.FOLD;
   }
 
-  set fduholeFoldBehavior(FoldBehavior value) {
-    preferences!.setInt(KEY_FDUHOLE_FOLDBEHAVIOR, value.index);
+  set forumFoldBehavior(FoldBehavior value) {
+    preferences!.setInt(KEY_FORUM_FOLDBEHAVIOR, value.index);
     notifyListeners();
   }
 

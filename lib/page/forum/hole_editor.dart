@@ -24,7 +24,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/forum/tag.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/forum/hole_detail.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
@@ -556,7 +556,7 @@ class TagSuggestionWidget extends StatefulWidget {
 
 Future<List<String>?> getTagSuggestions(String content) async {
   try {
-    return await fduholeChannel.invokeListMethod(
+    return await forumChannel.invokeListMethod(
         "get_tag_suggestions", content);
   } on PlatformException catch (_) {
     return null;

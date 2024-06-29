@@ -30,7 +30,7 @@ import 'package:dan_xi/page/forum/admin_operation.dart';
 import 'package:dan_xi/page/forum/hole_editor.dart';
 import 'package:dan_xi/page/forum/image_viewer.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
