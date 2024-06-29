@@ -16,10 +16,10 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/opentreehole/tag.dart';
+import 'package:dan_xi/model/forum/tag.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/opentreehole/ottag_selector.dart';
+import 'package:dan_xi/widget/forum/ottag_selector.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -51,7 +51,7 @@ class BBSHiddenTagsPreferencePageState
       iosContentBottomPadding: false,
       iosContentPadding: false,
       appBar: PlatformAppBarX(
-        title: Text(S.of(context).fduhole_hidden_tags_title),
+        title: Text(S.of(context).forum_hidden_tags_title),
       ),
       body: SafeArea(
         child: OTTagSelector(

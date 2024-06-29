@@ -17,7 +17,7 @@
 import 'dart:core';
 
 import 'package:dan_xi/model/danke/review_extra.dart';
-import 'package:dan_xi/model/opentreehole/floor.dart';
+import 'package:dan_xi/model/forum/floor.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import 'course.dart';

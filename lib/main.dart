@@ -33,21 +33,21 @@ import 'package:dan_xi/page/dashboard/empty_classroom_detail.dart';
 import 'package:dan_xi/page/dashboard/exam_detail.dart';
 import 'package:dan_xi/page/dashboard/gpa_table.dart';
 import 'package:dan_xi/page/home_page.dart';
-import 'package:dan_xi/page/opentreehole/admin_operation.dart';
-import 'package:dan_xi/page/opentreehole/hole_detail.dart';
-import 'package:dan_xi/page/opentreehole/hole_editor.dart';
-import 'package:dan_xi/page/opentreehole/hole_login.dart';
-import 'package:dan_xi/page/opentreehole/hole_messages.dart';
-import 'package:dan_xi/page/opentreehole/hole_reports.dart';
-import 'package:dan_xi/page/opentreehole/hole_search.dart';
-import 'package:dan_xi/page/opentreehole/hole_tags.dart';
-import 'package:dan_xi/page/opentreehole/image_viewer.dart';
-import 'package:dan_xi/page/opentreehole/text_selector.dart';
+import 'package:dan_xi/page/forum/admin_operation.dart';
+import 'package:dan_xi/page/forum/hole_detail.dart';
+import 'package:dan_xi/page/forum/hole_editor.dart';
+import 'package:dan_xi/page/forum/hole_login.dart';
+import 'package:dan_xi/page/forum/hole_messages.dart';
+import 'package:dan_xi/page/forum/hole_reports.dart';
+import 'package:dan_xi/page/forum/hole_search.dart';
+import 'package:dan_xi/page/forum/hole_tags.dart';
+import 'package:dan_xi/page/forum/image_viewer.dart';
+import 'package:dan_xi/page/forum/text_selector.dart';
 import 'package:dan_xi/page/settings/diagnostic_console.dart';
 import 'package:dan_xi/page/settings/hidden_tags_preference.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
-import 'package:dan_xi/page/subpage_treehole.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/page/subpage_forum.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/language_manager.dart';
 import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -178,7 +178,7 @@ class DanxiApp extends StatelessWidget {
     '/dashboard/reorder': (context, {arguments}) =>
         DashboardReorderPage(arguments: arguments),
     '/bbs/discussions': (context, {arguments}) =>
-        TreeHoleSubpage(arguments: arguments),
+        ForumSubpage(arguments: arguments),
     '/bbs/tags': (context, {arguments}) => BBSTagsPage(arguments: arguments),
     '/bbs/fullScreenEditor': (context, {arguments}) =>
         BBSEditorPage(arguments: arguments),
@@ -315,10 +315,9 @@ class DanxiApp extends StatelessWidget {
 
     // Init FDUHoleProvider. This object provides some global states about
     // FDUHole such as the current division and the json web token.
-    var fduHoleProvider = FDUHoleProvider();
-    // Init OpenTreeHoleRepository with the provider. This is the api implementations
-    // of OpenTreeHole.
-    FDUHoleProvider.init(fduHoleProvider);
+    var fduHoleProvider = ForumProvider();
+    // Init ForumRepository with the provider. This is the api implementations of the forum. 
+    ForumProvider.init(fduHoleProvider);
 
     // Wrap the whole app with [Phoenix] to enable fast reload. When user
     // logouts the Fudan UIS account, the whole app will be reloaded.

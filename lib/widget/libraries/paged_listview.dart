@@ -17,7 +17,7 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
@@ -244,7 +244,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
       error = "Unknown Error";
     } else {
       if (snapshot.error is LoginExpiredError) {
-        SettingsProvider.getInstance().deleteAllFduholeData();
+        SettingsProvider.getInstance().deleteAllForumData();
       }
       if (snapshot.error is NotLoginError) {
         error = (snapshot.error as NotLoginError).errorMessage;

@@ -24,8 +24,8 @@ import 'package:dan_xi/model/danke/course.dart';
 import 'package:dan_xi/model/danke/course_grade.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
-import 'package:dan_xi/page/opentreehole/hole_detail.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/page/forum/hole_detail.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
@@ -164,7 +164,7 @@ class CourseReviewEditor {
       progressDialog.dismiss(showAnim: false);
     }
     context
-        .read<FDUHoleProvider>()
+        .read<ForumProvider>()
         .courseReviewEditorCache
         .remove(courseGroup.code);
     return true;
@@ -198,7 +198,7 @@ class CourseReviewEditor {
       progressDialog.dismiss(showAnim: false);
     }
     context
-        .read<FDUHoleProvider>()
+        .read<ForumProvider>()
         .courseReviewEditorCache
         .remove(courseGroup.code);
     return true;
@@ -713,20 +713,20 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
     } else {
       review.addListener(() {
         context
-            .read<FDUHoleProvider>()
+            .read<ForumProvider>()
             .courseReviewEditorCache[_courseGroup.code]!
             .copyValuesFrom(review);
       });
       if (context
-          .read<FDUHoleProvider>()
+          .read<ForumProvider>()
           .courseReviewEditorCache
           .containsKey(_courseGroup.code)) {
         review.copyValuesFrom(context
-            .read<FDUHoleProvider>()
+            .read<ForumProvider>()
             .courseReviewEditorCache[_courseGroup.code]!);
       } else {
         context
-                .read<FDUHoleProvider>()
+                .read<ForumProvider>()
                 .courseReviewEditorCache[_courseGroup.code] =
             CourseReviewEditorText.newInstance();
       }

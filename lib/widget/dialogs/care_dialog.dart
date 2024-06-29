@@ -1,6 +1,6 @@
 import 'package:dan_xi/util/browser_util.dart';
-import 'package:dan_xi/widget/opentreehole/post_render.dart';
-import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
+import 'package:dan_xi/widget/forum/post_render.dart';
+import 'package:dan_xi/widget/forum/render/render_impl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';

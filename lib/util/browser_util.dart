@@ -135,8 +135,8 @@ class CustomInAppBrowser extends InAppBrowser {
       // TODO: Any better ways to implement this?
       final XSharedPreferences preferences =
           await XSharedPreferences.getInstance();
-      if (preferences.containsKey(SettingsProvider.KEY_FDUHOLE_FOLDBEHAVIOR) ||
-          preferences.containsKey(SettingsProvider.KEY_FDUHOLE_SORTORDER)) {
+      if (preferences.containsKey(SettingsProvider.KEY_FORUM_FOLDBEHAVIOR) ||
+          preferences.containsKey(SettingsProvider.KEY_FORUM_SORTORDER)) {
         if (Random().nextDouble() > 0.997) inAppReview.requestReview();
       }
     }
