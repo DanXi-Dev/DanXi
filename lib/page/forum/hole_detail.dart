@@ -628,7 +628,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 isConfirmDestructive: true);
             if (confirmed != true || !mounted) return;
 
-            FDUHoleProvider provider = context.read<FDUHoleProvider>();
+            ForumProvider provider = context.read<ForumProvider>();
             int divisionId = provider.currentDivision!.division_id!;
             List<int> pinned = provider.currentDivision!.pinned!
                 .map((hole) => hole.hole_id!)
@@ -707,7 +707,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                       ],
                     ),
                     onPointerUp: (PointerUpEvent details) async {
-                      if (context.read<FDUHoleProvider>().isUserInitialized &&
+                      if (context.read<ForumProvider>().isUserInitialized &&
                           OpenTreeHoleRepository.getInstance()
                               .getDivisions()
                               .isNotEmpty) {

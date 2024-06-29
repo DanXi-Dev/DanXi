@@ -315,10 +315,10 @@ class DanxiApp extends StatelessWidget {
 
     // Init FDUHoleProvider. This object provides some global states about
     // FDUHole such as the current division and the json web token.
-    var fduHoleProvider = FDUHoleProvider();
+    var fduHoleProvider = ForumProvider();
     // Init OpenTreeHoleRepository with the provider. This is the api implementations
     // of OpenTreeHole.
-    FDUHoleProvider.init(fduHoleProvider);
+    ForumProvider.init(fduHoleProvider);
 
     // Wrap the whole app with [Phoenix] to enable fast reload. When user
     // logouts the Fudan UIS account, the whole app will be reloaded.

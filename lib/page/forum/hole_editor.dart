@@ -111,7 +111,7 @@ class OTEditor {
     } finally {
       progressDialog.dismiss(showAnim: false);
     }
-    context.read<FDUHoleProvider>().editorCache.remove(object);
+    context.read<ForumProvider>().editorCache.remove(object);
     return true;
   }
 
@@ -143,7 +143,7 @@ class OTEditor {
     } finally {
       progressDialog.dismiss(showAnim: false);
     }
-    context.read<FDUHoleProvider>().editorCache.remove(object);
+    context.read<ForumProvider>().editorCache.remove(object);
     return true;
   }
 
@@ -173,7 +173,7 @@ class OTEditor {
     } finally {
       progressDialog.dismiss(showAnim: false);
     }
-    context.read<FDUHoleProvider>().editorCache.remove(object);
+    context.read<ForumProvider>().editorCache.remove(object);
     return true;
   }
 
@@ -208,14 +208,14 @@ class OTEditor {
 
     switch (editorType ?? OTEditorType.PAGE) {
       case OTEditorType.DIALOG:
-        if (!context.read<FDUHoleProvider>().editorCache.containsKey(object)) {
-          context.read<FDUHoleProvider>().editorCache[object] =
+        if (!context.read<ForumProvider>().editorCache.containsKey(object)) {
+          context.read<ForumProvider>().editorCache[object] =
               PostEditorText.newInstance(withText: placeholder);
         }
         final textController = TextEditingController(
-            text: context.read<FDUHoleProvider>().editorCache[object]!.text);
+            text: context.read<ForumProvider>().editorCache[object]!.text);
         textController.addListener(() => context
-            .read<FDUHoleProvider>()
+            .read<ForumProvider>()
             .editorCache[object]!
             .text = textController.text);
         final value = await showPlatformDialog<PostEditorText>(
@@ -234,7 +234,7 @@ class OTEditor {
                         child: Text(S.of(context).cancel),
                         onPressed: () {
                           context
-                              .read<FDUHoleProvider>()
+                              .read<ForumProvider>()
                               .editorCache[object]!
                               .text = textController.text;
                           Navigator.of(context).pop<PostEditorText>(null);
@@ -249,7 +249,7 @@ class OTEditor {
                               PostEditorText(
                                   textController.text,
                                   context
-                                      .read<FDUHoleProvider>()
+                                      .read<ForumProvider>()
                                       .editorCache[object]!
                                       .tags));
                         }),
@@ -430,7 +430,7 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                 child: OTTagSelector(
                     key: _tagSelectorKey,
                     initialTags: context
-                        .read<FDUHoleProvider>()
+                        .read<ForumProvider>()
                         .editorCache[widget.editorObject]!
                         .tags),
               ),
@@ -670,7 +670,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
     super.initState();
 
     _controller.addListener(() {
-      context.read<FDUHoleProvider>().editorCache[_object]!.text =
+      context.read<ForumProvider>().editorCache[_object]!.text =
           _controller.text;
     });
   }
@@ -690,11 +690,11 @@ class BBSEditorPageState extends State<BBSEditorPage> {
         widget.arguments!['title'] ?? S.of(context).forum_post_enter_content;
     _object = widget.arguments!['object'];
     _placeholder = widget.arguments!['placeholder'];
-    if (context.read<FDUHoleProvider>().editorCache.containsKey(_object)) {
+    if (context.read<ForumProvider>().editorCache.containsKey(_object)) {
       _controller.text =
-          context.read<FDUHoleProvider>().editorCache[_object]!.text!;
+          context.read<ForumProvider>().editorCache[_object]!.text!;
     } else {
-      context.read<FDUHoleProvider>().editorCache[_object] =
+      context.read<ForumProvider>().editorCache[_object] =
           PostEditorText.newInstance(withText: _placeholder);
       _controller.text = _placeholder;
     }
@@ -769,7 +769,7 @@ class BBSEditorPageState extends State<BBSEditorPage> {
     String text = _controller.text;
     if (text.isEmpty) return;
     final editorText = PostEditorText(
-        text, context.read<FDUHoleProvider>().editorCache[object]!.tags);
+        text, context.read<ForumProvider>().editorCache[object]!.tags);
 
     if ((await _interceptor?.call(context, editorText)) ?? true) {
       Navigator.pop<PostEditorText>(context, editorText);

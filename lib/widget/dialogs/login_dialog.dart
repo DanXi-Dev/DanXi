@@ -365,7 +365,7 @@ class LoginDialogState extends State<LoginDialog> {
   /// Change the login group and rebuild the dialog.
   _switchLoginGroup(UserGroup e) {
     if (e == UserGroup.VISITOR) {
-      _nameController.text = _pwdController.text = "[ FDUHole Only ]";
+      _nameController.text = _pwdController.text = "[ Forum Only ]";
     } else {
       _nameController.text = _pwdController.text = "";
     }

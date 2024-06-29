@@ -50,7 +50,7 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
   }
 
   /// Short name for the provider singleton
-  FDUHoleProvider get provider => FDUHoleProvider.getInstance();
+  ForumProvider get provider => ForumProvider.getInstance();
 
   Map<String, String> get _tokenHeader {
     if (provider.token == null || !provider.token!.isValid) {

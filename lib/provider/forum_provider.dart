@@ -25,20 +25,20 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/util/forum/editor_object.dart';
 import 'package:flutter/foundation.dart';
 
-/// A [ChangeNotifier] that exports some global states about FDUHole to the app.
+/// A [ChangeNotifier] that exports some global states about the forum to the app.
 ///
 /// Also see:
 /// * [StateProvider]
-class FDUHoleProvider with ChangeNotifier {
-  static late FDUHoleProvider _instance;
+class ForumProvider with ChangeNotifier {
+  static late ForumProvider _instance;
 
-  factory FDUHoleProvider.getInstance() => _instance;
+  factory ForumProvider.getInstance() => _instance;
 
-  static void init(FDUHoleProvider injectProvider) {
+  static void init(ForumProvider injectProvider) {
     _instance = injectProvider;
   }
 
-  FDUHoleProvider();
+  ForumProvider();
 
   /// Caches of [OTEditor].
   final Map<EditorObject?, PostEditorText> editorCache = {};

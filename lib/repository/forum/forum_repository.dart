@@ -50,7 +50,7 @@ import 'package:dan_xi/model/forum/history.dart';
 /// During to some history reasons, this repository's state can be complex.
 /// Please read the method comments carefully before using them.
 ///
-/// All states have been moved to [FDUHoleProvider], which is a [ChangeNotifier];
+/// All states have been moved to [ForumProvider], which is a [ChangeNotifier];
 /// any field in this class should be considered as temporary variables, e.g. caches.
 class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   static final _instance = OpenTreeHoleRepository._();
@@ -76,7 +76,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
   String? lastUploadToken;
 
   /// Short aliases.
-  FDUHoleProvider get provider => FDUHoleProvider.getInstance();
+  ForumProvider get provider => ForumProvider.getInstance();
 
   /// Logout, removing all cached data, tokens, on-disk local settings, etc.
   ///
@@ -91,7 +91,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     }
     await deletePushNotificationToken(await PlatformX.getUniqueDeviceId());
     clearCache();
-    SettingsProvider.getInstance().deleteAllFduholeData();
+    SettingsProvider.getInstance().deleteAllForumData();
   }
 
   /// Clear all cached data and in-memory states (i.e. token and user info that have been loaded).

@@ -53,7 +53,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   void initState() {
     super.initState();
     diagnoses = [
-      diagnoseFDUHole,
+      diagnoseForum,
       diagnoseGoogleAds,
       diagnoseDanXi,
       diagnoseUrl
@@ -74,15 +74,15 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     }
   }
 
-  Future<void> diagnoseFDUHole() async {
+  Future<void> diagnoseForum() async {
     _console.writeln(
-        "FDUHole is user initialized: ${context.read<FDUHoleProvider>().isUserInitialized}");
+        "Forum is user initialized: ${context.read<ForumProvider>().isUserInitialized}");
     _console.writeln(
-        "FDUHole is user admin: ${OpenTreeHoleRepository.getInstance().isAdmin}");
+        "Forum is user admin: ${OpenTreeHoleRepository.getInstance().isAdmin}");
     _console.writeln(
-        "FDUHole Push Token last uploaded on this device: ${OpenTreeHoleRepository.getInstance().lastUploadToken}");
+        "Forum Push Token last uploaded on this device: ${OpenTreeHoleRepository.getInstance().lastUploadToken}");
     _console.writeln(
-        "FDUHole Token stored: ${context.read<SettingsProvider>().forumToken}");
+        "Forum Token stored: ${context.read<SettingsProvider>().forumToken}");
 
     String? deviceId;
     try {
@@ -117,7 +117,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     _console.writeln(
         "User Agent used by DanXi for UIS: ${UserAgentInterceptor.defaultUsedUserAgent}");
     _console
-        .writeln("User Agent used by DanXi for FDUHole: ${Constant.version}");
+        .writeln("User Agent used by DanXi for Forum: ${Constant.version}");
     _console.writeln("Media Query: ${MediaQuery.of(context)}");
 
     _console.writeln("Everything we stored in the local device:");

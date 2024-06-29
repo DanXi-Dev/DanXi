@@ -63,7 +63,7 @@ class FullScreenWatermark extends StatelessWidget {
         offset: Offset(_getPositionNoise(), _getPositionNoise()),
         child: Transform.rotate(
             angle: pi / 10,
-            child: Consumer<FDUHoleProvider>(
+            child: Consumer<ForumProvider>(
               builder: (context, holeProvider, _) => Text(
                   holeProvider.userInfo?.user_id.toString() ?? " ",
                   style: textStyle),

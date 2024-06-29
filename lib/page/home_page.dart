@@ -375,7 +375,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     // Do a quick initialization and push
     // Throw an error if the user is not logged in
-    if (!context.read<FDUHoleProvider>().isUserInitialized) {
+    if (!context.read<ForumProvider>().isUserInitialized) {
       try {
         await OpenTreeHoleRepository.getInstance().initializeRepo();
       } catch (ignored) {}
@@ -434,7 +434,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     String? code,
     Map<String, dynamic>? data,
   ) async {
-    if (!context.read<FDUHoleProvider>().isUserInitialized) {
+    if (!context.read<ForumProvider>().isUserInitialized) {
       // Do a quick initialization and push
       try {
         OpenTreeHoleRepository.getInstance().initializeToken();

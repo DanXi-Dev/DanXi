@@ -343,7 +343,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          S.of(context).tip_that_fduhole_is_not_fdu,
+          S.of(context).tip_that_danxi_is_not_fdu,
           style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: 16),
@@ -436,7 +436,7 @@ class OTSetPasswordWidget extends SubStatelessWidget {
           textAlign: TextAlign.center,
         ),
         Text(
-          S.of(context).set_your_fduhole_password,
+          S.of(context).set_your_danxi_password,
           style: Theme.of(context).textTheme.bodySmall,
           textAlign: TextAlign.center,
         ),
@@ -494,7 +494,7 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            S.of(context).welcome_to_fduhole,
+            S.of(context).welcome_to_forum,
             style: Theme.of(context).textTheme.titleLarge,
             textAlign: TextAlign.center,
           ),

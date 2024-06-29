@@ -276,7 +276,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
   List<Widget> _buildFoldBehaviorList(BuildContext menuContext) {
     List<Widget> list = [];
     void onTapListener(FoldBehavior value) {
-      context.read<FDUHoleProvider>().userInfo!.config!.show_folded =
+      context.read<ForumProvider>().userInfo!.config!.show_folded =
           value.internalString();
       updateOTUserProfile(context);
       forumPageKey.currentState?.setState(() {});
@@ -529,7 +529,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     ),
 
                   // FDUHOLE
-                  _buildFDUHoleSettingsCard(context),
+                  _buildForumSettingsCard(context),
                   if (SettingsProvider.getInstance().debugMode)
                     //Theme Selection
                     Card(
@@ -605,25 +605,25 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                 ])));
   }
 
-  Widget _buildFDUHoleSettingsCard(BuildContext context) {
+  Widget _buildForumSettingsCard(BuildContext context) {
     return Card(
       child: Column(
         children: [
           ExpansionTileX(
             leading: Icon(PlatformIcons(context).accountCircle),
             title: Text(S.of(context).forum),
-            subtitle: Text(context.read<FDUHoleProvider>().isUserInitialized
-                ? S.of(context).fduhole_user_id(
-                    context.read<FDUHoleProvider>().userInfo!.user_id ?? "null")
+            subtitle: Text(context.read<ForumProvider>().isUserInitialized
+                ? S.of(context).forum_user_id(
+                    context.read<ForumProvider>().userInfo!.user_id ?? "null")
                 : S.of(context).not_logged_in),
             children: [
-              if (context.read<FDUHoleProvider>().isUserInitialized) ...[
+              if (context.read<ForumProvider>().isUserInitialized) ...[
                 FutureWidget<OTUser?>(
                   future: OpenTreeHoleRepository.getInstance().getUserProfile(),
                   successBuilder:
                       (BuildContext context, AsyncSnapshot<OTUser?> snapshot) =>
                           ListTile(
-                    title: Text(S.of(context).fduhole_nsfw_behavior),
+                    title: Text(S.of(context).forum_nsfw_behavior),
                     leading: PlatformX.isMaterial(context)
                         ? const Icon(Icons.hide_image)
                         : const Icon(CupertinoIcons.eye_slash),
@@ -644,7 +644,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     },
                   ),
                   errorBuilder: ListTile(
-                    title: Text(S.of(context).fduhole_nsfw_behavior),
+                    title: Text(S.of(context).forum_nsfw_behavior),
                     leading: PlatformX.isMaterial(context)
                         ? const Icon(Icons.hide_image)
                         : const Icon(CupertinoIcons.eye_slash),
@@ -652,7 +652,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     onTap: () => refreshSelf(),
                   ),
                   loadingBuilder: ListTile(
-                    title: Text(S.of(context).fduhole_nsfw_behavior),
+                    title: Text(S.of(context).forum_nsfw_behavior),
                     leading: PlatformX.isMaterial(context)
                         ? const Icon(Icons.hide_image)
                         : const Icon(CupertinoIcons.eye_slash),
@@ -663,10 +663,10 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                 OTNotificationSettingsTile(onSettingsUpdate: refreshSelf),
                 Selector<SettingsProvider, bool>(
                     builder: (_, bool value, __) => SwitchListTile.adaptive(
-                          title: Text(S.of(context).fduhole_show_banner),
+                          title: Text(S.of(context).forum_show_banner),
                           secondary: const Icon(Icons.campaign),
                           subtitle: Text(
-                              S.of(context).fduhole_show_banner_description),
+                              S.of(context).forum_show_banner_description),
                           value: value,
                           onChanged: (bool value) =>
                               SettingsProvider.getInstance().isBannerEnabled =
@@ -675,10 +675,10 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     selector: (_, model) => model.isBannerEnabled),
                 Selector<SettingsProvider, bool>(
                     builder: (_, bool value, __) => SwitchListTile.adaptive(
-                          title: Text(S.of(context).fduhole_clean_mode),
+                          title: Text(S.of(context).forum_clean_mode),
                           secondary: const Icon(Icons.ac_unit),
                           subtitle: Text(
-                              S.of(context).fduhole_clean_mode_description),
+                              S.of(context).forum_clean_mode_description),
                           value: value,
                           onChanged: (bool value) {
                             if (value) {
@@ -722,8 +722,8 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                   ),
                 ListTile(
                   leading: Icon(PlatformIcons(context).tag),
-                  title: Text(S.of(context).fduhole_hidden_tags),
-                  subtitle: Text(S.of(context).fduhole_hidden_tags_description),
+                  title: Text(S.of(context).forum_hidden_tags),
+                  subtitle: Text(S.of(context).forum_hidden_tags_description),
                   onTap: () async {
                     await smartNavigatorPush(context, '/bbs/tags/blocklist');
                     forumPageKey.currentState?.setState(() {});
@@ -813,7 +813,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
               ],
               ListTile(
                 leading: nil,
-                title: context.read<FDUHoleProvider>().isUserInitialized
+                title: context.read<ForumProvider>().isUserInitialized
                     ? Text(
                         S.of(context).logout,
                         style: TextStyle(
@@ -825,7 +825,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                             color: Theme.of(context).colorScheme.secondary),
                       ),
                 onTap: () async {
-                  if (!context.read<FDUHoleProvider>().isUserInitialized) {
+                  if (!context.read<ForumProvider>().isUserInitialized) {
                     if (SettingsProvider.getInstance().forumToken == null) {
                       Noticing.showNotice(
                           context, S.of(context).login_from_treehole_page,
@@ -837,7 +837,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       refreshSelf();
                     }
                   } else if (await Noticing.showConfirmationDialog(
-                          context, S.of(context).logout_fduhole,
+                          context, S.of(context).logout_forum,
                           title: S.of(context).logout,
                           isConfirmDestructive: true) ==
                       true) {
@@ -869,11 +869,11 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
   _showCleanModeGuideDialog() => showPlatformDialog(
       context: context,
       builder: (context) => AlertDialog(
-            title: Text(S.of(context).fduhole_clean_mode),
+            title: Text(S.of(context).forum_clean_mode),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(S.of(context).fduhole_clean_mode_detail),
+                Text(S.of(context).forum_clean_mode_detail),
                 const SizedBox(height: 8),
                 Text(S.of(context).before_enabled),
                 const SizedBox(height: 4),
@@ -1151,11 +1151,11 @@ class _OTNotificationSettingsWidgetState
 
   List<Widget> _buildNotificationSettingsList(BuildContext context) {
     List<Widget> list = [];
-    if (context.read<FDUHoleProvider>().userInfo?.config?.notify == null) {
+    if (context.read<ForumProvider>().userInfo?.config?.notify == null) {
       return [Text(S.of(context).fatal_error)];
     }
     getNotifyListNonNull() =>
-        context.read<FDUHoleProvider>().userInfo!.config!.notify!;
+        context.read<ForumProvider>().userInfo!.config!.notify!;
     for (var value in OTNotificationTypes.values) {
       list.add(SwitchListTile.adaptive(
           title: Text(value.displayTitle(context) ?? "null"),
@@ -1216,7 +1216,7 @@ class OTNotificationSettingsTile extends StatelessWidget {
           successBuilder:
               (BuildContext context, AsyncSnapshot<bool> permissionSnapshot) {
             if (permissionSnapshot.data == true) {
-              if (!context.read<FDUHoleProvider>().isUserInitialized) {
+              if (!context.read<ForumProvider>().isUserInitialized) {
                 return ListTile(
                   title: Text(S.of(context).notification_settings),
                   leading: icon,

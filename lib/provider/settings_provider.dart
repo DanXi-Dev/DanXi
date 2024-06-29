@@ -442,7 +442,7 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteAllFduholeData() {
+  void deleteAllForumData() {
     preferences!.remove(KEY_FORUM_TOKEN);
     //preferences!.remove(KEY_LAST_PUSH_TOKEN);
     preferences!.remove(KEY_FORUM_FOLDBEHAVIOR);
@@ -465,7 +465,7 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  //FDUHOLE Default Sorting Order
+  //Forum Default Sorting Order
   SortOrder? get forumSortOrder {
     if (preferences!.containsKey(KEY_FORUM_SORTORDER)) {
       String? str = preferences!.getString(KEY_FORUM_SORTORDER);
@@ -483,7 +483,7 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// FDUHOLE Folded Post Behavior
+  /// Forum Folded Post Behavior
 
   /// NOTE: This getter defaults to a FOLD and won't return [null]
   FoldBehavior get forumFoldBehavior {
@@ -533,7 +533,7 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Hide FDUHole
+  /// Hide Forum
   bool get hideHole {
     if (preferences!.containsKey(KEY_HIDDEN_TREEHOLE)) {
       return preferences!.getBool(KEY_HIDDEN_TREEHOLE)!;
@@ -750,7 +750,7 @@ extension SortOrderEx on SortOrder? {
   }
 }
 
-//FDUHOLE Folded Post Behavior
+//Forum Folded Post Behavior
 enum FoldBehavior { SHOW, FOLD, HIDE }
 
 extension FoldBehaviorEx on FoldBehavior {

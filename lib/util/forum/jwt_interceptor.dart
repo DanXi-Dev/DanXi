@@ -26,7 +26,7 @@ import 'package:flutter/cupertino.dart';
 ///
 /// Also see:
 /// * [JWToken]
-/// * [FDUHoleProvider]
+/// * [ForumProvider]
 class JWTInterceptor extends QueuedInterceptor {
   final Dio _dio = Dio();
   final String refreshUrl;

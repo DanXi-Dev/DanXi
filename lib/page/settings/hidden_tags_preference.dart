@@ -51,7 +51,7 @@ class BBSHiddenTagsPreferencePageState
       iosContentBottomPadding: false,
       iosContentPadding: false,
       appBar: PlatformAppBarX(
-        title: Text(S.of(context).fduhole_hidden_tags_title),
+        title: Text(S.of(context).forum_hidden_tags_title),
       ),
       body: SafeArea(
         child: OTTagSelector(

@@ -36,7 +36,7 @@ class StateProvider {
   static String? onlineUserAgent;
 
   static void initialize(BuildContext context) {
-    FDUHoleProvider provider = context.read<FDUHoleProvider>();
+    ForumProvider provider = context.read<ForumProvider>();
     provider.currentDivisionId = null;
     personInfo.value = null;
     isForeground = true;

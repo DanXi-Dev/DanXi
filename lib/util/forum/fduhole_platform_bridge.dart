@@ -19,11 +19,11 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/services.dart';
 
 class FDUHolePlatformBridge {
-  static const FDUHOLE_CHANNEL = MethodChannel('fduhole');
+  static const FORUM_CHANNEL = MethodChannel('fduhole');
 
   static void registerRemoteNotification() {
     if (PlatformX.isIOS) {
-      FDUHOLE_CHANNEL.invokeMethod("request_notification_permission");
+      FORUM_CHANNEL.invokeMethod("request_notification_permission");
     }
   }
 }
