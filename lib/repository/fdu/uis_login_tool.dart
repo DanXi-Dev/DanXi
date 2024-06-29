@@ -22,7 +22,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/independent_cookie_jar.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';

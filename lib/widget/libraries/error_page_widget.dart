@@ -16,7 +16,7 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dio/dio.dart';

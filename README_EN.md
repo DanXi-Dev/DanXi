@@ -20,7 +20,7 @@ Maybe the best all-rounded service app for Fudan University students!
 - Dining hall traffic
 - Shortcut for Fudan QR Code (with support for Apple Watch)
 - View empty classrooms
-- Tree Hole
+- Student forum
 - View compulsory-exercise records
 - View timetable and export as .ics file
 - Show Notices from Academic Affairs Office
