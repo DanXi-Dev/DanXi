@@ -110,7 +110,7 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
 
   Future<CourseReview?> _loadRandomReview({bool forceRefetch = false}) async {
     if (!context.read<ForumProvider>().isUserInitialized) {
-      await OpenTreeHoleRepository.getInstance().initializeUser();
+      await ForumRepository.getInstance().initializeUser();
       settingsPageKey.currentState?.setState(() {});
     }
 

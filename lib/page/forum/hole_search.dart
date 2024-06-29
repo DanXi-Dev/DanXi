@@ -221,7 +221,7 @@ Widget searchByFloorId(BuildContext context, String searchKeyword) {
 
 Widget searchByTag(BuildContext context, String searchKeyword) {
   return FutureWidget<List<OTTag>?>(
-      future: LazyFuture.pack(OpenTreeHoleRepository.getInstance().loadTags()),
+      future: LazyFuture.pack(ForumRepository.getInstance().loadTags()),
       successBuilder: (context, snapshot) {
         Iterable<OTTag> suggestionList = snapshot.data!.where((element) =>
             element.name != null &&
@@ -252,7 +252,7 @@ Future<void> goToPIDResultPage(BuildContext context, int pid) async {
       showProgressDialog(loadingText: S.of(context).loading, context: context);
   try {
     final OTHole? post =
-        await OpenTreeHoleRepository.getInstance().loadSpecificHole(pid);
+        await ForumRepository.getInstance().loadSpecificHole(pid);
     smartNavigatorPush(context, "/bbs/postDetail", arguments: {
       "post": post!,
     });
@@ -273,7 +273,7 @@ Future<void> goToFloorIdResultPage(BuildContext context, int floorId) async {
   ProgressFuture progressDialog =
       showProgressDialog(loadingText: S.of(context).loading, context: context);
   try {
-    final floor = (await OpenTreeHoleRepository.getInstance()
+    final floor = (await ForumRepository.getInstance()
         .loadSpecificFloor(floorId))!;
     OTFloorMentionWidget.showFloorDetail(context, floor);
   } catch (error, st) {

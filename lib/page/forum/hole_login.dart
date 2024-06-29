@@ -33,7 +33,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
-/// OpenTreeHole login wizard page.
+/// Forum login wizard page.
 ///
 class HoleLoginPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
@@ -191,7 +191,7 @@ class OTEmailSelectionWidget extends SubStatelessWidget {
     var model = Provider.of<LoginInfoModel>(context, listen: false);
     state.jumpTo(OTLoadingWidget(state: state), putInStack: false);
     bool? registered =
-        await OpenTreeHoleRepository.getInstance().checkRegisterStatus(email);
+        await ForumRepository.getInstance().checkRegisterStatus(email);
     if (registered!) {
       state.jumpTo(OTEmailPasswordLoginWidget(state: state));
     } else {
@@ -285,7 +285,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
   Future<void> executeLogin(BuildContext context) async {
     var model = Provider.of<LoginInfoModel>(context, listen: false);
     state.jumpTo(OTLoadingWidget(state: state), putInStack: false);
-    await OpenTreeHoleRepository.getInstance()
+    await ForumRepository.getInstance()
         .loginWithUsernamePassword(model.selectedEmail!, model.password!);
     state.jumpTo(OTLoginSuccessWidget(state: state));
   }
@@ -361,7 +361,7 @@ class OTEmailPasswordLoginWidget extends SubStatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Text(S.of(context).forgot_password),
                   onPressed: () => BrowserUtil.openUrl(
-                      Constant.OPEN_TREEHOLE_FORGOT_PASSWORD_URL, context),
+                      Constant.FORUM_FORGOT_PASSWORD_URL, context),
                 ),
                 PlatformTextButton(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -476,12 +476,12 @@ class OTRegisterLicenseWidget extends SubStatelessWidget {
     var model = Provider.of<LoginInfoModel>(context, listen: false);
     state.jumpTo(OTLoadingWidget(state: state), putInStack: false);
     if (model.verifyCode == null) {
-      await OpenTreeHoleRepository.getInstance()
+      await ForumRepository.getInstance()
           .requestEmailVerifyCode(model.selectedEmail!);
       state.jumpTo(OTEmailVerifyCodeWidget(state: state));
       return;
     }
-    await OpenTreeHoleRepository.getInstance()
+    await ForumRepository.getInstance()
         .register(model.selectedEmail!, model.password!, model.verifyCode!);
     state.jumpTo(OTRegisterSuccessWidget(state: state));
   }

@@ -180,7 +180,7 @@ class MarkdownFloorMentionSupport extends MarkdownElementBuilder {
       );
     } else {
       return OTFloorMentionWidget(
-        future: OpenTreeHoleRepository.getInstance()
+        future: ForumRepository.getInstance()
             .loadSpecificFloor(int.parse(element.textContent)),
         hasBackgroundImage: hasBackgroundImage,
       );
@@ -204,7 +204,7 @@ class MarkdownHoleMentionSupport extends MarkdownElementBuilder {
       );
     } else {
       return OTFloorMentionWidget(
-        future: OpenTreeHoleRepository.getInstance()
+        future: ForumRepository.getInstance()
             .loadSpecificHole(int.parse(element.textContent))
             .then((value) => value?.floors?.first_floor),
         hasBackgroundImage: hasBackgroundImage,

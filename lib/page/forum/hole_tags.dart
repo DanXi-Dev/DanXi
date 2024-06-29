@@ -45,7 +45,7 @@ class BBSTagsPageState extends State<BBSTagsPage> {
   @override
   void initState() {
     super.initState();
-    _content = LazyFuture.pack(OpenTreeHoleRepository.getInstance().loadTags());
+    _content = LazyFuture.pack(ForumRepository.getInstance().loadTags());
   }
 
   @override
@@ -79,7 +79,7 @@ class BBSTagsPageState extends State<BBSTagsPage> {
                       stackTrace: snapShot.stackTrace,
                       onTap: () => setState(() {
                             _content = LazyFuture.pack(
-                                OpenTreeHoleRepository.getInstance()
+                                ForumRepository.getInstance()
                                     .loadTags());
                           })),
               loadingBuilder: Center(

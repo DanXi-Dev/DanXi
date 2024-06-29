@@ -61,11 +61,11 @@ class OTMessagesPageState extends State<OTMessagesPage> {
       } else {
         time = DateTime.now();
       }
-      return OpenTreeHoleRepository.getInstance()
+      return ForumRepository.getInstance()
           .loadMessages(startTime: time, unreadOnly: showUnreadOnly)
           .then((value) {
         // Automatically clear all messages after loading, assuming that the user has already read them.
-        unawaited(OpenTreeHoleRepository.getInstance().clearMessages());
+        unawaited(ForumRepository.getInstance().clearMessages());
         return value;
       });
     }).call(page);

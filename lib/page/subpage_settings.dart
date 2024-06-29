@@ -64,7 +64,7 @@ import 'package:provider/provider.dart';
 
 Future<void> updateOTUserProfile(BuildContext context) async {
   try {
-    await OpenTreeHoleRepository.getInstance().updateUserProfile();
+    await ForumRepository.getInstance().updateUserProfile();
   } catch (e, st) {
     if (context.mounted) {
       Noticing.showErrorDialog(context, e, trace: st);
@@ -245,7 +245,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     ProgressFuture progressDialog =
         showProgressDialog(loadingText: S.of(context).logout, context: context);
     try {
-      await OpenTreeHoleRepository.getInstance().logout();
+      await ForumRepository.getInstance().logout();
     } finally {
       progressDialog.dismiss(showAnim: false);
       SettingsProvider.getInstance()
@@ -619,7 +619,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
             children: [
               if (context.read<ForumProvider>().isUserInitialized) ...[
                 FutureWidget<OTUser?>(
-                  future: OpenTreeHoleRepository.getInstance().getUserProfile(),
+                  future: ForumRepository.getInstance().getUserProfile(),
                   successBuilder:
                       (BuildContext context, AsyncSnapshot<OTUser?> snapshot) =>
                           ListTile(
@@ -795,7 +795,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                   leading: nil,
                   title: Text(S.of(context).modify_password),
                   onTap: () => BrowserUtil.openUrl(
-                      Constant.OPEN_TREEHOLE_FORGOT_PASSWORD_URL, context),
+                      Constant.FORUM_FORGOT_PASSWORD_URL, context),
                 ),
                 ListTile(
                   leading: nil,
@@ -828,10 +828,10 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                   if (!context.read<ForumProvider>().isUserInitialized) {
                     if (SettingsProvider.getInstance().forumToken == null) {
                       Noticing.showNotice(
-                          context, S.of(context).login_from_treehole_page,
+                          context, S.of(context).login_from_forum_page,
                           title: S.of(context).login);
                     } else {
-                      await OpenTreeHoleRepository.getInstance()
+                      await ForumRepository.getInstance()
                           .initializeRepo();
                       onLogout();
                       refreshSelf();
@@ -844,7 +844,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     ProgressFuture progressDialog = showProgressDialog(
                         loadingText: S.of(context).logout, context: context);
                     try {
-                      await OpenTreeHoleRepository.getInstance().logout();
+                      await ForumRepository.getInstance().logout();
                       while (auxiliaryNavigatorState?.canPop() == true) {
                         auxiliaryNavigatorState?.pop();
                       }
@@ -1225,7 +1225,7 @@ class OTNotificationSettingsTile extends StatelessWidget {
                 );
               }
               return FutureWidget<OTUser?>(
-                future: OpenTreeHoleRepository.getInstance().getUserProfile(),
+                future: ForumRepository.getInstance().getUserProfile(),
                 successBuilder:
                     (BuildContext context, AsyncSnapshot<OTUser?> snapshot) =>
                         ListTile(

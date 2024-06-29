@@ -178,7 +178,7 @@ class DanxiApp extends StatelessWidget {
     '/dashboard/reorder': (context, {arguments}) =>
         DashboardReorderPage(arguments: arguments),
     '/bbs/discussions': (context, {arguments}) =>
-        TreeHoleSubpage(arguments: arguments),
+        ForumSubpage(arguments: arguments),
     '/bbs/tags': (context, {arguments}) => BBSTagsPage(arguments: arguments),
     '/bbs/fullScreenEditor': (context, {arguments}) =>
         BBSEditorPage(arguments: arguments),
@@ -316,8 +316,7 @@ class DanxiApp extends StatelessWidget {
     // Init FDUHoleProvider. This object provides some global states about
     // FDUHole such as the current division and the json web token.
     var fduHoleProvider = ForumProvider();
-    // Init OpenTreeHoleRepository with the provider. This is the api implementations
-    // of OpenTreeHole.
+    // Init ForumRepository with the provider. This is the api implementations of the forum. 
     ForumProvider.init(fduHoleProvider);
 
     // Wrap the whole app with [Phoenix] to enable fast reload. When user

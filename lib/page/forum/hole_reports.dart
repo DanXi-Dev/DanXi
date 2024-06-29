@@ -59,7 +59,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTReport>?> _loadReportContent(int page) =>
-      OpenTreeHoleRepository.getInstance().adminGetReports(page * 10, 10);
+      ForumRepository.getInstance().adminGetReports(page * 10, 10);
 
   @override
   Widget build(BuildContext context) {
@@ -151,7 +151,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
           menuContext: menuContext,
           child: const Text("Mark as dealt"),
           onPressed: () async {
-            int? result = await OpenTreeHoleRepository.getInstance()
+            int? result = await ForumRepository.getInstance()
                 .adminSetReportDealt(e.report_id!);
             if (result != null && result < 300 && mounted) {
               Noticing.showModalNotice(pageContext,
@@ -172,7 +172,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
     void onImageTap(String? url, Object heroTag) {
       smartNavigatorPush(context, '/image/detail', arguments: {
         'preview_url': url,
-        'hd_url': OpenTreeHoleRepository.getInstance()
+        'hd_url': ForumRepository.getInstance()
             .extractHighDefinitionImageUrl(url!),
         'hero_tag': heroTag
       });
@@ -227,7 +227,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                       style: TextStyle(
                           color: Theme.of(context).hintColor, fontSize: 12)),
                   onTap: () async {
-                    int? result = await OpenTreeHoleRepository.getInstance()
+                    int? result = await ForumRepository.getInstance()
                         .adminSetReportDealt(e.report_id!);
                     if (result != null && result < 300 && mounted) {
                       Noticing.showModalNotice(context,
@@ -243,7 +243,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
               ProgressFuture progressDialog = showProgressDialog(
                   loadingText: S.of(context).loading, context: context);
               try {
-                final OTHole? post = await OpenTreeHoleRepository.getInstance()
+                final OTHole? post = await ForumRepository.getInstance()
                     .loadSpecificHole(e.hole_id!);
                 if (!mounted) return;
                 smartNavigatorPush(context, "/bbs/postDetail",
@@ -282,7 +282,7 @@ class AuditListState extends State<AuditList> {
       if (lastElement != null) {
         time = DateTime.parse(lastElement.time_updated!);
       }
-      return OpenTreeHoleRepository.getInstance()
+      return ForumRepository.getInstance()
           .adminGetAuditFloors(time, open, Constant.POST_COUNT_PER_PAGE);
     }).call(page);
     // If not more posts, notify ListView that we reached the end.
@@ -297,7 +297,7 @@ class AuditListState extends State<AuditList> {
           menuContext: menuContext,
           child: const Text("标记为敏感"),
           onPressed: () async {
-            int? result = await OpenTreeHoleRepository.getInstance()
+            int? result = await ForumRepository.getInstance()
                 .adminSetAuditFloor(e.id, true);
             if (result != null && result < 300 && mounted) {
               Noticing.showModalNotice(pageContext,
@@ -311,7 +311,7 @@ class AuditListState extends State<AuditList> {
           menuContext: menuContext,
           child: const Text("标记为不敏感"),
           onPressed: () async {
-            int? result = await OpenTreeHoleRepository.getInstance()
+            int? result = await ForumRepository.getInstance()
                 .adminSetAuditFloor(e.id, false);
             if (result != null && result < 300 && mounted) {
               Noticing.showModalNotice(pageContext,
@@ -332,7 +332,7 @@ class AuditListState extends State<AuditList> {
     void onImageTap(String? url, Object heroTag) {
       smartNavigatorPush(context, '/image/detail', arguments: {
         'preview_url': url,
-        'hd_url': OpenTreeHoleRepository.getInstance()
+        'hd_url': ForumRepository.getInstance()
             .extractHighDefinitionImageUrl(url!),
         'hero_tag': heroTag
       });
@@ -396,10 +396,10 @@ class AuditListState extends State<AuditList> {
                     loadingText: S.of(context).loading, context: context);
                 try {
                   final OTHole? post =
-                      await OpenTreeHoleRepository.getInstance()
+                      await ForumRepository.getInstance()
                           .loadSpecificHole(e.hole_id);
                   final OTFloor? floor =
-                      await OpenTreeHoleRepository.getInstance()
+                      await ForumRepository.getInstance()
                           .loadSpecificFloor(e.id);
                   if (!mounted) return;
                   smartNavigatorPush(context, "/bbs/postDetail",

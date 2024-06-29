@@ -172,13 +172,13 @@ class OTTitle extends StatelessWidget {
   }
 }
 
-class TreeHoleSubpage extends PlatformSubpage<TreeHoleSubpage> {
+class ForumSubpage extends PlatformSubpage<ForumSubpage> {
   final Map<String, dynamic>? arguments;
 
   @override
-  TreeHoleSubpageState createState() => TreeHoleSubpageState();
+  ForumSubpageState createState() => ForumSubpageState();
 
-  const TreeHoleSubpage({super.key, this.arguments});
+  const ForumSubpage({super.key, this.arguments});
 
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
@@ -305,7 +305,7 @@ enum PostsType {
 /// [String] tagFilter: if [tagFilter] is not null, it means this page is showing
 /// the posts which is tagged with [tagFilter].
 ///
-class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
+class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   /// Unrelated to the state.
   /// These field should only be initialized once when created.
   final StateStreamListener<CreateNewPostEvent> _postSubscription =
@@ -349,9 +349,9 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     // Initialize the user token from shared preferences.
     // If no token, NotLoginError will be thrown.
     if (!context.read<ForumProvider>().isUserInitialized) {
-      await OpenTreeHoleRepository.getInstance().initializeRepo();
+      await ForumRepository.getInstance().initializeRepo();
       context.read<ForumProvider>().currentDivisionId =
-          OpenTreeHoleRepository.getInstance()
+          ForumRepository.getInstance()
               .getDivisions()
               .firstOrNull
               ?.division_id;
@@ -359,7 +359,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
     }
 
     bool answered =
-        await OpenTreeHoleRepository.getInstance().hasAnsweredQuestions() ??
+        await ForumRepository.getInstance().hasAnsweredQuestions() ??
             true;
     if (!answered) {
       throw QuizUnansweredError(
@@ -370,10 +370,10 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
       case PostsType.FAVORED_DISCUSSION:
         // Favored discussion has only one page.
         if (page > 1) return [];
-        return await OpenTreeHoleRepository.getInstance().getFavoriteHoles();
+        return await ForumRepository.getInstance().getFavoriteHoles();
       case PostsType.SUBSCRIBED_DISCUSSION:
         if (page > 1) return [];
-        return await OpenTreeHoleRepository.getInstance().getSubscribedHoles();
+        return await ForumRepository.getInstance().getSubscribedHoles();
       case PostsType.FILTER_BY_ME:
         List<OTHole>? loadedPost = await adaptLayer
             .generateReceiver(listViewController, (lastElement) {
@@ -381,7 +381,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           if (lastElement != null) {
             time = DateTime.parse(lastElement.time_updated!);
           }
-          return OpenTreeHoleRepository.getInstance()
+          return ForumRepository.getInstance()
               .loadUserHoles(time, sortOrder: SortOrder.LAST_CREATED);
         }).call(page);
         // If not more posts, notify ListView that we reached the end.
@@ -399,7 +399,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           if (lastElement != null) {
             time = DateTime.parse(lastElement.time_updated!);
           }
-          return OpenTreeHoleRepository.getInstance().loadHoles(
+          return ForumRepository.getInstance().loadHoles(
               time, getDivisionId(context),
               tag: _tagFilter,
               sortOrder: context.read<SettingsProvider>().forumSortOrder);
@@ -436,11 +436,11 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   Future<void> refreshList() async {
     try {
       if (_postsType == PostsType.FAVORED_DISCUSSION) {
-        await OpenTreeHoleRepository.getInstance().getFavoriteHoleId();
+        await ForumRepository.getInstance().getFavoriteHoleId();
       } else if (_postsType == PostsType.SUBSCRIBED_DISCUSSION) {
-        await OpenTreeHoleRepository.getInstance().getSubscribedHoleId();
+        await ForumRepository.getInstance().getSubscribedHoleId();
       } else if (context.read<ForumProvider>().isUserInitialized) {
-        await OpenTreeHoleRepository.getInstance()
+        await ForumRepository.getInstance()
             .loadDivisions(useCache: false);
         await refreshSelf();
       }
@@ -455,7 +455,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   }
 
   Widget _autoSilenceNotice() {
-    final DateTime? silenceDate = OpenTreeHoleRepository.getInstance()
+    final DateTime? silenceDate = ForumRepository.getInstance()
         .getSilenceDateForDivision(getDivisionId(context))
         ?.toLocal();
     if (silenceDate == null || silenceDate.isBefore(DateTime.now())) {
@@ -480,7 +480,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
   }
 
   Widget _autoPinnedPosts() => Column(
-        children: OpenTreeHoleRepository.getInstance()
+        children: ForumRepository.getInstance()
             .getPinned(getDivisionId(context))
             .map((e) => _buildListItem(context, null, null, e, isPinned: true))
             .toList(),
@@ -724,7 +724,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
           } else if (error is QuizUnansweredError) {
             return OTQuizWidget(successCallback: () async {
               // Update user data
-              await OpenTreeHoleRepository.getInstance()
+              await ForumRepository.getInstance()
                   .getUserProfile(forceUpdate: true);
               refreshList();
             });
@@ -735,7 +735,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         dataReceiver: _loadContent,
         onDismissItem: switch (_postsType) {
           PostsType.FAVORED_DISCUSSION => (context, index, item) async {
-              await OpenTreeHoleRepository.getInstance()
+              await ForumRepository.getInstance()
                   .setFavorite(SetStatusMode.DELETE, item.hole_id)
                   .onError((error, stackTrace) {
                 Noticing.showNotice(context, error.toString(),
@@ -744,7 +744,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
               });
             },
           PostsType.SUBSCRIBED_DISCUSSION => (context, index, item) async {
-              await OpenTreeHoleRepository.getInstance()
+              await ForumRepository.getInstance()
                   .setSubscription(SetStatusMode.DELETE, item.hole_id)
                   .onError((error, stackTrace) {
                 Noticing.showNotice(context, error.toString(),
@@ -780,7 +780,7 @@ class TreeHoleSubpageState extends PlatformSubpageState<TreeHoleSubpage> {
         (foldBehavior == FoldBehavior.HIDE && postElement.is_folded) ||
         (!isPinned &&
             !isSpecialView &&
-            OpenTreeHoleRepository.getInstance()
+            ForumRepository.getInstance()
                 .getPinned(getDivisionId(context))
                 .contains(postElement))) return const SizedBox();
     return OTHoleWidget(
@@ -860,12 +860,12 @@ class ForumTabDelegate extends SliverPersistentHeaderDelegate {
 
 /// A delegate class to control the body widget shown in the tab page.
 ///
-/// When [TreeHoleSubpageState._postsType] is set to [PostsType.EXTERNAL_VIEW],
+/// When [ForumSubpageState._postsType] is set to [PostsType.EXTERNAL_VIEW],
 /// the subpage will use the delegate as its content, rather than [PagedListView]
-/// built in the [TreeHoleSubpageState.build] method.
+/// built in the [ForumSubpageState.build] method.
 ///
 /// Also see:
-/// - [TreeHoleSubpageState]
+/// - [ForumSubpageState]
 abstract class ListDelegate {
   /// Same as a normal build() method. Return a widget to be shown in the page.
   Widget build(BuildContext context);

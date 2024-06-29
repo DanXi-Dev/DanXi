@@ -58,7 +58,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_DEBUG_MODE = "DEBUG";
   static const String KEY_AD_ENABLED = "ad_enabled";
   static const String KEY_HIDDEN_TAGS = "hidden_tags";
-  static const String KEY_HIDDEN_TREEHOLE = "hidden_hole";
+  static const String KEY_HIDE_FORUM = "hide_fduhole";
   static const String KEY_ACCESSIBILITY_COLORING = "accessibility_coloring";
   static const String KEY_CELEBRATION = "celebration";
   static const String KEY_BACKGROUND_IMAGE_PATH = "background";
@@ -447,7 +447,7 @@ class SettingsProvider with ChangeNotifier {
     //preferences!.remove(KEY_LAST_PUSH_TOKEN);
     preferences!.remove(KEY_FORUM_FOLDBEHAVIOR);
     preferences!.remove(KEY_FORUM_SORTORDER);
-    preferences!.remove(KEY_HIDDEN_TREEHOLE);
+    preferences!.remove(KEY_HIDE_FORUM);
     preferences!.remove(KEY_HIDDEN_TAGS);
   }
 
@@ -535,15 +535,15 @@ class SettingsProvider with ChangeNotifier {
 
   /// Hide Forum
   bool get hideHole {
-    if (preferences!.containsKey(KEY_HIDDEN_TREEHOLE)) {
-      return preferences!.getBool(KEY_HIDDEN_TREEHOLE)!;
+    if (preferences!.containsKey(KEY_HIDE_FORUM)) {
+      return preferences!.getBool(KEY_HIDE_FORUM)!;
     } else {
       return false;
     }
   }
 
   set hideHole(bool mode) {
-    preferences!.setBool(KEY_HIDDEN_TREEHOLE, mode);
+    preferences!.setBool(KEY_HIDE_FORUM, mode);
     notifyListeners();
   }
 

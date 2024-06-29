@@ -43,10 +43,10 @@ Future<bool> showAdminOperation(BuildContext context, OTFloor floor) async {
     final operation = result! as AdminOperationInfo;
     int? response;
     if (operation.isDelete) {
-      response = await OpenTreeHoleRepository.getInstance().adminDeleteFloor(
+      response = await ForumRepository.getInstance().adminDeleteFloor(
           operation.floorId, operation.reason.isEmpty ? "" : operation.reason);
     } else {
-      response = await OpenTreeHoleRepository.getInstance().adminFoldFloor(
+      response = await ForumRepository.getInstance().adminFoldFloor(
           operation.reason.isEmpty ? [] : [operation.reason],
           operation.floorId);
     }
@@ -57,7 +57,7 @@ Future<bool> showAdminOperation(BuildContext context, OTFloor floor) async {
     }
 
     if (operation.doPenalty && operation.penaltyDays > 0) {
-      response = await OpenTreeHoleRepository.getInstance()
+      response = await ForumRepository.getInstance()
           .adminAddPenaltyDays(operation.floorId, operation.penaltyDays);
       if (response == null || response >= 300) {
         throw Exception("Request for adding penalty failed! ");
@@ -112,7 +112,7 @@ class AdminOperationPageState extends State<AdminOperationPage> {
   }
 
   Future<List<String>> getPunishmentHistory() async {
-    _punishmentHistory ??= await OpenTreeHoleRepository.getInstance()
+    _punishmentHistory ??= await ForumRepository.getInstance()
         .adminGetPunishmentHistory(_floor.floor_id!);
 
     return _punishmentHistory!;
@@ -120,7 +120,7 @@ class AdminOperationPageState extends State<AdminOperationPage> {
 
   Future<List<OTHistory>> getModifyHistory() async {
     _modifyHistory ??=
-        await OpenTreeHoleRepository.getInstance().getHistory(_floor.floor_id);
+        await ForumRepository.getInstance().getHistory(_floor.floor_id);
 
     return _modifyHistory!;
   }

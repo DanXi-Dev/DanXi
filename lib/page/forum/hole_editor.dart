@@ -103,7 +103,7 @@ class OTEditor {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
     try {
-      await OpenTreeHoleRepository.getInstance()
+      await ForumRepository.getInstance()
           .newHole(divisionId, content!.text, tags: content.tags);
     } catch (e, st) {
       Noticing.showErrorDialog(context, e, trace: st);
@@ -135,7 +135,7 @@ class OTEditor {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
     try {
-      await OpenTreeHoleRepository.getInstance()
+      await ForumRepository.getInstance()
           .newFloor(discussionId, content);
     } catch (e, st) {
       Noticing.showErrorDialog(context, e, trace: st);
@@ -165,7 +165,7 @@ class OTEditor {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
     try {
-      await OpenTreeHoleRepository.getInstance().modifyFloor(content, floorId);
+      await ForumRepository.getInstance().modifyFloor(content, floorId);
     } catch (e, st) {
       Noticing.showErrorDialog(context, e,
           trace: st, title: S.of(context).reply_failed);
@@ -186,7 +186,7 @@ class OTEditor {
     ProgressFuture progressDialog =
         showProgressDialog(loadingText: S.of(context).report, context: context);
     try {
-      await OpenTreeHoleRepository.getInstance().reportPost(floorId, content);
+      await ForumRepository.getInstance().reportPost(floorId, content);
     } catch (error, st) {
       Noticing.showErrorDialog(context, error,
           trace: st, title: S.of(context).report_failed);
@@ -284,7 +284,7 @@ class OTEditor {
         loadingText: S.of(context).uploading_image, context: context);
     try {
       String? url =
-          await OpenTreeHoleRepository.getInstance().uploadImage(File(file));
+          await ForumRepository.getInstance().uploadImage(File(file));
       if (url != null) controller.text += "![]($url)";
       // "showAnim: true" makes it crash. Don't know the reason.
       progressDialog.dismiss(showAnim: false);

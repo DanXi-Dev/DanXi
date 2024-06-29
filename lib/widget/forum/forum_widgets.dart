@@ -382,7 +382,7 @@ class OTFloorWidget extends StatelessWidget {
     void defaultOnImageTap(String? url, Object heroTag) {
       smartNavigatorPush(context, '/image/detail', arguments: {
         'preview_url': url,
-        'hd_url': OpenTreeHoleRepository.getInstance()
+        'hd_url': ForumRepository.getInstance()
             .extractHighDefinitionImageUrl(url!),
         'hero_tag': heroTag
       });
@@ -582,8 +582,8 @@ class OTMentionPreviewWidgetState extends State<OTMentionPreviewWidget> {
     if (isShowingPreview) {
       return OTFloorMentionWidget(
         future: widget.type == OTMentionType.FLOOR
-            ? OpenTreeHoleRepository.getInstance().loadSpecificFloor(widget.id)
-            : OpenTreeHoleRepository.getInstance()
+            ? ForumRepository.getInstance().loadSpecificFloor(widget.id)
+            : ForumRepository.getInstance()
                 .loadSpecificHole(widget.id)
                 .then((value) => value?.floors?.first_floor),
         hasBackgroundImage: widget.hasBackgroundImage,
@@ -623,7 +623,7 @@ class OTFloorMentionWidget extends StatelessWidget {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
     try {
-      OTHole? hole = await OpenTreeHoleRepository.getInstance()
+      OTHole? hole = await ForumRepository.getInstance()
           .loadSpecificHole(floor.hole_id!);
       if (context.mounted) {
         smartNavigatorPush(context, "/bbs/postDetail",
@@ -841,7 +841,7 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                     setState(() {
                       floor.liked = !floor.liked!;
                     });
-                    floor = (await OpenTreeHoleRepository.getInstance()
+                    floor = (await ForumRepository.getInstance()
                         .likeFloor(
                             floor.floor_id!, (floor.liked ?? false) ? 1 : 0))!;
                     setState(() {});
@@ -866,7 +866,7 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                     setState(() {
                       floor.disliked = !floor.disliked!;
                     });
-                    floor = (await OpenTreeHoleRepository.getInstance()
+                    floor = (await ForumRepository.getInstance()
                         .likeFloor(floor.floor_id!,
                             (floor.disliked ?? false) ? -1 : 0))!;
                     setState(() {});
@@ -912,7 +912,7 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                               isConfirmDestructive: true) ==
                           true) {
                         try {
-                          await OpenTreeHoleRepository.getInstance()
+                          await ForumRepository.getInstance()
                               .deleteFloor(floor.floor_id!);
                           Noticing.showMaterialNotice(
                               context, S.of(context).request_success);
@@ -1029,7 +1029,7 @@ class OTMessageItem extends StatefulWidget {
   static Future<void> markMessageAsRead(OTMessage message) async {
     if (message.has_read == true) return;
     message.has_read = true;
-    await OpenTreeHoleRepository.getInstance().modifyMessage(message);
+    await ForumRepository.getInstance().modifyMessage(message);
   }
 
   static void dispatchMessageByCode(BuildContext context, String? code,

@@ -78,9 +78,9 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     _console.writeln(
         "Forum is user initialized: ${context.read<ForumProvider>().isUserInitialized}");
     _console.writeln(
-        "Forum is user admin: ${OpenTreeHoleRepository.getInstance().isAdmin}");
+        "Forum is user admin: ${ForumRepository.getInstance().isAdmin}");
     _console.writeln(
-        "Forum Push Token last uploaded on this device: ${OpenTreeHoleRepository.getInstance().lastUploadToken}");
+        "Forum Push Token last uploaded on this device: ${ForumRepository.getInstance().lastUploadToken}");
     _console.writeln(
         "Forum Token stored: ${context.read<SettingsProvider>().forumToken}");
 
@@ -137,14 +137,14 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   }
 
   Future<void> changePassword() async {
-    if (!OpenTreeHoleRepository.getInstance().isAdmin) return;
+    if (!ForumRepository.getInstance().isAdmin) return;
     String? email = await Noticing.showInputDialog(context, "Input email");
     if (!mounted) return;
     String? password =
         await Noticing.showInputDialog(context, "Input password");
     if ((email ?? "").isEmpty || (password ?? "").isEmpty) return;
 
-    int? result = await OpenTreeHoleRepository.getInstance()
+    int? result = await ForumRepository.getInstance()
         .adminChangePassword(email!, password!);
     if (result != null && result < 300 && mounted) {
       Noticing.showModalNotice(context,
@@ -201,7 +201,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   }
 
   Future<void> sendMessage() async {
-    if (!OpenTreeHoleRepository.getInstance().isAdmin) return;
+    if (!ForumRepository.getInstance().isAdmin) return;
     String? message = await Noticing.showInputDialog(context, "Input Message");
     if (!mounted) return;
     String? ids = await Noticing.showInputDialog(context, "Input Id List",
@@ -211,7 +211,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     final idList = (jsonDecode("[$ids]") as List<dynamic>)
         .map<int>((e) => e as int)
         .toList(growable: false);
-    int? result = await OpenTreeHoleRepository.getInstance()
+    int? result = await ForumRepository.getInstance()
         .adminSendMessage(message!, idList);
     if (result != null && result < 300 && mounted) {
       Noticing.showModalNotice(context,
@@ -232,7 +232,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
 
   Future<void> deleteAllPushToken() async {
     try {
-      final ret = await OpenTreeHoleRepository.getInstance()
+      final ret = await ForumRepository.getInstance()
           .deleteAllPushNotificationToken();
       Noticing.showNotice(context, "Status code $ret");
     } catch (e) {

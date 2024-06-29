@@ -71,7 +71,7 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
               child: PlatformElevatedButton(
                 padding: const EdgeInsets.all(20.0),
                 onPressed: () async {
-                  questions = await OpenTreeHoleRepository.getInstance()
+                  questions = await ForumRepository.getInstance()
                       .getPostRegisterQuestions();
                   if (questions != null) {
                     indexes =
@@ -115,7 +115,7 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
             onPressed: () {
               widget.successCallback();
             },
-            child: Text(S.of(context).enter_treehole),
+            child: Text(S.of(context).enter_forum),
           );
 
     final text = hasErrors
@@ -182,7 +182,7 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
       return;
     } else {
       final errorList =
-          await OpenTreeHoleRepository.getInstance().submitAnswers(answers!);
+          await ForumRepository.getInstance().submitAnswers(answers!);
 
       // Have trouble submitting
       if (errorList == null) {

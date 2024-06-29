@@ -63,7 +63,7 @@ class OTTagSelectorState extends State<OTTagSelector> {
             ),
           ),
           findSuggestions: (String filter) async {
-            _allTags ??= await OpenTreeHoleRepository.getInstance().loadTags();
+            _allTags ??= await ForumRepository.getInstance().loadTags();
             return _allTags!
                 .where((value) =>
                     value.name!.toLowerCase().contains(filter.toLowerCase()))

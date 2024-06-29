@@ -58,17 +58,17 @@ class Constant {
   /// The default user agent used by the app.
   ///
   /// Note that this is not the same as the user agent used by the WebView, or the
-  /// forum's [Dio]. Those two are set by WebView and [OpenTreeHoleRepository].
+  /// forum's [Dio]. Those two are set by WebView and [ForumRepository].
   static const String DEFAULT_USER_AGENT =
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36";
 
   static const String APPSTORE_APPID = '1568629997';
 
   /// A link to the "forget password" page of FDUHole.
-  static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL =
+  static const String FORUM_FORGOT_PASSWORD_URL =
       "https://auth.fduhole.com/register?type=forget_password";
 
-  static const String OPEN_TREEHOLE_REGISTER_URL =
+  static const String FORUM_REGISTER_URL =
       "https://auth.fduhole.com/register";
 
   /// The default start date of a semester.
@@ -79,7 +79,7 @@ class Constant {
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
   static const String UIS_HOST = "uis.fudan.edu.cn";
 
-  /// The default URLs of [OpenTreeHoleRepository] and [CurriculumBoardHoleRepository].
+  /// The default URLs of [ForumRepository] and [CurriculumBoardHoleRepository].
   ///
   static const String FORUM_BASE_URL_LEGACY = "https://www.fduhole.com/api";
   static const String FORUM_BASE_URL = "https://fduhole-admin.fduhole.com/api";
@@ -96,7 +96,7 @@ class Constant {
   /// Client version descriptor.
   ///
   /// It is used to identify the client in the HTTP request header.
-  /// Currently, it is used in the [OpenTreeHoleRepository] to tell the server
+  /// Currently, it is used in the [ForumRepository] to tell the server
   /// about the client version.
   static String get version {
     if (PlatformX.isWeb) {

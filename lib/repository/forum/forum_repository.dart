@@ -44,7 +44,7 @@ import 'package:dio/dio.dart';
 
 import 'package:dan_xi/model/forum/history.dart';
 
-/// The repository for OpenTreeHole.
+/// The repository for forum.
 ///
 /// # State
 /// During to some history reasons, this repository's state can be complex.
@@ -52,10 +52,10 @@ import 'package:dan_xi/model/forum/history.dart';
 ///
 /// All states have been moved to [ForumProvider], which is a [ChangeNotifier];
 /// any field in this class should be considered as temporary variables, e.g. caches.
-class OpenTreeHoleRepository extends BaseRepositoryWithDio {
-  static final _instance = OpenTreeHoleRepository._();
+class ForumRepository extends BaseRepositoryWithDio {
+  static final _instance = ForumRepository._();
 
-  factory OpenTreeHoleRepository.getInstance() => _instance;
+  factory ForumRepository.getInstance() => _instance;
 
   static final String _BASE_URL = SettingsProvider.getInstance().forumBaseUrl;
   static final String _BASE_AUTH_URL =
@@ -124,7 +124,7 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
     _floorCache.remove(floor_id);
   }
 
-  OpenTreeHoleRepository._() {
+  ForumRepository._() {
     // Override the options set in parent class.
     dio.options = BaseOptions(
       receiveDataWhenStatusError: true,
@@ -156,9 +156,9 @@ class OpenTreeHoleRepository extends BaseRepositoryWithDio {
 
   /// A full initialization of the user data.
   ///
-  /// It loads the token and user info which are shared across treehole and danke.
+  /// It loads the token and user info which are shared across forum and danke.
   ///
-  /// It is used to provide user data for sections apart from treehole (specifically danke for now).
+  /// It is used to provide user data for sections apart from forum (specifically danke for now).
   Future<void> initializeUser() async {
     initializeToken();
     if (provider.userInfo == null) await getUserProfile(forceUpdate: true);

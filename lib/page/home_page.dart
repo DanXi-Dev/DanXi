@@ -75,7 +75,7 @@ void sendFduholeTokenToWatch(String? token) {
 
 GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
 GlobalKey<State<SettingsSubpage>> settingsPageKey = GlobalKey();
-GlobalKey<TreeHoleSubpageState> forumPageKey = GlobalKey();
+GlobalKey<ForumSubpageState> forumPageKey = GlobalKey();
 GlobalKey<DankeSubPageState> dankePageKey = GlobalKey();
 GlobalKey<HomeSubpageState> dashboardPageKey = GlobalKey();
 GlobalKey<TimetableSubPageState> timetablePageKey = GlobalKey();
@@ -137,7 +137,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
         HomeSubpage(key: dashboardPageKey),
       if (!SettingsProvider.getInstance().hideHole)
-        TreeHoleSubpage(key: forumPageKey),
+        ForumSubpage(key: forumPageKey),
       // Don't show Timetable in visitor mode
       DankeSubPage(key: dankePageKey),
       if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
@@ -254,7 +254,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void didHaveMemoryPressure() {
     super.didHaveMemoryPressure();
-    OpenTreeHoleRepository.getInstance().reduceFloorCache();
+    ForumRepository.getInstance().reduceFloorCache();
   }
 
   @override
@@ -377,12 +377,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // Throw an error if the user is not logged in
     if (!context.read<ForumProvider>().isUserInitialized) {
       try {
-        await OpenTreeHoleRepository.getInstance().initializeRepo();
+        await ForumRepository.getInstance().initializeRepo();
       } catch (ignored) {}
     }
     try {
       if (element == 'hole') {
-        final OTHole hole = (await OpenTreeHoleRepository.getInstance()
+        final OTHole hole = (await ForumRepository.getInstance()
             .loadSpecificHole(postId))!;
         if (mounted) {
           smartNavigatorPush(context, "/bbs/postDetail", arguments: {
@@ -390,9 +390,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           });
         }
       } else if (element == 'floor') {
-        final floor = (await OpenTreeHoleRepository.getInstance()
+        final floor = (await ForumRepository.getInstance()
             .loadSpecificFloor(postId))!;
-        final OTHole hole = (await OpenTreeHoleRepository.getInstance()
+        final OTHole hole = (await ForumRepository.getInstance()
             .loadSpecificHole(floor.hole_id!))!;
         if (mounted) {
           smartNavigatorPush(context, "/bbs/postDetail", arguments: {
@@ -437,7 +437,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (!context.read<ForumProvider>().isUserInitialized) {
       // Do a quick initialization and push
       try {
-        OpenTreeHoleRepository.getInstance().initializeToken();
+        ForumRepository.getInstance().initializeToken();
       } catch (_) {}
     }
     smartNavigatorPush(context, '/bbs/messages',
@@ -514,7 +514,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           break;
         case "upload_apns_token":
           try {
-            await OpenTreeHoleRepository.getInstance()
+            await ForumRepository.getInstance()
                 .updatePushNotificationToken(
                     call.arguments["token"],
                     await PlatformX.getUniqueDeviceId(),
@@ -561,7 +561,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 (params.commandArguments?.isNotEmpty ?? false)) {
               String regId = params.commandArguments![0];
               try {
-                await OpenTreeHoleRepository.getInstance()
+                await ForumRepository.getInstance()
                     .updatePushNotificationToken(
                         regId,
                         await PlatformX.getUniqueDeviceId(),

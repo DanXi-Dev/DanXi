@@ -127,7 +127,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   Future<List<OTFloor>?> _loadContent(int page) async {
     Future<List<OTFloor>?> loadPunishmentHistory(int page) async {
       if (page == 0) {
-        return (await OpenTreeHoleRepository.getInstance()
+        return (await ForumRepository.getInstance()
                 .getPunishmentHistory())
             ?.map((e) => e.floor!)
             .toList();
@@ -138,10 +138,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     }
 
     final results = switch (_renderModel) {
-      Normal(hole: var hole) => await OpenTreeHoleRepository.getInstance()
+      Normal(hole: var hole) => await ForumRepository.getInstance()
           .loadFloors(hole, startFloor: page * Constant.POST_COUNT_PER_PAGE),
       Search(keyword: var searchKeyword) =>
-        await OpenTreeHoleRepository.getInstance().loadSearchResults(
+        await ForumRepository.getInstance().loadSearchResults(
             searchKeyword,
             startFloor: _listViewController.length()),
       PunishmentHistory() => await loadPunishmentHistory(page),
@@ -183,7 +183,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
       // Update hole view count
       if (hole.hole_id != null) {
-        unawaited(OpenTreeHoleRepository.getInstance()
+        unawaited(ForumRepository.getInstance()
             .updateHoleViewCount(hole.hole_id!));
       }
     } else if (widget.arguments!.containsKey('searchKeyword')) {
@@ -422,7 +422,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   // Load all floors, in case we have to scroll to end or to a specific floor
   Future<void> _loadAllContent() async {
     // If we haven't loaded before, we need to load all floors.
-    final allFloors = await OpenTreeHoleRepository.getInstance()
+    final allFloors = await ForumRepository.getInstance()
         .loadFloors((_renderModel as Normal).hole, startFloor: 0, length: 0);
 
     if (allFloors == null) {
@@ -475,7 +475,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         final normalModel = _renderModel as Normal;
         if (normalModel.isFavored == null) return;
         setState(() => normalModel.isFavored = !normalModel.isFavored!);
-        await OpenTreeHoleRepository.getInstance()
+        await ForumRepository.getInstance()
             .setFavorite(
                 normalModel.isFavored!
                     ? SetStatusMode.ADD
@@ -519,7 +519,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         final normalModel = _renderModel as Normal;
         if (normalModel.isSubscribed == null) return;
         setState(() => normalModel.isSubscribed = !normalModel.isSubscribed!);
-        await OpenTreeHoleRepository.getInstance()
+        await ForumRepository.getInstance()
             .setSubscription(
                 normalModel.isSubscribed!
                     ? SetStatusMode.ADD
@@ -570,7 +570,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 context, "锁定或解锁树洞？",
                 confirmText: "锁定", cancelText: "解锁");
             if (lock != null) {
-              int? result = await OpenTreeHoleRepository.getInstance()
+              int? result = await ForumRepository.getInstance()
                   .adminLockHole(e.hole_id, lock);
               if (result != null && result < 300 && mounted) {
                 Noticing.showMaterialNotice(
@@ -589,9 +589,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 confirmText: "Hide", cancelText: "Unhide");
             if (hide != null) {
               int? result = hide
-                  ? await OpenTreeHoleRepository.getInstance()
+                  ? await ForumRepository.getInstance()
                       .adminDeleteHole(e.hole_id)
-                  : await OpenTreeHoleRepository.getInstance()
+                  : await ForumRepository.getInstance()
                       .adminUndeleteHole(e.hole_id);
               if (result != null && result < 300 && mounted) {
                 Noticing.showMaterialNotice(
@@ -609,7 +609,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 context, "标记或取消树洞敏感状态？",
                 confirmText: "标记敏感", cancelText: "取消敏感");
             if (sens != null) {
-              int? result = await OpenTreeHoleRepository.getInstance()
+              int? result = await ForumRepository.getInstance()
                   .adminSetAuditFloor(e.floor_id!, sens);
               if (result != null && result < 300 && mounted) {
                 Noticing.showMaterialNotice(
@@ -638,11 +638,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             } else {
               pinned.add(e.hole_id!);
             }
-            int? result = await OpenTreeHoleRepository.getInstance()
+            int? result = await ForumRepository.getInstance()
                 .adminModifyDivision(divisionId, null, null, pinned);
             if (result != null && result < 300) {
               // refresh the division's pinned holes
-              final _ = await OpenTreeHoleRepository.getInstance()
+              final _ = await ForumRepository.getInstance()
                   .loadSpecificDivision(divisionId, useCache: false);
               if (mounted) {
                 Noticing.showMaterialNotice(
@@ -660,7 +660,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             if (tag == null) {
               return; // Note: don't return if tag is empty string, because user may want to clear the special tag with this
             }
-            int? result = await OpenTreeHoleRepository.getInstance()
+            int? result = await ForumRepository.getInstance()
                 .adminAddSpecialTag(tag, e.floor_id);
             if (result != null && result < 300 && mounted) {
               Noticing.showMaterialNotice(
@@ -673,7 +673,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         PlatformContextMenuItem(
           onPressed: () async {
             final hole = (_renderModel as Normal).hole;
-            OTDivision selectedDivision = OpenTreeHoleRepository.getInstance()
+            OTDivision selectedDivision = ForumRepository.getInstance()
                 .getDivisions()
                 .firstWhere(
                     (element) => element.division_id == hole.division_id,
@@ -685,7 +685,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 Navigator.of(cxt).pop(newDivision);
               }
 
-              OpenTreeHoleRepository.getInstance()
+              ForumRepository.getInstance()
                   .getDivisions()
                   .forEach((value) {
                 list.add(ListTile(
@@ -708,7 +708,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                     ),
                     onPointerUp: (PointerUpEvent details) async {
                       if (context.read<ForumProvider>().isUserInitialized &&
-                          OpenTreeHoleRepository.getInstance()
+                          ForumRepository.getInstance()
                               .getDivisions()
                               .isNotEmpty) {
                         selectedDivision =
@@ -757,7 +757,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               ),
             );
             if (confirmChanged ?? false) {
-              int? result = await OpenTreeHoleRepository.getInstance()
+              int? result = await ForumRepository.getInstance()
                   .adminUpdateTagAndDivision(
                       newTagsList, hole.hole_id, selectedDivision.division_id);
               if (result != null && result < 300 && mounted) {
@@ -785,9 +785,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 context, e.hole_id, e.floor_id, e.content)) {
               Noticing.showMaterialNotice(
                   context, S.of(context).request_success);
-              OpenTreeHoleRepository.getInstance()
+              ForumRepository.getInstance()
                   .invalidateFloorCache(e.floor_id!);
-              final newFloor = await OpenTreeHoleRepository.getInstance()
+              final newFloor = await ForumRepository.getInstance()
                   .loadSpecificFloor(e.floor_id!);
               _listViewController.replaceDatumWith(e, newFloor!);
             }
@@ -860,7 +860,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         child: Text(S.of(menuContext).report),
       ),
 
-      if (OpenTreeHoleRepository.getInstance().isAdmin) ...[
+      if (ForumRepository.getInstance().isAdmin) ...[
         PlatformContextMenuItem(
           onPressed: () => showPlatformModalSheet(
               context: context,
@@ -913,7 +913,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   context, S.of(context).input_reason);
               await multiExecution(
                   _selectedFloors,
-                  (floor) async => await OpenTreeHoleRepository.getInstance()
+                  (floor) async => await ForumRepository.getInstance()
                       .adminDeleteFloor(floor.floor_id, reason));
             }
           },
@@ -930,7 +930,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             }
             await multiExecution(
                 _selectedFloors,
-                (floor) async => await OpenTreeHoleRepository.getInstance()
+                (floor) async => await ForumRepository.getInstance()
                     .adminAddSpecialTag(tag, floor.floor_id));
           },
           menuContext: menuContext,
@@ -945,7 +945,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             }
             await multiExecution(
                 _selectedFloors,
-                (floor) async => await OpenTreeHoleRepository.getInstance()
+                (floor) async => await ForumRepository.getInstance()
                     .adminFoldFloor(
                         reason.isEmpty ? [] : [reason], floor.floor_id));
           },
@@ -956,7 +956,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     }
 
     List<Widget> menu = [
-      if (OpenTreeHoleRepository.getInstance().isAdmin) ...[
+      if (ForumRepository.getInstance().isAdmin) ...[
         PlatformContextMenuItem(
           onPressed: () => showPlatformModalSheet(
               context: context,
@@ -989,15 +989,15 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     Future<List<ImageUrlInfo>?> loadPageImage(
         BuildContext pageContext, int pageIndex) async {
       List<OTFloor>? result = switch (_renderModel) {
-        Normal(hole: var hole) => await OpenTreeHoleRepository.getInstance()
+        Normal(hole: var hole) => await ForumRepository.getInstance()
             .loadFloors(hole,
                 startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
         Search(keyword: var searchKeyword) =>
-          await OpenTreeHoleRepository.getInstance().loadSearchResults(
+          await ForumRepository.getInstance().loadSearchResults(
               searchKeyword,
               startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
         PunishmentHistory() =>
-          (await OpenTreeHoleRepository.getInstance().getPunishmentHistory())
+          (await ForumRepository.getInstance().getPunishmentHistory())
               ?.map((e) => e.floor!)
               .toList(),
       };
@@ -1019,9 +1019,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       floor: floor,
       // Refresh single floor when modified or deleted
       onOperation: () async {
-        OpenTreeHoleRepository.getInstance()
+        ForumRepository.getInstance()
             .invalidateFloorCache(floor.floor_id!);
-        final newFloor = await OpenTreeHoleRepository.getInstance()
+        final newFloor = await ForumRepository.getInstance()
             .loadSpecificFloor(floor.floor_id!);
         _listViewController.replaceDatumWith(floor, newFloor!);
       },
@@ -1061,7 +1061,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   // Set the replyId to null when tapping on the first reply.
                   if (hole.floors?.first_floor?.floor_id != floor.floor_id) {
                     replyId = floor.floor_id;
-                    OpenTreeHoleRepository.getInstance().cacheFloor(floor);
+                    ForumRepository.getInstance().cacheFloor(floor);
                   }
                   if (await OTEditor.createNewReply(
                       context, hole.hole_id, replyId)) {
@@ -1077,7 +1077,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         final int length = _listViewController.length();
         smartNavigatorPush(context, '/image/detail', arguments: {
           'preview_url': url,
-          'hd_url': OpenTreeHoleRepository.getInstance()
+          'hd_url': ForumRepository.getInstance()
               .extractHighDefinitionImageUrl(url!),
           'hero_tag': heroTag,
           'image_list': extractAllImages(),
@@ -1127,7 +1127,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     final imageExp = RegExp(r'!\[.*?\]\((.*?)\)');
     return imageExp.allMatches(content).map((e) => ImageUrlInfo(
         e.group(1),
-        OpenTreeHoleRepository.getInstance()
+        ForumRepository.getInstance()
             .extractHighDefinitionImageUrl(e.group(1)!)));
   }
 
@@ -1174,14 +1174,14 @@ class Normal extends RenderModel {
   Future<bool> isHoleFavorite() async {
     if (isFavored != null) return isFavored!;
     final List<int>? favorites =
-        await (OpenTreeHoleRepository.getInstance().getFavoriteHoleId());
+        await (ForumRepository.getInstance().getFavoriteHoleId());
     return favorites!.any((elementId) => elementId == hole.hole_id);
   }
 
   Future<bool> isHoleSubscribed() async {
     if (isSubscribed != null) return isSubscribed!;
     final List<int>? subscriptions =
-        await (OpenTreeHoleRepository.getInstance().getSubscribedHoleId());
+        await (ForumRepository.getInstance().getSubscribedHoleId());
     return subscriptions!.any((elementId) => elementId == hole.hole_id);
   }
 }
