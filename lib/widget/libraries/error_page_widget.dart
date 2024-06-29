@@ -48,14 +48,14 @@ class ErrorPageWidget extends StatelessWidget {
     if (error == null) return locale.unknown_error;
     String errorType = error.toString();
 
-    if (error is DioError) {
+    if (error is DioException) {
       switch (error.type) {
-        case DioErrorType.connectTimeout:
-        case DioErrorType.sendTimeout:
-        case DioErrorType.receiveTimeout:
+        case DioExceptionType.connectionTimeout:
+        case DioExceptionType.sendTimeout:
+        case DioExceptionType.receiveTimeout:
           errorType = locale.connection_timeout;
           break;
-        case DioErrorType.response:
+        case DioExceptionType.badResponse:
           errorType = locale.response_error +
               (error.response?.statusCode?.toString() ?? locale.unknown_error);
           try {
@@ -67,10 +67,12 @@ class ErrorPageWidget extends StatelessWidget {
             errorType += "\n$message";
           } catch (_) {}
           break;
-        case DioErrorType.cancel:
+        case DioExceptionType.cancel:
           errorType = locale.connection_cancelled;
           break;
-        case DioErrorType.other:
+        case DioExceptionType.connectionError:
+        case DioExceptionType.badCertificate:
+        case DioExceptionType.unknown:
           return generateUserFriendlyDescription(locale, error.error);
       }
     } else if (error is StateError) {
@@ -107,7 +109,7 @@ class ErrorPageWidget extends StatelessWidget {
   static String generateErrorDetails(dynamic error, StackTrace? trace) {
     String errorInfo = error.toString();
     // DioError will insert its stack trace in the result of [toString] method.
-    if (trace != null && error is! DioError) {
+    if (trace != null && error is! DioException) {
       errorInfo += ("\n$trace");
     }
     return errorInfo;

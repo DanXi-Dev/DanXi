@@ -94,7 +94,7 @@ class ThemedSystemOverlay extends StatelessWidget {
     if (PlatformX.isAndroid) {
       // Copy from Flutter's [AnimatedPhysicalModel] widget.
       final bottomColor = ElevationOverlay.applySurfaceTint(
-          Theme.of(context).colorScheme.background,
+          Theme.of(context).colorScheme.surface,
           Theme.of(context).colorScheme.surfaceTint,
           3.0);
 

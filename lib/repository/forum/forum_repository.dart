@@ -31,6 +31,7 @@ import 'package:dan_xi/model/forum/quiz_question.dart';
 import 'package:dan_xi/model/forum/report.dart';
 import 'package:dan_xi/model/forum/tag.dart';
 import 'package:dan_xi/model/forum/user.dart';
+import 'package:dan_xi/model/forum/history.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -41,8 +42,6 @@ import 'package:dan_xi/util/forum/jwt_interceptor.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/dio.dart';
-
-import 'package:dan_xi/model/forum/history.dart';
 
 /// The repository for forum.
 ///
@@ -120,8 +119,8 @@ class ForumRepository extends BaseRepositoryWithDio {
     _floorCache.removeWhere((key, value) => key % factor == 0);
   }
 
-  void invalidateFloorCache(int floor_id){
-    _floorCache.remove(floor_id);
+  void invalidateFloorCache(int floorId) {
+    _floorCache.remove(floorId);
   }
 
   ForumRepository._() {

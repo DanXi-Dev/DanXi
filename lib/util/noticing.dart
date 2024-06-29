@@ -175,7 +175,7 @@ class Noticing {
                   style: isConfirmDestructive
                       ? ButtonStyle(
                           foregroundColor:
-                              MaterialStateProperty.all<Color>(Colors.red))
+                              WidgetStateProperty.all<Color>(Colors.red))
                       : null),
               child: PlatformText(confirmText ?? S.of(context).i_see),
               onPressed: () => Navigator.pop(context, controller.text)),
@@ -230,8 +230,7 @@ class Noticing {
                         style: isConfirmDestructive
                             ? ButtonStyle(
                                 foregroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Colors.red))
+                                    WidgetStateProperty.all<Color>(Colors.red))
                             : null),
                     child: PlatformText(confirmText ?? S.of(context).i_see),
                     onPressed: () => Navigator.pop(context, true)),

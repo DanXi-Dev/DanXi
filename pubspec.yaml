@@ -17,7 +17,7 @@ dependencies:
   dio_cookie_manager: ^2.0.0
   flutter_progress_dialog:
     git:
-      url: https://github.com/Boreas618/flutter_progress_dialog.git
+      url: https://github.com/w568w/flutter_progress_dialog.git
       ref: master
   xiao_mi_push_plugin:
     git:
@@ -42,7 +42,7 @@ dependencies:
   uni_links: ^0.5.1
   desktop_window: ^0.4.0
   http: ^1.0.0
-  dio: ^4.0.6
+  dio: ^5.4.3+1
   shared_preferences: ^2.0.15
   flutter_phoenix: ^1.0.0
   asn1lib: ^1.1.0
@@ -56,7 +56,7 @@ dependencies:
   open_file:
     git:
       url: https://github.com/crazecoder/open_file.git
-  dio_log: ^2.0.2
+  dio5_log: ^5.1.2
   json_serializable: ^6.2.0
   photo_view: ^0.14.0
   gal: ^2.1.2
@@ -96,7 +96,13 @@ dependencies:
   encrypt_shared_preferences: ^0.3.5
   device_identity: ^1.0.0
   tutorial_coach_mark: ^1.2.9
-
+  flutter_platform_widgets: ^7.0.0
+  intl: any
+  json_annotation: any
+  flutter_cache_manager: any
+  html: any
+  cookie_jar: any
+  ffi: any
 
 dependency_overrides:
   intl: ^0.18.1
@@ -108,10 +114,6 @@ dependency_overrides:
     git:
       url: https://github.com/singularity-s0/linkify.git
       ref: master
-
-  # Temporary override version for flutter_progress_dialog.
-  # Should be removed if the dependency is updated.
-  flutter_platform_widgets: ^6.0.2
 
 dev_dependencies:
   build_runner: ^2.1.2

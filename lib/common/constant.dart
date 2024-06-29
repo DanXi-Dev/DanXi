@@ -342,12 +342,12 @@ class Constant {
   static ThemeData lightTheme(bool isCupertino, MaterialColor color) {
     if (isCupertino) {
       Color toggleableActiveColor = const Color(0xFF007AFF);
-      var toggleableProperty = MaterialStateProperty.resolveWith<Color?>(
-          (Set<MaterialState> states) {
-        if (states.contains(MaterialState.disabled)) {
+      var toggleableProperty =
+          WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+        if (states.contains(WidgetState.disabled)) {
           return null;
         }
-        if (states.contains(MaterialState.selected)) {
+        if (states.contains(WidgetState.selected)) {
           return toggleableActiveColor;
         }
         return null;
@@ -359,7 +359,7 @@ class Constant {
             tertiary: const Color(0xFF007AFF),
             secondary: const Color(0xFF007AFF),
             primary: const Color(0xFF007AFF),
-            background: const Color.fromRGBO(242, 242, 247, 1)),
+            surface: const Color.fromRGBO(242, 242, 247, 1)),
         switchTheme: SwitchThemeData(
           thumbColor: toggleableProperty,
           trackColor: toggleableProperty,
@@ -397,12 +397,12 @@ class Constant {
   static ThemeData darkTheme(bool isCupertino, MaterialColor color) {
     if (isCupertino) {
       Color toggleableActiveColor = const Color(0xFF007AFF);
-      var toggleableProperty = MaterialStateProperty.resolveWith<Color?>(
-          (Set<MaterialState> states) {
-        if (states.contains(MaterialState.disabled)) {
+      var toggleableProperty =
+          WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+        if (states.contains(WidgetState.disabled)) {
           return null;
         }
-        if (states.contains(MaterialState.selected)) {
+        if (states.contains(WidgetState.selected)) {
           return toggleableActiveColor;
         }
         return null;
@@ -413,7 +413,7 @@ class Constant {
             tertiary: const Color(0xFF007AFF),
             secondary: const Color(0xFF007AFF),
             primary: const Color(0xFF007AFF),
-            background: Colors.black),
+            surface: Colors.black),
         indicatorColor: const Color(0xFF007AFF),
         switchTheme: SwitchThemeData(
           thumbColor: toggleableProperty,
