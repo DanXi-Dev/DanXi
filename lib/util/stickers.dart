@@ -16,22 +16,22 @@
  */
 
 enum Stickers {
-  danxi_angry,
-  danxi_call,
-  danxi_cate,
-  danxi_dying,
-  danxi_egg,
-  danxi_fright,
-  danxi_heart,
-  danxi_hug,
-  danxi_overwhelm,
-  danxi_roll,
-  danxi_roped,
-  danxi_sleep,
-  danxi_swim,
-  danxi_thrill,
-  danxi_touchFish,
-  danxi_twin;
+  dx_angry,
+  dx_call,
+  dx_cate,
+  dx_dying,
+  dx_egg,
+  dx_fright,
+  dx_heart,
+  dx_hug,
+  dx_overwhelm,
+  dx_roll,
+  dx_roped,
+  dx_sleep,
+  dx_swim,
+  dx_thrill,
+  dx_touchFish,
+  dx_twin;
 }
 
 String? getStickerAssetPath(String stickerName) {
