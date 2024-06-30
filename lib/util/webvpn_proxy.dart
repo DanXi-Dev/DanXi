@@ -21,7 +21,9 @@ import 'package:mutex/mutex.dart';
 class WebvpnProxy {
   static bool directLinkFailed = false;
 
-  static Map<String, String> vpnPrefix = {
+  static const String WEBVPN_LOGIN_URL = "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fwebvpn.fudan.edu.cn%2Flogin%3Fcas_login%3Dtrue";
+
+  static final Map<String, String> vpnPrefix = {
     "www.fduhole.com":
         "https://webvpn.fudan.edu.cn/https/77726476706e69737468656265737421e7e056d221347d5871048ce29b5a2e",
     "auth.fduhole.com":

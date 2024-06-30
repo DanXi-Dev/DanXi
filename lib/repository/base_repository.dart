@@ -46,9 +46,9 @@ abstract class BaseRepositoryWithDio {
       _dios[linkHost] = Dio();
       _dios[linkHost]!.options = BaseOptions(
           receiveDataWhenStatusError: true,
-          connectTimeout: const Duration(seconds: 5),
-          receiveTimeout: const Duration(seconds: 5),
-          sendTimeout: const Duration(seconds: 5));
+          connectTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 10),
+          sendTimeout: const Duration(seconds: 10));
       _dios[linkHost]!.interceptors.add(LimitedQueuedInterceptor.getInstance());
       _dios[linkHost]!.interceptors.add(UserAgentInterceptor(
           userAgent: SettingsProvider.getInstance().customUserAgent));
@@ -73,8 +73,7 @@ abstract class BaseRepositoryWithDio {
     }
   }
 
-  Future<T> requestWithProxy<T>(
-      Dio dio, String path, RequestType type,
+  Future<T> requestWithProxy<T>(Dio dio, String path, RequestType type,
       {Object? data, Options? options}) async {
     Future<Response<String>> Function(String) requestFunction = switch (type) {
       RequestType.Get => (p) => dio.get(p, data: data, options: options),
@@ -85,13 +84,17 @@ abstract class BaseRepositoryWithDio {
     };
 
     // Try direct link once
-    if (!directLinkFailed) {
+    if (!directLinkFailed || !SettingsProvider.getInstance().useProxy) {
       try {
         final response = await requestFunction(path);
         return jsonDecode(response.data!);
       } on DioException catch (e) {
         debugPrint(
             "Direct connextion failed, trying to connect through proxy: $e");
+        // Throw immediately if `useProxy` is false
+        if (!SettingsProvider.getInstance().useProxy) {
+          rethrow;
+        }
       } catch (e) {
         debugPrint("Connection failed with unknown exception: $e");
         rethrow;
@@ -101,26 +104,25 @@ abstract class BaseRepositoryWithDio {
     // Turn to the proxy
     directLinkFailed = true;
     String proxiedPath = WebvpnProxy.getProxiedUri(path);
-    try {
-      Response<dynamic> response = await requestFunction(proxiedPath);
+    Response<dynamic> response = await requestFunction(proxiedPath);
 
-      // If not redirected to login, then return
-      if (!response.realUri.toString()
-          .startsWith("https://webvpn.fudan.edu.cn/login")) {
-        return jsonDecode(response.data!);
-      }
-    } catch (e) {
-      debugPrint("$e");
+    // If not redirected to login, then return
+    if (!response.realUri
+        .toString()
+        .startsWith("https://webvpn.fudan.edu.cn/login")) {
+      return jsonDecode(response.data!);
     }
 
     // Login and retry
-    UISLoginTool.loginUIS(
-        dio,
-        "https://webvpn.fudan.edu.cn/login?cas_login=true",
-        cookieJar!,
-        StateProvider.personInfo.value);
-    final finalResponse = await requestFunction(proxiedPath);
-    return jsonDecode(finalResponse.data!);
+    await UISLoginTool.loginUIS(dio, WebvpnProxy.WEBVPN_LOGIN_URL, cookieJar!,
+        StateProvider.personInfo.value, false);
+    try{
+      response = await requestFunction(proxiedPath);
+    }catch(err){
+      debugPrint("DSHU: $err");
+    }
+
+    return jsonDecode(response.data!);
   }
 
   static final Map<String, IndependentCookieJar> _cookieJars = {};
