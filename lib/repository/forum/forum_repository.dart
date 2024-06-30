@@ -477,9 +477,8 @@ class ForumRepository extends BaseRepositoryWithDio {
   /// i.e. [provider.userInfo].
   Future<OTUser?> getUserProfile({bool forceUpdate = false}) async {
     if (provider.userInfo == null || forceUpdate) {
-      final Response<Map<String, dynamic>> response = await dio
-          .get("$_BASE_URL/users", options: Options(headers: _tokenHeader));
-      provider.userInfo = OTUser.fromJson(response.data!);
+      final Map<String, dynamic> response = await requestWithProxy(dio, "$_BASE_URL/users", RequestType.Get, options: Options(headers: _tokenHeader));
+      provider.userInfo = OTUser.fromJson(response);
       provider.userInfo?.favorites = null;
       provider.userInfo?.subscriptions = null;
     }

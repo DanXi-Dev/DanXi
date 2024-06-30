@@ -15,16 +15,26 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/repository/independent_cookie_jar.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
+import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dio/dio.dart';
 import 'package:dio5_log/interceptor/diox_log_interceptor.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 
+enum RequestType { Get, Post, Put, Delete, Head }
+
 abstract class BaseRepositoryWithDio {
+  static bool directLinkFailed = false;
+
   /// The host that the implementation works with.
   ///
   /// Should not contain scheme and/or path. e.g. www.jwc.fudan.edu.cn
@@ -36,9 +46,9 @@ abstract class BaseRepositoryWithDio {
       _dios[linkHost] = Dio();
       _dios[linkHost]!.options = BaseOptions(
           receiveDataWhenStatusError: true,
-          connectTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 10),
-          sendTimeout: const Duration(seconds: 10));
+          connectTimeout: const Duration(seconds: 5),
+          receiveTimeout: const Duration(seconds: 5),
+          sendTimeout: const Duration(seconds: 5));
       _dios[linkHost]!.interceptors.add(LimitedQueuedInterceptor.getInstance());
       _dios[linkHost]!.interceptors.add(UserAgentInterceptor(
           userAgent: SettingsProvider.getInstance().customUserAgent));
@@ -61,6 +71,56 @@ abstract class BaseRepositoryWithDio {
     for (IndependentCookieJar jar in _cookieJars.values) {
       await jar.deleteAll();
     }
+  }
+
+  Future<T> requestWithProxy<T>(
+      Dio dio, String path, RequestType type,
+      {Object? data, Options? options}) async {
+    Future<Response<String>> Function(String) requestFunction = switch (type) {
+      RequestType.Get => (p) => dio.get(p, data: data, options: options),
+      RequestType.Post => (p) => dio.post(p, data: data, options: options),
+      RequestType.Put => (p) => dio.put(p, data: data, options: options),
+      RequestType.Delete => (p) => dio.delete(p, data: data, options: options),
+      RequestType.Head => (p) => dio.head(p, data: data, options: options),
+    };
+
+    // Try direct link once
+    if (!directLinkFailed) {
+      try {
+        final response = await requestFunction(path);
+        return jsonDecode(response.data!);
+      } on DioException catch (e) {
+        debugPrint(
+            "Direct connextion failed, trying to connect through proxy: $e");
+      } catch (e) {
+        debugPrint("Connection failed with unknown exception: $e");
+        rethrow;
+      }
+    }
+
+    // Turn to the proxy
+    directLinkFailed = true;
+    String proxiedPath = WebvpnProxy.getProxiedUri(path);
+    try {
+      Response<dynamic> response = await requestFunction(proxiedPath);
+
+      // If not redirected to login, then return
+      if (!response.realUri.toString()
+          .startsWith("https://webvpn.fudan.edu.cn/login")) {
+        return jsonDecode(response.data!);
+      }
+    } catch (e) {
+      debugPrint("$e");
+    }
+
+    // Login and retry
+    UISLoginTool.loginUIS(
+        dio,
+        "https://webvpn.fudan.edu.cn/login?cas_login=true",
+        cookieJar!,
+        StateProvider.personInfo.value);
+    final finalResponse = await requestFunction(proxiedPath);
+    return jsonDecode(finalResponse.data!);
   }
 
   static final Map<String, IndependentCookieJar> _cookieJars = {};

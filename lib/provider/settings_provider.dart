@@ -83,6 +83,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_AUTH_BASE_URL = "auth_base_url";
   static const String KEY_IMAGE_BASE_URL = "image_base_url";
   static const String KEY_DANKE_BASE_URL = "danke_base_url";
+  static const String KEY_USE_PROXY = "use_proxy";
 
   SettingsProvider._();
 
@@ -720,6 +721,18 @@ class SettingsProvider with ChangeNotifier {
 
   set isMarkdownRenderingEnabled(bool value) {
     preferences!.setBool(KEY_MARKDOWN_ENABLED, value);
+    notifyListeners();
+  }
+
+  bool get useProxy{
+    if (preferences!.containsKey(KEY_USE_PROXY)) {
+      return preferences!.getBool(KEY_USE_PROXY)!;
+    }
+    return true;
+  }
+
+  set useProxy(bool value){
+    preferences!.setBool(KEY_USE_PROXY, value);
     notifyListeners();
   }
 }
