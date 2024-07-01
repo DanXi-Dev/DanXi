@@ -19,10 +19,8 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/widget/libraries/chip_widgets.dart';
-import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:flutter/material.dart';
 
-List<String>? overallWord, contentWord, workloadWord, assessmentWord;
 const List<Color> wordColor = [
   Colors.red,
   Colors.orange,

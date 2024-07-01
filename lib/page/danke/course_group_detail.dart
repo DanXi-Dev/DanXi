@@ -327,6 +327,9 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   }
 
   Widget _buildHead(BuildContext context) {
+    final overallWord =
+        S.of(context).curriculum_ratings_overall_words.split(';');
+
     var wildCard = S.of(context).all;
     var teacherList = [
       FilterTag(wildCard, "*"),
@@ -376,7 +379,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                     ),
                     averageOverallLevel >= 0
                         ? Text(
-                            overallWord![averageOverallLevel],
+                            overallWord[averageOverallLevel],
                             style: TextStyle(
                                 color: wordColor[averageOverallLevel],
                                 fontSize: 15),

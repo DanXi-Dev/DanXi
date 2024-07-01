@@ -332,6 +332,15 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
       teacherFilterNotifier.value = selectedCourse.teachers!;
     }
 
+    final overallWord =
+        S.of(context).curriculum_ratings_overall_words.split(';');
+    final contentWord =
+        S.of(context).curriculum_ratings_content_words.split(';');
+    final workloadWord =
+        S.of(context).curriculum_ratings_workload_words.split(';');
+    final assessmentWord =
+        S.of(context).curriculum_ratings_assessment_words.split(';');
+
     return ChangeNotifierProvider(
         create: (_) => review.grade.clone(),
         child: SingleChildScrollView(
@@ -444,7 +453,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                             )),
                     Consumer<CourseGrade>(
                         builder: (ctx, grade, _) => RatingTextWidget(
-                            words: overallWord!, rating: grade.overall ?? 0)),
+                            words: overallWord, rating: grade.overall ?? 0)),
                     Center(
                         child: Text(S.of(context).curriculum_ratings_content)),
                     Builder(
@@ -459,7 +468,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                             })),
                     Consumer<CourseGrade>(
                         builder: (ctx, grade, _) => RatingTextWidget(
-                            words: contentWord!, rating: grade.content ?? 0)),
+                            words: contentWord, rating: grade.content ?? 0)),
                     Center(
                         child: Text(S.of(context).curriculum_ratings_workload)),
                     Builder(
@@ -475,7 +484,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                             )),
                     Consumer<CourseGrade>(
                         builder: (ctx, grade, _) => RatingTextWidget(
-                            words: workloadWord!, rating: grade.workload ?? 0)),
+                            words: workloadWord, rating: grade.workload ?? 0)),
                     Center(
                         child:
                             Text(S.of(context).curriculum_ratings_assessment)),
@@ -492,7 +501,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                             )),
                     Consumer<CourseGrade>(
                         builder: (ctx, grade, _) => RatingTextWidget(
-                            words: assessmentWord!,
+                            words: assessmentWord,
                             rating: grade.assessment ?? 0)),
                   ],
                 ),
