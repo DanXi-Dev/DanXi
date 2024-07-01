@@ -22,7 +22,6 @@ import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/model/forum/message.dart';
 import 'package:dan_xi/model/forum/report.dart';
 import 'package:dan_xi/page/forum/hole_detail.dart';
-import 'package:dan_xi/page/forum/hole_editor.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
@@ -133,20 +132,19 @@ class OTHoleWidget extends StatelessWidget {
               title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        alignment: WrapAlignment.spaceBetween,
-                        runSpacing: 4,
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          generateTagWidgets(context, postElement,
-                              (String? tagName) {
+                          Expanded(
+                              child: generateTagWidgets(context, postElement,
+                                  (String? tagName) {
                             smartNavigatorPush(context, '/bbs/discussions',
                                 arguments: {"tagFilter": tagName},
                                 forcePushOnMainNavigator: true);
                           },
-                              context
-                                  .read<SettingsProvider>()
-                                  .useAccessibilityColoring),
+                                  context
+                                      .read<SettingsProvider>()
+                                      .useAccessibilityColoring)),
                           Row(
                             //mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -307,12 +305,11 @@ class OTFloorWidget extends StatelessWidget {
   /// Whether this widget is called as a result of [mention]
   final bool isInMention;
   final bool hasBackgroundImage;
-  final bool showBottomBar;
+  final bool showToolBars;
   final OTHole? parentHole;
   final int? index;
   final void Function()? onTap;
   final void Function()? onLongPress;
-  final Function()? onOperation;
   final ImageTapCallback? onTapImage;
   final String? searchKeyWord;
 
@@ -320,7 +317,7 @@ class OTFloorWidget extends StatelessWidget {
     super.key,
     required this.floor,
     this.isInMention = false,
-    this.showBottomBar = true,
+    this.showToolBars = true,
     this.index,
     this.onTap,
     this.onLongPress,
@@ -328,7 +325,6 @@ class OTFloorWidget extends StatelessWidget {
     required this.hasBackgroundImage,
     this.onTapImage,
     this.searchKeyWord,
-    this.onOperation,
   });
 
   @override
@@ -391,6 +387,7 @@ class OTFloorWidget extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(2, 4, 2, 4),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
@@ -438,6 +435,9 @@ class OTFloorWidget extends StatelessWidget {
                       ],
                     ],
                   ),
+                  if(showToolBars && !floor.deleted!)
+                  OTFloorToolBar(
+                      floor: floor, index: index, onClickMore: onLongPress)
                 ],
               ),
             ),
@@ -461,9 +461,10 @@ class OTFloorWidget extends StatelessWidget {
                         onLinkTap,
                         onTapImage ?? defaultOnImageTap,
                         hasBackgroundImage)),
-            if (showBottomBar && !floor.deleted!)
-              OTFloorWidgetBottomBar(
-                  floor: floor, index: index, onOperation: onOperation),
+            if (showToolBars && !floor.deleted!) ...[
+              const SizedBox(height: 5),
+              OTFloorWidgetBottomBar(floor: floor, index: index),
+            ]
           ],
         ),
       ),
@@ -562,7 +563,7 @@ class OTMentionPreviewWidgetState extends State<OTMentionPreviewWidget> {
         floor: OTFloor.special(
             S.of(context).quote, S.of(context).tap_to_show_preview),
         isInMention: true,
-        showBottomBar: widget.showBottomBar,
+        showToolBars: widget.showBottomBar,
         onTap: () => setState(() => isShowingPreview = true),
       );
     }
@@ -637,7 +638,7 @@ class OTFloorMentionWidget extends StatelessWidget {
                   child: OTFloorWidget(
                     hasBackgroundImage: false,
                     floor: floor,
-                    showBottomBar: false,
+                    showToolBars: false,
                   ),
                 ),
               ),
@@ -704,7 +705,7 @@ class OTFloorMentionWidget extends StatelessWidget {
             hasBackgroundImage: hasBackgroundImage,
             floor: snapshot.data!,
             isInMention: true,
-            showBottomBar: showBottomBar,
+            showToolBars: showBottomBar,
             onTap: () => showFloorDetail(context, snapshot.data!),
           );
         },
@@ -713,57 +714,38 @@ class OTFloorMentionWidget extends StatelessWidget {
           floor: OTFloor.special(
               S.of(context).fatal_error, S.of(context).unable_to_find_quote),
           isInMention: true,
-          showBottomBar: showBottomBar,
+          showToolBars: showBottomBar,
         ),
         loadingBuilder: OTFloorWidget(
           hasBackgroundImage: hasBackgroundImage,
           floor: OTFloor.special(S.of(context).loading, S.of(context).loading),
           isInMention: true,
-          showBottomBar: showBottomBar,
+          showToolBars: showBottomBar,
         ));
   }
 }
 
-class OTFloorWidgetBottomBar extends StatefulWidget {
+class OTFloorWidgetBottomBar extends StatelessWidget {
   final OTFloor floor;
   final int? index;
-  // The callback when modify or delete is invoked
-  final Function()? onOperation;
+  final TextStyle? prebuiltStyle;
 
   const OTFloorWidgetBottomBar(
-      {super.key, required this.floor, required this.index, this.onOperation});
-
-  @override
-  OTFloorWidgetBottomBarState createState() => OTFloorWidgetBottomBarState();
-}
-
-class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
-  late OTFloor floor;
-  TextStyle? prebuiltStyle;
-  ActionItem? selectedActionItem;
-
-  @override
-  void initState() {
-    super.initState();
-    floor = widget.floor;
-  }
-
-  @override
-  void didUpdateWidget(OTFloorWidgetBottomBar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    floor = widget.floor;
-  }
+      {super.key,
+      required this.floor,
+      required this.index,
+      this.prebuiltStyle});
 
   @override
   Widget build(BuildContext context) {
-    prebuiltStyle ??=
+    final style = prebuiltStyle ??
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
     return DefaultTextStyle(
-      style: prebuiltStyle!,
+      style: style,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          if (widget.index == null)
+          if (index == null)
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -778,12 +760,12 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                 ),
               ],
             ),
-          if (widget.index != null)
+          if (index != null)
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  "${widget.index! + 1}F",
+                  "${index! + 1}F",
                   style: TextStyle(
                       color: Theme.of(context).hintColor,
                       fontSize: 12,
@@ -805,160 +787,106 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                 context, DateTime.tryParse(floor.time_created ?? "")),
             style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
           ),
-          /*
-          Row(
-            children: [
-              OTFloorWidgetBottomBarButton(
-                text: "${floor.like}",
-                onTap: () async {
-                  try {
-                    floor.liked ??= false;
-                    setState(() {
-                      floor.liked = !floor.liked!;
-                    });
-                    floor = (await ForumRepository.getInstance().likeFloor(
-                        floor.floor_id!, (floor.liked ?? false) ? 1 : 0))!;
-                    setState(() {});
-                  } catch (e, st) {
-                    Noticing.showErrorDialog(context, e, trace: st);
-                  }
-                },
-                icon: Icon(
-                  (floor.liked ?? false)
-                      ? CupertinoIcons.hand_thumbsup_fill
-                      : CupertinoIcons.hand_thumbsup,
-                  color: Theme.of(context).textTheme.bodyLarge!.color,
-                  size: 16,
-                ),
-              ),
-              const SizedBox(width: 5),
-              OTFloorWidgetBottomBarButton(
-                text: "${floor.dislike}",
-                onTap: () async {
-                  try {
-                    floor.disliked ??= false;
-                    setState(() {
-                      floor.disliked = !floor.disliked!;
-                    });
-                    floor = (await ForumRepository.getInstance().likeFloor(
-                        floor.floor_id!, (floor.disliked ?? false) ? -1 : 0))!;
-                    setState(() {});
-                  } catch (e, st) {
-                    Noticing.showErrorDialog(context, e, trace: st);
-                  }
-                },
-                icon: Icon(
-                  (floor.disliked ?? false)
-                      ? CupertinoIcons.hand_thumbsdown_fill
-                      : CupertinoIcons.hand_thumbsdown,
-                  color: Theme.of(context).textTheme.bodyLarge!.color,
-                  size: 16,
-                ),
-              ),
-              PopupMenuButton<ActionItem>(
-                icon: Icon(
-                  CupertinoIcons.ellipsis_circle,
-                  color: Theme.of(context).textTheme.bodyLarge!.color,
-                  size: 16,
-                ),
-                initialValue: selectedActionItem,
-                // Callback that sets the selected popup menu item.
-                onSelected: (ActionItem item) async {
-                  setState(() {
-                    selectedActionItem = item;
-                  });
-                  switch (item) {
-                    case ActionItem.Report:
-                      if (await OTEditor.reportPost(context, floor.floor_id)) {
-                        if (!context.mounted) return;
-                        Noticing.showMaterialNotice(
-                            context, S.of(context).report_success);
-                      }
-                      break;
-                    case ActionItem.Delete:
-                      if (!context.mounted) return;
-                      if (await Noticing.showConfirmationDialog(
-                              context,
-                              S.of(context).about_to_delete_floor(
-                                  floor.floor_id ?? "null"),
-                              title: S.of(context).are_you_sure,
-                              isConfirmDestructive: true) ==
-                          true) {
-                        try {
-                          await ForumRepository.getInstance()
-                              .deleteFloor(floor.floor_id!);
-                          Noticing.showMaterialNotice(
-                              context, S.of(context).request_success);
-                          if (widget.onOperation != null) {
-                            widget.onOperation!();
-                          }
-                        } catch (e, st) {
-                          if (!context.mounted) return;
-                          Noticing.showErrorDialog(context, e, trace: st);
-                        }
-                      }
-                      break;
-                    case ActionItem.Modify:
-                      if (!context.mounted) return;
-                      if (await OTEditor.modifyReply(context, floor.hole_id,
-                          floor.floor_id, floor.content)) {
-                        if (!context.mounted) return;
-                        Noticing.showMaterialNotice(
-                            context, S.of(context).request_success);
-                        if (widget.onOperation != null) {
-                          widget.onOperation!();
-                        }
-                      }
-                      break;
-                    default:
-                      break;
-                  }
-                },
-                itemBuilder: (BuildContext context) =>
-                    <PopupMenuEntry<ActionItem>>[
-                  if (floor.is_me == true && floor.deleted == false)
-                    PopupMenuItem<ActionItem>(
-                      value: ActionItem.Modify,
-                      child: OTFloorWidgetBottomBarButton(
-                        icon: Icon(
-                          CupertinoIcons.pencil,
-                          color: Theme.of(context).hintColor,
-                          size: 12,
-                        ),
-                        text: S.of(context).modify,
-                      ),
-                    ),
-                  if (floor.is_me == true && floor.deleted == false)
-                    PopupMenuItem<ActionItem>(
-                      value: ActionItem.Delete,
-                      child: OTFloorWidgetBottomBarButton(
-                        text: S.of(context).delete,
-                        icon: Icon(
-                          CupertinoIcons.trash,
-                          color: Theme.of(context).hintColor,
-                          size: 12,
-                        ),
-                      ),
-                    ),
-                  if (floor.is_me != true)
-                    PopupMenuItem<ActionItem>(
-                      value: ActionItem.Report,
-                      child: OTFloorWidgetBottomBarButton(
-                        text: S.of(context).report,
-                        icon: Icon(
-                          CupertinoIcons.exclamationmark_octagon,
-                          color: Theme.of(context).hintColor,
-                          size: 12,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ],
-          )
-          */
         ],
       ),
+    );
+  }
+}
+
+class OTFloorToolBar extends StatefulWidget {
+  final OTFloor floor;
+  final int? index;
+  // The callback when modify or delete is invoked
+  final Function()? onClickMore;
+
+  const OTFloorToolBar(
+      {super.key, required this.floor, required this.index, this.onClickMore});
+
+  @override
+  OTFloorToolBarState createState() => OTFloorToolBarState();
+}
+
+class OTFloorToolBarState extends State<OTFloorToolBar> {
+  late OTFloor floor;
+  TextStyle? prebuiltStyle;
+  ActionItem? selectedActionItem;
+
+  @override
+  void initState() {
+    super.initState();
+    floor = widget.floor;
+  }
+
+  @override
+  void didUpdateWidget(OTFloorToolBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    floor = widget.floor;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        OTFloorWidgetBottomBarButton(
+          text: "${floor.like}",
+          onTap: () async {
+            try {
+              floor.liked ??= false;
+              setState(() {
+                floor.liked = !floor.liked!;
+              });
+              floor = (await ForumRepository.getInstance()
+                  .likeFloor(floor.floor_id!, (floor.liked ?? false) ? 1 : 0))!;
+              setState(() {});
+            } catch (e, st) {
+              Noticing.showErrorDialog(context, e, trace: st);
+            }
+          },
+          icon: Icon(
+            (floor.liked ?? false)
+                ? CupertinoIcons.hand_thumbsup_fill
+                : CupertinoIcons.hand_thumbsup,
+            color: Theme.of(context).textTheme.bodyLarge!.color,
+            size: 14,
+          ),
+        ),
+        const SizedBox(width: 5),
+        OTFloorWidgetBottomBarButton(
+          text: "${floor.dislike}",
+          onTap: () async {
+            try {
+              floor.disliked ??= false;
+              setState(() {
+                floor.disliked = !floor.disliked!;
+              });
+              floor = (await ForumRepository.getInstance().likeFloor(
+                  floor.floor_id!, (floor.disliked ?? false) ? -1 : 0))!;
+              setState(() {});
+            } catch (e, st) {
+              Noticing.showErrorDialog(context, e, trace: st);
+            }
+          },
+          icon: Icon(
+            (floor.disliked ?? false)
+                ? CupertinoIcons.hand_thumbsdown_fill
+                : CupertinoIcons.hand_thumbsdown,
+            color: Theme.of(context).textTheme.bodyLarge!.color,
+            size: 14,
+          ),
+        ),
+        const SizedBox(width: 5),
+        InkWell(
+          onTap: widget.onClickMore,
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: Icon(
+              CupertinoIcons.ellipsis_circle,
+              color: Theme.of(context).textTheme.bodyLarge!.color,
+              size: 14,
+            ),
+          ),
+        )
+      ],
     );
   }
 }
@@ -976,7 +904,7 @@ class OTFloorWidgetBottomBarButton extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(4),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
