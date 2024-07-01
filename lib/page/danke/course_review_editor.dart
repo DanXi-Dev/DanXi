@@ -37,10 +37,10 @@ import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 
 typedef PostInterceptor = Future<bool> Function(
     BuildContext context, CourseReviewEditorText? text);
@@ -426,7 +426,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                 textField,
                 const Divider(),
                 LayoutGrid(
-                  columnSizes: [auto, 1.fr, auto],
+                  columnSizes: [1.fr, auto, 1.fr],
                   rowSizes: const [auto, auto, auto, auto],
                   children: [
                     Center(
