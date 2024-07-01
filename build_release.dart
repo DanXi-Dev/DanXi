@@ -30,7 +30,7 @@ String dartExecutable = 'dart';
 void main(List<String> arguments) async {
   var parser = ArgParser()
     ..addOption("target",
-        allowed: ['android', 'windows', 'aab'],
+        allowed: ['android', 'windows', 'aab', 'linux'],
         help: "The target to build for.",
         mandatory: true)
     ..addOption("versionCode",
@@ -88,6 +88,9 @@ void main(List<String> arguments) async {
       break;
     case 'aab':
       await buildAppBundle(versionCode, gitHash);
+      break;
+    case 'linux':
+      await buildLinux(versionCode, gitHash);
       break;
   }
 }
@@ -169,5 +172,27 @@ Future<void> buildAppBundle(String? versionCode, String gitHash) async {
   File newFile = File('build/app/DanXi-$versionCode-release.android.aab');
   File sourceFile = File('build/app/outputs/bundle/release/app-release.aab');
   sourceFile.copySync(newFile.path);
+  print('Build success.');
+}
+
+Future<void> buildLinux(String? versionCode, String gitHash) async {
+  print('Build for Linux...');
+  await runFlutterProcess([
+    'build',
+    'linux',
+    '--release',
+    '--dart-define=GIT_HASH=$gitHash',
+  ]);
+
+  print('Clean old files...');
+  File oldFile = File('build/app/DanXi-$versionCode-release.linux-x64.zip');
+  if (oldFile.existsSync()) {
+    oldFile.deleteSync();
+  }
+  print('Compress file...');
+  var encoder = ZipFileEncoder();
+  File newFile = File('build/app/DanXi-$versionCode-release.linux-x64.zip');
+  Directory sourceDir = Directory('build/linux/x64/release/bundle');
+  encoder.zipDirectory(sourceDir, filename: newFile.path);
   print('Build success.');
 }
