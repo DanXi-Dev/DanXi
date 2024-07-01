@@ -17,7 +17,7 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/forum/tag.dart';
-import 'package:dan_xi/widget/libraries/round_chip.dart';
+import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:flutter/cupertino.dart';
 
 /// A wrapped container for [OTTag].

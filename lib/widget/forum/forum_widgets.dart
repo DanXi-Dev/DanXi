@@ -37,7 +37,7 @@ import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
-import 'package:dan_xi/widget/libraries/round_chip.dart';
+import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:dan_xi/widget/forum/render/base_render.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -68,34 +68,6 @@ void launchUrlWithNotice(BuildContext context, LinkableElement link) async {
   }
 }
 
-class OTLeadingTag extends StatelessWidget {
-  final Color color;
-  final String text;
-
-  const OTLeadingTag({super.key, required this.color, this.text = "DZ"});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      //height: 18,
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-          color: color.withOpacity(0.8),
-          borderRadius: const BorderRadius.all(Radius.circular(2.0))),
-      child: Text(
-        text,
-        style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: color.withOpacity(0.8).computeLuminance() <= 0.5
-                ? Colors.white
-                : Colors.black,
-            fontSize: 12),
-      ),
-    );
-  }
-}
-
 /// Turn tags into Widgets
 Widget generateTagWidgets(BuildContext context, OTHole? e,
     void Function(String?) onTap, bool useAccessibilityColoring) {
@@ -103,7 +75,7 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
   List<Widget> tags = [];
   for (var element in e.tags!) {
     if (element.name == KEY_NO_TAG) continue;
-    tags.add(RoundChip(
+    tags.add(RectangularChip(
       onTap: () => onTap(element.name),
       label: Constant.withZwb(element.name),
       color: useAccessibilityColoring
@@ -181,32 +153,32 @@ class OTHoleWidget extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               if (isPinned)
-                                OTLeadingTag(
+                                LeadingChip(
                                   color: Theme.of(context).colorScheme.primary,
-                                  text: S.of(context).pinned,
+                                  label: S.of(context).pinned,
                                 ),
                               if (postElement.floors?.first_floor?.special_tag
                                       ?.isNotEmpty ==
                                   true) ...[
                                 const SizedBox(width: 4),
-                                OTLeadingTag(
+                                LeadingChip(
                                   color: Colors.red,
-                                  text: postElement
+                                  label: postElement
                                       .floors!.first_floor!.special_tag!,
                                 ),
                               ],
                               if (postElement.hidden == true) ...[
                                 const SizedBox(width: 4),
-                                OTLeadingTag(
+                                LeadingChip(
                                   color: Theme.of(context).colorScheme.primary,
-                                  text: S.of(context).hole_hidden,
+                                  label: S.of(context).hole_hidden,
                                 ),
                               ],
                               if (postElement.locked == true) ...[
                                 const SizedBox(width: 4),
-                                OTLeadingTag(
+                                LeadingChip(
                                   color: Theme.of(context).colorScheme.primary,
-                                  text: S.of(context).hole_locked,
+                                  label: S.of(context).hole_locked,
                                 )
                               ]
                             ],
@@ -355,13 +327,12 @@ class OTFloorWidget extends StatelessWidget {
     this.parentHole,
     required this.hasBackgroundImage,
     this.onTapImage,
-    this.searchKeyWord, this.onOperation,
+    this.searchKeyWord,
+    this.onOperation,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bool needGenerateTags = (index == 0);
-
     const int foldLimit = 500;
     const int showCharCount = 15;
     String? fullContent;
@@ -382,8 +353,8 @@ class OTFloorWidget extends StatelessWidget {
     void defaultOnImageTap(String? url, Object heroTag) {
       smartNavigatorPush(context, '/image/detail', arguments: {
         'preview_url': url,
-        'hd_url': ForumRepository.getInstance()
-            .extractHighDefinitionImageUrl(url!),
+        'hd_url':
+            ForumRepository.getInstance().extractHighDefinitionImageUrl(url!),
         'hero_tag': heroTag
       });
     }
@@ -411,20 +382,11 @@ class OTFloorWidget extends StatelessWidget {
     final cardChild = InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (needGenerateTags)
-              Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: generateTagWidgets(context, parentHole,
-                      (String? tagName) {
-                    smartNavigatorPush(context, '/bbs/discussions',
-                        arguments: {"tagFilter": tagName},
-                        forcePushOnMainNavigator: true);
-                  }, SettingsProvider.getInstance().useAccessibilityColoring)),
             Padding(
               padding: const EdgeInsets.fromLTRB(2, 4, 2, 4),
               child: Row(
@@ -438,7 +400,7 @@ class OTFloorWidget extends StatelessWidget {
                       const SizedBox(width: 8),
                       if (floor.anonyname ==
                           parentHole?.floors?.first_floor?.anonyname) ...[
-                        OTLeadingTag(color: nameColor),
+                        LeadingChip(color: nameColor),
                         const SizedBox(width: 4),
                       ],
                       Text(
@@ -449,36 +411,25 @@ class OTFloorWidget extends StatelessWidget {
                       const SizedBox(
                         width: 4,
                       ),
-                      Text(
-                        HumanDuration.tryFormat(context,
-                            DateTime.tryParse(floor.time_created ?? "")),
-                        style: TextStyle(
-                            color: Theme.of(context).hintColor, fontSize: 12),
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
                       if (floor.deleted == true) ...[
                         const SizedBox(width: 4),
-                        OTLeadingTag(
+                        LeadingChip(
                           color: Theme.of(context).colorScheme.primary,
-                          text: S.of(context).deleted,
+                          label: S.of(context).deleted,
                         ),
                       ],
                       if ((floor.modified ?? 0) > 0) ...[
                         const SizedBox(width: 4),
-                        OTLeadingTag(
+                        LeadingChip(
                           color: Theme.of(context).colorScheme.primary,
-                          text: S.of(context).modified,
+                          label: S.of(context).modified,
                         ),
                       ],
                       if (floor.special_tag?.isNotEmpty == true) ...[
                         const SizedBox(width: 4),
-                        OTLeadingTag(
+                        LeadingChip(
                           color: Colors.red,
-                          text: floor.special_tag!,
+                          label: floor.special_tag!,
                         ),
                       ],
                       // We will only show the hidden tag if this hole is hidden
@@ -487,13 +438,22 @@ class OTFloorWidget extends StatelessWidget {
                           floor.floor_id ==
                               parentHole?.floors?.first_floor?.floor_id) ...[
                         const SizedBox(width: 4),
-                        OTLeadingTag(
+                        LeadingChip(
                           color: Colors.red,
-                          text: S.of(context).hole_hidden,
+                          label: S.of(context).hole_hidden,
                         ),
                       ],
+                      // MOVE ME!!
+                      /*
+                      Text(
+                        HumanDuration.tryFormat(context,
+                            DateTime.tryParse(floor.time_created ?? "")),
+                        style: TextStyle(
+                            color: Theme.of(context).hintColor, fontSize: 12),
+                      )
+                      */
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -518,13 +478,14 @@ class OTFloorWidget extends StatelessWidget {
                         onTapImage ?? defaultOnImageTap,
                         hasBackgroundImage)),
             if (showBottomBar && !floor.deleted!)
-              OTFloorWidgetBottomBar(floor: floor, index: index, onOperation: onOperation),
+              OTFloorWidgetBottomBar(
+                  floor: floor, index: index, onOperation: onOperation),
           ],
         ),
       ),
     );
 
-    return GestureDetector(
+    final card = GestureDetector(
       onLongPress: onLongPress,
       child: Card(
         color: isInMention && PlatformX.isCupertino(context)
@@ -547,6 +508,28 @@ class OTFloorWidget extends StatelessWidget {
             : cardChild,
       ),
     );
+
+    // If first floor, we shall include the tags before the card
+    if (index == 0) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+              // Since [Card] has a margin on top of 8 units,
+              // Remove padding on buttom, in order to keep the tags appear vertically aligned to the center
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+              child: generateTagWidgets(context, parentHole, (String? tagName) {
+                smartNavigatorPush(context, '/bbs/discussions',
+                    arguments: {"tagFilter": tagName},
+                    forcePushOnMainNavigator: true);
+              }, SettingsProvider.getInstance().useAccessibilityColoring)),
+          card,
+        ],
+      );
+    } else {
+      return card;
+    }
   }
 }
 
@@ -623,8 +606,8 @@ class OTFloorMentionWidget extends StatelessWidget {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).loading, context: context);
     try {
-      OTHole? hole = await ForumRepository.getInstance()
-          .loadSpecificHole(floor.hole_id!);
+      OTHole? hole =
+          await ForumRepository.getInstance().loadSpecificHole(floor.hole_id!);
       if (context.mounted) {
         smartNavigatorPush(context, "/bbs/postDetail",
             arguments: {"post": hole, "locate": floor});
@@ -841,9 +824,8 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                     setState(() {
                       floor.liked = !floor.liked!;
                     });
-                    floor = (await ForumRepository.getInstance()
-                        .likeFloor(
-                            floor.floor_id!, (floor.liked ?? false) ? 1 : 0))!;
+                    floor = (await ForumRepository.getInstance().likeFloor(
+                        floor.floor_id!, (floor.liked ?? false) ? 1 : 0))!;
                     setState(() {});
                   } catch (e, st) {
                     Noticing.showErrorDialog(context, e, trace: st);
@@ -866,9 +848,8 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                     setState(() {
                       floor.disliked = !floor.disliked!;
                     });
-                    floor = (await ForumRepository.getInstance()
-                        .likeFloor(floor.floor_id!,
-                            (floor.disliked ?? false) ? -1 : 0))!;
+                    floor = (await ForumRepository.getInstance().likeFloor(
+                        floor.floor_id!, (floor.disliked ?? false) ? -1 : 0))!;
                     setState(() {});
                   } catch (e, st) {
                     Noticing.showErrorDialog(context, e, trace: st);
