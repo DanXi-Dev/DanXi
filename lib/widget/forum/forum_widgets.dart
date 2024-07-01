@@ -382,7 +382,7 @@ class OTFloorWidget extends StatelessWidget {
     final cardChild = InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -418,13 +418,6 @@ class OTFloorWidget extends StatelessWidget {
                           label: S.of(context).deleted,
                         ),
                       ],
-                      if ((floor.modified ?? 0) > 0) ...[
-                        const SizedBox(width: 4),
-                        LeadingChip(
-                          color: Theme.of(context).colorScheme.primary,
-                          label: S.of(context).modified,
-                        ),
-                      ],
                       if (floor.special_tag?.isNotEmpty == true) ...[
                         const SizedBox(width: 4),
                         LeadingChip(
@@ -443,15 +436,6 @@ class OTFloorWidget extends StatelessWidget {
                           label: S.of(context).hole_hidden,
                         ),
                       ],
-                      // MOVE ME!!
-                      /*
-                      Text(
-                        HumanDuration.tryFormat(context,
-                            DateTime.tryParse(floor.time_created ?? "")),
-                        style: TextStyle(
-                            color: Theme.of(context).hintColor, fontSize: 12),
-                      )
-                      */
                     ],
                   ),
                 ],
@@ -777,11 +761,10 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
     return DefaultTextStyle(
       style: prebuiltStyle!,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           if (widget.index == null)
-            Expanded(
-                child: Row(
+            Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
@@ -794,10 +777,9 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                       color: Theme.of(context).hintColor, fontSize: 10),
                 ),
               ],
-            )),
+            ),
           if (widget.index != null)
-            Expanded(
-                child: Row(
+            Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
@@ -813,7 +795,17 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
                       color: Theme.of(context).hintColor, fontSize: 10),
                 ),
               ],
-            )),
+            ),
+          if ((floor.modified ?? 0) > 0)
+            Text(S.of(context).modified,
+                style: TextStyle(
+                    color: Theme.of(context).hintColor, fontSize: 12)),
+          Text(
+            HumanDuration.tryFormat(
+                context, DateTime.tryParse(floor.time_created ?? "")),
+            style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
+          ),
+          /*
           Row(
             children: [
               OTFloorWidgetBottomBarButton(
@@ -964,6 +956,7 @@ class OTFloorWidgetBottomBarState extends State<OTFloorWidgetBottomBar> {
               ),
             ],
           )
+          */
         ],
       ),
     );
