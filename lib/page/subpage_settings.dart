@@ -31,22 +31,22 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/flutter_app.dart';
+import 'package:dan_xi/util/forum/clean_mode_filter.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/forum/clean_mode_filter.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/win32/auto_start.dart'
     if (dart.library.html) 'package:dan_xi/util/win32/auto_start_stub.dart';
 import 'package:dan_xi/widget/dialogs/swatch_picker_dialog.dart';
+import 'package:dan_xi/widget/forum/post_render.dart';
+import 'package:dan_xi/widget/forum/render/render_impl.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
-import 'package:dan_xi/widget/forum/post_render.dart';
-import 'package:dan_xi/widget/forum/render/render_impl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -996,23 +996,11 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         textScaleFactor: 1.1,
                       ),
                       Divider(color: originalDividerColor),
-                      Text.rich(TextSpan(children: [
-                        TextSpan(
-                          style: defaultText,
-                          text: S.of(context).acknowledgements_1,
-                        ),
-                        TextSpan(
-                            style: linkText,
-                            text: S.of(context).acknowledgement_name_1,
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () => BrowserUtil.openUrl(
-                                  S.of(context).acknowledgement_link_1,
-                                  context)),
-                        TextSpan(
-                          style: defaultText,
-                          text: S.of(context).acknowledgements_2,
-                        ),
-                      ])),
+                      PostRenderWidget(
+                        render: kMarkdownRenderFactory(null),
+                        content: S.of(context).acknowledgements_markdown,
+                        hasBackgroundImage: false,
+                      ),
 
                       const SizedBox(height: 16),
 
