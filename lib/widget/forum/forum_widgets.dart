@@ -194,6 +194,10 @@ class OTHoleWidget extends StatelessWidget {
                             title: Text(S.of(context).folded, style: infoStyle),
                             children: [postContentWidget])
                         : postContentWidget,
+                    const SizedBox(height: 4),
+                    if (!isFolded &&
+              postElement.floors?.last_floor != postElement.floors?.first_floor)
+            _buildCommentView(context, postElement)
                   ]),
               subtitle:
                   Column(mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -221,12 +225,6 @@ class OTHoleWidget extends StatelessWidget {
               ]),
               onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
                   arguments: {"post": postElement})),
-          if (!isFolded &&
-              postElement.floors?.last_floor !=
-                  postElement.floors?.first_floor) ...[
-            const Divider(height: 4),
-            _buildCommentView(context, postElement)
-          ]
         ],
       ),
     );
@@ -239,51 +237,7 @@ class OTHoleWidget extends StatelessWidget {
             postElement.floors!.last_floor!.filteredContent!,
         S.of(context).image_tag,
         S.of(context).formula);
-    return ListTile(
-        dense: true,
-        minLeadingWidth: 16,
-        leading: Padding(
-          padding: const EdgeInsets.only(bottom: 4),
-          child: Icon(
-            PlatformX.isMaterial(context)
-                ? Icons.sms_outlined
-                : CupertinoIcons.quote_bubble,
-            color: Theme.of(context).hintColor,
-          ),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 8, 0, 4),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      S.of(context).latest_reply(
-                          postElement.floors!.last_floor!.anonyname ?? "?",
-                          HumanDuration.tryFormat(
-                              context,
-                              DateTime.parse(postElement
-                                      .floors!.last_floor!.time_created!)
-                                  .toLocal())),
-                      style: TextStyle(color: Theme.of(context).hintColor),
-                    ),
-                    Icon(CupertinoIcons.search,
-                        size: 14,
-                        color: Theme.of(context).hintColor.withOpacity(0.2)),
-                  ]),
-            ),
-            Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: LinkifyX(
-                    text: lastReplyContent,
-                    style: const TextStyle(fontSize: 14),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    onOpen: (link) => launchUrlWithNotice(context, link))),
-          ],
-        ),
+    return InkWell(
         onTap: () async {
           ProgressFuture dialog = showProgressDialog(
               loadingText: S.of(context).loading, context: context);
@@ -295,7 +249,42 @@ class OTHoleWidget extends StatelessWidget {
           } finally {
             dialog.dismiss(showAnim: false);
           }
-        });
+        },
+        child: IntrinsicHeight(child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 8, 0, 8), child:Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ColoredBox(
+                color: Theme.of(context).hintColor,
+                child: const SizedBox(width: 2)),
+            const SizedBox(width: 8),
+            Expanded(
+                child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                          S.of(context).latest_reply(
+                              postElement.floors!.last_floor!.anonyname ?? "?",
+                              HumanDuration.tryFormat(
+                                  context,
+                                  DateTime.parse(postElement
+                                          .floors!.last_floor!.time_created!)
+                                      .toLocal())),
+                          style: TextStyle(color: Theme.of(context).hintColor),
+                        ),
+                const SizedBox(height: 4),
+                LinkifyX(
+                        text: lastReplyContent,
+                        style: TextStyle(fontSize: 14, color: Theme.of(context).hintColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        onOpen: (link) => launchUrlWithNotice(context, link)),
+              ],
+            ))
+          ],
+        ))));
   }
 }
 
@@ -435,9 +424,9 @@ class OTFloorWidget extends StatelessWidget {
                       ],
                     ],
                   ),
-                  if(showToolBars && !floor.deleted!)
-                  OTFloorToolBar(
-                      floor: floor, index: index, onClickMore: onLongPress)
+                  if (showToolBars && !floor.deleted!)
+                    OTFloorToolBar(
+                        floor: floor, index: index, onClickMore: onLongPress)
                 ],
               ),
             ),
