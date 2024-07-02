@@ -1175,14 +1175,16 @@ class Normal extends RenderModel {
     if (isFavored != null) return isFavored!;
     final List<int>? favorites =
         await (ForumRepository.getInstance().getFavoriteHoleId());
-    return favorites!.any((elementId) => elementId == hole.hole_id);
+    isFavored = favorites!.any((elementId) => elementId == hole.hole_id);
+    return isFavored!;
   }
 
   Future<bool> isHoleSubscribed() async {
     if (isSubscribed != null) return isSubscribed!;
     final List<int>? subscriptions =
         await (ForumRepository.getInstance().getSubscribedHoleId());
-    return subscriptions!.any((elementId) => elementId == hole.hole_id);
+    isSubscribed = subscriptions!.any((elementId) => elementId == hole.hole_id);
+    return isSubscribed!;
   }
 }
 
