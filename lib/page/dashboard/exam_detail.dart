@@ -383,7 +383,8 @@ class ExamListState extends State<ExamList> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
+                Expanded(
+                    child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -400,15 +401,18 @@ class ExamListState extends State<ExamList> {
                         value.location.trim() != "" ||
                         value.time.trim() != "")
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text(
-                            "${value.date} ${value.time}",
-                            textScaleFactor: 0.8,
-                          ),
-                          const SizedBox(
-                            width: 8,
-                          ),
+                          if (value.date != "" || value.time != "") ...[
+                            Text(
+                              "${value.date} ${value.time}",
+                              textScaleFactor: 0.8,
+                            ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                          ] else
+                            ...[],
                           Text(
                             "${value.location} ",
                             textScaleFactor: 0.8,
@@ -422,7 +426,7 @@ class ExamListState extends State<ExamList> {
                         style: TextStyle(color: Theme.of(context).hintColor),
                       ),
                   ],
-                ),
+                )),
                 if (!value.type.contains("补") && !value.type.contains("缓")) ...[
                   Align(
                     alignment: Alignment.centerLeft,
@@ -440,24 +444,40 @@ class ExamListState extends State<ExamList> {
                         if (snapshot.hasData) {
                           _cachedScoreData = snapshot.data;
                           try {
-                            return Container(
-                                height: 28,
-                                width: 28,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 1,
-                                  ),
-                                  //borderRadius: BorderRadius.circular(16),
+                            return Row(
+                              children: [
+                                const SizedBox(
+                                  width: 8,
                                 ),
-                                child: Center(
-                                  child: Text(
-                                      _cachedScoreData!
-                                          .firstWhere((element) =>
-                                              element.id == value.id)
-                                          .level,
-                                      textScaleFactor: 1.2),
-                                ));
+                                Container(
+                                    height: 36,
+                                    width: 36,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Column(children: [
+                                      Center(
+                                        child: Text(
+                                          _cachedScoreData!
+                                              .firstWhere((element) =>
+                                                  element.id == value.id)
+                                              .level,
+                                        ),
+                                      ),
+                                      Center(
+                                        child: Text(
+                                            _cachedScoreData!
+                                                .firstWhere((element) =>
+                                                    element.id == value.id)
+                                                .score!,
+                                            textScaleFactor: 0.6),
+                                      ),
+                                    ]))
+                              ],
+                            );
                             // If we cannot find such an element, we will build an empty SizedBox.
                           } catch (_) {}
                         }
