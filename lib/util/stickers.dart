@@ -30,7 +30,7 @@ enum Stickers {
   dx_sleep,
   dx_swim,
   dx_thrill,
-  dx_touchFish,
+  dx_touch_fish,
   dx_twin;
 }
 
