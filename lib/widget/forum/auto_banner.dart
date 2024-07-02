@@ -158,11 +158,6 @@ class AutoBannerState extends State<AutoBanner> {
             return Container();
           }
 
-          // No need for banner if no banner elements
-          if (list!.isEmpty){
-            return Container();
-          }
-
           // Since the banner is not a fixed size, we need to use [SizedByChildBuilder]
           // to get the height of the banner. Otherwise, [Swiper] will have infinite
           // height bound and throw an exception during build.
