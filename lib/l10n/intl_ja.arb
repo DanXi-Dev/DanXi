@@ -10,7 +10,7 @@
   "account": "アカウント",
   "account_is_set": "アカウント設定完了",
   "acknowledgements": "謝辞",
-  "acknowledgements_markdown": "このアプリのアイコンをデザインしてくれた [IvanFei](https://github.com/ivanfei-1) さん、フォーラム絵文字などのアートデザインを提供してくれた [MSapphire](https://www.xiaohongshu.com/user/profile/6575475f000000001902d794) さん、[Lin2510]() さん、[zzz111]() さんに感謝します。",
+  "acknowledgements_markdown": "このアプリのアイコンをデザインしてくれた [IvanFei](https://github.com/ivanfei-1) さん、ステッカーなどのアートデザインを提供してくれた [MSapphire](https://www.xiaohongshu.com/user/profile/6575475f000000001902d794) さん、[Lin2510]() さん、[zzz111]() さんに感謝します。",
   "add": "追加",
   "add_class_time": "授業時間を追加",
   "add_courses": "手動でコースを追加する",
@@ -520,5 +520,10 @@
   "enter_forum": "フォーラムへの旅を始めよう",
   "next_question": "次へ",
   "prev_question": "前へ",
-  "sticker": "表情"
+  "sticker": "ステッカー",
+  "proxy_setting": "プロキシ設定",
+  "proxy_setting_unset": "未設定",
+  "proxy_setting_input_title": "HTTPプロキシアドレスを入力",
+  "proxy_setting_input_hint": "例：127.0.0.1:1234（空白のままにしてプロキシを無効にする）",
+  "proxy_setting_set_successfully": "プロキシ設定が保存されました。再起動すると有効になります。"
 }

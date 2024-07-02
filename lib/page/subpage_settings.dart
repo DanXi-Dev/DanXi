@@ -489,6 +489,30 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                           onPressed: () =>
                                               Navigator.of(context).pop()))),
                         ),
+                        ListTile(
+                          title: Text(S.of(context).proxy_setting),
+                          subtitle: Text(
+                              context.select<SettingsProvider, String?>(
+                                      (s) => s.proxy) ??
+                                  S.of(context).proxy_setting_unset),
+                          leading: const Icon(Icons.network_ping),
+                          onTap: () async {
+                            String? email = await Noticing.showInputDialog(
+                                context,
+                                S.of(context).proxy_setting_input_title,
+                                initialText:
+                                    context.read<SettingsProvider>().proxy,
+                                hintText:
+                                    S.of(context).proxy_setting_input_hint);
+                            if (!context.mounted || email == null)
+                              return; // return if cancelled
+                            if (email.isEmpty) email = null;
+                            context.read<SettingsProvider>().proxy = email;
+                            await Noticing.showNotice(context,
+                                S.of(context).proxy_setting_set_successfully);
+                          },
+                          enabled: !PlatformX.isWeb,
+                        ),
                         if (context.select<SettingsProvider, bool>(
                             (value) => value.hiddenNotifications.isNotEmpty))
                           ListTile(
@@ -665,8 +689,8 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     builder: (_, bool value, __) => SwitchListTile.adaptive(
                           title: Text(S.of(context).forum_show_banner),
                           secondary: const Icon(Icons.campaign),
-                          subtitle: Text(
-                              S.of(context).forum_show_banner_description),
+                          subtitle:
+                              Text(S.of(context).forum_show_banner_description),
                           value: value,
                           onChanged: (bool value) =>
                               SettingsProvider.getInstance().isBannerEnabled =
@@ -677,8 +701,8 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     builder: (_, bool value, __) => SwitchListTile.adaptive(
                           title: Text(S.of(context).forum_clean_mode),
                           secondary: const Icon(Icons.ac_unit),
-                          subtitle: Text(
-                              S.of(context).forum_clean_mode_description),
+                          subtitle:
+                              Text(S.of(context).forum_clean_mode_description),
                           value: value,
                           onChanged: (bool value) {
                             if (value) {
@@ -831,8 +855,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                           context, S.of(context).login_from_forum_page,
                           title: S.of(context).login);
                     } else {
-                      await ForumRepository.getInstance()
-                          .initializeRepo();
+                      await ForumRepository.getInstance().initializeRepo();
                       onLogout();
                       refreshSelf();
                     }

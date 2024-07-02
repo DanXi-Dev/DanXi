@@ -19,6 +19,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
@@ -54,7 +55,8 @@ import 'package:share_plus/share_plus.dart';
 class ImageViewerPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
   @protected
-  final Dio dio = Dio(BaseOptions(responseType: ResponseType.bytes));
+  final Dio dio =
+      DioUtils.newDioWithProxy(BaseOptions(responseType: ResponseType.bytes));
 
   static const List<String> IMAGE_SUFFIX = [
     '.jpg',

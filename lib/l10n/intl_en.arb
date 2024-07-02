@@ -536,5 +536,10 @@
   "next_question": "Next",
   "prev_question": "Previous",
   "sticker": "Stickers",
-  "welcome_prompt":"Welcome to DanXi!\n\nIf you are using DanXi for the first time, perhaps you would like to take a look at the FAQ section?"
+  "welcome_prompt": "Welcome to DanXi!\n\nIf you are using DanXi for the first time, perhaps you would like to take a look at the FAQ section?",
+  "proxy_setting": "Proxy Setting",
+  "proxy_setting_unset": "Not Set",
+  "proxy_setting_input_title": "Input HTTP Proxy",
+  "proxy_setting_input_hint": "e.g. 127.0.0.1:1234 (Leave blank to disable)",
+  "proxy_setting_set_successfully": "Proxy settings saved, restart the app to take effect."
 }

@@ -16,6 +16,7 @@
  */
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/widget/forum/render/base_render.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,8 @@ class BBSImagePlaceholder extends StatelessWidget {
 /// A network image loader that will show the image from network, and
 /// fit the image's size to at most [maxWidth].
 class AutoBBSImage extends StatelessWidget {
-  final Dio dio = Dio(BaseOptions(responseType: ResponseType.bytes));
+  final Dio dio =
+      DioUtils.newDioWithProxy(BaseOptions(responseType: ResponseType.bytes));
   final String src;
   final double? maxWidth;
   final ImageTapCallback? onTapImage;

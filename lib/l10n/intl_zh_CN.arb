@@ -530,5 +530,10 @@
   "next_question": "下一题",
   "prev_question": "上一题",
   "welcome_prompt":"欢迎来到旦夕！\n\n如果你是第一次使用旦夕，或许你想看看FAQ板块？",
-  "sticker": "表情"
+  "sticker": "表情",
+  "proxy_setting": "代理设置",
+  "proxy_setting_unset": "未设置",
+  "proxy_setting_input_title": "输入 HTTP 代理地址",
+  "proxy_setting_input_hint": "如 127.0.0.1:1234（留空以关闭代理）",
+  "proxy_setting_set_successfully": "代理设置已保存，重启应用后生效"
 }

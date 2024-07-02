@@ -21,8 +21,8 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/repository/independent_cookie_jar.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
+import 'package:dan_xi/repository/independent_cookie_jar.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
@@ -89,7 +89,7 @@ class UISLoginTool {
       Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
     // Create a temporary dio for logging in.
-    Dio workDio = Dio();
+    Dio workDio = DioUtils.newDioWithProxy();
     workDio.options = BaseOptions(
         receiveDataWhenStatusError: true,
         connectTimeout: const Duration(seconds: 5),
