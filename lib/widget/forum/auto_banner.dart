@@ -153,9 +153,13 @@ class AutoBannerState extends State<AutoBanner> {
             return Container();
           }
           list ??= AnnouncementRepository.getInstance().getBannerExtras();
-          // Only update if list is null
+          // Only update if list is null. And if the update fails, return nil
           if (list == null && !updateBannerList()) {
             return Container();
+          }
+          // If the list is empty (i.e. no banner), return nil
+          if (list!.isEmpty) {
+            return Container(); // FIXME: using `nil` here will break the layout. Don't know why.
           }
 
           // Since the banner is not a fixed size, we need to use [SizedByChildBuilder]
