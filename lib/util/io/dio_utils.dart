@@ -15,7 +15,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
+
+import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 
 /// Useful utils when processing network requests with dio.
 class DioUtils {
@@ -76,5 +81,26 @@ class DioUtils {
       }
     }
     return response?.data.toString();
+  }
+
+  /// Set the [proxy] for the [dio] instance.
+  ///
+  /// If [proxy] is null, the proxy will be set to DIRECT (i.e. no proxy).
+  ///
+  /// If the platform is web, this method will return false and do nothing.
+  static bool setProxy(Dio dio, String? proxy) {
+    if (PlatformX.isWeb) return false; // Web does not support proxy
+
+    dio.httpClientAdapter = IOHttpClientAdapter(
+      createHttpClient: () => HttpClient()
+        ..findProxy = (uri) => proxy != null ? "PROXY $proxy" : "DIRECT",
+    );
+    return true;
+  }
+
+  static Dio newDioWithProxy([BaseOptions? options]) {
+    Dio dio = Dio(options);
+    setProxy(dio, SettingsProvider.getInstance().proxy);
+    return dio;
   }
 }

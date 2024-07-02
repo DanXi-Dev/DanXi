@@ -149,8 +149,9 @@ class Noticing {
       {String? confirmText,
       bool isConfirmDestructive = false,
       int? maxLines,
+      String? initialText,
       String? hintText}) async {
-    TextEditingController controller = TextEditingController();
+    TextEditingController controller = TextEditingController(text: initialText);
     String? value = await showPlatformDialog<String?>(
       context: context,
       builder: (BuildContext context) => PlatformAlertDialog(

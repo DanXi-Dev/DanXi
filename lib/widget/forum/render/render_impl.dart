@@ -115,10 +115,15 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
               MarkdownHoleMentionSupport(translucentCard, isPreviewWidget),
         },
     imageBuilder: (Uri uri, String? title, String? alt) {
-      // render stickers first
-      if (uri.toString().contains("dx_")) {
-        var asset = getStickerAssetPath(uri.toString());
-        // print(asset);
+          String url = uri.toString();
+          // render stickers first
+          if (url.startsWith("danxi_")) {
+            // backward compatibility: <=1.4.3, danxi_ is used; after that, dx_ is used
+            url = url.replaceFirst("danxi_", "dx_");
+          }
+          if (url.startsWith("dx_")) {
+            var asset = getStickerAssetPath(url);
+            // print(asset);
         if (asset != null) {
           return Image.asset(
             asset,
@@ -131,7 +136,7 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
           return Center(
             child: AutoBBSImage(
                 key: UniqueKey(),
-                src: uri.toString(),
+                src: url,
                 maxWidth: imageWidth,
                 onTapImage: onTapImage),
           );

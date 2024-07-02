@@ -20,6 +20,7 @@ import 'dart:convert';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 
@@ -35,7 +36,7 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   EmptyClassroomRepository._();
 
   @override
-  Dio dio = Dio(BaseOptions(
+  Dio dio = DioUtils.newDioWithProxy(BaseOptions(
       connectTimeout: const Duration(seconds: 3),
       receiveTimeout: const Duration(seconds: 3)));
 

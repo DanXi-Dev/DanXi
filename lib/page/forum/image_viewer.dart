@@ -19,6 +19,8 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/util/io/cache_manager_with_proxy.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
@@ -54,7 +56,8 @@ import 'package:share_plus/share_plus.dart';
 class ImageViewerPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
   @protected
-  final Dio dio = Dio(BaseOptions(responseType: ResponseType.bytes));
+  final Dio dio =
+      DioUtils.newDioWithProxy(BaseOptions(responseType: ResponseType.bytes));
 
   static const List<String> IMAGE_SUFFIX = [
     '.jpg',
@@ -130,8 +133,8 @@ class ImageViewerPageState extends State<ImageViewerPage> {
   }
 
   Future<void> shareImage(BuildContext context) async {
-    File image =
-        await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
+    File image = await DefaultCacheManagerWithProxy()
+        .getSingleFile(_imageList[showIndex].hdUrl);
     if (!mounted) return;
 
     if (PlatformX.isMobile) {
@@ -157,8 +160,8 @@ class ImageViewerPageState extends State<ImageViewerPage> {
   }
 
   Future<void> saveImage(BuildContext context) async {
-    File image =
-        await DefaultCacheManager().getSingleFile(_imageList[showIndex].hdUrl);
+    File image = await DefaultCacheManagerWithProxy()
+        .getSingleFile(_imageList[showIndex].hdUrl);
     if (PlatformX.isAndroid) {
       bool hasPermission = await PlatformX.galleryStorageGranted;
       if (!hasPermission && !(await Permission.storage.request().isGranted)) {
@@ -307,7 +310,8 @@ class ImageViewerBodyViewState extends State<ImageViewerBodyView> {
   Future<void> cacheOriginalImage() async {
     if (widget.imageInfo.thumbUrl == null) return;
     try {
-      await DefaultCacheManager().getSingleFile(widget.imageInfo.hdUrl);
+      await DefaultCacheManagerWithProxy()
+          .getSingleFile(widget.imageInfo.hdUrl);
       setState(() => originalLoading = false);
     } catch (e, st) {
       setState(() {

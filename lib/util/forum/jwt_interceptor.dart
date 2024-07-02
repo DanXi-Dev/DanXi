@@ -19,6 +19,7 @@ import 'dart:io';
 
 import 'package:dan_xi/model/forum/jwt.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -28,7 +29,7 @@ import 'package:flutter/cupertino.dart';
 /// * [JWToken]
 /// * [ForumProvider]
 class JWTInterceptor extends QueuedInterceptor {
-  final Dio _dio = Dio();
+  final Dio _dio = DioUtils.newDioWithProxy();
   final String refreshUrl;
   final Function tokenGetter;
   final Function? tokenSetter;
