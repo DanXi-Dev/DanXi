@@ -26,18 +26,18 @@ import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
+import 'package:dan_xi/util/forum/human_duration.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/forum/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
+import 'package:dan_xi/widget/forum/render/base_render.dart';
+import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/material_x.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
-import 'package:dan_xi/widget/libraries/chip_widgets.dart';
-import 'package:dan_xi/widget/forum/render/base_render.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -250,6 +250,8 @@ class OTHoleWidget extends StatelessWidget {
             dialog.dismiss(showAnim: false);
           }
         },
+        // Use IntrinsicHeight to make the row stretch to the height of the child with the largest height,
+        // so that the ColoredBox below can be stretched to the height of that child.
         child: IntrinsicHeight(child: Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8, 0, 8), child:Row(
           mainAxisAlignment: MainAxisAlignment.start,
