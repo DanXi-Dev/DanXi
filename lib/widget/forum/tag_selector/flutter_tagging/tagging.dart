@@ -74,11 +74,14 @@ class FlutterTagging<T extends Taggable> extends StatefulWidget {
   /// It is provided with the suggestions box instance and the animation
   /// controller, and expected to return some animation that uses the controller
   /// to display the suggestion box.
-  final Widget Function(BuildContext, Widget, AnimationController?)?
-      transitionBuilder;
+  final Widget Function(
+    BuildContext context,
+    Animation<double> animation,
+    Widget child,
+  )? transitionBuilder;
 
   /// The configuration of suggestion box.
-  final SuggestionsBoxConfiguration suggestionsBoxConfiguration;
+  final SuggestionsBoxConfiguration<T> suggestionsBoxConfiguration;
 
   /// The duration that [transitionBuilder] animation takes.
   ///
@@ -87,14 +90,6 @@ class FlutterTagging<T extends Taggable> extends StatefulWidget {
   ///
   /// Defaults to 500 milliseconds.
   final Duration animationDuration;
-
-  /// The value at which the [transitionBuilder] animation starts.
-  ///
-  /// This argument is best used with [transitionBuilder] and [animationDuration]
-  /// to fully control the animation.
-  ///
-  /// Defaults to 0.25.
-  final double animationStart;
 
   /// If set to true, no loading box will be shown while suggestions are
   /// being fetched. [loadingBuilder] will also be ignored.
@@ -123,16 +118,6 @@ class FlutterTagging<T extends Taggable> extends StatefulWidget {
   /// This duration is set by default to 300 milliseconds.
   final Duration debounceDuration;
 
-  /// If set to true, suggestions will be fetched immediately when the field is
-  /// added to the view.
-  ///
-  /// But the suggestions box will only be shown when the field receives focus.
-  /// To make the field receive focus immediately, you can set the `autofocus`
-  /// property in the [textFieldConfiguration] to true.
-  ///
-  /// Defaults to false.
-  final bool enableImmediateSuggestion;
-
   ///
   final List<T> initialItems;
 
@@ -144,7 +129,6 @@ class FlutterTagging<T extends Taggable> extends StatefulWidget {
       required this.configureSuggestion,
       this.onChanged,
       this.additionCallback,
-      this.enableImmediateSuggestion = false,
       this.errorBuilder,
       this.loadingBuilder,
       this.emptyBuilder,
@@ -157,7 +141,6 @@ class FlutterTagging<T extends Taggable> extends StatefulWidget {
       this.hideOnError = false,
       this.hideOnLoading = false,
       this.animationDuration = const Duration(milliseconds: 500),
-      this.animationStart = 0.25,
       this.onAdded,
       super.key,
       this.customChipBuilder});
@@ -167,16 +150,17 @@ class FlutterTagging<T extends Taggable> extends StatefulWidget {
 }
 
 class FlutterTaggingState<T extends Taggable> extends State<FlutterTagging<T>> {
-  late final TextEditingController _textController;
-  late final FocusNode _focusNode;
+  final TextEditingController _textController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
   T? _additionItem;
+  late final SuggestionsController<T> _suggestionsController;
 
   @override
   void initState() {
     super.initState();
-    _textController =
-        widget.textFieldConfiguration.controller ?? TextEditingController();
-    _focusNode = widget.textFieldConfiguration.focusNode ?? FocusNode();
+    _suggestionsController =
+        widget.suggestionsBoxConfiguration.suggestionsBoxController ??
+            SuggestionsController<T>();
   }
 
   @override
@@ -193,29 +177,25 @@ class FlutterTaggingState<T extends Taggable> extends State<FlutterTagging<T>> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         TypeAheadField<T>(
-          ignoreAccessibleNavigation: true,
-          getImmediateSuggestions: widget.enableImmediateSuggestion,
           debounceDuration: widget.debounceDuration,
           hideOnEmpty: widget.hideOnEmpty,
           hideOnError: widget.hideOnError,
           hideOnLoading: widget.hideOnLoading,
-          animationStart: widget.animationStart,
           animationDuration: widget.animationDuration,
           autoFlipDirection:
               widget.suggestionsBoxConfiguration.autoFlipDirection,
           direction: widget.suggestionsBoxConfiguration.direction,
-          hideSuggestionsOnKeyboardHide:
+          hideWithKeyboard:
               widget.suggestionsBoxConfiguration.hideSuggestionsOnKeyboardHide,
-          keepSuggestionsOnLoading:
+          retainOnLoading:
               widget.suggestionsBoxConfiguration.keepSuggestionsOnLoading,
-          keepSuggestionsOnSuggestionSelected: widget
+          hideOnSelect: !widget
               .suggestionsBoxConfiguration.keepSuggestionsOnSuggestionSelected,
-          suggestionsBoxController:
-              widget.suggestionsBoxConfiguration.suggestionsBoxController,
-          suggestionsBoxDecoration:
+          suggestionsController: _suggestionsController,
+          decorationBuilder:
               widget.suggestionsBoxConfiguration.suggestionsBoxDecoration,
-          suggestionsBoxVerticalOffset:
-              widget.suggestionsBoxConfiguration.suggestionsBoxVerticalOffset,
+          offset: Offset(0,
+              widget.suggestionsBoxConfiguration.suggestionsBoxVerticalOffset),
           errorBuilder: widget.errorBuilder,
           transitionBuilder: widget.transitionBuilder,
           loadingBuilder: (context) =>
@@ -224,12 +204,17 @@ class FlutterTaggingState<T extends Taggable> extends State<FlutterTagging<T>> {
                 height: 3.0,
                 child: LinearProgressIndicator(),
               ),
-          noItemsFoundBuilder: widget.emptyBuilder,
-          textFieldConfiguration: widget.textFieldConfiguration.copyWith(
-            focusNode: _focusNode,
-            controller: _textController,
-            enabled: widget.textFieldConfiguration.enabled,
-          ),
+          emptyBuilder: widget.emptyBuilder,
+          controller: _textController,
+          focusNode: _focusNode,
+          builder: (context, controller, focusNode) {
+            return TextField(
+                controller: controller,
+                focusNode: focusNode,
+                enabled: widget.textFieldConfiguration.enabled,
+                autofocus: true,
+                decoration: widget.textFieldConfiguration.decoration);
+          },
           suggestionsCallback: (query) async {
             final suggestions = await widget.findSuggestions(query);
             suggestions.removeWhere(widget.initialItems.contains);
@@ -279,12 +264,18 @@ class FlutterTaggingState<T extends Taggable> extends State<FlutterTagging<T>> {
               ),
             );
           },
-          onSuggestionSelected: (suggestion) {
+          onSelected: (suggestion) {
             if (_additionItem != suggestion) {
               widget.initialItems.add(suggestion);
               setState(() {});
               widget.onChanged?.call();
               _textController.clear();
+
+              // @w568w (2024-07-02): TypeAheadField<T> now loves to keep the
+              // cache of the suggestions even after the user has selected one.
+              // To prevent user from selecting the same suggestion again, we
+              // clear the suggestions cache explicitly.
+              _suggestionsController.suggestions = null;
             }
           },
         ),
