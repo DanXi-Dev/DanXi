@@ -32,6 +32,7 @@ import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/forum/clean_mode_filter.dart';
+import 'package:dan_xi/util/io/cache_manager_with_proxy.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -51,7 +52,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -797,7 +797,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                   subtitle: Text(_clearCacheSubtitle ??
                       S.of(context).clear_cache_description),
                   onTap: () async {
-                    await DefaultCacheManager().emptyCache();
+                    await DefaultCacheManagerWithProxy().emptyCache();
                     setState(() {
                       _clearCacheSubtitle = S.of(context).cache_cleared;
                     });
