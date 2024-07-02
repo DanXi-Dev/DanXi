@@ -31,13 +31,13 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/danke/course_review_widget.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
+import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
-import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -327,6 +327,9 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   }
 
   Widget _buildHead(BuildContext context) {
+    final overallWord =
+        S.of(context).curriculum_ratings_overall_words.split(';');
+
     var wildCard = S.of(context).all;
     var teacherList = [
       FilterTag(wildCard, "*"),
@@ -358,9 +361,9 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                                 color: Colors.grey)),
                         ..._courseGroup!.credits!.map((e) => Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: OTLeadingTag(
+                            child: LeadingChip(
                               color: Colors.orange,
-                              text:
+                              label:
                                   "${e.toStringAsFixed(1)} ${S.of(context).credits}",
                             )))
                       ],
@@ -376,7 +379,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                     ),
                     averageOverallLevel >= 0
                         ? Text(
-                            overallWord![averageOverallLevel],
+                            overallWord[averageOverallLevel],
                             style: TextStyle(
                                 color: wordColor[averageOverallLevel],
                                 fontSize: 15),

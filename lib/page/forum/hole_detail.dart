@@ -50,6 +50,7 @@ import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:intl/intl.dart';
@@ -127,8 +128,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   Future<List<OTFloor>?> _loadContent(int page) async {
     Future<List<OTFloor>?> loadPunishmentHistory(int page) async {
       if (page == 0) {
-        return (await ForumRepository.getInstance()
-                .getPunishmentHistory())
+        return (await ForumRepository.getInstance().getPunishmentHistory())
             ?.map((e) => e.floor!)
             .toList();
       } else {
@@ -140,10 +140,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     final results = switch (_renderModel) {
       Normal(hole: var hole) => await ForumRepository.getInstance()
           .loadFloors(hole, startFloor: page * Constant.POST_COUNT_PER_PAGE),
-      Search(keyword: var searchKeyword) =>
-        await ForumRepository.getInstance().loadSearchResults(
-            searchKeyword,
-            startFloor: _listViewController.length()),
+      Search(keyword: var searchKeyword) => await ForumRepository.getInstance()
+          .loadSearchResults(searchKeyword,
+              startFloor: _listViewController.length()),
       PunishmentHistory() => await loadPunishmentHistory(page),
     };
 
@@ -183,8 +182,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
       // Update hole view count
       if (hole.hole_id != null) {
-        unawaited(ForumRepository.getInstance()
-            .updateHoleViewCount(hole.hole_id!));
+        unawaited(
+            ForumRepository.getInstance().updateHoleViewCount(hole.hole_id!));
       }
     } else if (widget.arguments!.containsKey('searchKeyword')) {
       _renderModel = Search(widget.arguments!['searchKeyword']);
@@ -685,9 +684,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 Navigator.of(cxt).pop(newDivision);
               }
 
-              ForumRepository.getInstance()
-                  .getDivisions()
-                  .forEach((value) {
+              ForumRepository.getInstance().getDivisions().forEach((value) {
                 list.add(ListTile(
                   title: Text(value.name ?? "null"),
                   subtitle: Text(value.description ?? ""),
@@ -777,16 +774,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     String postTimeStr = S.of(menuContext).post_time(postTime);
 
     List<Widget> menu = [
-      if (e.is_me == true && e.deleted == false)
+      if (e.is_me == true && e.deleted == false) ...[
         PlatformContextMenuItem(
           menuContext: menuContext,
           onPressed: () async {
             if (await OTEditor.modifyReply(
                 context, e.hole_id, e.floor_id, e.content)) {
+              if (!context.mounted) return;
               Noticing.showMaterialNotice(
                   context, S.of(context).request_success);
-              ForumRepository.getInstance()
-                  .invalidateFloorCache(e.floor_id!);
+              ForumRepository.getInstance().invalidateFloorCache(e.floor_id!);
               final newFloor = await ForumRepository.getInstance()
                   .loadSpecificFloor(e.floor_id!);
               _listViewController.replaceDatumWith(e, newFloor!);
@@ -798,6 +795,31 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           },
           child: Text(S.of(context).modify),
         ),
+        PlatformContextMenuItem(
+          menuContext: menuContext,
+          onPressed: () async {
+            if (await Noticing.showConfirmationDialog(context,
+                    S.of(context).about_to_delete_floor(e.floor_id ?? "null"),
+                    title: S.of(context).are_you_sure,
+                    isConfirmDestructive: true) ==
+                true) {
+              if (!context.mounted) return;
+              try {
+                await ForumRepository.getInstance().deleteFloor(e.floor_id!);
+                Noticing.showMaterialNotice(
+                    context, S.of(context).request_success);
+                ForumRepository.getInstance().invalidateFloorCache(e.floor_id!);
+                final newFloor = await ForumRepository.getInstance()
+                    .loadSpecificFloor(e.floor_id!);
+                _listViewController.replaceDatumWith(e, newFloor!);
+              } catch (e, st) {
+                Noticing.showErrorDialog(context, e, trace: st);
+              }
+            }
+          },
+          child: Text(S.of(context).delete),
+        )
+      ],
 
       // Standard Operations
       PlatformContextMenuItem(
@@ -854,6 +876,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         isDestructive: true,
         onPressed: () async {
           if (await OTEditor.reportPost(context, e.floor_id)) {
+            if (!context.mounted) return;
             Noticing.showMaterialNotice(context, S.of(context).report_success);
           }
         },
@@ -993,8 +1016,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             .loadFloors(hole,
                 startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
         Search(keyword: var searchKeyword) =>
-          await ForumRepository.getInstance().loadSearchResults(
-              searchKeyword,
+          await ForumRepository.getInstance().loadSearchResults(searchKeyword,
               startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
         PunishmentHistory() =>
           (await ForumRepository.getInstance().getPunishmentHistory())
@@ -1017,14 +1039,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     final floorWidget = OTFloorWidget(
       hasBackgroundImage: _backgroundImage != null,
       floor: floor,
-      // Refresh single floor when modified or deleted
-      onOperation: () async {
-        ForumRepository.getInstance()
-            .invalidateFloorCache(floor.floor_id!);
-        final newFloor = await ForumRepository.getInstance()
-            .loadSpecificFloor(floor.floor_id!);
-        _listViewController.replaceDatumWith(floor, newFloor!);
-      },
       index: _renderModel is Normal ? index : null,
       isInMention: isNested,
       parentHole: switch (_renderModel) {
@@ -1077,8 +1091,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         final int length = _listViewController.length();
         smartNavigatorPush(context, '/image/detail', arguments: {
           'preview_url': url,
-          'hd_url': ForumRepository.getInstance()
-              .extractHighDefinitionImageUrl(url!),
+          'hd_url':
+              ForumRepository.getInstance().extractHighDefinitionImageUrl(url!),
           'hero_tag': heroTag,
           'image_list': extractAllImages(),
           'loader': loadPageImage,

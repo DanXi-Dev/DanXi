@@ -28,7 +28,6 @@ import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/widget/danke/course_list_widget.dart';
 import 'package:dan_xi/widget/danke/course_search_bar.dart';
-import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:dan_xi/widget/danke/random_review_widgets.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
@@ -59,14 +58,7 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
 
   @override
   Widget buildPage(BuildContext context) {
-    if (overallWord == null) {
-      overallWord = S.of(context).curriculum_ratings_overall_words.split(';');
-      contentWord = S.of(context).curriculum_ratings_content_words.split(';');
-      workloadWord = S.of(context).curriculum_ratings_workload_words.split(';');
-      assessmentWord =
-          S.of(context).curriculum_ratings_assessment_words.split(';');
-    }
-
+    
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     return Container(
       // padding top

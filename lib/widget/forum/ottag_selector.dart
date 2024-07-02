@@ -20,7 +20,7 @@ import 'package:dan_xi/model/forum/tag.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/libraries/round_chip.dart';
+import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:dan_xi/widget/forum/tag_selector/flutter_tagging/configurations.dart';
 import 'package:dan_xi/widget/forum/tag_selector/flutter_tagging/tagging.dart';
 import 'package:flutter/cupertino.dart';

@@ -156,7 +156,7 @@ class AdminOperationPageState extends State<AdminOperationPage> {
                       children: [
                     OTFloorWidget(
                         floor: _floor,
-                        showBottomBar: false,
+                        showToolBars: false,
                         hasBackgroundImage: _backgroundImage != null),
                     const Divider(),
                     FutureFoledListWidget(

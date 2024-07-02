@@ -214,6 +214,15 @@ class ReviewFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final overallWord =
+        S.of(context).curriculum_ratings_overall_words.split(';');
+    final contentWord =
+        S.of(context).curriculum_ratings_content_words.split(';');
+    final workloadWord =
+        S.of(context).curriculum_ratings_workload_words.split(';');
+    final assessmentWord =
+        S.of(context).curriculum_ratings_assessment_words.split(';');
+
     const labelStyle = TextStyle(color: Colors.grey, fontSize: 12);
 
     return Wrap(
@@ -229,7 +238,7 @@ class ReviewFooter extends StatelessWidget {
               width: 6,
             ),
             Text(
-              overallWord![overallLevel],
+              overallWord[overallLevel],
               style: TextStyle(color: wordColor[overallLevel], fontSize: 12),
             )
           ],
@@ -242,7 +251,7 @@ class ReviewFooter extends StatelessWidget {
               width: 6,
             ),
             Text(
-              contentWord![styleLevel],
+              contentWord[styleLevel],
               style: TextStyle(color: wordColor[styleLevel], fontSize: 12),
             )
           ],
@@ -255,7 +264,7 @@ class ReviewFooter extends StatelessWidget {
               width: 6,
             ),
             Text(
-              workloadWord![workloadLevel],
+              workloadWord[workloadLevel],
               style: TextStyle(color: wordColor[workloadLevel], fontSize: 12),
             )
           ],
@@ -269,7 +278,7 @@ class ReviewFooter extends StatelessWidget {
               width: 6,
             ),
             Text(
-              assessmentWord![assessmentLevel],
+              assessmentWord[assessmentLevel],
               style: TextStyle(color: wordColor[assessmentLevel], fontSize: 12),
             )
           ],
