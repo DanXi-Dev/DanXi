@@ -136,14 +136,13 @@ class AdminOperationPageState extends State<AdminOperationPage> {
       appBar: PlatformAppBarX(
         title: Text(_title),
         trailingActions: [
-          if (!_floor.deleted!)
-            PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: PlatformX.isMaterial(context)
-                  ? const Icon(Icons.send)
-                  : const Icon(CupertinoIcons.paperplane),
-              onPressed: () async => _sendDocument(),
-            ),
+          PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon: PlatformX.isMaterial(context)
+                ? const Icon(Icons.send)
+                : const Icon(CupertinoIcons.paperplane),
+            onPressed: () async => _sendDocument(),
+          ),
         ],
       ),
       body: SafeArea(
