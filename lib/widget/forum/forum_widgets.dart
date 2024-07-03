@@ -452,7 +452,7 @@ class OTFloorWidget extends StatelessWidget {
                         onLinkTap,
                         onTapImage ?? defaultOnImageTap,
                         hasBackgroundImage)),
-            if (showToolBars && !floor.deleted!) ...[
+            if (showToolBars) ...[
               const SizedBox(height: 5),
               OTFloorWidgetBottomBar(floor: floor, index: index),
             ]
