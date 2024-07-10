@@ -1138,7 +1138,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   Iterable<ImageUrlInfo> extractAllImagesInFloor(String content) {
-    final imageExp = RegExp(r'!\[.*?\]\((.*?)\)');
+    final imageExp = RegExp(r'!\[.*?\]\((?!danxi_|dx_)(.*?)\)');
     return imageExp.allMatches(content).map((e) => ImageUrlInfo(
         e.group(1),
         ForumRepository.getInstance()
