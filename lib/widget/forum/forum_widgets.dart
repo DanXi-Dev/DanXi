@@ -111,7 +111,8 @@ class OTHoleWidget extends StatelessWidget {
           postElement.floors!.first_floor!.foldReason ??
               postElement.floors!.first_floor!.filteredContent!,
           S.of(context).image_tag,
-          S.of(context).formula),
+          S.of(context).formula,
+          S.of(context).sticker_tag),
       style: const TextStyle(fontSize: 16),
       maxLines: 6,
       overflow: TextOverflow.ellipsis,
@@ -236,7 +237,8 @@ class OTHoleWidget extends StatelessWidget {
         postElement.floors!.last_floor!.foldReason ??
             postElement.floors!.last_floor!.filteredContent!,
         S.of(context).image_tag,
-        S.of(context).formula);
+        S.of(context).formula,
+        S.of(context).sticker_tag);
     return InkWell(
         onTap: () async {
           ProgressFuture dialog = showProgressDialog(
@@ -326,8 +328,8 @@ class OTFloorWidget extends StatelessWidget {
     String? subContent;
     // Use renderText to remove latex, image links and mentions
     if (searchKeyWord != null && floor.content != null) {
-      fullContent = renderText(
-              floor.content!, S.of(context).image_tag, S.of(context).formula)
+      fullContent = renderText(floor.content!, S.of(context).image_tag,
+              S.of(context).formula, S.of(context).sticker_tag)
           .replaceAll('\n', ' ');
     }
     final bool foldLongFloor =
@@ -437,8 +439,11 @@ class OTFloorWidget extends StatelessWidget {
                 child: isInMention
                     // If content is being quoted, limit its height so that the view won't be too long.
                     ? LinkifyX(
-                        text: renderText(floor.filteredContent!,
-                                S.of(context).image_tag, S.of(context).formula)
+                        text: renderText(
+                                floor.filteredContent!,
+                                S.of(context).image_tag,
+                                S.of(context).formula,
+                                S.of(context).sticker_tag)
                             .trim(),
                         textScaleFactor: 0.8,
                         maxLines: 3,
