@@ -99,8 +99,8 @@ final RegExp mentionRegExp =
 
 /// Render the text from a clip of [content].
 /// Also supports adding image tag to markdown posts
-String renderText(
-    String content, String imagePlaceholder, String formulaPlaceholder,
+String renderText(String content, String imagePlaceholder,
+    String formulaPlaceholder, String stickerPlaceholder,
     {bool removeMentions = true}) {
   String originalContent = content;
   if (!isHtml(content)) {
@@ -117,15 +117,24 @@ String renderText(
   // Deal with images
   BeautifulSoup soup = BeautifulSoup(content);
   List<Bs4Element> images = soup.findAll("img");
-  if (images.isNotEmpty) {
-    return soup.getText().trim() + imagePlaceholder;
-  }
 
   String result = soup.getText().trim();
 
+  if (images.isNotEmpty) {
+    if (images[0].toString().contains("danxi_") ||
+        images[0].toString().contains("dx_")) {
+      return result + stickerPlaceholder;
+    } else {
+      return result + imagePlaceholder;
+    }
+  }
+
   // If we have reduce the text to nothing, we would rather not remove mention texts.
   if (result.isEmpty && removeMentions) {
-    return renderText(originalContent, imagePlaceholder, formulaPlaceholder,
+    return renderText(originalContent,
+        imagePlaceholder,
+        formulaPlaceholder,
+        stickerPlaceholder,
         removeMentions: false);
   } else {
     return result;

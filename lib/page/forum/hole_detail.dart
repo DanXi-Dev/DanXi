@@ -842,7 +842,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           child: Text(S.of(menuContext).copy),
           onPressed: () async {
-            await FlutterClipboard.copy(renderText(e.filteredContent!, '', ''));
+            await FlutterClipboard.copy(
+                renderText(e.filteredContent!, '', '', ''));
             if (mounted) {
               Noticing.showMaterialNotice(
                   context, S.of(menuContext).copy_success);

@@ -518,6 +518,7 @@
   "next_question": "次へ",
   "prev_question": "前へ",
   "sticker": "ステッカー",
+  "sticker_tag": "[ステッカー]",
   "proxy_setting": "プロキシ設定",
   "proxy_setting_unset": "未設定",
   "proxy_setting_input_title": "HTTPプロキシアドレスを入力",

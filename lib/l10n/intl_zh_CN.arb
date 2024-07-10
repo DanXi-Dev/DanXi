@@ -528,6 +528,7 @@
   "prev_question": "上一题",
   "welcome_prompt":"欢迎来到旦夕！\n\n如果你是第一次使用旦夕，或许你想看看FAQ板块？",
   "sticker": "表情",
+  "sticker_tag": "[表情]",
   "proxy_setting": "代理设置",
   "proxy_setting_unset": "未设置",
   "proxy_setting_input_title": "输入 HTTP 代理地址",
