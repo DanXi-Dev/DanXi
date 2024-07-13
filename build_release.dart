@@ -76,8 +76,8 @@ void main(List<String> arguments) async {
   print('Start building...');
 
   print('Run build_runner...');
-  await runDartProcess(
-      ['run', 'build_runner', 'build', '--delete-conflicting-outputs']);
+  await runFlutterProcess(
+      ['pub', 'run', 'build_runner', 'build', '--delete-conflicting-outputs']);
 
   switch (args['target']) {
     case 'android':
