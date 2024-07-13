@@ -18,7 +18,6 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

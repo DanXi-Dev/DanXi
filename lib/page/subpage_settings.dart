@@ -504,8 +504,9 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                     context.read<SettingsProvider>().proxy,
                                 hintText:
                                     S.of(context).proxy_setting_input_hint);
-                            if (!context.mounted || email == null)
+                            if (!context.mounted || email == null) {
                               return; // return if cancelled
+                            }
                             if (email.isEmpty) email = null;
                             context.read<SettingsProvider>().proxy = email;
                             await Noticing.showNotice(context,
