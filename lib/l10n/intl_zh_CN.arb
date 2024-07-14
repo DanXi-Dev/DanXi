@@ -190,7 +190,7 @@
   "hidden_widgets": "隐藏",
   "hide": "隐藏",
   "hide_hole": "隐藏此帖子",
-  "hide_hole_confirm": "确定要永久隐藏此帖子吗？隐藏后，除非重新安装应用，否则将无法在帖子列表中再看到此茶楼。",
+  "hide_hole_confirm": "确定要永久隐藏此帖子吗？隐藏后，除非重新安装应用，否则将无法在帖子列表中再看到此帖子。",
   "hide_hole_success": "帖子已隐藏，下次刷新列表后生效。",
   "hide_notification_description": "你想要永久隐藏这条通知吗？你可以在设置中显示所有已隐藏的通知。",
   "high_contrast_color_description": "空教室查询和茶馆标签",
