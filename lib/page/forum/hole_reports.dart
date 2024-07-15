@@ -302,8 +302,7 @@ class AuditListState extends State<AuditList> {
             if (result != null && result < 300 && mounted) {
               Noticing.showModalNotice(pageContext,
                   message: S.of(pageContext).operation_successful);
-              await _auditListViewController.notifyUpdate(
-                  useInitialData: false, queueDataClear: false);
+              _auditListViewController.replaceDatumWith(e, e.processed());
             }
           },
         ),
@@ -316,8 +315,7 @@ class AuditListState extends State<AuditList> {
             if (result != null && result < 300 && mounted) {
               Noticing.showModalNotice(pageContext,
                   message: S.of(pageContext).operation_successful);
-              await _auditListViewController.notifyUpdate(
-                  useInitialData: false, queueDataClear: false);
+              _auditListViewController.replaceDatumWith(e, e.processed());
             }
           },
         )

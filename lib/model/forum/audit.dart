@@ -44,6 +44,8 @@ class OTAudit {
   factory OTAudit.fromJson(Map<String, dynamic> json) =>
       _$OTAuditFromJson(json);
 
+  OTAudit processed() => OTAudit("已处理", hole_id, id, is_actual_sensitive, modified, time_created, time_updated, sensitive_detail);
+
   Map<String, dynamic> toJson() => _$OTAuditToJson(this);
 
   @override
