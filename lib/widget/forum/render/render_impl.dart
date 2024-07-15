@@ -104,7 +104,8 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
         inlineSyntaxes: [
           LatexSyntax(),
           LatexMultiLineSyntax(),
-          MentionSyntax()
+          MentionSyntax(),
+          AuditSyntax()
         ],
         builders: {
       'tex': MarkdownLatexSupport(),
@@ -287,5 +288,16 @@ class MentionSyntax extends md.InlineSyntax {
       return true;
     }
     return false;
+  }
+}
+
+class AuditSyntax extends md.InlineSyntax {
+  AuditSyntax() : super(r'<audit>([^\$]*?)</audit>');
+
+  @override
+  bool onMatch(md.InlineParser parser, Match match) {
+    var sensitiveString = match[1]!;
+    parser.addNode(md.Element.text("mark", sensitiveString));
+    return true;
   }
 }

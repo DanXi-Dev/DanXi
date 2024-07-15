@@ -704,7 +704,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: dc813d6925509aac6da2dbde3962639e8369e6c2
+      resolved-ref: "0edfbd6ba76963b1c5952a6b19ca4264275a1be1"
       url: "https://github.com/singularity-s0/flutter_markdown_selectable.git"
     source: git
     version: "0.6.13+1"
