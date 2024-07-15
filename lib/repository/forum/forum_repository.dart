@@ -678,7 +678,8 @@ class ForumRepository extends BaseRepositoryWithDio {
           "offset": startTime.toUtc().toIso8601String(),
           "size": length,
           "all": false,
-          "open": open
+          "open": open,
+          "order_by": "time_created"
         },
         options: Options(headers: _tokenHeader));
     final result = response.data;

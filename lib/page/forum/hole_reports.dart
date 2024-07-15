@@ -280,7 +280,7 @@ class AuditListState extends State<AuditList> {
         .generateReceiver(_auditListViewController, (lastElement) async {
       DateTime time = DateTime.now();
       if (lastElement != null) {
-        time = DateTime.parse(lastElement.time_updated!);
+        time = DateTime.parse(lastElement.time_created!);
       }
       return ForumRepository.getInstance()
           .adminGetAuditFloors(time, open, Constant.POST_COUNT_PER_PAGE);
