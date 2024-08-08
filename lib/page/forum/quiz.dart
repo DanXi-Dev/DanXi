@@ -74,8 +74,8 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
                 onPressed: () async {
                   final result = await ForumRepository.getInstance()
                       .getPostRegisterQuestions();
-                  questions = result.item1;
-                  version = result.item2;
+                  questions = result.$1;
+                  version = result.$2;
                   if (questions != null) {
                     indexes =
                         List.generate(questions!.length, (index) => index);

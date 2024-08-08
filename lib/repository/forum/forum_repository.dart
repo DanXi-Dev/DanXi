@@ -43,7 +43,6 @@ import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/dio.dart';
-import 'package:tuple/tuple.dart';
 
 /// The repository for forum.
 ///
@@ -834,16 +833,16 @@ class ForumRepository extends BaseRepositoryWithDio {
     return resp.statusCode;
   }
 
-  Future<Tuple2<List<QuizQuestion>?, int>> getPostRegisterQuestions() async {
+  Future<(List<QuizQuestion>?, int)> getPostRegisterQuestions() async {
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_AUTH_URL/register/questions",
         options: Options(headers: _tokenHeader));
-    final questionList = response.data?["questions"]
+    final List<QuizQuestion>? questionList = response.data?["questions"]
         .map((e) => QuizQuestion.fromJson(e))
         .toList()
         .cast<QuizQuestion>();
     final int version = response.data?["version"];
-    return Tuple2(questionList, version);
+    return (questionList, version);
   }
 
   // Empty list means all-correct
