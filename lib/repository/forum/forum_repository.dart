@@ -43,6 +43,7 @@ import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/dio.dart';
+import 'package:tuple/tuple.dart';
 
 /// The repository for forum.
 ///
@@ -833,26 +834,26 @@ class ForumRepository extends BaseRepositoryWithDio {
     return resp.statusCode;
   }
 
-  Future<List<QuizQuestion>?> getPostRegisterQuestions() async {
+  Future<Tuple2<List<QuizQuestion>?, int>> getPostRegisterQuestions() async {
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_AUTH_URL/register/questions",
         options: Options(headers: _tokenHeader));
     final questionList = response.data?["questions"]
         .map((e) => QuizQuestion.fromJson(e))
-        .toList();
-    final length = response.data?["spec"]["number_of_questions"] as int;
-
-    assert(questionList?.length == length);
-    return questionList.cast<QuizQuestion>();
+        .toList()
+        .cast<QuizQuestion>();
+    final int version = response.data?["version"];
+    return Tuple2(questionList, version);
   }
 
   // Empty list means all-correct
-  Future<List<int>?> submitAnswers(List<QuizAnswer> answers) async {
+  Future<List<int>?> submitAnswers(
+      List<QuizAnswer> answers, int version) async {
     final Response<Map<String, dynamic>> response = await dio.post(
         "$_BASE_AUTH_URL/register/questions/_answer",
         data: {
           "answers": answers.map((e) => e.toJson()).toList(),
-          "version": 0
+          "version": version
         },
         options: Options(headers: _tokenHeader));
 
