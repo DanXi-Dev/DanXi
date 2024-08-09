@@ -85,7 +85,7 @@ abstract class BaseRepositoryWithDio {
     };
 
     // Try direct link once
-    if (!directLinkFailed || !SettingsProvider.getInstance().useProxy) {
+    if (!directLinkFailed || !SettingsProvider.getInstance().useWebVpn) {
       try {
         final response = await requestFunction(path);
         return jsonDecode(response.data!);
@@ -93,7 +93,7 @@ abstract class BaseRepositoryWithDio {
         debugPrint(
             "Direct connextion failed, trying to connect through proxy: $e");
         // Throw immediately if `useProxy` is false
-        if (!SettingsProvider.getInstance().useProxy) {
+        if (!SettingsProvider.getInstance().useWebVpn) {
           rethrow;
         }
       } catch (e) {
