@@ -31,6 +31,7 @@ import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 import 'package:dio5_log/dio_log.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/foundation.dart';
 import 'package:mutex/mutex.dart';
 
 class UISLoginTool {
@@ -75,6 +76,7 @@ class UISLoginTool {
   static Future<Response<dynamic>?> loginUIS(
       Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
+    debugPrint("Login UIS Triggered");
     _mutexMap.putIfAbsent(jar, () => Mutex());
     await _mutexMap[jar]!.acquire();
     Response<dynamic>? result =

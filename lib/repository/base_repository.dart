@@ -18,6 +18,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
@@ -25,17 +26,12 @@ import 'package:dan_xi/repository/independent_cookie_jar.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
-import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dio/dio.dart';
 import 'package:dio5_log/interceptor/diox_log_interceptor.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 
-enum RequestType { Get, Post, Put, Delete, Head }
-
 abstract class BaseRepositoryWithDio {
-  static bool directLinkFailed = false;
-
   /// The host that the implementation works with.
   ///
   /// Should not contain scheme and/or path. e.g. www.jwc.fudan.edu.cn
@@ -47,13 +43,15 @@ abstract class BaseRepositoryWithDio {
       _dios[linkHost] = DioUtils.newDioWithProxy();
       _dios[linkHost]!.options = BaseOptions(
           receiveDataWhenStatusError: true,
-          connectTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 10),
-          sendTimeout: const Duration(seconds: 10));
+          connectTimeout: const Duration(seconds: 2),
+          receiveTimeout: const Duration(seconds: 2),
+          sendTimeout: const Duration(seconds: 2));
       _dios[linkHost]!.interceptors.add(LimitedQueuedInterceptor.getInstance());
       _dios[linkHost]!.interceptors.add(UserAgentInterceptor(
           userAgent: SettingsProvider.getInstance().customUserAgent));
-      _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
+      // _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
+      // Cookies related with webvpn
+      _dios[linkHost]!.interceptors.add(CookieManager(globalCookieJar));
       DioLogInterceptor.enablePrintLog = false;
       _dios[linkHost]!.interceptors.add(DioLogInterceptor());
     }
@@ -74,58 +72,7 @@ abstract class BaseRepositoryWithDio {
     }
   }
 
-  Future<T> requestWithProxy<T>(Dio dio, String path, RequestType type,
-      {Object? data, Options? options}) async {
-    Future<Response<String>> Function(String) requestFunction = switch (type) {
-      RequestType.Get => (p) => dio.get(p, data: data, options: options),
-      RequestType.Post => (p) => dio.post(p, data: data, options: options),
-      RequestType.Put => (p) => dio.put(p, data: data, options: options),
-      RequestType.Delete => (p) => dio.delete(p, data: data, options: options),
-      RequestType.Head => (p) => dio.head(p, data: data, options: options),
-    };
-
-    // Try direct link once
-    if (!directLinkFailed || !SettingsProvider.getInstance().useWebVpn) {
-      try {
-        final response = await requestFunction(path);
-        return jsonDecode(response.data!);
-      } on DioException catch (e) {
-        debugPrint(
-            "Direct connextion failed, trying to connect through proxy: $e");
-        // Throw immediately if `useProxy` is false
-        if (!SettingsProvider.getInstance().useWebVpn) {
-          rethrow;
-        }
-      } catch (e) {
-        debugPrint("Connection failed with unknown exception: $e");
-        rethrow;
-      }
-    }
-
-    // Turn to the proxy
-    directLinkFailed = true;
-    String proxiedPath = WebvpnProxy.getProxiedUri(path);
-    Response<dynamic> response = await requestFunction(proxiedPath);
-
-    // If not redirected to login, then return
-    if (!response.realUri
-        .toString()
-        .startsWith("https://webvpn.fudan.edu.cn/login")) {
-      return jsonDecode(response.data!);
-    }
-
-    // Login and retry
-    await UISLoginTool.loginUIS(dio, WebvpnProxy.WEBVPN_LOGIN_URL, cookieJar!,
-        StateProvider.personInfo.value, false);
-    try{
-      response = await requestFunction(proxiedPath);
-    }catch(err){
-      debugPrint("DSHU: $err");
-    }
-
-    return jsonDecode(response.data!);
-  }
-
+  static final IndependentCookieJar globalCookieJar = IndependentCookieJar();
   static final Map<String, IndependentCookieJar> _cookieJars = {};
   static final Map<String, Dio> _dios = {};
 }
