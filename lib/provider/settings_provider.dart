@@ -83,7 +83,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_AUTH_BASE_URL = "auth_base_url";
   static const String KEY_IMAGE_BASE_URL = "image_base_url";
   static const String KEY_DANKE_BASE_URL = "danke_base_url";
-  static const String KEY_USE_PROXY = "use_proxy";
+  static const String KEY_PROXY = "proxy";
 
   SettingsProvider._();
 
@@ -93,6 +93,22 @@ class SettingsProvider with ChangeNotifier {
   /// of widget tree.
   /// If you need to get access to a [SettingsProvider], call [context.read<SettingsProvider>()] instead.
   factory SettingsProvider.getInstance() => _instance;
+
+  String? get proxy {
+    if (preferences!.containsKey(KEY_PROXY)) {
+      return preferences!.getString(KEY_PROXY);
+    }
+    return null;
+  }
+
+  set proxy(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_PROXY, value);
+    } else {
+      preferences!.remove(KEY_PROXY);
+    }
+    notifyListeners();
+  }
 
   List<String> get searchHistory {
     if (preferences!.containsKey(KEY_SEARCH_HISTORY)) {
@@ -725,14 +741,14 @@ class SettingsProvider with ChangeNotifier {
   }
 
   bool get useProxy{
-    if (preferences!.containsKey(KEY_USE_PROXY)) {
-      return preferences!.getBool(KEY_USE_PROXY)!;
+    if (preferences!.containsKey(KEY_PROXY)) {
+      return preferences!.getBool(KEY_PROXY)!;
     }
     return true;
   }
 
   set useProxy(bool value){
-    preferences!.setBool(KEY_USE_PROXY, value);
+    preferences!.setBool(KEY_PROXY, value);
     notifyListeners();
   }
 }

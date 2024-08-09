@@ -22,6 +22,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/repository/independent_cookie_jar.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/webvpn_proxy.dart';
@@ -43,7 +44,7 @@ abstract class BaseRepositoryWithDio {
   @protected
   Dio get dio {
     if (!_dios.containsKey(linkHost)) {
-      _dios[linkHost] = Dio();
+      _dios[linkHost] = DioUtils.newDioWithProxy();
       _dios[linkHost]!.options = BaseOptions(
           receiveDataWhenStatusError: true,
           connectTimeout: const Duration(seconds: 10),

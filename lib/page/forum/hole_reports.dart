@@ -280,7 +280,7 @@ class AuditListState extends State<AuditList> {
         .generateReceiver(_auditListViewController, (lastElement) async {
       DateTime time = DateTime.now();
       if (lastElement != null) {
-        time = DateTime.parse(lastElement.time_updated!);
+        time = DateTime.parse(lastElement.time_created!);
       }
       return ForumRepository.getInstance()
           .adminGetAuditFloors(time, open, Constant.POST_COUNT_PER_PAGE);
@@ -302,8 +302,7 @@ class AuditListState extends State<AuditList> {
             if (result != null && result < 300 && mounted) {
               Noticing.showModalNotice(pageContext,
                   message: S.of(pageContext).operation_successful);
-              await _auditListViewController.notifyUpdate(
-                  useInitialData: false, queueDataClear: false);
+              _auditListViewController.replaceDatumWith(e, e.processed());
             }
           },
         ),
@@ -316,12 +315,45 @@ class AuditListState extends State<AuditList> {
             if (result != null && result < 300 && mounted) {
               Noticing.showModalNotice(pageContext,
                   message: S.of(pageContext).operation_successful);
-              await _auditListViewController.notifyUpdate(
-                  useInitialData: false, queueDataClear: false);
+              _auditListViewController.replaceDatumWith(e, e.processed());
             }
           },
         )
       ];
+
+  String processStringForAudit(String content, String? detail) {
+    if (detail == null) {
+      return content;
+    }
+    // Workaround for flutter_markdown not supporting \n\n inside tags
+    while (content.contains('\n\n')) {
+      content = content.replaceAll('\n\n', '\n');
+    }
+    while (detail!.contains('\n\n')) {
+      detail = detail.replaceAll('\n\n', '\n');
+    }
+    // New audit data with labels
+    if (detail[0] == '{' && detail.contains('\n')) {
+      final int sepLabelIndex = detail.indexOf('\n');
+      final String detailContent = detail.substring(sepLabelIndex + 1);
+      final int matchIndex = content.indexOf(detailContent);
+      if (matchIndex != -1) {
+        final String sensitiveLabel = detail.substring(0, sepLabelIndex);
+        final String prefix = content.substring(0, matchIndex);
+        final String suffix = content.substring(matchIndex + detailContent.length);
+        return '<audit>$sensitiveLabel</audit>\n$prefix<audit>$detailContent</audit>$suffix';
+      }
+    // Old data without labels
+    } else {
+      final int matchIndex = content.indexOf(detail);
+      if (matchIndex != -1) {
+        final String prefix = content.substring(0, matchIndex);
+        final String suffix = content.substring(matchIndex + detail.length);
+        return '$prefix<audit>$detail</audit>$suffix';
+      }
+    }
+    return '<audit>$detail</audit>\n$content';
+  }
 
   Widget _getAuditFloorsListItems(BuildContext context,
       ListProvider<OTAudit> dataProvider, int index, OTAudit e) {
@@ -359,7 +391,11 @@ class AuditListState extends State<AuditList> {
                   Align(
                       alignment: Alignment.topLeft,
                       child: smartRender(
-                          context, e.content, onLinkTap, onImageTap, false)),
+                          context,
+                          processStringForAudit(e.content, e.sensitive_detail),
+                          onLinkTap,
+                          onImageTap,
+                          false)),
                   const Divider(),
                 ],
               ),

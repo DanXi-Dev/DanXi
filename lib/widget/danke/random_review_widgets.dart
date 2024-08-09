@@ -18,7 +18,7 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/forum/forum_widgets.dart';
+import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -75,9 +75,9 @@ class RandomReviewWidgets extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          OTLeadingTag(
+                          LeadingChip(
                             color: Colors.orange,
-                            text:
+                            label:
                                 "${review.course!.credit!.toStringAsFixed(1)} ${S.of(context).credits}",
                           ),
                           Wrap(

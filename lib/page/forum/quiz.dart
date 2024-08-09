@@ -5,7 +5,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/widget/libraries/round_chip.dart';
+import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -30,6 +30,7 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
   int questionIndex = 0, prevQuestionIndex = 0;
   int displayIndex = 1, displayTotalIndex = 1;
   late List<QuizQuestion>? questions;
+  late int version;
   late List<int>? indexes;
   List<QuizAnswer>? answers;
   OTQuizDisplayTypes displayType = OTQuizDisplayTypes.WELCOME_PAGE;
@@ -71,8 +72,10 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
               child: PlatformElevatedButton(
                 padding: const EdgeInsets.all(20.0),
                 onPressed: () async {
-                  questions = await ForumRepository.getInstance()
+                  final result = await ForumRepository.getInstance()
                       .getPostRegisterQuestions();
+                  questions = result.$1;
+                  version = result.$2;
                   if (questions != null) {
                     indexes =
                         List.generate(questions!.length, (index) => index);
@@ -182,7 +185,7 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
       return;
     } else {
       final errorList =
-          await ForumRepository.getInstance().submitAnswers(answers!);
+          await ForumRepository.getInstance().submitAnswers(answers!, version);
 
       // Have trouble submitting
       if (errorList == null) {

@@ -22,6 +22,7 @@ import 'package:dan_xi/repository/fdu/ecard_repository.dart';
 import 'package:dan_xi/repository/fdu/ehall_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/browser_util.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -171,7 +172,7 @@ class LoginDialogState extends State<LoginDialog> {
     // This webpage only returns plain-text 'SUCCESS' and is ideal for testing connection.
     try {
       // fixme: use a privacy-friendly captive portal detection method.
-      await Dio().head('http://captive.apple.com');
+      await DioUtils.newDioWithProxy().head('http://captive.apple.com');
     } catch (ignored) {}
   }
 

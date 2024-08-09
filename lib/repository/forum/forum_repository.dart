@@ -22,6 +22,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/forum/audit.dart';
 import 'package:dan_xi/model/forum/division.dart';
 import 'package:dan_xi/model/forum/floor.dart';
+import 'package:dan_xi/model/forum/history.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/model/forum/jwt.dart';
 import 'package:dan_xi/model/forum/message.dart';
@@ -31,14 +32,14 @@ import 'package:dan_xi/model/forum/quiz_question.dart';
 import 'package:dan_xi/model/forum/report.dart';
 import 'package:dan_xi/model/forum/tag.dart';
 import 'package:dan_xi/model/forum/user.dart';
-import 'package:dan_xi/model/forum/history.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/forum/fduhole_platform_bridge.dart';
 import 'package:dan_xi/util/forum/jwt_interceptor.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
+import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/dio.dart';
@@ -203,7 +204,7 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   /// FIXME: we used to use a pinned cert to prevent HTTPS traffic sniffing. But now we do not need it anymore.
   Dio get secureDio {
-    Dio secureDio = Dio();
+    Dio secureDio = DioUtils.newDioWithProxy();
     // Pin HTTPS cert
     /*(secureDio.httpClientAdapter as DefaultHttpClientAdapter)
         .onHttpClientCreate = (client) {
@@ -677,7 +678,8 @@ class ForumRepository extends BaseRepositoryWithDio {
           "offset": startTime.toUtc().toIso8601String(),
           "size": length,
           "all": false,
-          "open": open
+          "open": open,
+          "order_by": "time_created"
         },
         options: Options(headers: _tokenHeader));
     final result = response.data;
@@ -831,26 +833,26 @@ class ForumRepository extends BaseRepositoryWithDio {
     return resp.statusCode;
   }
 
-  Future<List<QuizQuestion>?> getPostRegisterQuestions() async {
+  Future<(List<QuizQuestion>?, int)> getPostRegisterQuestions() async {
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_AUTH_URL/register/questions",
         options: Options(headers: _tokenHeader));
-    final questionList = response.data?["questions"]
+    final List<QuizQuestion>? questionList = response.data?["questions"]
         .map((e) => QuizQuestion.fromJson(e))
-        .toList();
-    final length = response.data?["spec"]["number_of_questions"] as int;
-
-    assert(questionList?.length == length);
-    return questionList.cast<QuizQuestion>();
+        .toList()
+        .cast<QuizQuestion>();
+    final int version = response.data?["version"];
+    return (questionList, version);
   }
 
   // Empty list means all-correct
-  Future<List<int>?> submitAnswers(List<QuizAnswer> answers) async {
+  Future<List<int>?> submitAnswers(
+      List<QuizAnswer> answers, int version) async {
     final Response<Map<String, dynamic>> response = await dio.post(
         "$_BASE_AUTH_URL/register/questions/_answer",
         data: {
           "answers": answers.map((e) => e.toJson()).toList(),
-          "version": 0
+          "version": version
         },
         options: Options(headers: _tokenHeader));
 

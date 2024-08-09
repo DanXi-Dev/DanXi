@@ -61,7 +61,7 @@ import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:receive_intent/receive_intent.dart' as ri;
 import 'package:screen_capture_event/screen_capture_event.dart';
-import 'package:uni_links/uni_links.dart';
+import 'package:app_links/app_links.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_command_message_entity.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
@@ -351,12 +351,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // is recognized as an invalid path by [dealWithUri] now. Improve it later.
     if (PlatformX.isWeb) return;
 
-    Uri? initialUri;
-    initialUri = await getInitialUri();
+    final appLinks = AppLinks();
+    Uri? initialUri = await appLinks.getInitialLink();
     if (initialUri != null) await dealWithUri(initialUri);
 
     _uniLinksSubscription.bindOnlyInvalid(
-        uriLinkStream.listen((Uri? uri) async {
+        appLinks.uriLinkStream.listen((Uri? uri) async {
           if (uri != null) await dealWithUri(uri);
         }, onError: (Object error) {
           // Handle exception by warning the user their action did not succeed

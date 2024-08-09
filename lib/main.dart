@@ -32,7 +32,6 @@ import 'package:dan_xi/page/dashboard/dashboard_reorder.dart';
 import 'package:dan_xi/page/dashboard/empty_classroom_detail.dart';
 import 'package:dan_xi/page/dashboard/exam_detail.dart';
 import 'package:dan_xi/page/dashboard/gpa_table.dart';
-import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/forum/admin_operation.dart';
 import 'package:dan_xi/page/forum/hole_detail.dart';
 import 'package:dan_xi/page/forum/hole_editor.dart';
@@ -43,6 +42,7 @@ import 'package:dan_xi/page/forum/hole_search.dart';
 import 'package:dan_xi/page/forum/hole_tags.dart';
 import 'package:dan_xi/page/forum/image_viewer.dart';
 import 'package:dan_xi/page/forum/text_selector.dart';
+import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/settings/diagnostic_console.dart';
 import 'package:dan_xi/page/settings/hidden_tags_preference.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
@@ -153,8 +153,11 @@ class DanxiApp extends StatelessWidget {
   /// Every route record is a function that returns a [Widget]. After registering
   //  the route, you can call [smartNavigatorPush] to navigate to the page.
   static final Map<String, Function> routes = {
-    '/placeholder': (context, {arguments}) =>
-        ColoredBox(color: Theme.of(context).scaffoldBackgroundColor),
+    // @w568w(2024-07-01): if the placeholder is a ColoredBox with color alpha 255,
+    // the app will be half black screen and half white screen, displaying nothing on Linux.
+    // Why?
+    '/placeholder': (context, {arguments}) => ColoredBox(
+        color: Theme.of(context).scaffoldBackgroundColor.withAlpha(254)),
     '/home': (context, {arguments}) => const HomePage(),
     '/diagnose': (context, {arguments}) =>
         DiagnosticConsole(arguments: arguments),

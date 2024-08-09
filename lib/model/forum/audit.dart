@@ -29,17 +29,27 @@ class OTAudit {
   final int modified;
   final String? time_created;
   final String? time_updated;
+  final String? sensitive_detail;
 
-  OTAudit(this.content, this.hole_id, this.id, this.is_actual_sensitive,
-      this.modified, this.time_created, this.time_updated);
+  OTAudit(
+      this.content,
+      this.hole_id,
+      this.id,
+      this.is_actual_sensitive,
+      this.modified,
+      this.time_created,
+      this.time_updated,
+      this.sensitive_detail);
 
   factory OTAudit.fromJson(Map<String, dynamic> json) =>
       _$OTAuditFromJson(json);
+
+  OTAudit processed() => OTAudit("已处理", hole_id, id, is_actual_sensitive, modified, time_created, time_updated, sensitive_detail);
 
   Map<String, dynamic> toJson() => _$OTAuditToJson(this);
 
   @override
   String toString() {
-    return 'OTAudit{content: $content, hole_id: $hole_id, id: $id, is_actual_sensitive: $is_actual_sensitive, modified: $modified, time_created: $time_created, time_updated: $time_updated}';
+    return 'OTAudit{content: $content, hole_id: $hole_id, id: $id, is_actual_sensitive: $is_actual_sensitive, modified: $modified, time_created: $time_created, time_updated: $time_updated, sensitive_detail: $sensitive_detail}';
   }
 }

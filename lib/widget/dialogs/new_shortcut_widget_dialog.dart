@@ -19,9 +19,9 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -48,7 +48,7 @@ class NewShortcutDialogState extends State<NewShortcutDialog> {
     }
     // Validate URL
     try {
-      await Dio().head(_linkTextFieldController.text);
+      await DioUtils.newDioWithProxy().head(_linkTextFieldController.text);
       SettingsProvider.getInstance().dashboardWidgetsSequence =
           SettingsProvider.getInstance().dashboardWidgetsSequence.followedBy([
             DashboardCard(Constant.FEATURE_CUSTOM_CARD,

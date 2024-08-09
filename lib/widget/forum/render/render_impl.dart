@@ -16,12 +16,12 @@
  */
 
 import 'package:dan_xi/repository/forum/forum_repository.dart';
-import 'package:dan_xi/util/viewport_utils.dart';
-import 'package:dan_xi/widget/forum/auto_bbs_image.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/stickers.dart';
-import 'package:dan_xi/widget/forum/render/base_render.dart';
+import 'package:dan_xi/util/viewport_utils.dart';
+import 'package:dan_xi/widget/forum/auto_bbs_image.dart';
 import 'package:dan_xi/widget/forum/forum_widgets.dart';
+import 'package:dan_xi/widget/forum/render/base_render.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
@@ -62,9 +62,9 @@ const double kFontLargerSize = 24.0;
 MarkdownStyleSheet _getMarkdownStyleSheetFromPlatform(BuildContext context) =>
     MarkdownStyleSheet.fromTheme(Theme.of(context));
 
-//Override the font size and background of blockquote
+// Override the font size and background of blockquote
 MarkdownStyleSheet _markdownStyleOverride(
-    MarkdownStyleSheet sheet, double fontSize) {
+    MarkdownStyleSheet sheet, double? fontSize) {
   return sheet.copyWith(
     p: sheet.p?.copyWith(fontSize: fontSize),
     a: sheet.a?.copyWith(fontSize: fontSize),
@@ -81,35 +81,50 @@ MarkdownStyleSheet _markdownStyleOverride(
   );
 }
 
-final BaseRender kMarkdownRender = (BuildContext context,
-    String? content,
-    ImageTapCallback? onTapImage,
-    LinkTapCallback? onTapLink,
-    bool translucentCard,
-    bool isPreviewWidget) {
-  double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
+/// Markdown render creator.
+///
+/// [defaultFontSize] is the default font size of the markdown content. If it is
+/// null, the default font size of theme will be used.
+final kMarkdownRenderFactory = (double? defaultFontSize) =>
+    (BuildContext context,
+        String? content,
+        ImageTapCallback? onTapImage,
+        LinkTapCallback? onTapLink,
+        bool translucentCard,
+        bool isPreviewWidget) {
+      double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
 
-  return MarkdownBody(
+      return MarkdownBody(
     softLineBreak: true,
     data: content!,
     styleSheet: _markdownStyleOverride(
-        _getMarkdownStyleSheetFromPlatform(context), kFontSize),
-    onTapLink: (String text, String? href, String title) =>
+            _getMarkdownStyleSheetFromPlatform(context), defaultFontSize),
+        onTapLink: (String text, String? href, String title) =>
         onTapLink?.call(href),
-    inlineSyntaxes: [LatexSyntax(), LatexMultiLineSyntax(), MentionSyntax()],
-    builders: {
+        inlineSyntaxes: [
+          LatexSyntax(),
+          LatexMultiLineSyntax(),
+          MentionSyntax(),
+          AuditSyntax()
+        ],
+        builders: {
       'tex': MarkdownLatexSupport(),
       'texLine': MarkdownLatexMultiLineSupport(),
       'floor_mention':
-          MarkdownFloorMentionSupport(translucentCard, isPreviewWidget),
-      'hole_mention':
-          MarkdownHoleMentionSupport(translucentCard, isPreviewWidget),
-    },
+              MarkdownFloorMentionSupport(translucentCard, isPreviewWidget),
+          'hole_mention':
+              MarkdownHoleMentionSupport(translucentCard, isPreviewWidget),
+        },
     imageBuilder: (Uri uri, String? title, String? alt) {
-      // render stickers first
-      if (uri.toString().contains("danxi_")) {
-        var asset = getStickerAssetPath(uri.toString());
-        // print(asset);
+          String url = uri.toString();
+          // render stickers first
+          if (url.startsWith("danxi_")) {
+            // backward compatibility: <=1.4.3, danxi_ is used; after that, dx_ is used
+            url = url.replaceFirst("danxi_", "dx_");
+          }
+          if (url.startsWith("dx_")) {
+            var asset = getStickerAssetPath(url);
+            // print(asset);
         if (asset != null) {
           return Image.asset(
             asset,
@@ -119,16 +134,18 @@ final BaseRender kMarkdownRender = (BuildContext context,
         }
       }
 
-      return Center(
-        child: AutoBBSImage(
-            key: UniqueKey(),
-            src: uri.toString(),
-            maxWidth: imageWidth,
-            onTapImage: onTapImage),
+          return Center(
+            child: AutoBBSImage(
+                key: UniqueKey(),
+                src: url,
+                maxWidth: imageWidth,
+                onTapImage: onTapImage),
+          );
+        },
       );
-    },
-  );
-};
+    };
+
+final BaseRender kMarkdownRender = kMarkdownRenderFactory(kFontSize);
 
 final BaseRender kPlainRender = (BuildContext context,
     String? content,
@@ -271,5 +288,16 @@ class MentionSyntax extends md.InlineSyntax {
       return true;
     }
     return false;
+  }
+}
+
+class AuditSyntax extends md.InlineSyntax {
+  AuditSyntax() : super(r'<audit>([^\$]*?)</audit>');
+
+  @override
+  bool onMatch(md.InlineParser parser, Match match) {
+    var sensitiveString = match[1]!;
+    parser.addNode(md.Element.text("mark", sensitiveString));
+    return true;
   }
 }

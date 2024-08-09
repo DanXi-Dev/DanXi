@@ -40,7 +40,7 @@ import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
 import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
-import 'package:dan_xi/widget/libraries/round_chip.dart';
+import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:dan_xi/widget/libraries/scale_transform.dart';
 import 'package:dan_xi/widget/forum/ottag_selector.dart';
 import 'package:flutter/cupertino.dart';
@@ -326,7 +326,7 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
   final GlobalKey<OTTagSelectorState> _tagSelectorKey =
       GlobalKey<OTTagSelectorState>();
 
-  Future _buildStickersSheet(BuildContext context) {
+  Future<T?> _buildStickersSheet<T>(BuildContext context) {
     return showPlatformModalSheet(
         context: context,
         builder: (BuildContext context) {

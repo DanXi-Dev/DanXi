@@ -18,11 +18,9 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
-import 'package:dan_xi/widget/libraries/round_chip.dart';
-import 'package:dan_xi/widget/forum/forum_widgets.dart';
+import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:flutter/material.dart';
 
-List<String>? overallWord, contentWord, workloadWord, assessmentWord;
 const List<Color> wordColor = [
   Colors.red,
   Colors.orange,
@@ -95,9 +93,9 @@ class CourseGroupCardWidget extends StatelessWidget {
                           spacing: 5,
                           // for each credit in credits create a text
                           children: <Widget>[
-                            ...courseGroup.credits!.map((e) => OTLeadingTag(
+                            ...courseGroup.credits!.map((e) => LeadingChip(
                                   color: Colors.orange,
-                                  text:
+                                  label:
                                       "${e.toStringAsFixed(1)} ${S.of(context).credits}",
                                 )),
                           ],

@@ -339,7 +339,7 @@ class WrapConfiguration {
 }
 
 ///
-class SuggestionsBoxConfiguration {
+class SuggestionsBoxConfiguration<T> {
   /// If set to false, the suggestions box will stay opened after
   /// the keyboard is closed.
   ///
@@ -381,32 +381,48 @@ class SuggestionsBoxConfiguration {
   /// The decoration of the material sheet that contains the suggestions.
   ///
   /// If null, default decoration with an elevation of 4.0 is used
-  final SuggestionsBoxDecoration suggestionsBoxDecoration;
+  final Widget Function(
+    BuildContext context,
+    Widget child,
+  )? suggestionsBoxDecoration;
 
   /// Used to control the `_SuggestionsBox`. Allows manual control to
   /// open, close, toggle, or resize the `_SuggestionsBox`.
-  final SuggestionsBoxController? suggestionsBoxController;
+  final SuggestionsController<T>? suggestionsBoxController;
 
   /// Determine the [SuggestionBox]'s direction.
-  ///
-  /// If [AxisDirection.down], the [SuggestionBox] will be below the [TextField]
-  /// and the list of suggestion will grow **down**.
-  ///
-  /// If [AxisDirection.up], the [SuggestionBox] will be above the [TextField]
-  /// and the list of suggestion will grow **up**.
-  ///
-  /// [AxisDirection.left] and [AxisDirection.right] are not allowed.
-  final AxisDirection direction;
+  final VerticalDirection direction;
 
   ///
   const SuggestionsBoxConfiguration({
-    this.direction = AxisDirection.down,
+    this.direction = VerticalDirection.down,
     this.autoFlipDirection = false,
     this.hideSuggestionsOnKeyboardHide = true,
     this.keepSuggestionsOnLoading = true,
     this.keepSuggestionsOnSuggestionSelected = false,
     this.suggestionsBoxController,
-    this.suggestionsBoxDecoration = const SuggestionsBoxDecoration(),
+    this.suggestionsBoxDecoration,
     this.suggestionsBoxVerticalOffset = 5.0,
   });
+}
+
+/// Our custom configuration for the text field
+class TextFieldConfiguration {
+  final InputDecoration? decoration;
+  final bool enabled;
+
+  const TextFieldConfiguration({
+    this.decoration,
+    this.enabled = true,
+  });
+
+  TextFieldConfiguration copyWith({
+    InputDecoration? decoration,
+    bool? enabled,
+  }) {
+    return TextFieldConfiguration(
+      decoration: decoration ?? this.decoration,
+      enabled: enabled ?? this.enabled,
+    );
+  }
 }
