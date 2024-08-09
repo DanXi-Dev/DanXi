@@ -516,7 +516,7 @@ class ForumRepository extends BaseRepositoryWithDio {
   }
 
   Future<void> modifyMessage(OTMessage message) async {
-    await dio.put("$_BASE_URL/messages/${message.message_id}",
+    await dio.delete("$_BASE_URL/messages/${message.message_id}",
         data: {
           "has_read": message.has_read,
         },
