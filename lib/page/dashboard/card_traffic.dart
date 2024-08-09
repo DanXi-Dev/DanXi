@@ -38,7 +38,7 @@ class CardCrowdData extends StatefulWidget {
   @override
   CardCrowdDataState createState() => CardCrowdDataState();
 
-  const CardCrowdData({Key? key, this.arguments}) : super(key: key);
+  const CardCrowdData({super.key, this.arguments});
 }
 
 class CardCrowdDataState extends State<CardCrowdData> {
@@ -60,7 +60,10 @@ class CardCrowdDataState extends State<CardCrowdData> {
 
   /// Load dining hall data
   Future<void> _onSelectedItemChanged(Campus? e) async {
-    setState(() => {_selectItem = e, _trafficInfo = null});
+    setState(() {
+      _selectItem = e;
+      _trafficInfo = null;
+    });
     _trafficInfo = await DataCenterRepository.getInstance()
         .getCrowdednessInfo(_personInfo, _selectItem!.index)
         .catchError((e) {

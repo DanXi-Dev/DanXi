@@ -1,6 +1,7 @@
 #include "my_application.h"
 
 #include <flutter_linux/flutter_linux.h>
+#include <bitsdojo_window_linux/bitsdojo_window_plugin.h>
 
 #ifdef GDK_WINDOWING_X11
 #include <gdk/gdkx.h>
@@ -19,6 +20,15 @@ G_DEFINE_TYPE(MyApplication, my_application, GTK_TYPE_APPLICATION
 // Implements GApplication::activate.
 static void my_application_activate(GApplication *application) {
   MyApplication * self = MY_APPLICATION(application);
+
+    // >>> Required by app_links
+    GList *windows = gtk_application_get_windows(GTK_APPLICATION(application));
+    if (windows) {
+        gtk_window_present(GTK_WINDOW(windows->data));
+        return;
+    }
+    // <<< Required by app_links
+
   GtkWindow *window =
           GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
 
@@ -49,7 +59,8 @@ static void my_application_activate(GApplication *application) {
     gtk_window_set_title(window, "dan_xi");
   }
 
-  gtk_window_set_default_size(window, 1280, 720);
+    bitsdojo_window_from(window);
+    gtk_window_set_default_size(window, 1280, 720);
   gtk_widget_show(GTK_WIDGET(window));
 
   g_autoptr(FlDartProject)
@@ -83,7 +94,9 @@ my_application_local_command_line(GApplication *application, gchar ***arguments,
   g_application_activate(application);
   *exit_status = 0;
 
-  return TRUE;
+    // >>> Required by app_links
+    return FALSE;
+    // <<< Required by app_links
 }
 
 // Implements GObject::dispose.
@@ -104,6 +117,9 @@ static void my_application_init(MyApplication * self) {}
 MyApplication *my_application_new() {
   return MY_APPLICATION(g_object_new(my_application_get_type(),
                                      "application-id", APPLICATION_ID,
-                                     "flags", G_APPLICATION_NON_UNIQUE,
+          // >>> Required by app_links
+                                     "flags", G_APPLICATION_HANDLES_COMMAND_LINE |
+                                              G_APPLICATION_HANDLES_OPEN,
+          // <<< Required by app_links
                                      nullptr));
 }

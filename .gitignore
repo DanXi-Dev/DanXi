@@ -8,6 +8,7 @@
 .buildlog/
 .history
 .svn/
+.gradle/
 
 # IntelliJ related
 *.iml
@@ -31,6 +32,7 @@
 .pub/
 /build/
 lib/generated/
+**/*.g.dart
 
 # Web related
 lib/generated_plugin_registrant.dart
@@ -52,19 +54,14 @@ app.*.map.json
 # macOS
 ios/build
 
-#Private Key
+# Private Key
 macos/Podfile.lock
 
 # Visual Studio
 windows/.vs
 windows/out
-ios/Runner/TagPredictorME.mlpackage/Data/com.apple.CoreML/FeatureDescriptions.json
-ios/Runner/TagPredictorME.mlpackage/Data/com.apple.CoreML/Metadata.json
-ios/Runner/TagPredictorME.mlpackage/Data/com.apple.CoreML/TagPredictor.mlmodel
-ios/Runner/TagPredictorME.mlpackage/Manifest.json
-ios/Runner/TagPredictorTL.mlmodelkey
-ios/Runner/TagPredictorTL.mlpackage/Data/com.apple.CoreML/FeatureDescriptions.json
-ios/Runner/TagPredictorTL.mlpackage/Data/com.apple.CoreML/Metadata.json
-ios/Runner/TagPredictorTL.mlpackage/Data/com.apple.CoreML/TagPredictorTL.mlmodel
-ios/Runner/TagPredictorTL.mlpackage/Manifest.json
 ios/fastlane/Matchfile
+
+# FVM Version Cache
+.fvm/
+.fvmrc

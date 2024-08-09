@@ -31,12 +31,7 @@ import 'package:provider/provider.dart';
 /// Note: a [PlatformSubpage] must have a parent widget [PageWithTab]. Otherwise, it will
 /// suppose that it is NOT in a tab page, and functions like a empty [Container].
 abstract class PlatformSubpage<T> extends StatefulWidget {
-  const PlatformSubpage({Key? key}) : super(key: key);
-
-  @deprecated
-  final bool needPadding = false;
-  @deprecated
-  final bool needBottomPadding = false;
+  const PlatformSubpage({super.key});
 
   Create<Widget> get title;
 
@@ -55,7 +50,7 @@ abstract class PlatformSubpage<T> extends StatefulWidget {
 class PageWithTab extends StatelessWidget {
   final Widget child;
 
-  const PageWithTab({Key? key, required this.child}) : super(key: key);
+  const PageWithTab({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) => child;
@@ -167,13 +162,12 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
       controller: _buildPrimaryScrollController(context),
       child: PlatformScaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          iosContentBottomPadding: widget.needBottomPadding,
-          iosContentPadding: widget.needPadding,
           appBar: PlatformAppBar(
             cupertino: (_, __) => CupertinoNavigationBarData(
               title: MediaQuery(
                   data: MediaQueryData(
-                      textScaleFactor: MediaQuery.textScaleFactorOf(context)),
+                      textScaler: TextScaler.linear(
+                          MediaQuery.textScaleFactorOf(context))),
                   child: TopController(child: widget.title(context))),
             ),
             material: (_, __) => MaterialAppBarData(

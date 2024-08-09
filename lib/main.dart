@@ -32,21 +32,22 @@ import 'package:dan_xi/page/dashboard/dashboard_reorder.dart';
 import 'package:dan_xi/page/dashboard/empty_classroom_detail.dart';
 import 'package:dan_xi/page/dashboard/exam_detail.dart';
 import 'package:dan_xi/page/dashboard/gpa_table.dart';
+import 'package:dan_xi/page/forum/admin_operation.dart';
+import 'package:dan_xi/page/forum/hole_detail.dart';
+import 'package:dan_xi/page/forum/hole_editor.dart';
+import 'package:dan_xi/page/forum/hole_login.dart';
+import 'package:dan_xi/page/forum/hole_messages.dart';
+import 'package:dan_xi/page/forum/hole_reports.dart';
+import 'package:dan_xi/page/forum/hole_search.dart';
+import 'package:dan_xi/page/forum/hole_tags.dart';
+import 'package:dan_xi/page/forum/image_viewer.dart';
+import 'package:dan_xi/page/forum/text_selector.dart';
 import 'package:dan_xi/page/home_page.dart';
-import 'package:dan_xi/page/opentreehole/hole_detail.dart';
-import 'package:dan_xi/page/opentreehole/hole_editor.dart';
-import 'package:dan_xi/page/opentreehole/hole_login.dart';
-import 'package:dan_xi/page/opentreehole/hole_messages.dart';
-import 'package:dan_xi/page/opentreehole/hole_reports.dart';
-import 'package:dan_xi/page/opentreehole/hole_search.dart';
-import 'package:dan_xi/page/opentreehole/hole_tags.dart';
-import 'package:dan_xi/page/opentreehole/image_viewer.dart';
-import 'package:dan_xi/page/opentreehole/text_selector.dart';
 import 'package:dan_xi/page/settings/diagnostic_console.dart';
 import 'package:dan_xi/page/settings/hidden_tags_preference.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
-import 'package:dan_xi/page/subpage_treehole.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/page/subpage_forum.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/language_manager.dart';
 import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -105,7 +106,9 @@ void main() {
   SettingsProvider.getInstance().init().then((_) {
     SettingsProvider.getInstance().isTagSuggestionAvailable().then((value) {
       SettingsProvider.getInstance().tagSuggestionAvailable = value;
-      DeviceIdentity.register().then((value) {
+      final registerDeviceIdentity =
+          PlatformX.isAndroid ? DeviceIdentity.register() : Future.value();
+      registerDeviceIdentity.then((_) {
         // This is the entrypoint of a simple Flutter app.
         // runApp() is a function that takes a [Widget] and makes it the root
         // of the widget tree.
@@ -150,8 +153,11 @@ class DanxiApp extends StatelessWidget {
   /// Every route record is a function that returns a [Widget]. After registering
   //  the route, you can call [smartNavigatorPush] to navigate to the page.
   static final Map<String, Function> routes = {
-    '/placeholder': (context, {arguments}) =>
-        ColoredBox(color: Theme.of(context).scaffoldBackgroundColor),
+    // @w568w(2024-07-01): if the placeholder is a ColoredBox with color alpha 255,
+    // the app will be half black screen and half white screen, displaying nothing on Linux.
+    // Why?
+    '/placeholder': (context, {arguments}) => ColoredBox(
+        color: Theme.of(context).scaffoldBackgroundColor.withAlpha(254)),
     '/home': (context, {arguments}) => const HomePage(),
     '/diagnose': (context, {arguments}) =>
         DiagnosticConsole(arguments: arguments),
@@ -175,7 +181,7 @@ class DanxiApp extends StatelessWidget {
     '/dashboard/reorder': (context, {arguments}) =>
         DashboardReorderPage(arguments: arguments),
     '/bbs/discussions': (context, {arguments}) =>
-        TreeHoleSubpage(arguments: arguments),
+        ForumSubpage(arguments: arguments),
     '/bbs/tags': (context, {arguments}) => BBSTagsPage(arguments: arguments),
     '/bbs/fullScreenEditor': (context, {arguments}) =>
         BBSEditorPage(arguments: arguments),
@@ -187,16 +193,19 @@ class DanxiApp extends StatelessWidget {
     '/bus/detail': (context, {arguments}) => BusPage(arguments: arguments),
     '/bbs/tags/blocklist': (context, {arguments}) =>
         BBSHiddenTagsPreferencePage(arguments: arguments),
+    '/bbs/admin': (context, {arguments}) =>
+        AdminOperationPage(arguments: arguments),
     '/bbs/login': (context, {arguments}) => HoleLoginPage(arguments: arguments),
     '/bbs/messages': (context, {arguments}) =>
         OTMessagesPage(arguments: arguments),
     '/bbs/search': (context, {arguments}) => OTSearchPage(arguments: arguments),
-    '/danke/courseDetail': (context, {arguments}) => CourseGroupDetail(arguments: arguments),
-    '/danke/fullScreenEditor':(context, {arguments}) =>
+    '/danke/courseDetail': (context, {arguments}) =>
+        CourseGroupDetail(arguments: arguments),
+    '/danke/fullScreenEditor': (context, {arguments}) =>
         CourseReviewEditorPage(arguments: arguments)
   };
 
-  const DanxiApp({Key? key}) : super(key: key);
+  const DanxiApp({super.key});
 
   Widget errorBuilder(FlutterErrorDetails details) => Builder(
       builder: (context) =>
@@ -227,7 +236,7 @@ class DanxiApp extends StatelessWidget {
       builder: (BuildContext context) {
         MaterialColor primarySwatch =
             context.select<SettingsProvider, MaterialColor>((value) =>
-                generateMaterialColor(color: Color(value.primarySwatch_V2)));
+                generateMaterialColor(color: Color(value.primarySwatch)));
         return DynamicThemeController(
           lightTheme: Constant.lightTheme(
               PlatformX.isCupertino(context), primarySwatch),
@@ -309,10 +318,9 @@ class DanxiApp extends StatelessWidget {
 
     // Init FDUHoleProvider. This object provides some global states about
     // FDUHole such as the current division and the json web token.
-    var fduHoleProvider = FDUHoleProvider();
-    // Init OpenTreeHoleRepository with the provider. This is the api implementations
-    // of OpenTreeHole.
-    FDUHoleProvider.init(fduHoleProvider);
+    var fduHoleProvider = ForumProvider();
+    // Init ForumRepository with the provider. This is the api implementations of the forum. 
+    ForumProvider.init(fduHoleProvider);
 
     // Wrap the whole app with [Phoenix] to enable fast reload. When user
     // logouts the Fudan UIS account, the whole app will be reloaded.

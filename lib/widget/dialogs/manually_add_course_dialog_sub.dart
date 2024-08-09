@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
-import '../../generated/l10n.dart';
 import '../../common/constant.dart';
+import '../../generated/l10n.dart';
 import '../../model/time_table.dart';
 import '../../provider/settings_provider.dart';
 import '../../util/platform_universal.dart';
 
 class AddCourseDialogSub extends StatefulWidget {
-  const AddCourseDialogSub({Key? key})
-      : super(key: key);
+  const AddCourseDialogSub({super.key});
+
   @override
   State<AddCourseDialogSub> createState() => _AddCourseDialogSubState();
 }
@@ -53,7 +53,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                           radius: 24.0,
                           backgroundColor: Color(context
                               .read<SettingsProvider>()
-                              .primarySwatch_V2),
+                              .primarySwatch),
                           foregroundColor: Colors.white,
                           child: e == selectedWeekDay
                               ? Icon(PlatformX.isMaterial(context)
@@ -83,7 +83,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                           radius: 24.0,
                           backgroundColor: Color(context
                               .read<SettingsProvider>()
-                              .primarySwatch_V2),
+                              .primarySwatch),
                           foregroundColor: Colors.white,
                           child: selectedSlots[e] == true
                               ? Icon(PlatformX.isMaterial(context)

@@ -41,8 +41,7 @@ class ScheduleView extends StatefulWidget {
 
   const ScheduleView(
       this.laneEventsList, this.timetableStyle, this.today, this.showingWeek,
-      {Key? key, this.tapCallback})
-      : super(key: key);
+      {super.key, this.tapCallback});
 
   @override
   ScheduleViewState createState() => ScheduleViewState();

@@ -19,12 +19,12 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/page/danke/course_review_editor.dart';
-import 'package:dan_xi/page/opentreehole/hole_detail.dart';
+import 'package:dan_xi/page/forum/hole_detail.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:dan_xi/widget/danke/review_vote_widget.dart';
-import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
+import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -37,11 +37,11 @@ class CourseReviewWidget extends StatelessWidget {
   final bool translucent;
 
   const CourseReviewWidget(
-      {Key? key,
+      {super.key,
       required this.review,
       required this.courseGroup,
-      this.translucent = false, this.reviewOperationCallback})
-      : super(key: key);
+      this.translucent = false,
+      this.reviewOperationCallback});
 
   @override
   Widget build(BuildContext context) {
@@ -67,72 +67,51 @@ class CourseReviewWidget extends StatelessWidget {
         Expanded(
           child: ListTile(
             contentPadding: EdgeInsets.zero,
-            title: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                alignment: WrapAlignment.spaceBetween,
-                runSpacing: 4,
-                children: [
-                  Column(
-                    children: [
-                      // course name, department name, course code and credits
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // use Expanded wrap the text to avoid overflow
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // todo add card information style
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 2),
-                                  child: ReviewHeader(
-                                    userId: review.reviewerId!,
-                                    teacher: review.courseInfo.teachers,
-                                    time: review.courseInfo.time,
-                                    title: review.title!,
-                                  ),
-                                ),
-                                const Divider(),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 2),
-                                  child: smartRender(context, review.content!,
-                                      null, null, translucent),
-                                ),
-                                const Divider(),
-                                Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 2),
-                                    child: Row(children: [
-                                      Expanded(
-                                        child: ReviewFooter(
-                                          overallLevel:
-                                              review.rank!.overall! - 1,
-                                          styleLevel: review.rank!.content! - 1,
-                                          workloadLevel:
-                                              review.rank!.workload! - 1,
-                                          assessmentLevel:
-                                              review.rank!.assessment! - 1,
-                                        ),
-                                      ),
-                                      if (review.isMe!)
-                                        ModifyMenuWidget(
-                                          originalReview: review,
-                                          courseGroup: courseGroup,
-                                          reviewOperationCallback: reviewOperationCallback ?? (rev){},
-                                        )
-                                    ])),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+            title: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // todo add card information style
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  child: ReviewHeader(
+                    userId: review.reviewerId!,
+                    teacher: review.courseInfo.teachers,
+                    time: review.courseInfo.time,
+                    title: review.title!,
                   ),
-                ]),
+                ),
+                const Divider(),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  child: smartRender(
+                      context, review.content!, null, null, translucent),
+                ),
+                const Divider(),
+                Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                    child: Row(children: [
+                      Expanded(
+                        child: ReviewFooter(
+                          overallLevel: review.rank!.overall! - 1,
+                          styleLevel: review.rank!.content! - 1,
+                          workloadLevel: review.rank!.workload! - 1,
+                          assessmentLevel: review.rank!.assessment! - 1,
+                        ),
+                      ),
+                      if (review.isMe!)
+                        ModifyMenuWidget(
+                          originalReview: review,
+                          courseGroup: courseGroup,
+                          reviewOperationCallback:
+                              reviewOperationCallback ?? (rev) {},
+                        )
+                    ])),
+              ],
+            ),
           ),
         )
       ]),
@@ -149,12 +128,11 @@ class ReviewHeader extends StatelessWidget {
   // final String reviewContent;
 
   const ReviewHeader(
-      {Key? key,
+      {super.key,
       required this.userId,
       required this.teacher,
       required this.time,
-      required this.title})
-      : super(key: key);
+      required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -223,12 +201,11 @@ class ReviewHeader extends StatelessWidget {
 
 class ReviewFooter extends StatelessWidget {
   const ReviewFooter(
-      {Key? key,
+      {super.key,
       required this.overallLevel,
       required this.styleLevel,
       required this.workloadLevel,
-      required this.assessmentLevel})
-      : super(key: key);
+      required this.assessmentLevel});
 
   final int overallLevel;
   final int styleLevel;
@@ -237,6 +214,15 @@ class ReviewFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final overallWord =
+        S.of(context).curriculum_ratings_overall_words.split(';');
+    final contentWord =
+        S.of(context).curriculum_ratings_content_words.split(';');
+    final workloadWord =
+        S.of(context).curriculum_ratings_workload_words.split(';');
+    final assessmentWord =
+        S.of(context).curriculum_ratings_assessment_words.split(';');
+
     const labelStyle = TextStyle(color: Colors.grey, fontSize: 12);
 
     return Wrap(
@@ -252,7 +238,7 @@ class ReviewFooter extends StatelessWidget {
               width: 6,
             ),
             Text(
-              overallWord![overallLevel],
+              overallWord[overallLevel],
               style: TextStyle(color: wordColor[overallLevel], fontSize: 12),
             )
           ],
@@ -265,7 +251,7 @@ class ReviewFooter extends StatelessWidget {
               width: 6,
             ),
             Text(
-              contentWord![styleLevel],
+              contentWord[styleLevel],
               style: TextStyle(color: wordColor[styleLevel], fontSize: 12),
             )
           ],
@@ -278,7 +264,7 @@ class ReviewFooter extends StatelessWidget {
               width: 6,
             ),
             Text(
-              workloadWord![workloadLevel],
+              workloadWord[workloadLevel],
               style: TextStyle(color: wordColor[workloadLevel], fontSize: 12),
             )
           ],
@@ -292,7 +278,7 @@ class ReviewFooter extends StatelessWidget {
               width: 6,
             ),
             Text(
-              assessmentWord![assessmentLevel],
+              assessmentWord[assessmentLevel],
               style: TextStyle(color: wordColor[assessmentLevel], fontSize: 12),
             )
           ],

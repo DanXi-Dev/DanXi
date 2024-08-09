@@ -20,7 +20,7 @@ import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/lazy_future.dart';
-import 'package:dan_xi/util/opentreehole/human_duration.dart';
+import 'package:dan_xi/util/forum/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
@@ -39,7 +39,7 @@ class AnnouncementList extends StatefulWidget {
   @override
   AnnouncementListState createState() => AnnouncementListState();
 
-  const AnnouncementList({Key? key, this.arguments}) : super(key: key);
+  const AnnouncementList({super.key, this.arguments});
 }
 
 class AnnouncementListState extends State<AnnouncementList> {

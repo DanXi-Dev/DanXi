@@ -37,7 +37,7 @@ class AAONoticesList extends StatefulWidget {
   @override
   AAONoticesListState createState() => AAONoticesListState();
 
-  const AAONoticesList({Key? key, this.arguments}) : super(key: key);
+  const AAONoticesList({super.key, this.arguments});
 }
 
 class AAONoticesListState extends State<AAONoticesList> {

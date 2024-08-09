@@ -31,8 +31,8 @@ import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
-import 'package:dan_xi/widget/opentreehole/tag_selector/selector.dart';
-import 'package:dan_xi/widget/opentreehole/tag_selector/tag.dart';
+import 'package:dan_xi/widget/forum/tag_selector/selector.dart';
+import 'package:dan_xi/widget/forum/tag_selector/tag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -46,7 +46,7 @@ class EmptyClassroomDetailPage extends StatefulWidget {
   EmptyClassroomDetailPageState createState() =>
       EmptyClassroomDetailPageState();
 
-  const EmptyClassroomDetailPage({Key? key, this.arguments}) : super(key: key);
+  const EmptyClassroomDetailPage({super.key, this.arguments});
 }
 
 class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {

@@ -26,28 +26,26 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/danke/course_review_widget.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
+import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
-import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:dan_xi/util/stream_listener.dart';
 
 enum FilterType { TEACHER_FILTER, TIME_FILTER }
 
 class RefreshFilterEvent {
-  // 0: Teacher filter, 1: Time filter
   final FilterType filterType;
   final String newFilter;
 
@@ -57,7 +55,7 @@ class RefreshFilterEvent {
 class CourseGroupDetail extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const CourseGroupDetail({Key? key, this.arguments}) : super(key: key);
+  const CourseGroupDetail({super.key, this.arguments});
 
   @override
   CourseGroupDetailState createState() => CourseGroupDetailState();
@@ -87,9 +85,14 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
       GlobalKey<RefreshIndicatorState>();
 
   CourseReview? locateReview;
+  Future<CourseGroup?>? _courseGroupFuture;
+  Future<List<CourseReview>?>? _reviewListFuture;
+  bool shouldScrollToEnd = false;
 
   /// Reload/load the (new) content
-  List<CourseReview>? _loadContent() {
+  Future<List<CourseReview>?> _loadContent() async {
+    await _courseGroupFuture;
+
     List<CourseReview> result = [];
     for (var elem in _courseGroup!.courseList!) {
       if (elem.reviewList != null) {
@@ -141,11 +144,20 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
 
   /// Refresh the whole list (excluding the head)
   Future<void> refreshList({bool scrollToEnd = false}) async {
-    await _fetchCourseGroup(forceRefetch: true);
+    _courseGroupFuture = _fetchCourseGroup(forceRefetch: true);
+    _reviewListFuture = _loadContent();
+
+    await _courseGroupFuture;
     await refreshSelf();
-    if (scrollToEnd) _listViewController.queueScrollToEnd();
-    return _listViewController.notifyUpdate(
+
+    await _listViewController.notifyUpdate(
         useInitialData: false, queueDataClear: true);
+
+    if (scrollToEnd) {
+      setState(() {
+        shouldScrollToEnd = true;
+      });
+    }
   }
 
   Future<CourseGroup?> _fetchCourseGroup({bool forceRefetch = false}) async {
@@ -173,11 +185,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
           // Attach information about its parent course for each review
           rev.linkCourse(elem.getSummary());
 
-          // Convert grades to client format
-          if (!rev.rank!.isClientFormat) {
-            rev.rank = rev.rank?.convertFormat();
-          }
-
           // calculate average score
           totalScore += rev.rank!.overall!;
         }
@@ -196,6 +203,33 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   @override
   Widget build(BuildContext context) {
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
+    _courseGroupFuture ??= _fetchCourseGroup();
+    _reviewListFuture ??= _loadContent();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (mounted) {
+        if (locateReview != null) {
+          // Scroll to the specific floor.
+          final floorToJump = locateReview!;
+          _listViewController.scheduleLoadedCallback(
+              () async => await _listViewController.scrollToItem(floorToJump),
+              rebuild: true);
+          locateReview = null;
+        }
+
+        if (shouldScrollToEnd) {
+          try {
+            // Scroll to end.
+            _listViewController.scheduleLoadedCallback(
+                () async => await _listViewController.scrollToEnd(),
+                rebuild: true);
+            shouldScrollToEnd = false;
+          } catch (_) {
+            // we don't care if we failed to scroll to the end.
+          }
+        }
+      }
+    });
 
     return PlatformScaffold(
       iosContentPadding: false,
@@ -211,8 +245,8 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
             PlatformIconButton(
               padding: EdgeInsets.zero,
               icon: PlatformX.isMaterial(context)
-                  ? const Icon(Icons.reply)
-                  : const Icon(CupertinoIcons.arrowshape_turn_up_left),
+                  ? const Icon(Icons.add)
+                  : const Icon(CupertinoIcons.add),
               onPressed: () async {
                 if (await CourseReviewEditor.createNewPost(
                     context, _courseGroup!)) {
@@ -241,78 +275,61 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   }
 
   Widget _buildBody(BuildContext context) {
-    return Builder(
-      // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-      builder: (context) => Container(
-        decoration: _backgroundImage == null
-            ? null
-            : BoxDecoration(
-                image: DecorationImage(
-                    image: _backgroundImage!, fit: BoxFit.cover)),
-        child: RefreshIndicator(
-          key: indicatorKey,
-          edgeOffset: MediaQuery.of(context).padding.top,
-          color: Theme.of(context).colorScheme.secondary,
-          backgroundColor: Theme.of(context).dialogBackgroundColor,
-          onRefresh: () async {
-            HapticFeedback.mediumImpact();
-            // Refresh the list...
-            await refreshList();
-          },
-          child: FutureWidget<CourseGroup?>(
-              future: _fetchCourseGroup(),
-              successBuilder: (context, snapshot) {
-                return PagedListView<CourseReview>(
-                  pagedController: _listViewController,
-                  withScrollbar: true,
-                  scrollController: PrimaryScrollController.of(context),
-                  // [_loadContent] does no internet request so it shall be quick
-                  allDataReceiver: Future.value(_loadContent()).then((value) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) async {
-                      if (locateReview != null && mounted) {
-                        // Scroll to the specific floor
-                        await PagedListViewHelper.scrollToItem(
-                            context,
-                            _listViewController,
-                            locateReview,
-                            ScrollDirection.DOWN);
-                        locateReview = null;
-                      }
-                    });
-
-                    return value;
-                  }),
-                  builder: _getListItems,
-                  headBuilder: (ctx) => _buildHead(ctx),
-                  loadingBuilder: (BuildContext context) => Container(
-                    padding: const EdgeInsets.all(8),
-                    child: Center(child: PlatformCircularProgressIndicator()),
+    return Container(
+      decoration: _backgroundImage == null
+          ? null
+          : BoxDecoration(
+              image:
+                  DecorationImage(image: _backgroundImage!, fit: BoxFit.cover)),
+      child: RefreshIndicator(
+        key: indicatorKey,
+        edgeOffset: MediaQuery.of(context).padding.top,
+        color: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Theme.of(context).dialogBackgroundColor,
+        onRefresh: () async {
+          HapticFeedback.mediumImpact();
+          // Refresh the list...
+          await refreshList();
+        },
+        child: FutureWidget<CourseGroup?>(
+            future: _courseGroupFuture,
+            successBuilder: (context, snapshot) {
+              return PagedListView<CourseReview>(
+                pagedController: _listViewController,
+                withScrollbar: true,
+                scrollController: PrimaryScrollController.of(context),
+                // [_loadContent] does no internet request so it shall be quick
+                allDataReceiver: _reviewListFuture,
+                builder: _getListItems,
+                headBuilder: _buildHead,
+                loadingBuilder: (BuildContext context) => Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Center(child: PlatformCircularProgressIndicator()),
+                ),
+                emptyBuilder: (context) =>
+                    Center(child: Text(S.of(context).no_course_review)),
+                endBuilder: (context) => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Text(S.of(context).end_reached),
                   ),
-                  emptyBuilder: (context) =>
-                      Center(child: Text(S.of(context).no_course_review)),
-                  endBuilder: (context) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: Text(S.of(context).end_reached),
-                      ),
-                    );
-                  },
-                );
-              },
-              errorBuilder: (BuildContext context,
-                      AsyncSnapshot<CourseGroup?> snapshot) =>
-                  ErrorPageWidget.buildWidget(context, snapshot.error,
-                      stackTrace: snapshot.stackTrace,
-                      onTap: () => setState(() {})),
-              loadingBuilder:
-                  Center(child: PlatformCircularProgressIndicator())),
-        ),
+                ),
+              );
+            },
+            errorBuilder:
+                (BuildContext context, AsyncSnapshot<CourseGroup?> snapshot) =>
+                    ErrorPageWidget.buildWidget(context, snapshot.error,
+                        stackTrace: snapshot.stackTrace,
+                        onTap: () => setState(() {})),
+            loadingBuilder: Center(child: PlatformCircularProgressIndicator())),
       ),
     );
   }
 
   Widget _buildHead(BuildContext context) {
+    final overallWord =
+        S.of(context).curriculum_ratings_overall_words.split(';');
+
     var wildCard = S.of(context).all;
     var teacherList = [
       FilterTag(wildCard, "*"),
@@ -344,9 +361,9 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                                 color: Colors.grey)),
                         ..._courseGroup!.credits!.map((e) => Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: OTLeadingTag(
+                            child: LeadingChip(
                               color: Colors.orange,
-                              text:
+                              label:
                                   "${e.toStringAsFixed(1)} ${S.of(context).credits}",
                             )))
                       ],
@@ -362,7 +379,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                     ),
                     averageOverallLevel >= 0
                         ? Text(
-                            overallWord![averageOverallLevel],
+                            overallWord[averageOverallLevel],
                             style: TextStyle(
                                 color: wordColor[averageOverallLevel],
                                 fontSize: 15),
@@ -409,9 +426,9 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
 
   Future<void> _onTapScrollToEnd(_) async {
     try {
-      _listViewController.queueScrollToEnd();
-      _listViewController.notifyUpdate(
-          useInitialData: false, queueDataClear: false);
+      setState(() {
+        shouldScrollToEnd = true;
+      });
     } catch (error, st) {
       Noticing.showErrorDialog(context, error, trace: st);
     }
@@ -427,7 +444,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
           locateReview = affectedReview;
         }
 
-        await _fetchCourseGroup(forceRefetch: true);
         indicatorKey.currentState?.show();
       },
     );

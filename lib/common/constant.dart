@@ -19,12 +19,12 @@ import 'dart:io' show Platform;
 import 'dart:math';
 
 import 'package:dan_xi/common/feature_registers.dart';
-import 'package:dan_xi/common/pubspec.yaml.g.dart' as pubspec;
+import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/page/dashboard/dashboard_reorder.dart';
-import 'package:dan_xi/page/opentreehole/hole_editor.dart';
+import 'package:dan_xi/page/forum/hole_editor.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
@@ -46,7 +46,7 @@ class Constant {
   static const SUPPORT_QQ_GROUP = "941342818";
 
   /// The division name of the curriculum page. We use this to determine whether
-  /// we should show the curriculum page (instead of a normal treehole division).
+  /// we should show the curriculum page (instead of a normal forum division).
   ///
   /// See also:
   ///
@@ -58,17 +58,17 @@ class Constant {
   /// The default user agent used by the app.
   ///
   /// Note that this is not the same as the user agent used by the WebView, or the
-  /// treehole's [Dio]. Those two are set by WebView and [OpenTreeHoleRepository].
+  /// forum's [Dio]. Those two are set by WebView and [ForumRepository].
   static const String DEFAULT_USER_AGENT =
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36";
 
   static const String APPSTORE_APPID = '1568629997';
 
   /// A link to the "forget password" page of FDUHole.
-  static const String OPEN_TREEHOLE_FORGOT_PASSWORD_URL =
+  static const String FORUM_FORGOT_PASSWORD_URL =
       "https://auth.fduhole.com/register?type=forget_password";
 
-  static const String OPEN_TREEHOLE_REGISTER_URL =
+  static const String FORUM_REGISTER_URL =
       "https://auth.fduhole.com/register";
 
   /// The default start date of a semester.
@@ -79,12 +79,16 @@ class Constant {
   static const String UIS_URL = "https://uis.fudan.edu.cn/authserver/login";
   static const String UIS_HOST = "uis.fudan.edu.cn";
 
-  /// The default URLs of [OpenTreeHoleRepository] and [CurriculumBoardHoleRepository].
+  /// The default URLs of [ForumRepository] and [CurriculumBoardHoleRepository].
   ///
-  static const String FDUHOLE_BASE_URL = "https://www.fduhole.com/api";
+  static const String FORUM_BASE_URL_LEGACY = "https://www.fduhole.com/api";
+  static const String FORUM_BASE_URL = "https://forum.fduhole.com/api";
   static const String AUTH_BASE_URL = "https://auth.fduhole.com/api";
   static const String IMAGE_BASE_URL = "https://image.fduhole.com";
   static const String DANKE_BASE_URL = "https://danke.fduhole.com/api";
+
+  /// An link to the FAQ page of Danxi.
+  static const String FAQ_URL = "https://danxi-dev.feishu.cn/wiki/wikcnrPPGDCiTODBYRkdwLlHH65";
 
   static const LINKIFY_THEME =
       TextStyle(color: Colors.blue, decoration: TextDecoration.none);
@@ -92,13 +96,19 @@ class Constant {
   /// Client version descriptor.
   ///
   /// It is used to identify the client in the HTTP request header.
-  /// Currently, it is used in the [OpenTreeHoleRepository] to tell the server
+  /// Currently, it is used in the [ForumRepository] to tell the server
   /// about the client version.
-  static String get version =>
-      "DanXi/${FlutterApp.versionName}b${pubspec.build.single} (${Platform.operatingSystem}; ${Platform.operatingSystemVersion})";
+  static String get version {
+    if (PlatformX.isWeb) {
+      // web does not support [Platform] API
+      return "DanXi/${FlutterApp.versionName}b${Pubspec.version.build.single} (Web)";
+    } else {
+      return "DanXi/${FlutterApp.versionName}b${Pubspec.version.build.single} (${Platform.operatingSystem}; ${Platform.operatingSystemVersion})";
+    }
+  }
 
   /// The tips to be shown as hints in the [BBSEditorWidget].
-  static List<String> fduHoleTips = [];
+  static List<String> forumTips = [];
 
   /// Load in the tips in the [BBSEditorWidget].
   static Future<List<String>> _loadTips() async {
@@ -109,7 +119,7 @@ class Constant {
   /// The stop words to be determined in the [BBSEditorWidget].
   ///
   /// Stop words are used to warn the user when he/she is about to post
-  /// something that is not encouraged by the treehole community.
+  /// something that is not encouraged by the community.
   static List<String> _stopWords = [];
 
   /// The care words to be determined in the [BBSEditorWidget] and [OTSearchPage].
@@ -182,13 +192,13 @@ class Constant {
   /// Get a random tip from [_loadTips].
   ///
   /// If failed to get, return an empty string.
-  static Future<String> get randomFDUHoleTip async {
-    if (fduHoleTips.isEmpty) fduHoleTips = await _loadTips();
+  static Future<String> get randomForumTip async {
+    if (forumTips.isEmpty) forumTips = await _loadTips();
 
-    if (fduHoleTips.isEmpty) {
+    if (forumTips.isEmpty) {
       return '';
     } else {
-      return fduHoleTips[Random().nextInt(fduHoleTips.length)];
+      return forumTips[Random().nextInt(forumTips.length)];
     }
   }
 
@@ -332,12 +342,12 @@ class Constant {
   static ThemeData lightTheme(bool isCupertino, MaterialColor color) {
     if (isCupertino) {
       Color toggleableActiveColor = const Color(0xFF007AFF);
-      var toggleableProperty = MaterialStateProperty.resolveWith<Color?>(
-          (Set<MaterialState> states) {
-        if (states.contains(MaterialState.disabled)) {
+      var toggleableProperty =
+          WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+        if (states.contains(WidgetState.disabled)) {
           return null;
         }
-        if (states.contains(MaterialState.selected)) {
+        if (states.contains(WidgetState.selected)) {
           return toggleableActiveColor;
         }
         return null;
@@ -349,7 +359,7 @@ class Constant {
             tertiary: const Color(0xFF007AFF),
             secondary: const Color(0xFF007AFF),
             primary: const Color(0xFF007AFF),
-            background: const Color.fromRGBO(242, 242, 247, 1)),
+            surface: const Color.fromRGBO(242, 242, 247, 1)),
         switchTheme: SwitchThemeData(
           thumbColor: toggleableProperty,
           trackColor: toggleableProperty,
@@ -387,12 +397,12 @@ class Constant {
   static ThemeData darkTheme(bool isCupertino, MaterialColor color) {
     if (isCupertino) {
       Color toggleableActiveColor = const Color(0xFF007AFF);
-      var toggleableProperty = MaterialStateProperty.resolveWith<Color?>(
-          (Set<MaterialState> states) {
-        if (states.contains(MaterialState.disabled)) {
+      var toggleableProperty =
+          WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+        if (states.contains(WidgetState.disabled)) {
           return null;
         }
-        if (states.contains(MaterialState.selected)) {
+        if (states.contains(WidgetState.selected)) {
           return toggleableActiveColor;
         }
         return null;
@@ -403,7 +413,7 @@ class Constant {
             tertiary: const Color(0xFF007AFF),
             secondary: const Color(0xFF007AFF),
             primary: const Color(0xFF007AFF),
-            background: Colors.black),
+            surface: Colors.black),
         indicatorColor: const Color(0xFF007AFF),
         switchTheme: SwitchThemeData(
           thumbColor: toggleableProperty,

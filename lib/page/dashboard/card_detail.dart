@@ -22,8 +22,8 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
-import 'package:dan_xi/widget/opentreehole/tag_selector/selector.dart';
-import 'package:dan_xi/widget/opentreehole/tag_selector/tag.dart';
+import 'package:dan_xi/widget/forum/tag_selector/selector.dart';
+import 'package:dan_xi/widget/forum/tag_selector/tag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -39,7 +39,7 @@ class CardDetailPage extends StatefulWidget {
   @override
   CardDetailPageState createState() => CardDetailPageState();
 
-  const CardDetailPage({Key? key, this.arguments}) : super(key: key);
+  const CardDetailPage({super.key, this.arguments});
 }
 
 class CardDetailPageState extends State<CardDetailPage> {

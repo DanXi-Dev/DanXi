@@ -20,37 +20,37 @@ import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/model/danke/search_results.dart';
 import 'package:dan_xi/page/danke/course_review_editor.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
-import 'package:dan_xi/util/opentreehole/jwt_interceptor.dart';
+import 'package:dan_xi/util/forum/jwt_interceptor.dart';
 import 'package:dio/dio.dart';
 
 class CurriculumBoardRepository extends BaseRepositoryWithDio {
-  static const String _BASE_URL = "https://danke.fduhole.com/api";
-  static const String _BASE_AUTH_URL = "https://auth.fduhole.com/api";
+  static final String _BASE_URL = SettingsProvider.getInstance().dankeBaseUrl;
+  static final String _BASE_AUTH_URL = SettingsProvider.getInstance().authBaseUrl;
 
   CurriculumBoardRepository._() {
     dio.interceptors.add(JWTInterceptor(
         "$_BASE_AUTH_URL/refresh",
         () => provider.token,
         (token) => provider.token =
-            SettingsProvider.getInstance().fduholeToken = token));
+            SettingsProvider.getInstance().forumToken = token));
     dio.interceptors.add(
         UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
 
     // First fetch of the course list is VERY SLOW
     dio.options = BaseOptions(
         receiveDataWhenStatusError: true,
-        connectTimeout: 30000,
-        receiveTimeout: 30000,
-        sendTimeout: 10000);
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        sendTimeout: const Duration(seconds: 10));
   }
 
   /// Short name for the provider singleton
-  FDUHoleProvider get provider => FDUHoleProvider.getInstance();
+  ForumProvider get provider => ForumProvider.getInstance();
 
   Map<String, String> get _tokenHeader {
     if (provider.token == null || !provider.token!.isValid) {
@@ -131,7 +131,7 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
   }
 
   Future<CourseReview?> getRandomReview() async {
-    // debugPrint(SettingsProvider.getInstance().fduholeToken!.access!);
+    // debugPrint(SettingsProvider.getInstance().forumToken!.access!);
     Response<dynamic> response = await dio.get("$_BASE_URL/reviews/random",
         options: Options(headers: _tokenHeader));
     return CourseReview.fromJson(response.data ?? "");

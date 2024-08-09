@@ -37,7 +37,7 @@ class PlatformNavBarM3 extends PlatformNavBar {
   final PlatformBuilder<CupertinoTabBarData>? cupertino;
 
   PlatformNavBarM3({
-    Key? key,
+    super.key,
     this.widgetKey,
     this.backgroundColor,
     this.items,
@@ -46,7 +46,6 @@ class PlatformNavBarM3 extends PlatformNavBar {
     this.material,
     this.cupertino,
   }) : super(
-          key: key,
           widgetKey: widgetKey,
           backgroundColor: backgroundColor,
           items: items,

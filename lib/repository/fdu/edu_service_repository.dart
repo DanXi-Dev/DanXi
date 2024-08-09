@@ -245,19 +245,6 @@ class ExamScore {
   final String credit;
   final String level;
   final String? score;
-  static const MAP_LEVEL_SCORE = {
-    "A": "4.0",
-    "A-": "3.7",
-    "B+": "3.3",
-    "B": "3.0",
-    "B-": "2.7",
-    "C+": "2.3",
-    "C": "2.0",
-    "C-": "1.7",
-    "D+": "1.3",
-    "D": "1.0",
-    "F": "0",
-  };
 
   ExamScore(this.id, this.name, this.type, this.credit, this.level, this.score);
 
@@ -282,7 +269,7 @@ class ExamScore {
         '${elements[1].text.trim()} ${elements[2].text.trim()}',
         elements[4].text.trim(),
         elements[5].text.trim(),
-        MAP_LEVEL_SCORE[elements[5].text.trim()]);
+        null);
   }
 }
 

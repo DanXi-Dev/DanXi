@@ -10,8 +10,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
 class ManuallyAddCourseDialog extends StatefulWidget {
-  const ManuallyAddCourseDialog(this.courseAvailableList, {Key? key})
-      : super(key: key);
+  const ManuallyAddCourseDialog(this.courseAvailableList, {super.key});
 
   final List<int> courseAvailableList;
 
@@ -160,7 +159,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                             radius: 15.0,
                             backgroundColor: Color(context
                                 .read<SettingsProvider>()
-                                .primarySwatch_V2),
+                                .primarySwatch),
                             foregroundColor: Colors.white,
                             child: widget.courseAvailableList.contains(e)
                                 ? Icon(PlatformX.isMaterial(context)

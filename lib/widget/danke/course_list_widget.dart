@@ -34,7 +34,7 @@ class CourseListWidget extends StatefulWidget {
 
   final String? searchKeyword;
 
-  const CourseListWidget({Key? key, this.searchKeyword}) : super(key: key);
+  const CourseListWidget({super.key, this.searchKeyword});
 }
 
 class CourseListWidgetState extends State<CourseListWidget> {
@@ -74,7 +74,7 @@ class CourseListWidgetState extends State<CourseListWidget> {
         withScrollbar: true,
         scrollController: PrimaryScrollController.of(context),
         // If we need to scroll to the end, we should prefetch all the data beforehand.
-        // See also [prefetchAllFloors] in [TreeHoleSubpageState].
+        // See also [prefetchAllFloors] in [ForumSubpageState].
         dataReceiver: _loadContent,
         builder: _getListItems,
         loadingBuilder: (BuildContext context) => Container(

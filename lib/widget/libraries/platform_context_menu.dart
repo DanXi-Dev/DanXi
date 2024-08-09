@@ -24,8 +24,7 @@ class PlatformContextMenu extends StatelessWidget {
   final List<Widget> actions;
 
   const PlatformContextMenu(
-      {Key? key, this.cancelButton, required this.actions})
-      : super(key: key);
+      {super.key, this.cancelButton, required this.actions});
 
   @override
   Widget build(BuildContext context) {
@@ -50,12 +49,11 @@ class PlatformContextMenuItem extends StatelessWidget {
   final Widget child;
 
   const PlatformContextMenuItem(
-      {Key? key,
+      {super.key,
       required this.menuContext,
       this.onPressed,
       required this.child,
-      this.isDestructive = false})
-      : super(key: key);
+      this.isDestructive = false});
 
   @override
   Widget build(BuildContext context) {
@@ -92,8 +90,8 @@ class PlatformPopupMenuX extends StatelessWidget {
     required this.icon,
     this.cupertino,
     this.material,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

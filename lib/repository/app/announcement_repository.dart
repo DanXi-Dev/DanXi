@@ -22,6 +22,7 @@ import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/extra.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dio/dio.dart';
@@ -44,7 +45,8 @@ class AnnouncementRepository {
   List<Announcement>? _announcementCache;
 
   Future<bool?> loadAnnouncements() async {
-    final Response<List<dynamic>> response = await Dio().get(_URL);
+    final Response<List<dynamic>> response =
+        await DioUtils.newDioWithProxy().get(_URL);
     _announcementCache =
         response.data?.map((e) => Announcement.fromJson(e)).toList() ?? [];
     return _announcementCache?.isNotEmpty ?? false;
@@ -77,7 +79,7 @@ class AnnouncementRepository {
   }
 
   List<Announcement> getAnnouncements() {
-    final version = int.tryParse(build.first) ?? 0;
+    final version = int.tryParse(Pubspec.version.build.single) ?? 0;
     return _announcementCache
         .filter((element) => element.maxVersion! >= version);
   }

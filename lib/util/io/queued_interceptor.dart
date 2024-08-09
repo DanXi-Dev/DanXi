@@ -52,7 +52,7 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
   }
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     // Notify a completer in queue to complete itself.
     //
     // Note: We do NOT care the match between [RequestOptions] and [Completer<void>],

@@ -80,20 +80,23 @@ class BusScheduleItem implements Comparable<BusScheduleItem> {
   BusScheduleItem(this.id, this.start, this.end, this.startTime, this.endTime,
       this.direction, this.holidayRun);
 
-  factory BusScheduleItem.fromRawJson(
-          Map<String, dynamic> json) =>
+  factory BusScheduleItem.fromRawJson(Map<String, dynamic> json) =>
       BusScheduleItem(
           json['id'],
           CampusEx.fromChineseName(json['start']),
           CampusEx.fromChineseName(json['end']),
-          (json['stime'] as String).isNotEmpty
-              ? VagueTime.onlyMMSS(json['stime'])
-              : null,
-          (json['etime'] as String).isNotEmpty
-              ? VagueTime.onlyMMSS(json['etime'])
-              : null,
+          _parseTime(json['stime']),
+          _parseTime(json['etime']),
           BusDirection.values[int.parse(json['arrow'])],
           int.parse(json['holiday']) != 0);
+
+  // Some times are using "." as separator, so we need to parse it manually
+  static VagueTime? _parseTime(String time) {
+    if (time.isEmpty) {
+      return null;
+    }
+    return VagueTime.onlyHHmm(time.replaceAll(".", ":"));
+  }
 
   @override
   int compareTo(BusScheduleItem other) =>

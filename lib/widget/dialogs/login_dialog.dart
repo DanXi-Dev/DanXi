@@ -22,6 +22,7 @@ import 'package:dan_xi/repository/fdu/ecard_repository.dart';
 import 'package:dan_xi/repository/fdu/ehall_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/browser_util.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -69,11 +70,10 @@ class LoginDialog extends StatefulWidget {
   }
 
   const LoginDialog(
-      {Key? key,
+      {super.key,
       required this.sharedPreferences,
       required this.personInfo,
-      required this.dismissible})
-      : super(key: key);
+      required this.dismissible});
 
   @override
   LoginDialogState createState() => LoginDialogState();
@@ -101,6 +101,7 @@ class LoginDialogState extends State<LoginDialog> {
         widget.personInfo.value = newInfo;
         progressDialog.dismiss(showAnim: false);
         Navigator.of(context).pop();
+        showFAQ();
         break;
       case UserGroup.FUDAN_POSTGRADUATE_STUDENT:
       case UserGroup.FUDAN_UNDERGRADUATE_STUDENT:
@@ -113,8 +114,9 @@ class LoginDialogState extends State<LoginDialog> {
           widget.personInfo.value = newInfo;
           progressDialog.dismiss(showAnim: false);
           Navigator.of(context).pop();
+          showFAQ();
         } catch (e) {
-          if (e is DioError) {
+          if (e is DioException) {
             progressDialog.dismiss(showAnim: false);
             rethrow;
           }
@@ -141,11 +143,36 @@ class LoginDialogState extends State<LoginDialog> {
     }
   }
 
+  Future<bool?> showFAQ() {
+    return showPlatformDialog(
+        context: context,
+        builder: (BuildContext context) => PlatformAlertDialog(
+              title: PlatformText(
+                S.of(context).welcome_feature,
+                textAlign: TextAlign.center,
+              ),
+              content: PlatformText(
+                S.of(context).welcome_prompt,
+                textAlign: TextAlign.center,
+              ),
+              actions: <Widget>[
+                PlatformDialogAction(
+                    child: PlatformText(S.of(context).skip),
+                    onPressed: () => Navigator.pop(context)),
+                PlatformDialogAction(
+                    child: PlatformText(S.of(context).i_see),
+                    onPressed: () {
+                      BrowserUtil.openUrl(Constant.FAQ_URL, context);
+                    }),
+              ],
+            ));
+  }
+
   void requestInternetAccess() async {
     // This webpage only returns plain-text 'SUCCESS' and is ideal for testing connection.
     try {
       // fixme: use a privacy-friendly captive portal detection method.
-      await Dio().head('http://captive.apple.com');
+      await DioUtils.newDioWithProxy().head('http://captive.apple.com');
     } catch (ignored) {}
   }
 
@@ -339,7 +366,7 @@ class LoginDialogState extends State<LoginDialog> {
   /// Change the login group and rebuild the dialog.
   _switchLoginGroup(UserGroup e) {
     if (e == UserGroup.VISITOR) {
-      _nameController.text = _pwdController.text = "[ FDUHole Only ]";
+      _nameController.text = _pwdController.text = "[ Forum Only ]";
     } else {
       _nameController.text = _pwdController.text = "";
     }

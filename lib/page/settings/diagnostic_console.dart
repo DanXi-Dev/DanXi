@@ -21,10 +21,10 @@ import 'dart:convert';
 import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -38,7 +38,7 @@ import 'package:uuid/uuid.dart';
 class DiagnosticConsole extends StatefulWidget {
   final Map<String, dynamic>? arguments;
 
-  const DiagnosticConsole({Key? key, this.arguments}) : super(key: key);
+  const DiagnosticConsole({super.key, this.arguments});
 
   @override
   DiagnosticConsoleState createState() => DiagnosticConsoleState();
@@ -53,7 +53,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   void initState() {
     super.initState();
     diagnoses = [
-      diagnoseFDUHole,
+      diagnoseForum,
       diagnoseGoogleAds,
       diagnoseDanXi,
       diagnoseUrl
@@ -74,15 +74,15 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     }
   }
 
-  Future<void> diagnoseFDUHole() async {
+  Future<void> diagnoseForum() async {
     _console.writeln(
-        "FDUHole is user initialized: ${context.read<FDUHoleProvider>().isUserInitialized}");
+        "Forum is user initialized: ${context.read<ForumProvider>().isUserInitialized}");
     _console.writeln(
-        "FDUHole is user admin: ${OpenTreeHoleRepository.getInstance().isAdmin}");
+        "Forum is user admin: ${ForumRepository.getInstance().isAdmin}");
     _console.writeln(
-        "FDUHole Push Token last uploaded on this device: ${OpenTreeHoleRepository.getInstance().lastUploadToken}");
+        "Forum Push Token last uploaded on this device: ${ForumRepository.getInstance().lastUploadToken}");
     _console.writeln(
-        "FDUHole Token stored: ${context.read<SettingsProvider>().fduholeToken}");
+        "Forum Token stored: ${context.read<SettingsProvider>().forumToken}");
 
     String? deviceId;
     try {
@@ -103,19 +103,22 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   static const _IGNORE_KEYS = ["password"];
 
   Future<void> diagnoseUrl() async {
-    _console
-        .writeln("Base URL: ${SettingsProvider.getInstance().fduholeBaseUrl}");
     _console.writeln(
         "Base Auth URL: ${SettingsProvider.getInstance().authBaseUrl}");
+    _console
+        .writeln("Hole Base URL: ${SettingsProvider.getInstance().forumBaseUrl}");
     _console.writeln(
         "Image Base URL: ${SettingsProvider.getInstance().imageBaseUrl}");
+    _console.writeln(
+        "Danke Base URL: ${SettingsProvider.getInstance().dankeBaseUrl}");
   }
 
   Future<void> diagnoseDanXi() async {
     _console.writeln(
         "User Agent used by DanXi for UIS: ${UserAgentInterceptor.defaultUsedUserAgent}");
     _console
-        .writeln("User Agent used by DanXi for FDUHole: ${Constant.version}");
+        .writeln("User Agent used by DanXi for Forum: ${Constant.version}");
+    _console.writeln("Media Query: ${MediaQuery.of(context)}");
 
     _console.writeln("Everything we stored in the local device:");
     var allKeys = await context.read<SettingsProvider>().preferences?.getKeys();
@@ -134,14 +137,14 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   }
 
   Future<void> changePassword() async {
-    if (!OpenTreeHoleRepository.getInstance().isAdmin) return;
+    if (!ForumRepository.getInstance().isAdmin) return;
     String? email = await Noticing.showInputDialog(context, "Input email");
     if (!mounted) return;
     String? password =
         await Noticing.showInputDialog(context, "Input password");
     if ((email ?? "").isEmpty || (password ?? "").isEmpty) return;
 
-    int? result = await OpenTreeHoleRepository.getInstance()
+    int? result = await ForumRepository.getInstance()
         .adminChangePassword(email!, password!);
     if (result != null && result < 300 && mounted) {
       Noticing.showModalNotice(context,
@@ -149,14 +152,14 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     }
   }
 
-  Future<void> changeBaseUrl() async {
-    String? fduholeBaseUrl = await Noticing.showInputDialog(context,
-        "Input new base url (leave empty to reset to ${Constant.FDUHOLE_BASE_URL})");
-    if (fduholeBaseUrl == null || !mounted) return;
-    if (fduholeBaseUrl.isEmpty) {
-      SettingsProvider.getInstance().fduholeBaseUrl = Constant.FDUHOLE_BASE_URL;
+  Future<void> changeHoleBaseUrl() async {
+    String? forumBaseUrl = await Noticing.showInputDialog(context,
+        "Input new base url (leave empty to reset to ${Constant.FORUM_BASE_URL})");
+    if (forumBaseUrl == null || !mounted) return;
+    if (forumBaseUrl.isEmpty) {
+      SettingsProvider.getInstance().forumBaseUrl = Constant.FORUM_BASE_URL;
     } else {
-      SettingsProvider.getInstance().fduholeBaseUrl = fduholeBaseUrl;
+      SettingsProvider.getInstance().forumBaseUrl = forumBaseUrl;
     }
     Noticing.showNotice(context, "Restart app to take effects");
   }
@@ -185,8 +188,20 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     Noticing.showNotice(context, "Restart app to take effects");
   }
 
+  Future<void> changeDankeBaseUrl() async {
+    String? dankeBaseUrl = await Noticing.showInputDialog(context,
+        "Input new danke base url (leave empty to reset to ${Constant.DANKE_BASE_URL}))");
+    if (dankeBaseUrl == null || !mounted) return;
+    if (dankeBaseUrl.isEmpty) {
+      SettingsProvider.getInstance().dankeBaseUrl = Constant.DANKE_BASE_URL;
+    } else {
+      SettingsProvider.getInstance().dankeBaseUrl = dankeBaseUrl;
+    }
+    Noticing.showNotice(context, "Restart app to take effects");
+  }
+
   Future<void> sendMessage() async {
-    if (!OpenTreeHoleRepository.getInstance().isAdmin) return;
+    if (!ForumRepository.getInstance().isAdmin) return;
     String? message = await Noticing.showInputDialog(context, "Input Message");
     if (!mounted) return;
     String? ids = await Noticing.showInputDialog(context, "Input Id List",
@@ -196,7 +211,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     final idList = (jsonDecode("[$ids]") as List<dynamic>)
         .map<int>((e) => e as int)
         .toList(growable: false);
-    int? result = await OpenTreeHoleRepository.getInstance()
+    int? result = await ForumRepository.getInstance()
         .adminSendMessage(message!, idList);
     if (result != null && result < 300 && mounted) {
       Noticing.showModalNotice(context,
@@ -217,7 +232,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
 
   Future<void> deleteAllPushToken() async {
     try {
-      final ret = await OpenTreeHoleRepository.getInstance()
+      final ret = await ForumRepository.getInstance()
           .deleteAllPushNotificationToken();
       Noticing.showNotice(context, "Status code $ret");
     } catch (e) {
@@ -273,7 +288,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
                 PlatformElevatedButton(
                   child: const Text("Set _BASE_URL"),
                   onPressed: () async {
-                    await changeBaseUrl();
+                    await changeHoleBaseUrl();
                   },
                 ),
                 PlatformElevatedButton(
@@ -286,6 +301,12 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
                   child: const Text("Set _IMAGE_BASE_URL"),
                   onPressed: () async {
                     await changeImageBaseUrl();
+                  },
+                ),
+                PlatformElevatedButton(
+                  child: const Text("Set _DANKE_BASE_URL"),
+                  onPressed: () async {
+                    await changeDankeBaseUrl();
                   },
                 ),
                 ChangeNotifierProvider.value(

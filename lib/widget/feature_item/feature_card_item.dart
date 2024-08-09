@@ -31,8 +31,7 @@ class FeatureCardItem extends StatefulWidget implements FeatureContainer {
   FeatureCardItemState createState() => FeatureCardItemState();
 
   const FeatureCardItem(
-      {required this.feature, this.arguments, this.onDismissed, Key? key})
-      : super(key: key);
+      {required this.feature, this.arguments, this.onDismissed, super.key});
 
   @override
   Feature get childFeature => feature;

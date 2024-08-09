@@ -1,0 +1,58 @@
+name: Automated-CI-Windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Tag name for release. If set to nightly, the release will be a pre-release."
+        required: false
+        default: nightly
+
+jobs:
+  Automated-CI-Windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Workaround - Export pub environment variable on Windows
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            echo "PUB_CACHE=$LOCALAPPDATA\\Pub\\Cache" >> $GITHUB_ENV
+          fi
+        shell: bash
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Prepare Flutter Dependencies
+        run: |
+          flutter pub get
+          flutter pub global activate intl_utils
+          flutter pub global run intl_utils:generate
+
+      - name: Build Executable
+        run: |
+          dart build_release.dart --target windows --versionCode dummy
+
+      - if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name != 'nightly'
+        name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/DanXi-dummy-release.windows-x64.zip
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          name: Release ${{ github.ref }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+
+      - if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name == 'nightly'
+        name: Release Nightly
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/DanXi-dummy-release.windows-x64.zip
+          prerelease: true
+          tag_name: nightly
+          name: Nightly build
+          generate_release_notes: true
+          fail_on_unmatched_files: true
