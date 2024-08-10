@@ -64,10 +64,13 @@ class JWTInterceptor extends QueuedInterceptor {
         RequestOptions options = RequestOptions(
             path: refreshUrl,
             method: "POST",
-            headers: {"Authorization": "Bearer ${currentToken.refresh!}"});
+            headers: {
+              "Authorization": "Bearer ${currentToken.refresh!}"
+            });
         Response<Map<String, dynamic>> response;
         try {
           response = await WebvpnProxy.requestWithProxy(_dio, options);
+          debugPrint(response.data.toString());
         } catch (e) {
           if (e is DioException &&
               e.response?.statusCode == HttpStatus.unauthorized) {

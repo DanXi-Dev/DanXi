@@ -76,7 +76,6 @@ class UISLoginTool {
   static Future<Response<dynamic>?> loginUIS(
       Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
       [bool forceRelogin = false]) async {
-    debugPrint("Login UIS Triggered");
     _mutexMap.putIfAbsent(jar, () => Mutex());
     await _mutexMap[jar]!.acquire();
     Response<dynamic>? result =
