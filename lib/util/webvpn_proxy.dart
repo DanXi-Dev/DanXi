@@ -134,7 +134,7 @@ class WebvpnProxy {
       };
     }
 
-    // Login if first attempt failed
+    // Try logging in first, will return immediately if we've already logged in
     await loginWebVpn(dio);
 
     // First attempt
@@ -143,15 +143,17 @@ class WebvpnProxy {
       return jsonDecode(response.data!);
     }
 
-    // Reauth
+    // Re-login
     isLoggedIn = false;
     await loginWebVpn(dio);
 
+    // Second attempt
     response = await dio.fetch(options);
     if (checkResponse(response)) {
       return jsonDecode(response.data!);
     }
 
+    // All attempts failed
     throw WebVpnLoginException(options.method);
   }
 }
