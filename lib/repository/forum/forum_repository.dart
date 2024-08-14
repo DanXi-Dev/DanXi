@@ -386,6 +386,15 @@ class ForumRepository extends BaseRepositoryWithDio {
     return floors;
   }
 
+  Future<List<OTFloor>?> loadUserFloors(
+      {int startFloor = 0, int length = Constant.POST_COUNT_PER_PAGE}) async {
+    final Response<List<dynamic>> response = await dio.get(
+        "$_BASE_URL/users/me/floors",
+        queryParameters: {"offset": startFloor, "size": length},
+        options: Options(headers: _tokenHeader));
+    return response.data?.map((e) => OTFloor.fromJson(e)).toList();
+  }
+
   Future<List<OTFloor>?> loadSearchResults(String? searchString,
       {int? startFloor, int length = Constant.POST_COUNT_PER_PAGE}) async {
     final Response<List<dynamic>> response = await dio.get("$_BASE_URL/floors",
