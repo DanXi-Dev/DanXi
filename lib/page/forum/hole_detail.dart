@@ -142,6 +142,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       Search(keyword: var searchKeyword) => await ForumRepository.getInstance()
           .loadSearchResults(searchKeyword,
               startFloor: _listViewController.length()),
+      MyReplies() => await ForumRepository.getInstance()
+          .loadUserFloors(startFloor: _listViewController.length()),
       PunishmentHistory() => await loadPunishmentHistory(page),
     };
 
@@ -188,6 +190,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       _renderModel = Search(widget.arguments!['searchKeyword']);
     } else if (widget.arguments?['punishmentHistory'] == true) {
       _renderModel = PunishmentHistory();
+    } else if (widget.arguments?['myReplies'] == true) {
+      _renderModel = MyReplies();
     }
 
     shouldScrollToEnd = widget.arguments?['scroll_to_end'] == true;
@@ -294,6 +298,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           child: switch (_renderModel) {
             Normal(hole: var hole) => Text("#${hole.hole_id}"),
             Search() => Text(S.of(context).search_result),
+            MyReplies() => Text(S.of(context).list_my_replies),
             PunishmentHistory() => Text(S.of(context).list_my_punishments),
           },
         ),
@@ -1018,6 +1023,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         Search(keyword: var searchKeyword) =>
           await ForumRepository.getInstance().loadSearchResults(searchKeyword,
               startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
+        MyReplies() => (await ForumRepository.getInstance().loadUserFloors(
+            startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE)),
         PunishmentHistory() =>
           (await ForumRepository.getInstance().getPunishmentHistory())
               ?.map((e) => e.floor!)
@@ -1207,5 +1214,7 @@ class Search extends RenderModel {
 
   Search(this.keyword);
 }
+
+class MyReplies extends RenderModel {}
 
 class PunishmentHistory extends RenderModel {}
