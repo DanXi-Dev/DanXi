@@ -1881,6 +1881,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
+  toml:
+    dependency: "direct main"
+    description:
+      name: toml
+      sha256: d968d149c8bd06dc14e09ea3a140f90a3f2ba71949e7a91df4a46f3107400e71
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.16.0"
   tray_manager:
     dependency: "direct main"
     description:

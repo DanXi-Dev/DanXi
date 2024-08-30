@@ -19,28 +19,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'extra.g.dart';
 
-/// Extra is a data model represented extra data from the server.
-///
-/// It can contain different data. At the moment, we only stored semesters' start date.
-@JsonSerializable()
-class Extra {
-  TimeTableExtra? timetable;
-
-  String? userAgent;
-
-  List<String?>? stopWords;
-
-  List<BannerExtra?>? banners;
-
-  List<String?>? careWords;
-
-  Extra(this.timetable, this.userAgent, this.stopWords, this.banners, this.careWords);
-
-  factory Extra.fromJson(Map<String, dynamic> json) => _$ExtraFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ExtraToJson(this);
-}
-
 @JsonSerializable()
 class TimeTableExtra {
   /// The semester's start date of Fudan Undergraduates.

@@ -108,6 +108,7 @@ dependencies:
   html: any
   cookie_jar: any
   ffi: any
+  toml: ^0.16.0
 
 dependency_overrides:
   intl: ^0.19.0
