@@ -225,7 +225,8 @@ class PagedListViewState<T> extends State<PagedListView<T>>
           if (snapshot.error != null &&
               snapshot.error is FatalException &&
               widget.fatalErrorBuilder != null) {
-            _clearData();
+            // We cannot clear the error here
+            _clearData(clearError: false);
             pageIndex = widget.startPage;
             return widget.fatalErrorBuilder!.call(context, snapshot.error);
           } else {
@@ -396,11 +397,13 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   /// Clear all the data saved.
-  void _clearData() {
+  void _clearData({bool clearError = true}) {
     _data.clear();
     valueKeys.clear();
-    _hasError = false;
     _dataClearQueued = false;
+    if(clearError){
+      _hasError = true;
+    }
   }
 
   @override
@@ -448,7 +451,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
     });
   }
 
-  replaceDatumWith(T data, int index){
+  replaceDatumWith(T data, int index) {
     setState(() {
       _data[index] = data;
     });
@@ -477,7 +480,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
     }
   }
 
-  int _calculateRealWidgetCount(){
+  int _calculateRealWidgetCount() {
     return _data.length +
         (_isRefreshing ? 1 : 0) +
         (_isEnded ? 1 : 0) +
