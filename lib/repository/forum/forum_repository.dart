@@ -386,6 +386,15 @@ class ForumRepository extends BaseRepositoryWithDio {
     return floors;
   }
 
+  Future<List<OTFloor>?> loadUserFloors(
+      {int startFloor = 0, int length = Constant.POST_COUNT_PER_PAGE}) async {
+    final Response<List<dynamic>> response = await dio.get(
+        "$_BASE_URL/users/me/floors",
+        queryParameters: {"offset": startFloor, "size": length},
+        options: Options(headers: _tokenHeader));
+    return response.data?.map((e) => OTFloor.fromJson(e)).toList();
+  }
+
   Future<List<OTFloor>?> loadSearchResults(String? searchString,
       {int? startFloor, int length = Constant.POST_COUNT_PER_PAGE}) async {
     final Response<List<dynamic>> response = await dio.get("$_BASE_URL/floors",
@@ -516,7 +525,7 @@ class ForumRepository extends BaseRepositoryWithDio {
   }
 
   Future<void> modifyMessage(OTMessage message) async {
-    await dio.put("$_BASE_URL/messages/${message.message_id}",
+    await dio.delete("$_BASE_URL/messages/${message.message_id}",
         data: {
           "has_read": message.has_read,
         },
@@ -833,26 +842,26 @@ class ForumRepository extends BaseRepositoryWithDio {
     return resp.statusCode;
   }
 
-  Future<List<QuizQuestion>?> getPostRegisterQuestions() async {
+  Future<(List<QuizQuestion>?, int)> getPostRegisterQuestions() async {
     final Response<Map<String, dynamic>> response = await dio.get(
         "$_BASE_AUTH_URL/register/questions",
         options: Options(headers: _tokenHeader));
-    final questionList = response.data?["questions"]
+    final List<QuizQuestion>? questionList = response.data?["questions"]
         .map((e) => QuizQuestion.fromJson(e))
-        .toList();
-    final length = response.data?["spec"]["number_of_questions"] as int;
-
-    assert(questionList?.length == length);
-    return questionList.cast<QuizQuestion>();
+        .toList()
+        .cast<QuizQuestion>();
+    final int version = response.data?["version"];
+    return (questionList, version);
   }
 
   // Empty list means all-correct
-  Future<List<int>?> submitAnswers(List<QuizAnswer> answers) async {
+  Future<List<int>?> submitAnswers(
+      List<QuizAnswer> answers, int version) async {
     final Response<Map<String, dynamic>> response = await dio.post(
         "$_BASE_AUTH_URL/register/questions/_answer",
         data: {
           "answers": answers.map((e) => e.toJson()).toList(),
-          "version": 0
+          "version": version
         },
         options: Options(headers: _tokenHeader));
 

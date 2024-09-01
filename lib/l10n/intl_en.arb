@@ -510,6 +510,7 @@
   "danxi_care": "Danta Care",
   "danxi_care_message": "It could be that the ache of life surpasses the contemplation of harming yourself, or perhaps the absence of those you can confide in has left you adrift. However, when confidants seem distant, remember that we are here to support you. Sharing your journey, thoughts, and emotions might unveil a clearer perspective, guiding you through the complex maze of life.\n\nYou are not going through this alone. While our team at Danta may not have certified mental health professionals, we've assembled a comprehensive [\"Danta Mental Health Toolkit\"](https://danxi-dev.feishu.cn/docx/Trr5dEPfjoC97HxRklKccr1Ynyd?from=from_copylink) designed for your well-being in mind. I strongly encourage you to explore its resources, and also feel free to reach out to us at [danta@danta.tech](mailto:danta@danta.tech) whenever you're comfortable. We're here to offer immediate assistance, as you're never far from a helping hand.",
   "list_my_posts": "My Posts",
+  "list_my_replies": "My Replies",
   "list_my_punishments": "My Punishments",
   "multiple_select_mode_exit": "Stop Multi-Select",
   "multiple_select_mode_enter": "Start Multi-Select",

@@ -17,8 +17,6 @@
 
 import 'dart:async';
 import 'dart:collection';
-
-import 'package:dan_xi/model/pair.dart';
 import 'package:dio/dio.dart';
 
 /// The number of how many requests we allow to be executed simultaneously.
@@ -37,9 +35,9 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
   final Queue<Completer<void>> _requestWorkingQueue = Queue<Completer<void>>();
 
   /// The requests waiting to be executed.
-  final Queue<Pair<RequestOptions, RequestInterceptorHandler>>
+  final Queue<(RequestOptions, RequestInterceptorHandler)>
       _requestWaitingQueue =
-      Queue<Pair<RequestOptions, RequestInterceptorHandler>>();
+      Queue<(RequestOptions, RequestInterceptorHandler)>();
 
   LimitedQueuedInterceptor._();
 
@@ -87,16 +85,16 @@ class LimitedQueuedInterceptor extends QueuedInterceptor {
     }
     // Else, we add it to the [_requestWaitingQueue] and wait for any request to complete.
     //print("!! New request has to wait now, because working queue length = ${_requestWorkingQueue.length}");
-    _requestWaitingQueue.add(Pair(options, handler));
+    _requestWaitingQueue.add((options, handler));
 
     Future.any(_requestWorkingQueue.map((e) => e.future).followedBy(
         [Future.delayed(const Duration(seconds: _kWaitingSeconds))])).then((_) {
       // Launch the request when we have free rocket pod.
-      Pair<RequestOptions, RequestInterceptorHandler> requestHandlerPair =
+      (RequestOptions, RequestInterceptorHandler) requestHandlerPair =
           _requestWaitingQueue.removeFirst();
       _requestWorkingQueue.add(Completer());
       //print("<! New request finally gets its turn, working queue length = ${_requestWorkingQueue.length}");
-      requestHandlerPair.second.next(requestHandlerPair.first);
+      requestHandlerPair.$2.next(requestHandlerPair.$1);
     });
   }
 }
