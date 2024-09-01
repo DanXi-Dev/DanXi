@@ -152,7 +152,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   // construct the uri of the floor and copy it to clipboard
   Future<bool> _shareFloorAsUri(int? floorId) async {
-    String uri = 'https://www.fduhole.com/floor/$floorId';
+    // String uri = 'https://www.fduhole.com/floor/$floorId';
+    String uri = '##$floorId';
     try {
       if (floorId == null) return false;
       await FlutterClipboard.copy(uri);
@@ -164,7 +165,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   // construct the uri of the hole and copy it to clipboard
   Future<bool> _shareHoleAsUri(int? holeId) async {
-    String uri = 'https://www.fduhole.com/hole/$holeId';
+    // String uri = 'https://www.fduhole.com/hole/$holeId';
+    String uri = '#$holeId';
     try {
       if (holeId == null) return false;
       await FlutterClipboard.copy(uri);

@@ -62,7 +62,7 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
                   PlatformTextButton(
                     child: Text(S.of(context).community_convention),
                     onPressed: () => BrowserUtil.openUrl(
-                        "https://www.fduhole.com/#/licence", context),
+                        "https://www.fduhole.com/doc", context),
                   ),
                 ],
               ),
