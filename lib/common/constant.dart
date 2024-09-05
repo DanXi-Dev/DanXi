@@ -37,7 +37,7 @@ import 'package:flutter/services.dart';
 
 /// Store some important constants, such as app id, default color styles, etc.
 class Constant {
-  /// The number of posts on each pages returned from the server of FDUHole.
+  /// The number of posts on each pages returned from the server of Forum.
   static const POST_COUNT_PER_PAGE = 10;
 
   /// The number of serach results on each pages returned from the server of Danke.
@@ -64,7 +64,7 @@ class Constant {
 
   static const String APPSTORE_APPID = '1568629997';
 
-  /// A link to the "forget password" page of FDUHole.
+  /// A link to the "forget password" page of Forum.
   static const String FORUM_FORGOT_PASSWORD_URL =
       "https://auth.fduhole.com/register?type=forget_password";
 
@@ -101,9 +101,9 @@ class Constant {
   static String get version {
     if (PlatformX.isWeb) {
       // web does not support [Platform] API
-      return "DanXi/${FlutterApp.versionName}b${Pubspec.version.build.single} (Web)";
+      return "Danta/${FlutterApp.versionName}b${Pubspec.version.build.single} (Web)";
     } else {
-      return "DanXi/${FlutterApp.versionName}b${Pubspec.version.build.single} (${Platform.operatingSystem}; ${Platform.operatingSystemVersion})";
+      return "Danta/${FlutterApp.versionName}b${Pubspec.version.build.single} (${Platform.operatingSystem}; ${Platform.operatingSystemVersion})";
     }
   }
 
@@ -450,7 +450,7 @@ class Constant {
     );
   }
 
-  /// A list of tag colors used by FDUHole.
+  /// A list of tag colors used by Forum.
   static const List<String> TAG_COLOR_LIST = [
     'red',
     'pink',

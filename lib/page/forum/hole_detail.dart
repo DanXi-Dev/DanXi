@@ -152,7 +152,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   // construct the uri of the floor and copy it to clipboard
   Future<bool> _shareFloorAsUri(int? floorId) async {
-    String uri = 'https://www.fduhole.com/floor/$floorId';
+    // String uri = 'https://www.fduhole.com/floor/$floorId';
+    String uri = '##$floorId';
     try {
       if (floorId == null) return false;
       await FlutterClipboard.copy(uri);
@@ -164,7 +165,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   // construct the uri of the hole and copy it to clipboard
   Future<bool> _shareHoleAsUri(int? holeId) async {
-    String uri = 'https://www.fduhole.com/hole/$holeId';
+    // String uri = 'https://www.fduhole.com/hole/$holeId';
+    String uri = '#$holeId';
     try {
       if (holeId == null) return false;
       await FlutterClipboard.copy(uri);
@@ -570,7 +572,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         PlatformContextMenuItem(
           onPressed: () async {
             bool? lock = await Noticing.showConfirmationDialog(
-                context, "锁定或解锁树洞？",
+                context, "锁定或解锁帖子？",
                 confirmText: "锁定", cancelText: "解锁");
             if (lock != null) {
               int? result = await ForumRepository.getInstance()
@@ -583,12 +585,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           },
           isDestructive: true,
           menuContext: menuContext,
-          child: const Text("锁定/解锁树洞"),
+          child: const Text("锁定/解锁帖子"),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
             bool? hide = await Noticing.showConfirmationDialog(
-                context, "隐藏或显示树洞？",
+                context, "隐藏或显示帖子？",
                 confirmText: "Hide", cancelText: "Unhide");
             if (hide != null) {
               int? result = hide
@@ -604,12 +606,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           },
           isDestructive: true,
           menuContext: menuContext,
-          child: const Text("隐藏/显示树洞"),
+          child: const Text("隐藏/显示帖子"),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
             bool? sens = await Noticing.showConfirmationDialog(
-                context, "标记或取消树洞敏感状态？",
+                context, "标记或取消帖子敏感状态？",
                 confirmText: "标记敏感", cancelText: "取消敏感");
             if (sens != null) {
               int? result = await ForumRepository.getInstance()

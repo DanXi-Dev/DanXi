@@ -1,7 +1,7 @@
 [中文版](README.md) English Version
 [Official Website(Chinese Only)](https://danxi.fduhole.com)
 
-# DanXi
+# Danta
 
 [![CI](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml)
 [![Deploy to GitHub Pages](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml)
@@ -14,7 +14,7 @@ again.)
 
 Maybe the best all-rounded service app for Fudan University students!
 
-**DanXi only support Chinese (Simplified) and English language at the moment. Come to help us!**
+**Danta only support Chinese (Simplified) and English language at the moment. Come to help us!**
 
 - Campus card balance and transactions
 - Dining hall traffic
@@ -33,7 +33,7 @@ This application is still at active development stage, we will be happy if you c
 # Install
 
 If you meet abnormal behavior in
-DanXi，Please [create an issue](https://github.com/DanXi-Dev/DanXi/issues/new/choose)
+Danta, Please [create an issue](https://github.com/DanXi-Dev/DanXi/issues/new/choose)
 or [create a new pull request](https://github.com/DanXi-Dev/DanXi/compare).
 
 ## Windows

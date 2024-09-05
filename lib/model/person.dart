@@ -46,7 +46,7 @@ Map<UserGroup, Function> kUserGroupDescription = {
   UserGroup.SJTU_STUDENT: (BuildContext context) => S.of(context).sjtu_student,
 };
 
-/// PersonInfo is a model to store everything about the user (except data of FDUHole).
+/// PersonInfo is a model to store everything about the user (except data of Forum).
 class PersonInfo {
   /// Which type the user is.
   UserGroup group;

@@ -81,7 +81,7 @@ GlobalKey<HomeSubpageState> dashboardPageKey = GlobalKey();
 GlobalKey<TimetableSubPageState> timetablePageKey = GlobalKey();
 const QuickActions quickActions = QuickActions();
 
-/// The main page of DanXi.
+/// The main page of Danta.
 /// It is a container for [PlatformSubpage].
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -287,11 +287,11 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (!PlatformX.isWindows) return;
     // We first init the systray menu and then add the menu entries
     await _systemTray.initSystemTray(
-        title: 'DanXi',
+        title: 'Danta',
         iconPath: PlatformX.createPlatformFile(
                 "${PlatformX.getPathFromFile(Platform.resolvedExecutable)}/data/flutter_assets/assets/graphics/app_icon.ico")
             .path,
-        toolTip: "DanXi is here~");
+        toolTip: "Danta is here~");
     late List<tray.MenuItemBase> showingMenu, hidingMenu;
     showingMenu = [
       tray.MenuItem(

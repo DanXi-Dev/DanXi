@@ -168,7 +168,7 @@ class CustomInAppBrowser extends InAppBrowser {
                 document.forms[0].submit();
             }
             catch (e) {
-                window.alert("DanXi: Failed to auto login UIS");
+                window.alert("Danta: Failed to auto login UIS");
             }
         }''';
 

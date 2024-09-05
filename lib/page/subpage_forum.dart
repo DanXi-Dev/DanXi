@@ -72,7 +72,7 @@ bool isHtml(String content) {
   return htmlMatcher.hasMatch(content);
 }
 
-/// Should be called when user logged in DanXi account;
+/// Should be called when user logged in Danta account;
 /// it refreshes every page that cares about login status.
 /// (except the setting page, since it is refreshed when initializing token.)
 ///
@@ -82,7 +82,7 @@ void onLogin() {
   dankePageKey.currentState?.setState(() {});
 }
 
-/// Should be called when user logged out DanXi account;
+/// Should be called when user logged out Danta account;
 /// it refreshes every page that cares about login status.
 /// (except setting page, since it is refreshed when initializing token.)
 ///
