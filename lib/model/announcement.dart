@@ -39,4 +39,13 @@ class Announcement {
   Map<String, dynamic> toJson() => _$AnnouncementToJson(this);
 
   Announcement(this.content);
+
+  // FIXME: Use maxVersion as objectId requires maxVersion to be unique
+  Announcement.fromToml(Map<String, dynamic> notice){
+    updatedAt = notice['updatedAt'];
+    content = notice['content'];
+    maxVersion = notice['build'];
+    createdAt = updatedAt;
+    objectId = maxVersion.toString();
+  }
 }

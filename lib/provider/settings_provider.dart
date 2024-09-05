@@ -807,15 +807,15 @@ FoldBehavior foldBehaviorFromInternalString(String? str) {
   }
 }
 
-enum OTNotificationTypes { MENTION, FAVORITE, REPORT }
+enum OTNotificationTypes { MENTION, SUBSCRIPTION, REPORT }
 
 extension OTNotificationTypesEx on OTNotificationTypes {
   String? displayTitle(BuildContext context) {
     switch (this) {
       case OTNotificationTypes.MENTION:
         return S.of(context).notification_mention;
-      case OTNotificationTypes.FAVORITE:
-        return S.of(context).notification_favorite;
+      case OTNotificationTypes.SUBSCRIPTION:
+        return S.of(context).notification_subscription;
       case OTNotificationTypes.REPORT:
         return S.of(context).notification_reported;
     }
@@ -825,8 +825,8 @@ extension OTNotificationTypesEx on OTNotificationTypes {
     switch (this) {
       case OTNotificationTypes.MENTION:
         return S.of(context).notification_mention_s;
-      case OTNotificationTypes.FAVORITE:
-        return S.of(context).notification_favorite_s;
+      case OTNotificationTypes.SUBSCRIPTION:
+        return S.of(context).notification_subscription_s;
       case OTNotificationTypes.REPORT:
         return S.of(context).notification_reported_s;
     }
@@ -836,8 +836,8 @@ extension OTNotificationTypesEx on OTNotificationTypes {
     switch (this) {
       case OTNotificationTypes.MENTION:
         return 'mention';
-      case OTNotificationTypes.FAVORITE:
-        return 'favorite';
+      case OTNotificationTypes.SUBSCRIPTION:
+        return 'favorite'; // keep 'favorite' here for backward support
       case OTNotificationTypes.REPORT:
         return 'report';
     }
@@ -849,7 +849,7 @@ OTNotificationTypes? notificationTypeFromInternalString(String str) {
     case 'mention':
       return OTNotificationTypes.MENTION;
     case 'favorite':
-      return OTNotificationTypes.FAVORITE;
+      return OTNotificationTypes.SUBSCRIPTION;
     case 'report':
       return OTNotificationTypes.REPORT;
     default:

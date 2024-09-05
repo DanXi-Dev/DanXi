@@ -39,6 +39,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:intl/intl.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 
 /// A list page showing the reports for administrators.
@@ -274,11 +275,29 @@ class AuditListState extends State<AuditList> {
   final ScrollController _auditScrollController = ScrollController();
   final TimeBasedLoadAdaptLayer<OTAudit> auditAdaptLayer =
       TimeBasedLoadAdaptLayer(Constant.POST_COUNT_PER_PAGE, 0);
+  DateTime _startDateTime = DateTime.now();
 
-  Future<List<OTAudit>?> _loadAuditContent(int page, bool open) async {
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _startDateTime,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != _startDateTime) {
+      setState(() {
+        _startDateTime = picked.copyWith(hour: 23, minute: 59, second: 59);
+      });
+      await _auditListViewController.notifyUpdate(
+          useInitialData: false, queueDataClear: false);
+    }
+  }
+
+  Future<List<OTAudit>?> _loadAuditContent(
+      int page, bool open, DateTime startDate) async {
     List<OTAudit>? loadedAuditFloors = await auditAdaptLayer
         .generateReceiver(_auditListViewController, (lastElement) async {
-      DateTime time = DateTime.now();
+      DateTime time = startDate;
       if (lastElement != null) {
         time = DateTime.parse(lastElement.time_created!);
       }
@@ -449,6 +468,18 @@ class AuditListState extends State<AuditList> {
     );
   }
 
+  Widget _getDatePicker(BuildContext context) {
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        PlatformElevatedButton(
+            onPressed: () => _selectDate(context),
+            child: const Text("Select Date")),
+        Text(DateFormat('yyyy-MM-dd').format(_startDateTime))
+      ]
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -465,8 +496,10 @@ class AuditListState extends State<AuditList> {
         pagedController: _auditListViewController,
         withScrollbar: true,
         scrollController: _auditScrollController,
-        dataReceiver: (page) => _loadAuditContent(page, widget.open),
+        dataReceiver: (page) =>
+            _loadAuditContent(page, widget.open, _startDateTime),
         builder: _getAuditFloorsListItems,
+        headBuilder: _getDatePicker,
         loadingBuilder: (BuildContext context) => Container(
           padding: const EdgeInsets.all(8),
           child: Center(child: PlatformCircularProgressIndicator()),
