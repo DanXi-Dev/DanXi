@@ -402,7 +402,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
     valueKeys.clear();
     _dataClearQueued = false;
     if(clearError){
-      _hasError = true;
+      _hasError = false;
     }
   }
 
