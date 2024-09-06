@@ -3,9 +3,9 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
-const RESOURCES = {"main.dart.js": "0e00f64025b73246c378695a2e8cb40c",
-"index.html": "bf05df5619c6985622231eea37753fe0",
-"/": "bf05df5619c6985622231eea37753fe0",
+const RESOURCES = {"main.dart.js": "5f89055e25f3194b3cd12313bdee511a",
+"index.html": "96b2e21ed9ca02d40d9d447bcf65112e",
+"/": "96b2e21ed9ca02d40d9d447bcf65112e",
 "manifest.json": "012d91b9edf492757ddf24dd1b15d03e",
 "version.json": "64b640ac5cbb330d1d57029c9daa112b",
 "assets/fonts/MaterialIcons-Regular.otf": "0161955b3a6264f7f6903907f3b57080",
@@ -77,7 +77,7 @@ const RESOURCES = {"main.dart.js": "0e00f64025b73246c378695a2e8cb40c",
 "assets/packages/flutter_math_fork/lib/katex_fonts/fonts/KaTeX_Fraktur-Bold.ttf": "46b41c4de7a936d099575185a94855c4",
 "assets/AssetManifest.bin.json": "fbe830568e77d082701720ee0b0bd94c",
 "assets/AssetManifest.bin": "a20a895c5719238480cdf4fe4b54dc25",
-"flutter_bootstrap.js": "442cc84bf6a8f091ae6a7e9b00221692",
+"flutter_bootstrap.js": "d75db87d6e7fe6149df79e59427fd6ec",
 "canvaskit/skwasm.js": "694fda5704053957c2594de355805228",
 "canvaskit/chromium/canvaskit.wasm": "b1ac05b29c127d86df4bcfbf50dd902a",
 "canvaskit/chromium/canvaskit.js": "671c6b4f8fcc199dcc551c7bb125f239",
