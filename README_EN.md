@@ -83,8 +83,10 @@ If you are building for `iOS/iPadOS`, you should also [install and configure](ht
 Run the command 
 
 ```
-dart run build_runner build --delete-conflicting-outputs
+flutter pub get
+flutter pub global activate intl_utils
 dart run intl_utils:generate
+dart run build_runner build --delete-conflicting-outputs
 ```
 
 and then  `flutter run [ios/android]` to start the app.
