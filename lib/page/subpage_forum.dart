@@ -56,7 +56,7 @@ import 'package:intl/intl.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
 
-import '../util/watermark.dart';
+// import '../util/watermark.dart';
 import '../widget/forum/tag_selector/tag.dart';
 
 const kCompatibleUserGroup = [
@@ -549,9 +549,9 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           });
         }),
         hashCode);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Watermark.addWatermark(context, rowCount: 4, columnCount: 8);
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   Watermark.addWatermark(context, rowCount: 4, columnCount: 8);
+    // });
   }
 
   @override

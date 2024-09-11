@@ -124,7 +124,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
       locateReview = widget.arguments!['locate'];
     }
 
-    StateProvider.needScreenshotWarning = true;
+    StateProvider.needScreenshotWarning = false;
 
     _refreshSubscription.bindOnlyInvalid(
         Constant.eventBus.on<RefreshFilterEvent>().listen((event) {

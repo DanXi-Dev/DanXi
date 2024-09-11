@@ -26,27 +26,28 @@ class Watermark {
   /// Add a watermark to the screen.
   static void addWatermark(BuildContext context,
       {int rowCount = 3, int columnCount = 10, TextStyle? textStyle}) async {
-    if (overlayEntry != null) {
-      overlayEntry!.remove();
-    }
+    // if (overlayEntry != null) {
+    //   overlayEntry!.remove();
+    // }
 
-    OverlayState? overlayState = Overlay.of(context, rootOverlay: true);
+    // OverlayState? overlayState = Overlay.of(context, rootOverlay: true);
 
-    overlayEntry = OverlayEntry(
-        builder: (context) => FullScreenWatermark(
-          rowCount: rowCount,
-          columnCount: columnCount,
-          textStyle: textStyle ??
-              TextStyle(
-                  color: PlatformX.isDarkMode
-                      ? Color(
-                      SettingsProvider.getInstance().darkWatermarkColor)
-                      : Color(SettingsProvider.getInstance()
-                      .lightWatermarkColor),
-                  fontSize: 48,
-                  decoration: TextDecoration.none),
-        ));
+    // overlayEntry = OverlayEntry(
+    //     builder: (context) => FullScreenWatermark(
+    //       rowCount: rowCount,
+    //       columnCount: columnCount,
+    //       textStyle: textStyle ??
+    //           TextStyle(
+    //               color: PlatformX.isDarkMode
+    //                   ? Color(
+    //                   SettingsProvider.getInstance().darkWatermarkColor)
+    //                   : Color(SettingsProvider.getInstance()
+    //                   .lightWatermarkColor),
+    //               fontSize: 48,
+    //               decoration: TextDecoration.none),
+    //     ));
 
-    overlayState.insert(overlayEntry!);
+    // overlayState.insert(overlayEntry!);
+    overlayEntry = null;
   }
 }

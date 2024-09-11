@@ -199,7 +199,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     shouldScrollToEnd = widget.arguments?['scroll_to_end'] == true;
     locateFloor = widget.arguments?["locate"];
 
-    StateProvider.needScreenshotWarning = true;
+    StateProvider.needScreenshotWarning = false;
   }
 
   /// Refresh the list view.
