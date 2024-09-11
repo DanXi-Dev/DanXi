@@ -49,7 +49,7 @@ jobs:
           flutter clean
           flutter pub get
           flutter build apk --debug
-          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/DanXi-dummy-release.android.apk
+          mv build/app/outputs/flutter-apk/app-debug.apk build/app/outputs/flutter-apk/app-release.apk
           echo "Build success."
 
       - if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name != 'nightly'
