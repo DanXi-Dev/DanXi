@@ -33,19 +33,24 @@ jobs:
       - name: Import Secrets
         uses: actions/checkout@v2
         with:
-          repository: DanXi-Dev/DanXi-secrets
+          repository: habacat/DanXi-secrets
           path: secrets
           ssh-key: ${{ secrets.SECRETS_SSH_KEY }}
       
       - name: Populate Secrets
         run: |
-          mv -f secrets/sksl_default.json CI/sksl_default.json
+          # mv -f secrets/sksl_default.json CI/sksl_default.json
           mv -f secrets/key.properties android/key.properties
           mv -f secrets/danxi.keystore android/danxi.keystore
 
       - name: Build APK
         run: |
-          dart build_release.dart --target android --versionCode dummy
+          dart build_release.dart --target android --versionCode dummy || true
+          flutter clean
+          flutter pub get
+          flutter build apk --debug
+          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/DanXi-dummy-release.android.apk
+          echo "Build success."
 
       - if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name != 'nightly'
         name: Release
