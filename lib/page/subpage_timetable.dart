@@ -57,6 +57,7 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import '../widget/dialogs/manually_add_course_dialog.dart';
 
+/// Keys to locate buttons in the interactive tutorial.
 GlobalKey keyButton = GlobalKey();
 GlobalKey keyButton1 = GlobalKey();
 GlobalKey keyButton2 = GlobalKey();
@@ -146,14 +147,10 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
   List<Course> newCourses = [];
 
-  List<int> courseAvailableList = <int>[];
+  List<int> courseAvailableList = [];
 
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
-
-  void pageRefresh() {
-    refreshSelf();
-  }
 
   List<Course> getCourseList() {
     return SettingsProvider.getInstance().manualAddedCourses;
@@ -565,6 +562,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   }
 }
 
+/// Show a button to select the semester.
 class SemesterSelectionButton extends StatefulWidget {
   final void Function()? onSelectionUpdate;
 
