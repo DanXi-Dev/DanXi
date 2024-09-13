@@ -91,12 +91,12 @@ class AnnouncementRepository {
   }
 
   TimeTableExtra? getStartDates() {
-    final fdu_ug = _tomlCache!['semester_start_date']
+    final fduUg = _tomlCache!['semester_start_date']
         .entries
         .map<TimeTableStartTimeItem>(
             (entry) => TimeTableStartTimeItem(entry.key, entry.value))
         .toList();
-    return TimeTableExtra(fdu_ug);
+    return TimeTableExtra(fduUg);
   }
 
   String? getUserAgent() {
