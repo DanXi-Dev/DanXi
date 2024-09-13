@@ -879,7 +879,6 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       while (auxiliaryNavigatorState?.canPop() == true) {
                         auxiliaryNavigatorState?.pop();
                       }
-                      settingsPageKey.currentState?.setState(() {});
                       forumPageKey.currentState?.listViewController
                           .notifyUpdate();
                     } finally {

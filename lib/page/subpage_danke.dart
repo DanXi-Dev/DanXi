@@ -17,7 +17,6 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
-import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
@@ -103,7 +102,6 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
   Future<CourseReview?> _loadRandomReview({bool forceRefetch = false}) async {
     if (!context.read<ForumProvider>().isUserInitialized) {
       await ForumRepository.getInstance().initializeUser();
-      settingsPageKey.currentState?.setState(() {});
     }
 
     if (forceRefetch) {
