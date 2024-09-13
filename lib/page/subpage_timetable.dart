@@ -66,6 +66,12 @@ const kCompatibleUserGroup = [
   UserGroup.FUDAN_POSTGRADUATE_STUDENT
 ];
 
+/// Only some user groups can select the semester.
+/// For other user groups, the semester selection button should be hidden.
+const kSemesterSelectionCompatibleUserGroup = [
+  UserGroup.FUDAN_UNDERGRADUATE_STUDENT
+];
+
 class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
   @override
   TimetableSubPageState createState() => TimetableSubPageState();
@@ -96,17 +102,18 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
 
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
-        AppBarButtonItem(
-            S.of(cxt).select_semester,
-            SemesterSelectionButton(
-              key: keyButton1,
-              onSelectionUpdate: () {
-                timetablePageKey.currentState?.indicatorKey.currentState
-                    ?.show();
-              },
-            ),
-            null,
-            useCustomWidget: true),
+        if (checkGroup(kSemesterSelectionCompatibleUserGroup))
+          AppBarButtonItem(
+              S.of(cxt).select_semester,
+              SemesterSelectionButton(
+                key: keyButton1,
+                onSelectionUpdate: () {
+                  timetablePageKey.currentState?.indicatorKey.currentState
+                      ?.show();
+                },
+              ),
+              null,
+              useCustomWidget: true),
       ];
 }
 
@@ -446,12 +453,12 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    event.course.courseName!,
+                    event.course.courseName ?? "null",
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   Text((event.course.teacherNames ?? []).join(",")),
-                  Text(event.course.roomName!),
-                  Text(event.course.courseId!),
+                  Text(event.course.roomName ?? ""),
+                  Text(event.course.courseId ?? ""),
                 ],
               )),
               if (event.course.roomId == "999999") ...[
