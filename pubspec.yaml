@@ -28,7 +28,7 @@ dependencies:
   qr_flutter: ^4.0.0
   provider: ^6.0.5
   event_bus: ^2.0.0
-  share_plus: ^9.0.0
+  share_plus: ^10.0.2
   path_provider: ^2.0.9
   screen_brightness: ^1.0.0
   flutter_email_sender: ^6.0.1
@@ -53,9 +53,7 @@ dependencies:
   in_app_review: ^2.0.4
   flutter_linkify: ^6.0.0
   linkify: ^4.0.0
-  open_file:
-    git:
-      url: https://github.com/crazecoder/open_file.git
+  open_file: ^3.5.3
   dio5_log: ^5.1.2
   json_serializable: ^6.2.0
   photo_view: ^0.15.0
@@ -67,7 +65,7 @@ dependencies:
   tray_manager: ^0.2.1
   bitsdojo_window: ^0.1.6
   win32: ^5.0.2
-  file_picker: ^8.0.6
+  file_picker: ^8.1.2
   cached_network_image: ^3.2.1
   flutter_typeahead: ^5.2.0
   collection: ">=1.15.0 <2.0.0"
@@ -80,7 +78,7 @@ dependencies:
   screen_capture_event: ^1.0.0+1
   otp: ^3.0.2
   lunar: ^1.2.20
-  flutter_fgbg: ^0.3.0
+  flutter_fgbg: ^0.6.0
   lazy_load_indexed_stack: ^1.0.0
   js: ^0.6.3
   nil: ^1.1.1

@@ -15,7 +15,7 @@ import flutter_js
 import flutter_secure_storage_macos
 import gal
 import in_app_review
-import open_file
+import open_file_mac
 import path_provider_foundation
 import platform_device_id
 import platform_device_id_macos
