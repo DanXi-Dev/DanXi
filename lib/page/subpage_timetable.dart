@@ -159,6 +159,11 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     return SettingsProvider.getInstance().manualAddedCourses;
   }
 
+  /// Set the future that fetches the content.
+  ///
+  /// Note: in this method, when forceLoadFromRemote = false (i.e. called from [initState]),
+  /// [context] is NOT available. DO NOT use [context] in that case.
+  /// For example, instead of using [S.of(context)], use [S.current].
   void _setContent() {
     newCourses = getCourseList();
     if (checkGroup(kCompatibleUserGroup)) {
@@ -203,13 +208,13 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           // If throw an error, it means we don't have a valid timetable.
         } catch (_) {
           _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
-              NotLoginError(S.of(context).postgraduates_need_login)));
+              NotLoginError(S.current.postgraduates_need_login)));
         }
       }
       forceLoadFromRemote = false;
     } else {
-      _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
-          NotLoginError(S.of(context).not_fudan_student)));
+      _contentFuture = LazyFuture.pack(
+          Future<TimeTable?>.error(NotLoginError(S.current.not_fudan_student)));
     }
     _contentFuture?.then(
         (value) => TimeTable.mergeManuallyAddedCourses(value, newCourses));
@@ -274,6 +279,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     _shareSubscription.bindOnlyInvalid(
         Constant.eventBus.on<ShareTimetableEvent>().listen((_) {
           if (_table == null) return;
+          if (!mounted) return;
           showPlatformModalSheet(
             context: context,
             builder: (BuildContext context) => PlatformContextMenu(
@@ -288,7 +294,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         hashCode);
     _addCourseSubscription.bindOnlyInvalid(
         Constant.eventBus.on<ManuallyAddCourseEvent>().listen((_) async {
-          //if (_table == null) return;
+          if (_table == null) return;
+          if (!mounted) return;
           newCourses = (await showPlatformDialog<Course?>(
             context: context,
             builder: (_) => ManuallyAddCourseDialog(courseAvailableList),
