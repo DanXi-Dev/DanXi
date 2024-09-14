@@ -23,6 +23,7 @@ import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dio/dio.dart';
+import 'package:pub_semver/pub_semver.dart';
 import 'package:toml/toml.dart';
 
 class AnnouncementRepository {
@@ -147,23 +148,5 @@ class UpdateInfo {
 
   UpdateInfo(this.latestVersion, this.changeLog);
 
-  bool isAfter(int major, int minor, int patch) {
-    List<int?> versions =
-        latestVersion!.split(".").map((e) => int.tryParse(e)).toList();
-    if (versions[0]! > major) {
-      return true;
-    } else if (versions[0]! < major) {
-      return false;
-    }
-
-    if (versions[1]! > minor) {
-      return true;
-    } else if (versions[1]! < minor) {
-      return false;
-    }
-
-    if (versions[2]! > patch) return true;
-
-    return false;
-  }
+  bool isAfter(Version version) => Version.parse(latestVersion!) > version;
 }
