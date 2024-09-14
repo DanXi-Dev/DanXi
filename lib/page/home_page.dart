@@ -59,6 +59,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:provider/provider.dart';
+import 'package:pub_semver/pub_semver.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:receive_intent/receive_intent.dart' as ri;
 import 'package:screen_capture_event/screen_capture_event.dart';
@@ -749,8 +750,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (PlatformX.isIOS) return;
     final UpdateInfo updateInfo =
         AnnouncementRepository.getInstance().checkVersion();
-    if (updateInfo.isAfter(
-        Pubspec.version.major, Pubspec.version.minor, Pubspec.version.patch)) {
+    if (updateInfo.isAfter(Version.parse(Pubspec.version.canonical))) {
       await showPlatformDialog(
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(
