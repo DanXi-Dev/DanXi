@@ -25,9 +25,9 @@ import 'package:dan_xi/model/forum/division.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/model/forum/tag.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/forum/hole_editor.dart';
 import 'package:dan_xi/page/forum/quiz.dart';
+import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -39,15 +39,15 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
+import 'package:dan_xi/widget/forum/auto_banner.dart';
+import 'package:dan_xi/widget/forum/forum_widgets.dart';
+import 'package:dan_xi/widget/forum/login_widgets.dart';
+import 'package:dan_xi/widget/forum/render/render_impl.dart';
+import 'package:dan_xi/widget/forum/tag_selector/selector.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
-import 'package:dan_xi/widget/forum/auto_banner.dart';
-import 'package:dan_xi/widget/forum/login_widgets.dart';
-import 'package:dan_xi/widget/forum/render/render_impl.dart';
-import 'package:dan_xi/widget/forum/tag_selector/selector.dart';
-import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -364,7 +364,6 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
               .getDivisions()
               .firstOrNull
               ?.division_id;
-      settingsPageKey.currentState?.setState(() {});
     }
 
     bool answered =

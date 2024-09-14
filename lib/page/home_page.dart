@@ -17,6 +17,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:app_links/app_links.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -27,9 +28,9 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_danke.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
+import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
-import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
@@ -46,11 +47,11 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/dialogs/login_dialog.dart';
 import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
+import 'package:dan_xi/widget/forum/post_render.dart';
+import 'package:dan_xi/widget/forum/render/render_impl.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/platform_nav_bar_m3.dart';
-import 'package:dan_xi/widget/forum/post_render.dart';
-import 'package:dan_xi/widget/forum/render/render_impl.dart';
 import 'package:dio5_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +62,6 @@ import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:receive_intent/receive_intent.dart' as ri;
 import 'package:screen_capture_event/screen_capture_event.dart';
-import 'package:app_links/app_links.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_command_message_entity.dart';
 import 'package:xiao_mi_push_plugin/entity/mi_push_message_entity.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
@@ -74,7 +74,6 @@ void sendFduholeTokenToWatch(String? token) {
 }
 
 GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
-GlobalKey<State<SettingsSubpage>> settingsPageKey = GlobalKey();
 GlobalKey<ForumSubpageState> forumPageKey = GlobalKey();
 GlobalKey<DankeSubPageState> dankePageKey = GlobalKey();
 GlobalKey<HomeSubpageState> dashboardPageKey = GlobalKey();
@@ -142,7 +141,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       DankeSubPage(key: dankePageKey),
       if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
         TimetableSubPage(key: timetablePageKey),
-      SettingsSubpage(key: settingsPageKey),
+      const SettingsSubpage(),
     ];
   }
 

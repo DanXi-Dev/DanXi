@@ -172,7 +172,7 @@ class ForumRepository extends BaseRepositoryWithDio {
   ///
   /// We cache them all, so that one loading, everything done.
   Future<void> initializeRepo() async {
-    initializeUser();
+    await initializeUser();
 
     try {
       FDUHolePlatformBridge.registerRemoteNotification();
