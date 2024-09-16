@@ -93,55 +93,51 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
         bool translucentCard,
         bool isPreviewWidget) {
       double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
+      final imageBuilder = (Uri uri, String? title, String? alt) {
+        String url = uri.toString();
+        // render stickers first
+        if (url.startsWith("danxi_")) {
+          // backward compatibility: <=1.4.3, danxi_ is used; after that, dx_ is used
+          url = url.replaceFirst("danxi_", "dx_");
+        }
+        if (url.startsWith("dx_")) {
+          var asset = getStickerAssetPath(url);
+          // print(asset);
+          if (asset != null) {
+            return Image.asset(
+              asset,
+              width: 50,
+              height: 50,
+            );
+          }
+        }
+
+        return Center(
+          child: AutoBBSImage(
+              key: UniqueKey(),
+              src: url,
+              maxWidth: imageWidth,
+              onTapImage: onTapImage),
+        );
+      };
 
       return MarkdownBody(
-    softLineBreak: true,
-    data: content!,
-    styleSheet: _markdownStyleOverride(
+        softLineBreak: true,
+        data: content!,
+        styleSheet: _markdownStyleOverride(
             _getMarkdownStyleSheetFromPlatform(context), defaultFontSize),
         onTapLink: (String text, String? href, String title) =>
-        onTapLink?.call(href),
-        inlineSyntaxes: [
-          LatexSyntax(),
-          LatexMultiLineSyntax(),
-          MentionSyntax(),
-          AuditSyntax()
-        ],
+            onTapLink?.call(href),
+        inlineSyntaxes: [MentionSyntax(), AuditSyntax()],
         builders: {
-      'tex': MarkdownLatexSupport(),
-      'texLine': MarkdownLatexMultiLineSupport(),
-      'floor_mention':
+          MarkdownLatexSupport.tag: MarkdownLatexSupport(),
+          MarkdownLatexMultiLineSupport.tag: MarkdownLatexMultiLineSupport(),
+          MarkdownFloorMentionSupport.tag:
               MarkdownFloorMentionSupport(translucentCard, isPreviewWidget),
-          'hole_mention':
+          MarkdownHoleMentionSupport.tag:
               MarkdownHoleMentionSupport(translucentCard, isPreviewWidget),
         },
-    imageBuilder: (Uri uri, String? title, String? alt) {
-          String url = uri.toString();
-          // render stickers first
-          if (url.startsWith("danxi_")) {
-            // backward compatibility: <=1.4.3, danxi_ is used; after that, dx_ is used
-            url = url.replaceFirst("danxi_", "dx_");
-          }
-          if (url.startsWith("dx_")) {
-            var asset = getStickerAssetPath(url);
-            // print(asset);
-        if (asset != null) {
-          return Image.asset(
-            asset,
-            width: 50,
-            height: 50,
-          );
-        }
-      }
-
-          return Center(
-            child: AutoBBSImage(
-                key: UniqueKey(),
-                src: url,
-                maxWidth: imageWidth,
-                onTapImage: onTapImage),
-          );
-        },
+        imageBuilder: imageBuilder,
       );
     };
 
@@ -160,7 +156,28 @@ final BaseRender kPlainRender = (BuildContext context,
   );
 };
 
+final BaseRender kMarkdownSelectorRender = (BuildContext context,
+    String? content,
+    ImageTapCallback? onTapImage,
+    LinkTapCallback? onTapLink,
+    bool translucentCard,
+    bool isPreviewWidget) {
+  return SelectionArea(
+    child: Markdown(
+      softLineBreak: true,
+      data: content!,
+      styleSheet: _markdownStyleOverride(
+          _getMarkdownStyleSheetFromPlatform(context), kFontLargerSize),
+      onTapLink: (String text, String? href, String title) =>
+          onTapLink?.call(href),
+      imageBuilder: (Uri uri, String? title, String? alt) => nil,
+    ),
+  );
+};
+
 class MarkdownLatexSupport extends MarkdownElementBuilder {
+  static const String tag = "tex";
+
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) =>
       SingleChildScrollView(
@@ -169,6 +186,8 @@ class MarkdownLatexSupport extends MarkdownElementBuilder {
 }
 
 class MarkdownLatexMultiLineSupport extends MarkdownElementBuilder {
+  static const String tag = "texLine";
+
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     return Align(
@@ -182,6 +201,8 @@ class MarkdownLatexMultiLineSupport extends MarkdownElementBuilder {
 }
 
 class MarkdownFloorMentionSupport extends MarkdownElementBuilder {
+  static const String tag = "floorMention";
+
   final bool hasBackgroundImage;
   final bool isPreviewWidget;
 
@@ -206,6 +227,8 @@ class MarkdownFloorMentionSupport extends MarkdownElementBuilder {
 }
 
 class MarkdownHoleMentionSupport extends MarkdownElementBuilder {
+  static const String tag = "holeMention";
+
   final bool hasBackgroundImage;
   final bool isPreviewWidget;
 
@@ -230,32 +253,13 @@ class MarkdownHoleMentionSupport extends MarkdownElementBuilder {
   }
 }
 
-final BaseRender kMarkdownSelectorRender = (BuildContext context,
-    String? content,
-    ImageTapCallback? onTapImage,
-    LinkTapCallback? onTapLink,
-    bool translucentCard,
-    bool isPreviewWidget) {
-  return SelectionArea(
-    child: Markdown(
-      softLineBreak: true,
-      data: content!,
-      styleSheet: _markdownStyleOverride(
-          _getMarkdownStyleSheetFromPlatform(context), kFontLargerSize),
-      onTapLink: (String text, String? href, String title) =>
-          onTapLink?.call(href),
-      imageBuilder: (Uri uri, String? title, String? alt) => nil,
-    ),
-  );
-};
-
 class LatexSyntax extends md.InlineSyntax {
   LatexSyntax() : super(r'(?<!\$)\$([^\$]+?)\$(?!\$)');
 
   @override
   bool onMatch(md.InlineParser parser, Match match) {
     var tex = match[1]!;
-    parser.addNode(md.Element.text("tex", tex));
+    parser.addNode(md.Element.text(MarkdownLatexSupport.tag, tex));
     return true;
   }
 }
@@ -266,25 +270,24 @@ class LatexMultiLineSyntax extends md.InlineSyntax {
   @override
   bool onMatch(md.InlineParser parser, Match match) {
     var tex = match[1]!;
-    parser.addNode(md.Element("p", [md.Element.text("texLine", tex)]));
+    parser.addNode(md.Element(
+        "p", [md.Element.text(MarkdownLatexMultiLineSupport.tag, tex)]));
     return true;
   }
 }
 
-const MENTION_REGEX_STRING = r'(#{1,2})([0-9]+)';
-
 class MentionSyntax extends md.InlineSyntax {
-  MentionSyntax() : super(MENTION_REGEX_STRING);
+  MentionSyntax() : super(r'(#{1,2})([0-9]+)');
 
   @override
   bool onMatch(md.InlineParser parser, Match match) {
     final type = match[1]!;
     final mention = match[2]!;
     if (type == "#") {
-      parser.addNode(md.Element.text("hole_mention", mention));
+      parser.addNode(md.Element.text(MarkdownHoleMentionSupport.tag, mention));
       return true;
     } else if (type == "##") {
-      parser.addNode(md.Element.text("floor_mention", mention));
+      parser.addNode(md.Element.text(MarkdownFloorMentionSupport.tag, mention));
       return true;
     }
     return false;
