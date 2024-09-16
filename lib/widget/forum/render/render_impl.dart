@@ -23,6 +23,9 @@ import 'package:dan_xi/widget/forum/auto_bbs_image.dart';
 import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:dan_xi/widget/forum/render/base_render.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_highlighter/flutter_highlighter.dart';
+import 'package:flutter_highlighter/themes/atom-one-dark.dart';
+import 'package:flutter_highlighter/themes/atom-one-light.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:markdown/markdown.dart' as md;
@@ -122,23 +125,31 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
       };
 
       return MarkdownBody(
-        softLineBreak: true,
-        data: content!,
-        styleSheet: _markdownStyleOverride(
-            _getMarkdownStyleSheetFromPlatform(context), defaultFontSize),
-        onTapLink: (String text, String? href, String title) =>
-            onTapLink?.call(href),
-        inlineSyntaxes: [MentionSyntax(), AuditSyntax()],
-        builders: {
-          MarkdownLatexSupport.tag: MarkdownLatexSupport(),
-          MarkdownLatexMultiLineSupport.tag: MarkdownLatexMultiLineSupport(),
-          MarkdownFloorMentionSupport.tag:
-              MarkdownFloorMentionSupport(translucentCard, isPreviewWidget),
-          MarkdownHoleMentionSupport.tag:
-              MarkdownHoleMentionSupport(translucentCard, isPreviewWidget),
-        },
-        imageBuilder: imageBuilder,
-      );
+          softLineBreak: true,
+          data: content!,
+          styleSheet: _markdownStyleOverride(
+              _getMarkdownStyleSheetFromPlatform(context), defaultFontSize),
+          onTapLink: (String text, String? href, String title) =>
+              onTapLink?.call(href),
+          inlineSyntaxes: [
+            LatexSyntax(),
+            LatexMultiLineSyntax(),
+            MentionSyntax(),
+            AuditSyntax()
+          ],
+          builders: {
+            HighlightBuilder.tag: HighlightBuilder(
+                PlatformX.isDarkMode ? atomOneDarkTheme : atomOneLightTheme),
+            MarkdownLatexSupport.tag: MarkdownLatexSupport(),
+            MarkdownLatexMultiLineSupport.tag: MarkdownLatexMultiLineSupport(),
+            MarkdownFloorMentionSupport.tag:
+                MarkdownFloorMentionSupport(translucentCard, isPreviewWidget),
+            MarkdownHoleMentionSupport.tag:
+                MarkdownHoleMentionSupport(translucentCard, isPreviewWidget),
+          },
+          imageBuilder: imageBuilder,
+          extensionSet:
+              md.ExtensionSet([const md.FencedCodeBlockSyntax()], []));
     };
 
 final BaseRender kMarkdownRender = kMarkdownRenderFactory(kFontSize);
@@ -174,6 +185,42 @@ final BaseRender kMarkdownSelectorRender = (BuildContext context,
     ),
   );
 };
+
+// Refer to: https://github.com/flutter/flutter/issues/81755#issuecomment-807917577
+class HighlightBuilder extends MarkdownElementBuilder {
+  static const String tag = "code";
+  final Map<String, TextStyle>? theme;
+
+  HighlightBuilder([this.theme]);
+
+  @override
+  Widget visitElementAfter(md.Element element, TextStyle? preferredStyle) {
+    if (element.attributes['class'] == null &&
+        !element.textContent.trim().contains('\n')) {
+      return Container(
+          padding: const EdgeInsets.only(
+              top: 0.0, right: 4.0, bottom: 1.75, left: 4.0),
+          margin: const EdgeInsets.symmetric(horizontal: 2.0),
+          color: Colors.black12,
+          child: Text(element.textContent,
+              style:
+                  const TextStyle(fontFamily: 'RobotoMono', fontSize: 12.0)));
+    } else {
+      var language = 'plaintext';
+      final pattern = RegExp(r'^language-(.+)$');
+      if (element.attributes['class'] != null &&
+          pattern.hasMatch(element.attributes['class']!)) {
+        language = pattern.firstMatch(element.attributes['class']!)?.group(1) ??
+            'plaintext';
+      }
+      return HighlightView(element.textContent.trim(),
+          language: language,
+          theme: theme ?? {},
+          padding: const EdgeInsets.all(12),
+          textStyle: const TextStyle(fontFamily: 'RobotoMono', fontSize: 12));
+    }
+  }
+}
 
 class MarkdownLatexSupport extends MarkdownElementBuilder {
   static const String tag = "tex";
