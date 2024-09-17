@@ -342,7 +342,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
         S.of(context).curriculum_ratings_assessment_words.split(';');
 
     // Reduce the line height to fit into the dropdown list
-    final listItemStyle = TextStyle(height: 1.0);
+    final listItemStyle = const TextStyle(height: 1.0);
 
     return ChangeNotifierProvider(
         create: (_) => review.grade.clone(),

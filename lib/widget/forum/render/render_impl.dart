@@ -148,9 +148,7 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
             MarkdownHoleMentionSupport.tag:
                 MarkdownHoleMentionSupport(translucentCard, isPreviewWidget),
           },
-          imageBuilder: imageBuilder,
-          extensionSet:
-              md.ExtensionSet([const md.FencedCodeBlockSyntax()], []));
+          imageBuilder: imageBuilder);
     };
 
 final BaseRender kMarkdownRender = kMarkdownRenderFactory(kFontSize);
