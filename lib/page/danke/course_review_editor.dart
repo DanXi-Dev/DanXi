@@ -341,6 +341,9 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
     final assessmentWord =
         S.of(context).curriculum_ratings_assessment_words.split(';');
 
+    // Reduce the line height to fit into the dropdown list
+    final listItemStyle = const TextStyle(height: 1.0);
+
     return ChangeNotifierProvider(
         create: (_) => review.grade.clone(),
         child: SingleChildScrollView(
@@ -370,8 +373,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                             teacherFilterNotifier.value = e!;
                           },
                           itemBuilder: (e) => DropdownMenuItem(
-                              value: e,
-                              child: Text(e, overflow: TextOverflow.ellipsis)),
+                              value: e, child: Flexible(child: Text(e, style: listItemStyle,))),
                         )),
                     Expanded(
                         flex: 1,
@@ -391,8 +393,8 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                                   },
                                   itemBuilder: (e) => DropdownMenuItem(
                                       value: e,
-                                      child: Text(e.formatTime(),
-                                          overflow: TextOverflow.ellipsis))),
+                                      child: Flexible(
+                                          child: Text(e.formatTime(), style: listItemStyle,)))),
                           valueListenable: teacherFilterNotifier,
                         )),
                   ]),

@@ -54,8 +54,14 @@ class Course {
   @JsonKey(name: 'review_list')
   List<CourseReview>? reviewList;
 
-  Course({this.id, this.teachers, this.maxStudent, this.year, this.semester,
-      this.credit, this.reviewList});
+  Course(
+      {this.id,
+      this.teachers,
+      this.maxStudent,
+      this.year,
+      this.semester,
+      this.credit,
+      this.reviewList});
 
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);
 
@@ -68,8 +74,16 @@ class Course {
   int get hashCode => id ?? id.hashCode;
 
   String formatTime() {
-    // Todo: add support for other semesters
-    return "$year学年-${semester == 1 ? "秋季" : "春季"}";
+    // Todo: add i18n
+    final semesterString = switch (semester ?? 0) {
+      1 => "秋季",
+      2 => "寒假",
+      3 => "春季",
+      4 => "暑假",
+      _ => "未知"
+    };
+    final yearString = year == null ? "未知" : "$year~${year! + 1}";
+    return "$yearString学年-$semesterString";
   }
 
   CourseSummary getSummary() {

@@ -131,9 +131,7 @@ String renderText(String content, String imagePlaceholder,
 
   // If we have reduce the text to nothing, we would rather not remove mention texts.
   if (result.isEmpty && removeMentions) {
-    return renderText(originalContent,
-        imagePlaceholder,
-        formulaPlaceholder,
+    return renderText(originalContent, imagePlaceholder, formulaPlaceholder,
         stickerPlaceholder,
         removeMentions: false);
   } else {
@@ -360,15 +358,11 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     if (!context.read<ForumProvider>().isUserInitialized) {
       await ForumRepository.getInstance().initializeRepo();
       context.read<ForumProvider>().currentDivisionId =
-          ForumRepository.getInstance()
-              .getDivisions()
-              .firstOrNull
-              ?.division_id;
+          ForumRepository.getInstance().getDivisions().firstOrNull?.division_id;
     }
 
     bool answered =
-        await ForumRepository.getInstance().hasAnsweredQuestions() ??
-            true;
+        await ForumRepository.getInstance().hasAnsweredQuestions() ?? true;
     if (!answered) {
       throw QuizUnansweredError(
           "User hasn't finished the quiz of forum rules yet. ");
@@ -448,8 +442,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
       } else if (_postsType == PostsType.SUBSCRIBED_DISCUSSION) {
         await ForumRepository.getInstance().getSubscribedHoleId();
       } else if (context.read<ForumProvider>().isUserInitialized) {
-        await ForumRepository.getInstance()
-            .loadDivisions(useCache: false);
+        await ForumRepository.getInstance().loadDivisions(useCache: false);
         await refreshSelf();
       }
     } finally {

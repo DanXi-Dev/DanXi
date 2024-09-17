@@ -23,8 +23,12 @@ import 'package:dan_xi/widget/forum/auto_bbs_image.dart';
 import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:dan_xi/widget/forum/render/base_render.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_highlighting/flutter_highlighting.dart';
+import 'package:flutter_highlighting/themes/atom-one-dark.dart';
+import 'package:flutter_highlighting/themes/atom-one-light.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
+import 'package:highlighting/languages/all.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:nil/nil.dart';
 
@@ -93,56 +97,58 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
         bool translucentCard,
         bool isPreviewWidget) {
       double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
+      final imageBuilder = (Uri uri, String? title, String? alt) {
+        String url = uri.toString();
+        // render stickers first
+        if (url.startsWith("danxi_")) {
+          // backward compatibility: <=1.4.3, danxi_ is used; after that, dx_ is used
+          url = url.replaceFirst("danxi_", "dx_");
+        }
+        if (url.startsWith("dx_")) {
+          var asset = getStickerAssetPath(url);
+          // print(asset);
+          if (asset != null) {
+            return Image.asset(
+              asset,
+              width: 50,
+              height: 50,
+            );
+          }
+        }
+
+        return Center(
+          child: AutoBBSImage(
+              key: UniqueKey(),
+              src: url,
+              maxWidth: imageWidth,
+              onTapImage: onTapImage),
+        );
+      };
 
       return MarkdownBody(
-    softLineBreak: true,
-    data: content!,
-    styleSheet: _markdownStyleOverride(
-            _getMarkdownStyleSheetFromPlatform(context), defaultFontSize),
-        onTapLink: (String text, String? href, String title) =>
-        onTapLink?.call(href),
-        inlineSyntaxes: [
-          LatexSyntax(),
-          LatexMultiLineSyntax(),
-          MentionSyntax(),
-          AuditSyntax()
-        ],
-        builders: {
-      'tex': MarkdownLatexSupport(),
-      'texLine': MarkdownLatexMultiLineSupport(),
-      'floor_mention':
-              MarkdownFloorMentionSupport(translucentCard, isPreviewWidget),
-          'hole_mention':
-              MarkdownHoleMentionSupport(translucentCard, isPreviewWidget),
-        },
-    imageBuilder: (Uri uri, String? title, String? alt) {
-          String url = uri.toString();
-          // render stickers first
-          if (url.startsWith("danxi_")) {
-            // backward compatibility: <=1.4.3, danxi_ is used; after that, dx_ is used
-            url = url.replaceFirst("danxi_", "dx_");
-          }
-          if (url.startsWith("dx_")) {
-            var asset = getStickerAssetPath(url);
-            // print(asset);
-        if (asset != null) {
-          return Image.asset(
-            asset,
-            width: 50,
-            height: 50,
-          );
-        }
-      }
-
-          return Center(
-            child: AutoBBSImage(
-                key: UniqueKey(),
-                src: url,
-                maxWidth: imageWidth,
-                onTapImage: onTapImage),
-          );
-        },
-      );
+          softLineBreak: true,
+          data: content!,
+          styleSheet: _markdownStyleOverride(
+              _getMarkdownStyleSheetFromPlatform(context), defaultFontSize),
+          onTapLink: (String text, String? href, String title) =>
+              onTapLink?.call(href),
+          inlineSyntaxes: [
+            LatexSyntax(),
+            LatexMultiLineSyntax(),
+            MentionSyntax(),
+            AuditSyntax()
+          ],
+          builders: {
+            HighlightBuilder.tag: HighlightBuilder(
+                PlatformX.isDarkMode ? atomOneDarkTheme : atomOneLightTheme),
+            MarkdownLatexSupport.tag: MarkdownLatexSupport(),
+            MarkdownLatexMultiLineSupport.tag: MarkdownLatexMultiLineSupport(),
+            MarkdownFloorMentionSupport.tag:
+                MarkdownFloorMentionSupport(translucentCard, isPreviewWidget),
+            MarkdownHoleMentionSupport.tag:
+                MarkdownHoleMentionSupport(translucentCard, isPreviewWidget),
+          },
+          imageBuilder: imageBuilder);
     };
 
 final BaseRender kMarkdownRender = kMarkdownRenderFactory(kFontSize);
@@ -160,7 +166,56 @@ final BaseRender kPlainRender = (BuildContext context,
   );
 };
 
+final BaseRender kMarkdownSelectorRender = (BuildContext context,
+    String? content,
+    ImageTapCallback? onTapImage,
+    LinkTapCallback? onTapLink,
+    bool translucentCard,
+    bool isPreviewWidget) {
+  return SelectionArea(
+    child: Markdown(
+      softLineBreak: true,
+      data: content!,
+      styleSheet: _markdownStyleOverride(
+          _getMarkdownStyleSheetFromPlatform(context), kFontLargerSize),
+      onTapLink: (String text, String? href, String title) =>
+          onTapLink?.call(href),
+      imageBuilder: (Uri uri, String? title, String? alt) => nil,
+    ),
+  );
+};
+
+// Refer to: https://github.com/flutter/flutter/issues/81755#issuecomment-807917577
+class HighlightBuilder extends MarkdownElementBuilder {
+  static const String tag = "code";
+  final Map<String, TextStyle>? theme;
+  final TextStyle? textStyle;
+
+  HighlightBuilder([this.theme, this.textStyle]);
+
+  @override
+  Widget visitElementAfter(md.Element element, TextStyle? preferredStyle) {
+    var language = 'plaintext';
+    final pattern = RegExp(r'^language-(.+)$');
+    if (element.attributes['class'] != null &&
+        pattern.hasMatch(element.attributes['class']!)) {
+      language = pattern.firstMatch(element.attributes['class']!)?.group(1) ??
+          'plaintext';
+    }
+    return HighlightView(element.textContent.trim(),
+        // Avoid null error if language doesn't exist
+        languageId:
+            builtinLanguages.containsKey(language) ? language : 'plaintext',
+        theme: theme ?? {},
+        padding: const EdgeInsets.all(8),
+        textStyle: textStyle ??
+            const TextStyle(fontFamily: 'Monospace', fontSize: 16.0));
+  }
+}
+
 class MarkdownLatexSupport extends MarkdownElementBuilder {
+  static const String tag = "tex";
+
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) =>
       SingleChildScrollView(
@@ -169,6 +224,8 @@ class MarkdownLatexSupport extends MarkdownElementBuilder {
 }
 
 class MarkdownLatexMultiLineSupport extends MarkdownElementBuilder {
+  static const String tag = "texLine";
+
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     return Align(
@@ -182,6 +239,8 @@ class MarkdownLatexMultiLineSupport extends MarkdownElementBuilder {
 }
 
 class MarkdownFloorMentionSupport extends MarkdownElementBuilder {
+  static const String tag = "floorMention";
+
   final bool hasBackgroundImage;
   final bool isPreviewWidget;
 
@@ -206,6 +265,8 @@ class MarkdownFloorMentionSupport extends MarkdownElementBuilder {
 }
 
 class MarkdownHoleMentionSupport extends MarkdownElementBuilder {
+  static const String tag = "holeMention";
+
   final bool hasBackgroundImage;
   final bool isPreviewWidget;
 
@@ -230,32 +291,13 @@ class MarkdownHoleMentionSupport extends MarkdownElementBuilder {
   }
 }
 
-final BaseRender kMarkdownSelectorRender = (BuildContext context,
-    String? content,
-    ImageTapCallback? onTapImage,
-    LinkTapCallback? onTapLink,
-    bool translucentCard,
-    bool isPreviewWidget) {
-  return SelectionArea(
-    child: Markdown(
-      softLineBreak: true,
-      data: content!,
-      styleSheet: _markdownStyleOverride(
-          _getMarkdownStyleSheetFromPlatform(context), kFontLargerSize),
-      onTapLink: (String text, String? href, String title) =>
-          onTapLink?.call(href),
-      imageBuilder: (Uri uri, String? title, String? alt) => nil,
-    ),
-  );
-};
-
 class LatexSyntax extends md.InlineSyntax {
   LatexSyntax() : super(r'(?<!\$)\$([^\$]+?)\$(?!\$)');
 
   @override
   bool onMatch(md.InlineParser parser, Match match) {
     var tex = match[1]!;
-    parser.addNode(md.Element.text("tex", tex));
+    parser.addNode(md.Element.text(MarkdownLatexSupport.tag, tex));
     return true;
   }
 }
@@ -266,25 +308,24 @@ class LatexMultiLineSyntax extends md.InlineSyntax {
   @override
   bool onMatch(md.InlineParser parser, Match match) {
     var tex = match[1]!;
-    parser.addNode(md.Element("p", [md.Element.text("texLine", tex)]));
+    parser.addNode(md.Element(
+        "p", [md.Element.text(MarkdownLatexMultiLineSupport.tag, tex)]));
     return true;
   }
 }
 
-const MENTION_REGEX_STRING = r'(#{1,2})([0-9]+)';
-
 class MentionSyntax extends md.InlineSyntax {
-  MentionSyntax() : super(MENTION_REGEX_STRING);
+  MentionSyntax() : super(r'(#{1,2})([0-9]+)');
 
   @override
   bool onMatch(md.InlineParser parser, Match match) {
     final type = match[1]!;
     final mention = match[2]!;
     if (type == "#") {
-      parser.addNode(md.Element.text("hole_mention", mention));
+      parser.addNode(md.Element.text(MarkdownHoleMentionSupport.tag, mention));
       return true;
     } else if (type == "##") {
-      parser.addNode(md.Element.text("floor_mention", mention));
+      parser.addNode(md.Element.text(MarkdownFloorMentionSupport.tag, mention));
       return true;
     }
     return false;
