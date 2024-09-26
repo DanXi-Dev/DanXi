@@ -1030,6 +1030,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         render: kMarkdownRenderFactory(null),
                         content: S.of(context).acknowledgements_markdown,
                         hasBackgroundImage: false,
+                        onTapLink: (url) => BrowserUtil.openUrl(url!, null),
                       ),
 
                       const SizedBox(height: 16),
