@@ -9864,6 +9864,7 @@ flutter_inappwebview_ios
 flutter_inappwebview_macos
 flutter_inappwebview_platform_interface
 flutter_inappwebview_web
+flutter_inappwebview_windows
 
                                  Apache License
                            Version 2.0, January 2004
