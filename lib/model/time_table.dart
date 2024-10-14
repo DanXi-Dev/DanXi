@@ -206,7 +206,6 @@ class TimeTable {
       return TimeNow(diff.inDays ~/ 7 + 1, diff.inDays % 7, slot);
     }
   }
-
   /// Return the specific [week]'s course list.
   ///
   /// The key of map is the day of the week.
@@ -237,19 +236,26 @@ class TimeTable {
       table[i] = [];
     }
     for (var course in courses!) {
-      // if the course is available in this week
-      if (course.availableWeeks!.contains(week)) {
+      if (course.roomId == "999999") {
         for (var courseTime in course.times!) {
-          if (courseTime.weekDay != 6) {
-            table[courseTime.weekDay]!.add(Event(course, courseTime));
-          }
+          table[courseTime.weekDay]!.add(Event(course, courseTime));
         }
       }
-      // or the course is available in the next week and the course is on Sunday
-      if (course.availableWeeks!.contains(week + 1)) {
-        for (var courseTime in course.times!) {
-          if (courseTime.weekDay == 6) {
-            table[courseTime.weekDay]!.add(Event(course, courseTime));
+      else {
+        // if the course is available in this week
+        if (course.availableWeeks!.contains(week)) {
+          for (var courseTime in course.times!) {
+            if (courseTime.weekDay != 6) {
+              table[courseTime.weekDay]!.add(Event(course, courseTime));
+            }
+          }
+        }
+        // or the course is available in the next week and the course is on Sunday
+        if (course.availableWeeks!.contains(week + 1)) {
+          for (var courseTime in course.times!) {
+            if (courseTime.weekDay == 6) {
+              table[courseTime.weekDay]!.add(Event(course, courseTime));
+            }
           }
         }
       }
