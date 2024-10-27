@@ -214,7 +214,19 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           Future<TimeTable?>.error(NotLoginError(S.current.not_fudan_student)));
     }
     _contentFuture?.then(
-        (value) => TimeTable.mergeManuallyAddedCourses(value, newCourses));
+        (value) {
+          for (var course in value!.courses!) {
+            for (var weekday in course.times!) {
+              if (weekday.weekDay == 6)  {
+                for (int i = 0; i < course.availableWeeks!.length; i++) {
+                  course.availableWeeks![i] = course.availableWeeks![i] - 1;
+                }
+                break;
+              }
+            }
+          }
+          return TimeTable.mergeManuallyAddedCourses(value, newCourses);
+        });
   }
 
   void _startShare(
