@@ -92,12 +92,23 @@ class TimeTableRepository extends BaseRepositoryWithDio {
           "semester.id": await getAppropriateSemesterId()
         },
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    return TimeTable.fromHtml(
+    TimeTable timetable = TimeTable.fromHtml(
         startTime ??
             DateTime.tryParse(
                 SettingsProvider.getInstance().thisSemesterStartDate ?? "") ??
             Constant.DEFAULT_SEMESTER_START_DATE,
         tablePage.data!);
+    for (var course in timetable.courses!) {
+      for (var weekday in course.times!) {
+        if (weekday.weekDay == 6)  {
+          for (int i = 0; i < course.availableWeeks!.length; i++) {
+            course.availableWeeks![i] = course.availableWeeks![i] - 1;
+          }
+          break;
+        }
+      }
+    }
+    return timetable;
   }
 
   Future<TimeTable?> loadTimeTable(PersonInfo? info,
@@ -111,12 +122,25 @@ class TimeTableRepository extends BaseRepositoryWithDio {
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
     } else {
-      return Cache.get<TimeTable>(
+      Future<TimeTable?> timetable = Cache.get<TimeTable>(
           KEY_TIMETABLE_CACHE,
           () async =>
               (await loadTimeTableRemotely(info, startTime: startTime))!,
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
+      timetable.then((timetable) {
+        for (var course in timetable!.courses!) {
+          for (var weekday in course.times!) {
+            if (weekday.weekDay == 6)  {
+              for (int i = 0; i < course.availableWeeks!.length; i++) {
+                course.availableWeeks![i] = course.availableWeeks![i] - 1;
+              }
+              break;
+            }
+          }
+        }
+      });
+      return timetable;
     }
   }
 

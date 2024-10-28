@@ -43,16 +43,6 @@ class NextCourseFeature extends Feature {
       return await TimeTableRepository.getInstance()
           .loadTimeTable(StateProvider.personInfo.value);
     });
-    for (var course in timetable!.courses!) {
-      for (var weekday in course.times!) {
-        if (weekday.weekDay == 6)  {
-          for (int i = 0; i < course.availableWeeks!.length; i++) {
-            course.availableWeeks![i] = course.availableWeeks![i] - 1;
-          }
-          break;
-        }
-      }
-    }
     _data = getNextCourse(timetable!);
     _status = ConnectionStatus.DONE;
     notifyUpdate();
