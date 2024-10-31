@@ -128,18 +128,6 @@ class TimeTableRepository extends BaseRepositoryWithDio {
               (await loadTimeTableRemotely(info, startTime: startTime))!,
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
-      timetable.then((timetable) {
-        for (var course in timetable!.courses!) {
-          for (var weekday in course.times!) {
-            if (weekday.weekDay == 6)  {
-              for (int i = 0; i < course.availableWeeks!.length; i++) {
-                course.availableWeeks![i] = course.availableWeeks![i] - 1;
-              }
-              break;
-            }
-          }
-        }
-      });
       return timetable;
     }
   }
