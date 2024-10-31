@@ -122,13 +122,12 @@ class TimeTableRepository extends BaseRepositoryWithDio {
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
     } else {
-      Future<TimeTable?> timetable = Cache.get<TimeTable>(
+      return Cache.get<TimeTable>(
           KEY_TIMETABLE_CACHE,
           () async =>
               (await loadTimeTableRemotely(info, startTime: startTime))!,
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
-      return timetable;
     }
   }
 
