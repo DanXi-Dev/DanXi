@@ -2233,7 +2233,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "460dbf0930e32b572e0d813abde33c7cb6a5b3e5"
+      resolved-ref: "16ed4c3b4132ed0f402d1d25549ef7f8ef891665"
       url: "https://github.com/w568w/FlutterXiaoMiPushPlugin.git"
     source: git
     version: "2.0.0"
