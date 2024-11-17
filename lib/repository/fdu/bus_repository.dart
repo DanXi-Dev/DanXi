@@ -40,12 +40,8 @@ class FudanBusRepository extends BaseRepositoryWithDio {
   factory FudanBusRepository.getInstance() => _instance;
 
   Future<List<BusScheduleItem>?> loadBusList(PersonInfo? info,
-      {bool? holiday = false}) {
-    return Retrier.tryAsyncWithFix(
-        () => _loadBusList(holiday: holiday!),
-        (exception) => UISLoginTool.fixByLoginUIS(
-            dio, _LOGIN_URL, cookieJar!, info, true));
-  }
+      {bool holiday = false}) => UISLoginTool.tryAsyncWithAuth(
+        dio, _LOGIN_URL, cookieJar!, info, () => _loadBusList(holiday: holiday));
 
   Future<List<BusScheduleItem>?> _loadBusList({bool holiday = false}) async {
     List<BusScheduleItem> items = [];
@@ -63,7 +59,7 @@ class FudanBusRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "zlapp.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }
 
 class BusScheduleItem implements Comparable<BusScheduleItem> {
