@@ -28,7 +28,6 @@ import 'package:html/dom.dart';
 import 'package:intl/intl.dart';
 
 class CardRepository extends BaseRepositoryWithDio {
-  PersonInfo? _info;
   static const String _LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fecard.fudan.edu.cn%2Fepay%2Fj_spring_cas_security_check";
   static const String _USER_DETAIL_URL =
