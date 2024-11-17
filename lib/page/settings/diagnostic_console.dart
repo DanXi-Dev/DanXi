@@ -115,9 +115,9 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
 
   Future<void> diagnoseDanXi() async {
     _console.writeln(
-        "User Agent used by DanXi for UIS: ${UserAgentInterceptor.defaultUsedUserAgent}");
+        "User Agent used by Danta for UIS: ${UserAgentInterceptor.defaultUsedUserAgent}");
     _console
-        .writeln("User Agent used by DanXi for Forum: ${Constant.version}");
+        .writeln("User Agent used by Danta for Forum: ${Constant.version}");
     _console.writeln("Media Query: ${MediaQuery.of(context)}");
 
     _console.writeln("Everything we stored in the local device:");

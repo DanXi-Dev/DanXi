@@ -173,7 +173,7 @@ class ForumRepository extends BaseRepositoryWithDio {
   ///
   /// We cache them all, so that one loading, everything done.
   Future<void> initializeRepo() async {
-    initializeUser();
+    await initializeUser();
 
     try {
       FDUHolePlatformBridge.registerRemoteNotification();
@@ -392,6 +392,15 @@ class ForumRepository extends BaseRepositoryWithDio {
     return floors;
   }
 
+  Future<List<OTFloor>?> loadUserFloors(
+      {int startFloor = 0, int length = Constant.POST_COUNT_PER_PAGE}) async {
+    final Response<List<dynamic>> response = await dio.get(
+        "$_BASE_URL/users/me/floors",
+        queryParameters: {"offset": startFloor, "size": length},
+        options: Options(headers: _tokenHeader));
+    return response.data?.map((e) => OTFloor.fromJson(e)).toList();
+  }
+
   Future<List<OTFloor>?> loadSearchResults(String? searchString,
       {int? startFloor, int length = Constant.POST_COUNT_PER_PAGE}) async {
     final Response<List<dynamic>> response = await dio.get("$_BASE_URL/floors",
@@ -524,7 +533,7 @@ class ForumRepository extends BaseRepositoryWithDio {
   }
 
   Future<void> modifyMessage(OTMessage message) async {
-    await dio.put("$_BASE_URL/messages/${message.message_id}",
+    await dio.delete("$_BASE_URL/messages/${message.message_id}",
         data: {
           "has_read": message.has_read,
         },

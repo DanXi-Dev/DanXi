@@ -642,7 +642,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     context.read<ForumProvider>().userInfo!.user_id ?? "null")
                 : S.of(context).not_logged_in),
             children: [
-              if (context.read<ForumProvider>().isUserInitialized) ...[
+              if (context.watch<ForumProvider>().isUserInitialized) ...[
                 FutureWidget<OTUser?>(
                   future: ForumRepository.getInstance().getUserProfile(),
                   successBuilder:
@@ -831,6 +831,13 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                 ),
                 ListTile(
                   leading: nil,
+                  title: Text(S.of(context).list_my_replies),
+                  onTap: () => smartNavigatorPush(context, '/bbs/postDetail',
+                      arguments: {'myReplies': true},
+                      forcePushOnMainNavigator: true),
+                ),
+                ListTile(
+                  leading: nil,
                   title: Text(S.of(context).list_my_punishments),
                   onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
                       arguments: {"punishmentHistory": true}),
@@ -872,7 +879,6 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       while (auxiliaryNavigatorState?.canPop() == true) {
                         auxiliaryNavigatorState?.pop();
                       }
-                      settingsPageKey.currentState?.setState(() {});
                       forumPageKey.currentState?.listViewController
                           .notifyUpdate();
                     } finally {
@@ -1024,6 +1030,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         render: kMarkdownRenderFactory(null),
                         content: S.of(context).acknowledgements_markdown,
                         hasBackgroundImage: false,
+                        onTapLink: (url) => BrowserUtil.openUrl(url!, null),
                       ),
 
                       const SizedBox(height: 16),
@@ -1047,7 +1054,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         alignment: Alignment.centerRight,
                         child: Text(
                           '${S.of(context).version} ${FlutterApp.versionName} build ${Pubspec.version.build.single} #${const String.fromEnvironment("GIT_HASH", defaultValue: "?")}',
-                          textScaleFactor: 0.7,
+                          textScaler: const TextScaler.linear(0.7),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),

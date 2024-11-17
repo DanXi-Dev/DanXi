@@ -1,12 +1,12 @@
 中文版 [English Version](README_EN.md)
 [官方网站](https://danxi.fduhole.com)
 
-# 旦夕
+# 旦挞
 
 [![CI](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml)
 [![Deploy to GitHub Pages](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml)
 
-（原名旦兮）
+（原名旦夕、旦兮）
 
 日月光华，旦复旦兮.
 
@@ -56,9 +56,10 @@ dmg 硬盘映像，挂载拷贝即可。
 
 ```shell
 $ flutter --version
-Flutter 3.22.0 • channel  • https://github.com/flutter/flutter.git
-Engine • revision f6344b75dcf8
-Tools • Dart 3.4.0 • DevTools 2.34.3
+Flutter 3.24.5 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision dec2ee5c1f (4 days ago) • 2024-11-13 11:13:06 -0800
+Engine • revision a18df97ca5
+Tools • Dart 3.5.4 • DevTools 2.37.3
 ```
 
 ## 编译说明
@@ -88,4 +89,4 @@ dart run build_runner build --delete-conflicting-outputs
 
 由于 Apple Developer Program 费用（发布应用至 App Store 和 TestFlight 所必需）费用较高，如果您希望赞助我们，请通过邮件联系我们！
 
-我们的邮箱：[dev@fduhole.com](mailto:dev@fduhole.com)
+我们的邮箱：[dev@danta.tech](mailto:dev@danta.tech)

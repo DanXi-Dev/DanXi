@@ -62,7 +62,7 @@ class OTQuizWidgetState extends State<OTQuizWidget> {
                   PlatformTextButton(
                     child: Text(S.of(context).community_convention),
                     onPressed: () => BrowserUtil.openUrl(
-                        "https://www.fduhole.com/#/licence", context),
+                        "https://www.fduhole.com/doc", context),
                   ),
                 ],
               ),
@@ -293,6 +293,8 @@ class QuestionWidget extends StatefulWidget {
 }
 
 class QuestionWidgetState extends State<QuestionWidget> {
+  ScrollController optionsScrollController = ScrollController();
+
   List<bool> selectionState = [];
   bool multiSelect = false;
   static const labelChars = "ABCDEFGH";
@@ -349,29 +351,33 @@ class QuestionWidgetState extends State<QuestionWidget> {
                           text: widget.question.question!, style: largerText),
                     ],
                   )),
-                  Column(children: [
-                    ...Iterable<int>.generate(options.length)
-                        .map((index) => OptionWidget(
-                            active: selectionState[index],
-                            label: labelChars[index],
-                            content: options[index],
-                            tapCallback: () {
-                              setState(() {
-                                if (multiSelect) {
-                                  // Revert if multi-selection
-                                  selectionState[index] =
-                                      !selectionState[index];
-                                } else {
-                                  // We still have to set this to make the animation play
-                                  selectionState =
-                                      List.filled(options.length, false);
-                                  selectionState[index] = true;
-                                  // Submit answer and advance to next
-                                  widget.answerCallback(true, [options[index]]);
-                                }
-                              });
-                            }))
-                  ]),
+                  // Take up all remaining space in the middle
+                  Expanded(
+                      child: ListView.builder(
+                          addAutomaticKeepAlives: true,
+                          itemCount: options.length,
+                          controller: optionsScrollController,
+                          itemBuilder: (ctx, index) => OptionWidget(
+                              active: selectionState[index],
+                              label: labelChars[index],
+                              content: options[index],
+                              tapCallback: () {
+                                setState(() {
+                                  if (multiSelect) {
+                                    // Revert if multi-selection
+                                    selectionState[index] =
+                                        !selectionState[index];
+                                  } else {
+                                    // We still have to set this to make the animation play
+                                    selectionState =
+                                        List.filled(options.length, false);
+                                    selectionState[index] = true;
+                                    // Submit answer and advance to next
+                                    widget
+                                        .answerCallback(true, [options[index]]);
+                                  }
+                                });
+                              }))),
                   if (multiSelect)
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

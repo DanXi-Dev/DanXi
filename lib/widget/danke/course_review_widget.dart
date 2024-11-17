@@ -156,6 +156,7 @@ class ReviewHeader extends StatelessWidget {
             child: const Wrap(
               // todo this is the badge list of the user
               spacing: 3,
+              runSpacing: 2,
               alignment: WrapAlignment.end,
               children: [
                 // rating
@@ -183,7 +184,8 @@ class ReviewHeader extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Wrap(
           // todo this is the badge list of the user
-          spacing: 4,
+          spacing: 3,
+          runSpacing: 2,
           alignment: WrapAlignment.start,
           children: [
             // rating
