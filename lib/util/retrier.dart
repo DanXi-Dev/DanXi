@@ -55,6 +55,7 @@ class Retrier {
 
   /// Try to run [function] for [retryTimes] times asynchronously.
   /// If [function] throws an error, run [tryFix] to fix the problem. Then run the function again.
+  /// If [isFatalError] is provided, check if the error is fatal. If it is, stop retrying and throw the error immediately.
   /// Notes: Any errors thrown by [tryFix] will be ignored.
   ///
   /// Return the results of [function] if it executes successfully. Otherwise, throw an error that [function] threw.
@@ -62,9 +63,12 @@ class Retrier {
   /// Note: 2022/1/18 Must specify [retryTimes], or will only retry once.
   static Future<E> tryAsyncWithFix<E>(
       Future<E> Function() function, Future<void> Function(dynamic) tryFix,
-      {int retryTimes = 1}) async {
+      {int retryTimes = 1, bool Function(dynamic error)? isFatalError}) async {
     late Function errorCatcher;
     errorCatcher = (e, stack) async {
+      if (isFatalError != null && isFatalError(e)) {
+        throw e;
+      }
       if (retryTimes > 0) {
         retryTimes--;
         await tryFix(e).catchError((error, stackTrace) {});

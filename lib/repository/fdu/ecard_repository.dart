@@ -57,15 +57,9 @@ class CardRepository extends BaseRepositoryWithDio {
 
   factory CardRepository.getInstance() => _instance;
 
-  /// Log in before calling any method in this repository.
-  Future<void> init(PersonInfo? info) async {
-    _info = info;
-    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, _info);
-  }
-
-  Future<String?> getName() async {
-    return (await loadCardInfo(-1))?.name;
-  }
+  Future<String?> getName(PersonInfo? info) async =>
+      UISLoginTool.tryAsyncWithAuth(dio, _LOGIN_URL, cookieJar!, info,
+          () async => (await _loadCardInfo(-1))?.name);
 
   Future<Iterable<CardRecord>> _loadOnePageCardRecord(
       Map<String, String?> requestData, int pageNum) async {
@@ -94,7 +88,12 @@ class CardRepository extends BaseRepositoryWithDio {
   /// If [logDays] > 0, it will return records of recent [logDays] days;
   /// If [logDays] = 0, it will return the latest records;
   /// If [logDays] < 0, it will return null.
-  Future<List<CardRecord>?> loadCardRecord(int logDays) async {
+  Future<List<CardRecord>?> loadCardRecord(
+          PersonInfo? info, int logDays) async =>
+      UISLoginTool.tryAsyncWithAuth(
+          dio, _LOGIN_URL, cookieJar!, info, () => _loadCardRecord(logDays));
+
+  Future<List<CardRecord>?> _loadCardRecord(int logDays) async {
     if (logDays < 0) return null;
     //Get csrf id.
     Response<String> consumeCsrfPageResponse =
@@ -141,7 +140,12 @@ class CardRepository extends BaseRepositoryWithDio {
     return list;
   }
 
-  Future<CardInfo?> loadCardInfo(int logDays) async {
+
+  Future<CardInfo?> loadCardInfo(PersonInfo? info, int logDays) async =>
+      UISLoginTool.tryAsyncWithAuth(
+          dio, _LOGIN_URL, cookieJar!, info, () => _loadCardInfo(logDays));
+
+  Future<CardInfo?> _loadCardInfo(int logDays) async {
     var cardInfo = CardInfo();
 
     //获取用户页面信息
@@ -153,7 +157,7 @@ class CardRepository extends BaseRepositoryWithDio {
     cardInfo.cash = cashElement?.text.trim();
     cardInfo.name = nameElement?.text.between("您好，", "！")?.trim();
     List<CardRecord>? records =
-        await Retrier.runAsyncWithRetry(() => loadCardRecord(logDays));
+        await Retrier.runAsyncWithRetry(() => _loadCardRecord(logDays));
     cardInfo.records = records;
     return cardInfo;
   }

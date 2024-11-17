@@ -48,9 +48,20 @@ class UISLoginTool {
   /// The epoch should be updated after each change of the cookie jar.
   static final Map<IndependentCookieJar, Accumulator> _epochMap = {};
 
+  /// The main function to request a service behind the UIS login system.
+  ///
+  /// It will request the service with [function].
+  /// If failed, it will try to log in UIS at [serviceUrl] with HTTP client [dio] and credentials [info].
+  /// If it logs in successfully, it will put new cookies into [jar] and retry the [function].
+  /// The steps above will be repeated for [retryTimes] times.
+  ///
+  /// If [function] throws an error and [isFatalError] is provided, the error will be checked with [isFatalError].
+  /// If it is, stop retrying and throw the error immediately.
+  ///
+  /// This function is coroutine-safe and will elegantly handle multiple requests at the same time.
   static Future<E> tryAsyncWithAuth<E>(Dio dio, String serviceUrl,
       IndependentCookieJar jar, PersonInfo? info, Future<E> Function() function,
-      {int retryTimes = 1}) {
+      {int retryTimes = 1, bool Function(dynamic error)? isFatalError}) {
     ReadWriteMutex lock = _lockMap.putIfAbsent(jar, () => ReadWriteMutex());
     Accumulator epoch = _epochMap.putIfAbsent(jar, () => Accumulator());
     int? currentEpoch;
@@ -76,6 +87,7 @@ class UISLoginTool {
         });
       },
       retryTimes: retryTimes,
+      isFatalError: isFatalError,
     );
   }
 

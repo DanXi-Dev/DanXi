@@ -65,7 +65,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "fudan.edu.cn";
+  String get linkHost => "fdtyjw.fudan.edu.cn"; // uses a separate host here, since we are excepting an error response from server
 }
 
 class ExerciseItem {
