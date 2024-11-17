@@ -20,6 +20,7 @@ import 'package:collection/collection.dart' show IterableExtension;
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
@@ -94,7 +95,7 @@ class CardRepository extends BaseRepositoryWithDio {
 
   Future<List<CardRecord>?> _loadCardRecord(int logDays) async {
     if (logDays < 0) return null;
-    //Get csrf id.
+    // Get csrf id.
     Response<String> consumeCsrfPageResponse =
         await dio.get(_CONSUME_DETAIL_CSRF_URL);
     BeautifulSoup consumeCsrfPageSoup =
@@ -139,7 +140,6 @@ class CardRepository extends BaseRepositoryWithDio {
     return list;
   }
 
-
   Future<CardInfo?> loadCardInfo(PersonInfo? info, int logDays) async =>
       UISLoginTool.tryAsyncWithAuth(
           dio, _LOGIN_URL, cookieJar!, info, () => _loadCardInfo(logDays));
@@ -147,7 +147,12 @@ class CardRepository extends BaseRepositoryWithDio {
   Future<CardInfo?> _loadCardInfo(int logDays) async {
     var cardInfo = CardInfo();
 
-    //获取用户页面信息
+    // 2024-11-18 (@w568w): The ECard system is a little bit tricky, we need to
+    // obtain the ticket first. During this process, the correct JSESSIONID will be set.
+    final res = await dio.get(_LOGIN_URL,
+        options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
+    await DioUtils.processRedirect(dio, res);
+
     var userPageResponse = await dio.get(_USER_DETAIL_URL);
     var soup = BeautifulSoup(userPageResponse.data.toString());
 
