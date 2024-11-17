@@ -30,7 +30,7 @@ dependencies:
   event_bus: ^2.0.0
   share_plus: ^10.0.2
   path_provider: ^2.0.9
-  screen_brightness: ^1.0.0
+  screen_brightness: ^2.0.0
   flutter_email_sender: ^6.0.1
   auto_size_text: ^3.0.0
   super_sliver_list: ^0.4.0
@@ -86,7 +86,7 @@ dependencies:
   material_color_generator: ^1.1.0
   flutter_swiper_view: ^1.1.8
   mutex: ^3.0.1
-  device_info_plus: ^10.0.0
+  device_info_plus: ^11.0.0
   receive_intent:
     git:
       url: https://github.com/w568w/receive_intent.git
@@ -125,7 +125,7 @@ dev_dependencies:
   pubspec_generator: ^4.0.0
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0
   intl_utils: ^2.8.5
   # below used in build.dart
   archive: ^3.4.10
