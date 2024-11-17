@@ -31,63 +31,70 @@ import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 import 'package:dio5_log/dio_log.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/painting.dart';
 import 'package:mutex/mutex.dart';
 
 class UISLoginTool {
+  /// Error patterns from UIS.
   static const String CAPTCHA_CODE_NEEDED = "请输入验证码";
   static const String CREDENTIALS_INVALID = "密码有误";
   static const String WEAK_PASSWORD = "弱密码提示";
   static const String UNDER_MAINTENANCE = "网络维护中 | Under Maintenance";
-  static final Map<IndependentCookieJar, Mutex> _mutexMap = {};
 
-  static Future<E> tryAsyncWithAuth<E>(
-          Dio dio,
-          String serviceUrl,
-          IndependentCookieJar jar,
-          PersonInfo? info,
-          Future<E> Function() function,
-          {int retryTimes = 1}) =>
-      Retrier.tryAsyncWithFix(() async {
-        await throwIfNotLogin(serviceUrl, jar);
-        return function();
-      }, (_) => UISLoginTool.fixByLoginUIS(dio, serviceUrl, jar, info, true),
-          retryTimes: retryTimes);
+  /// RWLocks to prevent multiple login requests happening at the same time.
+  static final Map<IndependentCookieJar, ReadWriteMutex> _lockMap = {};
 
-  static Future<void> throwIfNotLogin(
-      String serviceUrl, IndependentCookieJar jar) async {
-    if ((await jar.loadForRequest(Uri.tryParse(serviceUrl)!)).isEmpty) {
-      throw NotLoginError("You have not logged in your UIS.");
-    }
-  }
+  /// Track the epoch of the last login to prevent multiple sequential login requests.
+  /// The epoch should be updated after each change of the cookie jar.
+  static final Map<IndependentCookieJar, Accumulator> _epochMap = {};
 
-  /// Log in Fudan UIS system and return the response.
-  ///
-  /// Warning: if having logged in, return null.
-  static Future<void> fixByLoginUIS(
-      Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
-      [bool forceReLogin = false]) async {
-    await loginUIS(dio, serviceUrl, jar, info, forceReLogin);
+  static Future<E> tryAsyncWithAuth<E>(Dio dio, String serviceUrl,
+      IndependentCookieJar jar, PersonInfo? info, Future<E> Function() function,
+      {int retryTimes = 1}) {
+    ReadWriteMutex lock = _lockMap.putIfAbsent(jar, () => ReadWriteMutex());
+    Accumulator epoch = _epochMap.putIfAbsent(jar, () => Accumulator());
+    int? currentEpoch;
+    final serviceUri = Uri.tryParse(serviceUrl)!;
+    return Retrier.tryAsyncWithFix(
+      () {
+        return lock.protectRead(() async {
+          currentEpoch = epoch.value;
+          if ((await jar.loadForRequest(serviceUri)).isEmpty) {
+            throw NotLoginError("Cannot find cookies for $serviceUrl");
+          }
+          return await function();
+        });
+      },
+      (_) async {
+        await lock.protectWrite(() async {
+          if (currentEpoch != epoch.value) {
+            // Someone has tried to log in before us! We should not log in again.
+            return null;
+          }
+          await _loginUIS(dio, serviceUrl, jar, info);
+          epoch.increment(1);
+        });
+      },
+      retryTimes: retryTimes,
+    );
   }
 
   /// Log in Fudan UIS system and return the response.
   ///
   /// Warning: if it has logged in or it's logging in, return null.
-  static Future<Response<dynamic>?> loginUIS(
-      Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
-      [bool forceRelogin = false]) async {
-    _mutexMap.putIfAbsent(jar, () => Mutex());
-    await _mutexMap[jar]!.acquire();
-    Response<dynamic>? result =
-        await _loginUIS(dio, serviceUrl, jar, info, forceRelogin)
-            .whenComplete(() {
-      _mutexMap[jar]!.release();
+  static Future<Response<dynamic>?> loginUIS(Dio dio, String serviceUrl,
+      IndependentCookieJar jar, PersonInfo? info) async {
+    ReadWriteMutex lock = _lockMap.putIfAbsent(jar, () => ReadWriteMutex());
+    Accumulator epoch = _epochMap.putIfAbsent(jar, () => Accumulator());
+    return await lock.protectWrite(() async {
+      final result = await _loginUIS(dio, serviceUrl, jar, info);
+      epoch.increment(1);
+      return result;
     });
-    return result;
   }
 
-  static Future<Response<dynamic>?> _loginUIS(
-      Dio dio, String serviceUrl, IndependentCookieJar jar, PersonInfo? info,
-      [bool forceRelogin = false]) async {
+  static Future<Response<dynamic>?> _loginUIS(Dio dio, String serviceUrl,
+      IndependentCookieJar jar, PersonInfo? info) async {
     // Create a temporary dio for logging in.
     Dio workDio = DioUtils.newDioWithProxy();
     workDio.options = BaseOptions(
@@ -101,18 +108,6 @@ class UISLoginTool {
         userAgent: SettingsProvider.getInstance().customUserAgent));
     workDio.interceptors.add(CookieManager(workJar));
     workDio.interceptors.add(DioLogInterceptor());
-
-    // If we has logged in, return null.
-    if (!forceRelogin &&
-        (await workJar.loadForRequest(Uri.tryParse(serviceUrl)!)).isNotEmpty) {
-      Response<dynamic> res = await workDio.head(serviceUrl,
-          options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-      if (res.statusCode == 302 &&
-          !res.headers.map.containsKey('set-cookie') &&
-          !res.headers.value("location")!.startsWith(Constant.UIS_URL)) {
-        return null;
-      }
-    }
 
     // Remove old cookies.
     workJar.deleteAll();

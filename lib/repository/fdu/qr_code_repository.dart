@@ -52,5 +52,5 @@ class QRCodeRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "workflow1.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }

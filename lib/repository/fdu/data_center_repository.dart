@@ -88,7 +88,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
       Retrier.tryAsyncWithFix(() => _getCrowdednessInfo(areaCode),
           (exception) async {
         if (exception is! UnsuitableTimeException) {
-          await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar!, info, true);
+          await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar!, info);
         }
       });
 
@@ -159,7 +159,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "my.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }
 
 class UnsuitableTimeException implements Exception {}

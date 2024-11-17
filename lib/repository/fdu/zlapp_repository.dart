@@ -45,7 +45,7 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
   FudanCOVID19Repository._();
 
   @override
-  String get linkHost => "zlapp.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 
   static final _instance = FudanCOVID19Repository._();
 
@@ -55,7 +55,7 @@ class FudanCOVID19Repository extends BaseRepositoryWithDio {
 
   Future<dynamic> _getHistoryInfo(PersonInfo? info) async {
     _info = info;
-    await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar!, _info, true);
+    await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar!, _info);
     var res = await dio.get(GET_INFO_URL);
     try {
       return res.data is Map

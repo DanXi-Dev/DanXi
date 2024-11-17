@@ -60,7 +60,7 @@ class CardRepository extends BaseRepositoryWithDio {
   /// Log in before calling any method in this repository.
   Future<void> init(PersonInfo? info) async {
     _info = info;
-    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, _info, true);
+    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, _info);
   }
 
   Future<String?> getName() async {
@@ -159,7 +159,7 @@ class CardRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "ecard.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }
 
 class CardInfo {

@@ -34,7 +34,7 @@ class FudanEhallRepository extends BaseRepositoryWithDio {
   factory FudanEhallRepository.getInstance() => _instance;
 
   Future<StudentInfo> getStudentInfo(PersonInfo info) async {
-    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, info, true);
+    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, info);
     return _getStudentInfo();
   }
 
@@ -49,7 +49,7 @@ class FudanEhallRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "ehall.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }
 
 class StudentInfo {

@@ -43,5 +43,5 @@ class FudanLibraryRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "mlibrary.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }
