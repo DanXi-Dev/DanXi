@@ -84,7 +84,6 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_IMAGE_BASE_URL = "image_base_url";
   static const String KEY_DANKE_BASE_URL = "danke_base_url";
   static const String KEY_PROXY = "proxy";
-  static const String KEY_USE_WEBVPN = "use_webvpn";
 
   SettingsProvider._();
 
@@ -738,18 +737,6 @@ class SettingsProvider with ChangeNotifier {
 
   set isMarkdownRenderingEnabled(bool value) {
     preferences!.setBool(KEY_MARKDOWN_ENABLED, value);
-    notifyListeners();
-  }
-
-  bool get useWebVpn{
-    if (preferences!.containsKey(KEY_USE_WEBVPN)) {
-      return preferences!.getBool(KEY_USE_WEBVPN)!;
-    }
-    return true;
-  }
-
-  set useWebVpn(bool value){
-    preferences!.setBool(KEY_USE_WEBVPN, value);
     notifyListeners();
   }
 }

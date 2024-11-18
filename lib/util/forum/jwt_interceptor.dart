@@ -20,7 +20,6 @@ import 'dart:io';
 import 'package:dan_xi/model/forum/jwt.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
-import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -56,7 +55,7 @@ class JWTInterceptor extends QueuedInterceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    debugPrint("Huston, we have troubles on ${err.response?.realUri}: \n$err");
+    debugPrint("Huston, we have troubles: $err");
 
     if (err.response?.statusCode == HttpStatus.unauthorized) {
       JWToken? currentToken = tokenGetter.call();
@@ -64,13 +63,10 @@ class JWTInterceptor extends QueuedInterceptor {
         RequestOptions options = RequestOptions(
             path: refreshUrl,
             method: "POST",
-            headers: {
-              "Authorization": "Bearer ${currentToken.refresh!}"
-            });
+            headers: {"Authorization": "Bearer ${currentToken.refresh!}"});
         Response<Map<String, dynamic>> response;
         try {
-          response = await WebvpnProxy.requestWithProxy(_dio, options);
-          debugPrint(response.data.toString());
+          response = await _dio.fetch(options);
         } catch (e) {
           if (e is DioException &&
               e.response?.statusCode == HttpStatus.unauthorized) {

@@ -106,7 +106,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     _console.writeln(
         "Base Auth URL: ${SettingsProvider.getInstance().authBaseUrl}");
     _console
-        .writeln("Forum Base URL: ${SettingsProvider.getInstance().forumBaseUrl}");
+        .writeln("Hole Base URL: ${SettingsProvider.getInstance().forumBaseUrl}");
     _console.writeln(
         "Image Base URL: ${SettingsProvider.getInstance().imageBaseUrl}");
     _console.writeln(
