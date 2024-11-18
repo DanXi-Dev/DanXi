@@ -178,10 +178,10 @@ packages:
     dependency: transitive
     description:
       name: build_daemon
-      sha256: "79b2aef6ac2ed00046867ed354c88778c9c0f029df8a20fe10b5436826721ef9"
+      sha256: "0343061a33da9c5810b2d6cee51945127d8f4c060b7fbdd9d54917f0a3feaaa1"
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.2"
+    version: "4.0.1"
   build_resolvers:
     dependency: transitive
     description:
@@ -1835,10 +1835,10 @@ packages:
     dependency: transitive
     description:
       name: shelf_web_socket
-      sha256: "073c147238594ecd0d193f3456a5fe91c4b0abbcc68bf5cd95b36c4e194ac611"
+      sha256: "9ca081be41c60190ebcb4766b2486a7d50261db7bd0f5d9615f2d653637a84c1"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0"
+    version: "1.0.4"
   shortid:
     dependency: transitive
     description:
@@ -2233,7 +2233,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "460dbf0930e32b572e0d813abde33c7cb6a5b3e5"
+      resolved-ref: "16ed4c3b4132ed0f402d1d25549ef7f8ef891665"
       url: "https://github.com/w568w/FlutterXiaoMiPushPlugin.git"
     source: git
     version: "2.0.0"

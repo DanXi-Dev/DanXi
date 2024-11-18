@@ -41,6 +41,7 @@ import 'package:dan_xi/util/forum/jwt_interceptor.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/dio.dart';
 
@@ -271,9 +272,11 @@ class ForumRepository extends BaseRepositoryWithDio {
     if (provider.divisionCache.isNotEmpty && useCache) {
       return provider.divisionCache;
     }
-    final Response<List<dynamic>> response = await dio
-        .get("$_BASE_URL/divisions", options: Options(headers: _tokenHeader));
-    final result = response.data?.map((e) => OTDivision.fromJson(e)).toList();
+    final options = RequestOptions(
+        path: "$_BASE_URL/divisions", method: "GET", headers: _tokenHeader);
+    final List<dynamic>? response =
+        await WebvpnProxy.requestWithProxy(dio, options);
+    final result = response?.map((e) => OTDivision.fromJson(e)).toList();
     if (result != null) {
       provider.divisionCache = result;
     }
@@ -302,10 +305,13 @@ class ForumRepository extends BaseRepositoryWithDio {
         return cached;
       } catch (_) {}
     }
-    final Response<Map<String, dynamic>> response = await dio.get(
-        "$_BASE_URL/divisions/$divisionId",
-        options: Options(headers: _tokenHeader));
-    final newDivision = OTDivision.fromJson(response.data!);
+    final options = RequestOptions(
+        path: "$_BASE_URL/divisions/$divisionId",
+        method: "GET",
+        headers: _tokenHeader);
+    final Map<String, dynamic> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
+    final newDivision = OTDivision.fromJson(response);
     var newList = provider.divisionCache.toList();
     newList.removeWhere((element) => element.division_id == divisionId);
     newList.add(newDivision);
@@ -487,9 +493,11 @@ class ForumRepository extends BaseRepositoryWithDio {
   /// i.e. [provider.userInfo].
   Future<OTUser?> getUserProfile({bool forceUpdate = false}) async {
     if (provider.userInfo == null || forceUpdate) {
-      final Response<Map<String, dynamic>> response = await dio
-          .get("$_BASE_URL/users", options: Options(headers: _tokenHeader));
-      provider.userInfo = OTUser.fromJson(response.data!);
+      final options = RequestOptions(
+          path: "$_BASE_URL/users/me", method: "GET", headers: _tokenHeader);
+      final Map<String, dynamic> response =
+          await WebvpnProxy.requestWithProxy(dio, options);
+      provider.userInfo = OTUser.fromJson(response);
       provider.userInfo?.favorites = null;
       provider.userInfo?.subscriptions = null;
     }
