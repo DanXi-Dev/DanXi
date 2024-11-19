@@ -234,9 +234,13 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     LicenseItem("encrypt_shared_preferences", LICENSE_APACHE_2_0,
         "https://github.com/xaldarof/encrypted-shared-preferences"),
     LicenseItem("device_identity", LICENSE_MIT,
-        "https://devgit.starschina.com/flutter_open_srouce/device_identity"),
+        "https://github.com/50431040/device_identity"),
     LicenseItem("tutorial_coach_mark", LICENSE_MIT,
-        "https://github.com/RafaelBarbosatec/tutorial_coach_mark")
+        "https://github.com/RafaelBarbosatec/tutorial_coach_mark"),
+    LicenseItem("toml", LICENSE_MIT,
+        "https://github.com/just95/toml.dart"),
+    LicenseItem("pub_semver", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/dart-lang/pub_semver"),
   ];
 
   String? _clearCacheSubtitle;
