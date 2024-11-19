@@ -28,7 +28,10 @@ import 'package:flutter/foundation.dart';
 abstract class BaseRepositoryWithDio {
   /// The host that the implementation works with.
   ///
-  /// Should not contain scheme and/or path. e.g. www.jwc.fudan.edu.cn
+  /// Should not contain scheme and/or path. e.g. fudan.edu.cn
+  ///
+  /// This is used to create a separate [Dio] instance (and [CookieJar]) for each host. That is to say,
+  /// the cookies which can be shared among multiple domains should come with the same [linkHost].
   String get linkHost;
 
   @protected

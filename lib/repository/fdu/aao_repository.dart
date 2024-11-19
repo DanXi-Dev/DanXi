@@ -67,7 +67,7 @@ class FudanAAORepository extends BaseRepositoryWithDio {
           .then((value) => true, onError: (e) => false);
 
   @override
-  String get linkHost => "jwc.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }
 
 class NotConnectedToLANError implements Exception {}
