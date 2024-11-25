@@ -59,15 +59,15 @@ class TimeTableRepository extends BaseRepositoryWithDio {
       UISLoginTool.tryAsyncWithAuth(dio, LOGIN_URL, cookieJar!, info,
           () => _loadTimeTableRemotely(startTime: startTime));
 
-  Future<String?> getDefaultSemesterId(PersonInfo? info) =>
-      Retrier.tryAsyncWithFix(() async {
-        await dio.get(ID_URL);
-        return (await cookieJar!.loadForRequest(Uri.parse(HOST)))
-            .firstWhere((element) => element.name == "semester.id")
-            .value;
-      },
-          (exception) => UISLoginTool.fixByLoginUIS(
-              dio, LOGIN_URL, cookieJar!, info, true));
+  Future<String?> getDefaultSemesterId(PersonInfo? info) {
+    return UISLoginTool.tryAsyncWithAuth(dio, LOGIN_URL, cookieJar!, info,
+        () async {
+      await dio.get(ID_URL);
+      return (await cookieJar!.loadForRequest(Uri.parse(HOST)))
+          .firstWhere((element) => element.name == "semester.id")
+          .value;
+    });
+  }
 
   Future<TimeTable?> _loadTimeTableRemotely({DateTime? startTime}) async {
     Future<String?> getAppropriateSemesterId() async {
@@ -100,7 +100,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
         tablePage.data!);
     for (var course in timetable.courses!) {
       for (var weekday in course.times!) {
-        if (weekday.weekDay == 6)  {
+        if (weekday.weekDay == 6) {
           for (int i = 0; i < course.availableWeeks!.length; i++) {
             course.availableWeeks![i] = course.availableWeeks![i] - 1;
           }
@@ -132,7 +132,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "jwfw.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }
 
 class Test {

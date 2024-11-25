@@ -121,8 +121,7 @@ class LoginDialogState extends State<LoginDialog> {
             rethrow;
           }
           try {
-            await CardRepository.getInstance().init(newInfo);
-            newInfo.name = await CardRepository.getInstance().getName();
+            newInfo.name = await CardRepository.getInstance().getName(newInfo);
             if (newInfo.name?.isEmpty ?? true) {
               throw GeneralLoginFailedException();
             }

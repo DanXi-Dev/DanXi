@@ -84,13 +84,11 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   }
 
   Future<Map<String, TrafficInfo>?> getCrowdednessInfo(
-          PersonInfo? info, int areaCode) async =>
-      Retrier.tryAsyncWithFix(() => _getCrowdednessInfo(areaCode),
-          (exception) async {
-        if (exception is! UnsuitableTimeException) {
-          await UISLoginTool.loginUIS(dio, LOGIN_URL, cookieJar!, info, true);
-        }
-      });
+      PersonInfo? info, int areaCode) async {
+    return UISLoginTool.tryAsyncWithAuth(
+        dio, LOGIN_URL, cookieJar!, info, () => _getCrowdednessInfo(areaCode),
+        isFatalError: (e) => e is UnsuitableTimeException);
+  }
 
   Future<Map<String, TrafficInfo>?> _getCrowdednessInfo(int areaCode) async {
     var result = <String, TrafficInfo>{};
@@ -159,7 +157,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "my.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }
 
 class UnsuitableTimeException implements Exception {}

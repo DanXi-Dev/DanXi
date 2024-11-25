@@ -136,7 +136,7 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "yjsxk.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }
 
 typedef OnCaptchaCallback = Future<String> Function(String imageUrl);

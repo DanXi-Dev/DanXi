@@ -40,7 +40,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
   Future<List<ExerciseItem>?> _loadExerciseRecords(PersonInfo? info) async {
     // PE system request a token from UIS to log in.
     String token = "";
-    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, info, true)
+    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, info)
         .catchError((e) {
       if (e is DioException && e.type == DioExceptionType.badResponse) {
         String url = e.response!.requestOptions.path;
@@ -65,7 +65,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "fdtyjw.fudan.edu.cn";
+  String get linkHost => "fdtyjw.fudan.edu.cn"; // uses a separate host here, since we are excepting an error response from server
 }
 
 class ExerciseItem {

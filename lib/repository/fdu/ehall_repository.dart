@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
@@ -33,10 +32,9 @@ class FudanEhallRepository extends BaseRepositoryWithDio {
 
   factory FudanEhallRepository.getInstance() => _instance;
 
-  Future<StudentInfo> getStudentInfo(PersonInfo info) async {
-    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, info, true);
-    return _getStudentInfo();
-  }
+  Future<StudentInfo> getStudentInfo(PersonInfo info) async =>
+      UISLoginTool.tryAsyncWithAuth(
+          dio, _LOGIN_URL, cookieJar!, info, _getStudentInfo);
 
   Future<StudentInfo> _getStudentInfo() async {
     Response<Map<String, dynamic>> rep = await dio.get(_INFO_URL);
@@ -49,7 +47,7 @@ class FudanEhallRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "ehall.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }
 
 class StudentInfo {
