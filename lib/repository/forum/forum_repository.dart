@@ -191,11 +191,13 @@ class ForumRepository extends BaseRepositoryWithDio {
   }
 
   Future<bool?> checkRegisterStatus(String email) async {
-    final Response<Map<String, dynamic>> response = await dio.get(
-        "$_BASE_AUTH_URL/verify/email",
+    final options = RequestOptions(
+        path: "$_BASE_AUTH_URL/verify/email",
+        method: "GET",
         queryParameters: {"email": email, "check": true},
-        options: Options(
-            validateStatus: (status) => status != null && status <= 400));
+        validateStatus: (status) => status != null && status <= 400);
+    final Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     if (response.data!.containsKey("registered")) {
       return response.data!["registered"];
     } else {
@@ -234,29 +236,36 @@ class ForumRepository extends BaseRepositoryWithDio {
   }
 
   Future<void> requestEmailVerifyCode(String email) async {
-    await dio
-        .get("$_BASE_AUTH_URL/verify/email", queryParameters: {"email": email});
+    final options = RequestOptions(
+        path: "$_BASE_AUTH_URL/verify/email",
+        method: "GET",
+        queryParameters: {"email": email});
+    await WebvpnProxy.requestWithProxy(dio, options);
   }
 
   Future<JWToken?> register(
       String email, String password, String verifyCode) async {
-    final Response<Map<String, dynamic>> response =
-        await dio.post("$_BASE_AUTH_URL/register", data: {
+    final options =
+        RequestOptions(path: "$_BASE_AUTH_URL/register", method: "POST", data: {
       "password": password,
       "email": email,
       "verification": int.parse(verifyCode),
     });
+    final Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return SettingsProvider.getInstance().forumToken =
         JWToken.fromJsonWithVerification(response.data!);
   }
 
   Future<JWToken?> loginWithUsernamePassword(
       String username, String password) async {
-    final Response<Map<String, dynamic>> response =
-        await dio.post("$_BASE_AUTH_URL/login", data: {
+    final options =
+        RequestOptions(path: "$_BASE_AUTH_URL/login", method: "POST", data: {
       'email': username,
       'password': password,
     });
+    final Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return SettingsProvider.getInstance().forumToken =
         JWToken.fromJsonWithVerification(response.data!);
   }

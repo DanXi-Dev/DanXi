@@ -67,11 +67,15 @@ class AnnouncementRepository {
   }
 
   Announcement? getLastAnnouncement() {
-    List<Announcement> list = getAnnouncements();
-    return list.firstOrNull;
+    List<Announcement>? list = getAnnouncements();
+    return list?.firstOrNull;
   }
 
-  List<Announcement> getAnnouncements() {
+  List<Announcement>? getAnnouncements() {
+    if (_tomlCache == null){
+      return null;
+    }
+
     final version = int.tryParse(Pubspec.version.build.single) ?? 0;
     if (_tomlCache!['dev_notice'] == null) {
       return [];
@@ -82,7 +86,11 @@ class AnnouncementRepository {
     return list.map<Announcement>((e) => Announcement.fromToml(e)).toList();
   }
 
-  List<Announcement> getAllAnnouncements() {
+  List<Announcement>? getAllAnnouncements() {
+    if (_tomlCache == null){
+      return null;
+    }
+
     if (_tomlCache!['dev_notice'] == null) {
       return [];
     }
@@ -92,6 +100,10 @@ class AnnouncementRepository {
   }
 
   TimeTableExtra? getStartDates() {
+    if (_tomlCache == null){
+      return null;
+    }
+
     final fduUg = _tomlCache!['semester_start_date']
         .entries
         .map<TimeTableStartTimeItem>(
@@ -101,14 +113,26 @@ class AnnouncementRepository {
   }
 
   String? getUserAgent() {
+    if (_tomlCache == null){
+      return null;
+    }
+
     return _tomlCache!['user_agent'];
   }
 
   List<String?>? getStopWords() {
+    if (_tomlCache == null){
+      return null;
+    }
+
     return _tomlCache!['stop_words'].cast<String>();
   }
 
   List<BannerExtra?>? getBannerExtras() {
+    if (_tomlCache == null){
+      return null;
+    }
+
     return _tomlCache!['banners']
         .map<BannerExtra>((banner) =>
             BannerExtra(banner['title'], banner['button'], banner['action']))
@@ -116,10 +140,18 @@ class AnnouncementRepository {
   }
 
   List<String?>? getCareWords() {
+    if (_tomlCache == null){
+      return null;
+    }
+
     return _tomlCache!['care_words'].cast<String>();
   }
 
-  UpdateInfo checkVersion() {
+  UpdateInfo? checkVersion() {
+    if (_tomlCache == null){
+      return null;
+    }
+
     return UpdateInfo(
         _tomlCache!['latest_version']['flutter'], _tomlCache!['change_log']);
   }
@@ -130,7 +162,11 @@ class AnnouncementRepository {
     return Celebration(type, date, m['words'].cast<String>());
   }
 
-  List<Celebration> getCelebrations() {
+  List<Celebration>? getCelebrations() {
+    if (_tomlCache == null){
+      return null;
+    }
+
     return _tomlCache!['celebrations']
         .map<Celebration>((e) => parseCelebration(e))
         .toList();

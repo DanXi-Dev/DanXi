@@ -95,8 +95,7 @@ class WebvpnProxy {
           dio,
           WebvpnProxy.WEBVPN_LOGIN_URL,
           BaseRepositoryWithDio.globalCookieJar,
-          StateProvider.personInfo.value,
-          false);
+          StateProvider.personInfo.value);
       await loginSession;
       loginSession = null;
       isLoggedIn = true;
@@ -127,8 +126,8 @@ class WebvpnProxy {
     // Replace path with translated path
     options.path = WebvpnProxy.getWebVpnUri(options.path);
 
+    // Protect `POST` against 302 exceptions
     if (options.method == "POST") {
-      // Protect `POST` against 302 exceptions
       options.validateStatus = (status) {
         return status != null && status < 400;
       };
