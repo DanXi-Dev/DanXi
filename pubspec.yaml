@@ -30,7 +30,7 @@ dependencies:
   event_bus: ^2.0.0
   share_plus: ^10.0.2
   path_provider: ^2.0.9
-  screen_brightness: ^2.0.0
+  screen_brightness: ^1.0.0 # before https://github.com/aaassseee/screen_brightness/issues/38 is fixed, we have to use this version
   flutter_email_sender: ^6.0.1
   auto_size_text: ^3.0.0
   super_sliver_list: ^0.4.0
