@@ -1138,10 +1138,10 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: ada15684ac89603681cec54bb07b05b191a05a1a
-      url: "https://github.com/singularity-s0/linkify.git"
+      resolved-ref: "152218c8f7e107259539a00038b5d803062e11c6"
+      url: "https://github.com/DanXi-Dev/linkify.git"
     source: git
-    version: "4.0.0"
+    version: "5.0.0"
   lints:
     dependency: transitive
     description:

@@ -117,7 +117,7 @@ dependency_overrides:
       ref: master
   linkify:
     git:
-      url: https://github.com/singularity-s0/linkify.git
+      url: https://github.com/DanXi-Dev/linkify.git
       ref: master
 
 dev_dependencies:
