@@ -15,7 +15,13 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/repository/independent_cookie_jar.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
@@ -40,13 +46,15 @@ abstract class BaseRepositoryWithDio {
       _dios[linkHost] = DioUtils.newDioWithProxy();
       _dios[linkHost]!.options = BaseOptions(
           receiveDataWhenStatusError: true,
-          connectTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 10),
-          sendTimeout: const Duration(seconds: 10));
+          connectTimeout: const Duration(seconds: 2),
+          receiveTimeout: const Duration(seconds: 2),
+          sendTimeout: const Duration(seconds: 2));
       _dios[linkHost]!.interceptors.add(LimitedQueuedInterceptor.getInstance());
       _dios[linkHost]!.interceptors.add(UserAgentInterceptor(
           userAgent: SettingsProvider.getInstance().customUserAgent));
-      _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
+      // _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
+      // Cookies related with webvpn
+      _dios[linkHost]!.interceptors.add(CookieManager(globalCookieJar));
       DioLogInterceptor.enablePrintLog = false;
       _dios[linkHost]!.interceptors.add(DioLogInterceptor());
     }
@@ -67,6 +75,7 @@ abstract class BaseRepositoryWithDio {
     }
   }
 
+  static final IndependentCookieJar globalCookieJar = IndependentCookieJar();
   static final Map<String, IndependentCookieJar> _cookieJars = {};
   static final Map<String, Dio> _dios = {};
 }

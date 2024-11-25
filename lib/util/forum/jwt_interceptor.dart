@@ -19,8 +19,11 @@ import 'dart:io';
 
 import 'package:dan_xi/model/forum/jwt.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
+import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
+import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/cupertino.dart';
 
 /// An interceptor that refresh the jwt token automatically.
@@ -34,7 +37,10 @@ class JWTInterceptor extends QueuedInterceptor {
   final Function tokenGetter;
   final Function? tokenSetter;
 
-  JWTInterceptor(this.refreshUrl, this.tokenGetter, [this.tokenSetter]);
+  JWTInterceptor(this.refreshUrl, this.tokenGetter, [this.tokenSetter]) {
+    // Add global cookies, since to make [_dio] compatible with webvpn
+    _dio.interceptors.add(CookieManager(BaseRepositoryWithDio.globalCookieJar));
+  }
 
   static _rewriteRequestOptionsWithToken(
       RequestOptions options, JWToken token) {
@@ -55,7 +61,7 @@ class JWTInterceptor extends QueuedInterceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    debugPrint("Huston, we have troubles: $err");
+    debugPrint("Huston, we have troubles on ${err.response?.realUri}");
 
     if (err.response?.statusCode == HttpStatus.unauthorized) {
       JWToken? currentToken = tokenGetter.call();
@@ -66,7 +72,7 @@ class JWTInterceptor extends QueuedInterceptor {
             headers: {"Authorization": "Bearer ${currentToken.refresh!}"});
         Response<Map<String, dynamic>> response;
         try {
-          response = await _dio.fetch(options);
+          response = await WebvpnProxy.requestWithProxy(_dio, options);
         } catch (e) {
           if (e is DioException &&
               e.response?.statusCode == HttpStatus.unauthorized) {

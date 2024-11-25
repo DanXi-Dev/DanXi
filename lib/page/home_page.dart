@@ -382,16 +382,16 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     try {
       if (element == 'hole') {
-        final OTHole hole = (await ForumRepository.getInstance()
-            .loadSpecificHole(postId))!;
+        final OTHole hole =
+            (await ForumRepository.getInstance().loadSpecificHole(postId))!;
         if (mounted) {
           smartNavigatorPush(context, "/bbs/postDetail", arguments: {
             "post": hole,
           });
         }
       } else if (element == 'floor') {
-        final floor = (await ForumRepository.getInstance()
-            .loadSpecificFloor(postId))!;
+        final floor =
+            (await ForumRepository.getInstance().loadSpecificFloor(postId))!;
         final OTHole hole = (await ForumRepository.getInstance()
             .loadSpecificHole(floor.hole_id!))!;
         if (mounted) {
@@ -482,8 +482,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       });
     }
     // Configure watch listeners on iOS.
-    if (_needSendToWatch &&
-        SettingsProvider.getInstance().forumToken != null) {
+    if (_needSendToWatch && SettingsProvider.getInstance().forumToken != null) {
       sendFduholeTokenToWatch(
           SettingsProvider.getInstance().forumToken!.access!);
       // Only send once.
@@ -514,11 +513,10 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           break;
         case "upload_apns_token":
           try {
-            await ForumRepository.getInstance()
-                .updatePushNotificationToken(
-                    call.arguments["token"],
-                    await PlatformX.getUniqueDeviceId(),
-                    PushNotificationServiceType.APNS);
+            await ForumRepository.getInstance().updatePushNotificationToken(
+                call.arguments["token"],
+                await PlatformX.getUniqueDeviceId(),
+                PushNotificationServiceType.APNS);
           } catch (e, st) {
             if (mounted) {
               Noticing.showNotice(
@@ -561,11 +559,10 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 (params.commandArguments?.isNotEmpty ?? false)) {
               String regId = params.commandArguments![0];
               try {
-                await ForumRepository.getInstance()
-                    .updatePushNotificationToken(
-                        regId,
-                        await PlatformX.getUniqueDeviceId(),
-                        PushNotificationServiceType.MIPUSH);
+                await ForumRepository.getInstance().updatePushNotificationToken(
+                    regId,
+                    await PlatformX.getUniqueDeviceId(),
+                    PushNotificationServiceType.MIPUSH);
               } catch (e, st) {
                 Noticing.showNotice(
                     context,
@@ -748,8 +745,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> _loadUpdate() async {
     //We don't need to check for update on iOS platform.
     if (PlatformX.isIOS) return;
-    final UpdateInfo updateInfo =
+    final UpdateInfo? updateInfo =
         AnnouncementRepository.getInstance().checkVersion();
+    if (updateInfo == null) {
+      return;
+    }
+
     if (updateInfo.isAfter(Version.parse(Pubspec.version.canonical))) {
       await showPlatformDialog(
           context: context,
@@ -836,6 +837,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Future<void> _loadCelebration() async {
     SettingsProvider.getInstance().celebrationWords =
-        AnnouncementRepository.getInstance().getCelebrations();
+        AnnouncementRepository.getInstance().getCelebrations() ?? [];
   }
 }
