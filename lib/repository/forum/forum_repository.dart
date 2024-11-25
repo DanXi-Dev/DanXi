@@ -283,9 +283,9 @@ class ForumRepository extends BaseRepositoryWithDio {
     }
     final options = RequestOptions(
         path: "$_BASE_URL/divisions", method: "GET", headers: _tokenHeader);
-    final List<dynamic>? response =
+    final Response<List<dynamic>> response =
         await WebvpnProxy.requestWithProxy(dio, options);
-    final result = response?.map((e) => OTDivision.fromJson(e)).toList();
+    final result = response.data?.map((e) => OTDivision.fromJson(e)).toList();
     if (result != null) {
       provider.divisionCache = result;
     }
@@ -318,9 +318,9 @@ class ForumRepository extends BaseRepositoryWithDio {
         path: "$_BASE_URL/divisions/$divisionId",
         method: "GET",
         headers: _tokenHeader);
-    final Map<String, dynamic> response =
+    final Response<Map<String, dynamic>> response =
         await WebvpnProxy.requestWithProxy(dio, options);
-    final newDivision = OTDivision.fromJson(response);
+    final newDivision = OTDivision.fromJson(response.data!);
     var newList = provider.divisionCache.toList();
     newList.removeWhere((element) => element.division_id == divisionId);
     newList.add(newDivision);
@@ -333,7 +333,9 @@ class ForumRepository extends BaseRepositoryWithDio {
       String? tag,
       SortOrder? sortOrder}) async {
     sortOrder ??= SortOrder.LAST_REPLIED;
-    final Response<List<dynamic>> response = await dio.get("$_BASE_URL/holes",
+    final options = RequestOptions(
+        path: "$_BASE_URL/holes",
+        method: "GET",
         queryParameters: {
           "start_time": startTime.toUtc().toIso8601String(),
           "division_id": divisionId,
@@ -341,29 +343,37 @@ class ForumRepository extends BaseRepositoryWithDio {
           "tag": tag,
           "order": sortOrder.getInternalString()
         },
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+
+    final Response<List<dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
   Future<List<OTHole>?> loadUserHoles(DateTime startTime,
       {int length = Constant.POST_COUNT_PER_PAGE, SortOrder? sortOrder}) async {
     sortOrder ??= SortOrder.LAST_REPLIED;
+
+    final options = RequestOptions(
+        path: "$_BASE_URL/users/me/holes",
+        method: "GET",
+        queryParameters: {
+          "offset": startTime.toUtc().toIso8601String(),
+          "size": length,
+          "order": sortOrder.getInternalString()
+        },
+        headers: _tokenHeader);
     final Response<List<dynamic>> response =
-        await dio.get("$_BASE_URL/users/me/holes",
-            queryParameters: {
-              "offset": startTime.toUtc().toIso8601String(),
-              "size": length,
-              "order": sortOrder.getInternalString()
-            },
-            options: Options(headers: _tokenHeader));
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
   // NEVER USED
   Future<OTHole?> loadSpecificHole(int holeId) async {
-    final Response<Map<String, dynamic>> response = await dio.get(
-        "$_BASE_URL/holes/$holeId",
-        options: Options(headers: _tokenHeader));
+    final options = RequestOptions(
+        path: "$_BASE_URL/holes/$holeId", method: "GET", headers: _tokenHeader);
+    final Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     final hole = OTHole.fromJson(response.data!);
     return hole;
   }
@@ -374,9 +384,12 @@ class ForumRepository extends BaseRepositoryWithDio {
       return result;
     }
 
-    final Response<Map<String, dynamic>> response = await dio.get(
-        "$_BASE_URL/floors/$floorId",
-        options: Options(headers: _tokenHeader));
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors/$floorId",
+        method: "GET",
+        headers: _tokenHeader);
+    final Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     final floor = OTFloor.fromJson(response.data!);
     cacheFloor(floor);
     return floor;
@@ -384,13 +397,17 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   Future<List<OTFloor>?> loadFloors(OTHole post,
       {int startFloor = 0, int length = Constant.POST_COUNT_PER_PAGE}) async {
-    final Response<List<dynamic>> response = await dio.get("$_BASE_URL/floors",
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors",
+        method: "GET",
         queryParameters: {
           "start_floor": startFloor,
           "hole_id": post.hole_id,
           "length": length
         },
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    final Response<List<dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     final floors = response.data?.map((e) => OTFloor.fromJson(e)).toList();
     for (var element in floors!) {
       cacheFloor(element);
@@ -403,23 +420,29 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   Future<List<OTFloor>?> loadUserFloors(
       {int startFloor = 0, int length = Constant.POST_COUNT_PER_PAGE}) async {
-    final Response<List<dynamic>> response = await dio.get(
-        "$_BASE_URL/users/me/floors",
+    final options = RequestOptions(
+        path: "$_BASE_URL/users/me/floors",
+        method: "GET",
         queryParameters: {"offset": startFloor, "size": length},
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    final Response<List<dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.data?.map((e) => OTFloor.fromJson(e)).toList();
   }
 
   Future<List<OTFloor>?> loadSearchResults(String? searchString,
       {int? startFloor, int length = Constant.POST_COUNT_PER_PAGE}) async {
-    final Response<List<dynamic>> response = await dio.get("$_BASE_URL/floors",
-        //queryParameters: {"start_floor": 0, "s": searchString, "length": 0},
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors",
+        method: "GET",
         queryParameters: {
           "start_floor": startFloor,
           "s": searchString,
           "length": length,
         },
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    final Response<List<dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.data?.map((e) => OTFloor.fromJson(e)).toList();
   }
 
@@ -427,8 +450,10 @@ class ForumRepository extends BaseRepositoryWithDio {
     if (useCache && _tagCache.isNotEmpty) {
       return _tagCache;
     }
-    final Response<List<dynamic>> response = await dio.get("$_BASE_URL/tags",
-        options: Options(headers: _tokenHeader));
+    final options = RequestOptions(
+        path: "$_BASE_URL/tags", method: "GET", headers: _tokenHeader);
+    final Response<List<dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return _tagCache = response.data!.map((e) => OTTag.fromJson(e)).toList();
   }
 
@@ -437,25 +462,31 @@ class ForumRepository extends BaseRepositoryWithDio {
     if (content == null) return -1;
     if (tags == null || tags.isEmpty) tags = [const OTTag(0, 0, KEY_NO_TAG)];
     // Suppose user is logged in. He should be.
-    final Response<dynamic> response = await dio.post("$_BASE_URL/holes",
+    final options = RequestOptions(
+        path: "$_BASE_URL/holes",
+        method: "POST",
         data: {
           "division_id": divisionId,
           "content": content,
           "tags": tags,
         },
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    final Response<dynamic> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.statusCode;
   }
 
   Future<String?> uploadImage(File file) async {
     String path = file.absolute.path;
     String fileName = path.substring(path.lastIndexOf("/") + 1, path.length);
+    final options = RequestOptions(
+        path: "$_IMAGE_BASE_URL/json",
+        method: "POST",
+        data: FormData.fromMap(
+            {"source": await MultipartFile.fromFile(path, filename: fileName)}),
+        headers: _tokenHeader);
     Response<Map<String, dynamic>> response =
-        await dio.post<Map<String, dynamic>>("$_IMAGE_BASE_URL/json",
-            data: FormData.fromMap({
-              "source": await MultipartFile.fromFile(path, filename: fileName)
-            }),
-            options: Options(headers: _tokenHeader));
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.data!['image']['display_url'];
   }
 
@@ -467,13 +498,17 @@ class ForumRepository extends BaseRepositoryWithDio {
   }
 
   Future<int?> newFloor(int? discussionId, String content) async {
-    final Response<dynamic> response = await dio.post("$_BASE_URL/floors",
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors",
+        method: "POST",
         data: {
           "content": content,
           "hole_id": discussionId,
           //"mention": findMention(content)
         },
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    final Response<dynamic> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.statusCode;
   }
 
@@ -485,16 +520,23 @@ class ForumRepository extends BaseRepositoryWithDio {
   }*/
 
   Future<OTFloor?> likeFloor(int floorId, int like) async {
-    final Response<Map<String, dynamic>> response = await dio.post(
-        "$_BASE_URL/floors/$floorId/like/$like",
-        options: Options(headers: _tokenHeader));
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors/$floorId/like/$like",
+        method: "POST",
+        headers: _tokenHeader);
+    final Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return OTFloor.fromJson(response.data!);
   }
 
   Future<int?> reportPost(int? postId, String reason) async {
-    final Response<dynamic> response = await dio.post("$_BASE_URL/reports",
+    final options = RequestOptions(
+        path: "$_BASE_URL/reports",
+        method: "POST",
         data: {"floor_id": postId, "reason": reason},
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    final Response<dynamic> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.statusCode;
   }
 
@@ -504,9 +546,9 @@ class ForumRepository extends BaseRepositoryWithDio {
     if (provider.userInfo == null || forceUpdate) {
       final options = RequestOptions(
           path: "$_BASE_URL/users/me", method: "GET", headers: _tokenHeader);
-      final Map<String, dynamic> response =
+      final Response<Map<String, dynamic>> response =
           await WebvpnProxy.requestWithProxy(dio, options);
-      provider.userInfo = OTUser.fromJson(response);
+      provider.userInfo = OTUser.fromJson(response.data!);
       provider.userInfo?.favorites = null;
       provider.userInfo?.subscriptions = null;
     }
@@ -514,10 +556,13 @@ class ForumRepository extends BaseRepositoryWithDio {
   }
 
   Future<OTUser?> updateUserProfile() async {
-    final Response<Map<String, dynamic>> response = await dio.put(
-        "$_BASE_URL/users/${provider.userInfo!.user_id}",
+    final options = RequestOptions(
+        path: "$_BASE_URL/users/${provider.userInfo!.user_id}",
+        method: "PUT",
         data: provider.userInfo!.toJson(),
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    final Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     provider.userInfo = OTUser.fromJson(response.data!);
     provider.userInfo?.favorites = null;
     provider.userInfo?.subscriptions = null;
@@ -525,36 +570,48 @@ class ForumRepository extends BaseRepositoryWithDio {
   }
 
   Future<void> updateHoleViewCount(int holeId) async {
-    await dio.patch("$_BASE_URL/holes/$holeId",
-        options: Options(headers: _tokenHeader));
+    final options = RequestOptions(
+        path: "$_BASE_URL/holes/$holeId",
+        method: "PATCH",
+        headers: _tokenHeader);
+    await WebvpnProxy.requestWithProxy(dio, options);
   }
 
   Future<List<OTMessage>?> loadMessages(
       {bool unreadOnly = false, DateTime? startTime}) async {
+    final options = RequestOptions(
+        path: "$_BASE_URL/messages",
+        method: "GET",
+        queryParameters: {
+          "not_read": unreadOnly,
+          "start_time": startTime?.toUtc().toIso8601String(),
+        },
+        headers: _tokenHeader);
     final Response<List<dynamic>> response =
-        await dio.get("$_BASE_URL/messages",
-            queryParameters: {
-              "not_read": unreadOnly,
-              "start_time": startTime?.toUtc().toIso8601String(),
-            },
-            options: Options(headers: _tokenHeader));
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.data?.map((e) => OTMessage.fromJson(e)).toList();
   }
 
   Future<void> modifyMessage(OTMessage message) async {
-    await dio.delete("$_BASE_URL/messages/${message.message_id}",
+    final options = RequestOptions(
+        path: "$_BASE_URL/messages/${message.message_id}",
+        method: "DELETE",
         data: {
           "has_read": message.has_read,
         },
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    await WebvpnProxy.requestWithProxy(dio, options);
   }
 
   Future<void> clearMessages() async {
-    await dio.put("$_BASE_URL/messages",
+    final options = RequestOptions(
+        path: "$_BASE_URL/messages",
+        method: "PUT",
         data: {
           "clear_all": true,
         },
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    await WebvpnProxy.requestWithProxy(dio, options);
   }
 
   Future<bool?> isUserAdmin() async {
@@ -580,10 +637,13 @@ class ForumRepository extends BaseRepositoryWithDio {
     if (provider.userInfo?.favorites != null) {
       return provider.userInfo?.favorites;
     }
-    final Response<Map<String, dynamic>> response = await dio.get(
-        "$_BASE_URL/user/favorites",
+    final options = RequestOptions(
+        path: "$_BASE_URL/user/favorites",
+        method: "GET",
         queryParameters: {"plain": true},
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    final Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
 
     var results = response.data?['data']?.cast<int>() ?? [];
     // when setting fields, we must make sure that the user info is initialized.
@@ -597,10 +657,13 @@ class ForumRepository extends BaseRepositoryWithDio {
     if (provider.userInfo?.subscriptions != null) {
       return provider.userInfo?.subscriptions;
     }
-    final Response<Map<String, dynamic>> response = await dio.get(
-        "$_BASE_URL/users/subscriptions",
+    final options = RequestOptions(
+        path: "$_BASE_URL/users/subscriptions",
+        method: "GET",
         queryParameters: {"plain": true},
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    final Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     var results = response.data?['data']?.cast<int>();
     (await getUserProfile())?.subscriptions =
         response.data?['data']?.cast<int>();
@@ -611,10 +674,13 @@ class ForumRepository extends BaseRepositoryWithDio {
     int length = Constant.POST_COUNT_PER_PAGE,
     int prefetchLength = Constant.POST_COUNT_PER_PAGE,
   }) async {
-    final Response<List<dynamic>> response = await dio.get(
-        "$_BASE_URL/user/favorites",
+    final options = RequestOptions(
+        path: "$_BASE_URL/user/favorites",
+        method: "GET",
         queryParameters: {"length": length, "prefetch_length": prefetchLength},
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    final Response<List<dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
@@ -622,23 +688,35 @@ class ForumRepository extends BaseRepositoryWithDio {
     int length = Constant.POST_COUNT_PER_PAGE,
     int prefetchLength = Constant.POST_COUNT_PER_PAGE,
   }) async {
-    final Response<List<dynamic>> response = await dio.get(
-        "$_BASE_URL/users/subscriptions",
+    final options = RequestOptions(
+        path: "$_BASE_URL/users/subscriptions",
+        method: "GET",
         queryParameters: {"length": length, "prefetch_length": prefetchLength},
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    final Response<List<dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
   Future<void> setFavorite(SetStatusMode mode, int? holeId) async {
     Response<dynamic> response;
+    RequestOptions options;
     switch (mode) {
       case SetStatusMode.ADD:
-        response = await dio.post("$_BASE_URL/user/favorites",
-            data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
+        options = RequestOptions(
+            path: "$_BASE_URL/user/favorites",
+            method: "POST",
+            data: {'hole_id': holeId},
+            headers: _tokenHeader);
+        response = await WebvpnProxy.requestWithProxy(dio, options);
         break;
       case SetStatusMode.DELETE:
-        response = await dio.delete("$_BASE_URL/user/favorites",
-            data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
+        options = RequestOptions(
+            path: "$_BASE_URL/user/favorites",
+            method: "DELETE",
+            data: {'hole_id': holeId},
+            headers: _tokenHeader);
+        response = await WebvpnProxy.requestWithProxy(dio, options);
         break;
     }
     final Map<String, dynamic> result = response.data;
@@ -647,14 +725,23 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   Future<void> setSubscription(SetStatusMode mode, int? holeId) async {
     Response<dynamic> response;
+    RequestOptions options;
     switch (mode) {
       case SetStatusMode.ADD:
-        response = await dio.post("$_BASE_URL/users/subscriptions",
-            data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
+        options = RequestOptions(
+            path: "$_BASE_URL/users/subscriptions",
+            method: "POST",
+            data: {'hole_id': holeId},
+            headers: _tokenHeader);
+        response = await WebvpnProxy.requestWithProxy(dio, options);
         break;
       case SetStatusMode.DELETE:
-        response = await dio.delete("$_BASE_URL/users/subscription",
-            data: {'hole_id': holeId}, options: Options(headers: _tokenHeader));
+        options = RequestOptions(
+            path: "$_BASE_URL/users/subscriptions",
+            method: "DELETE",
+            data: {'hole_id': holeId},
+            headers: _tokenHeader);
+        response = await WebvpnProxy.requestWithProxy(dio, options);
         break;
     }
     final Map<String, dynamic> result = response.data;
@@ -663,43 +750,55 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   /// Modify a floor
   Future<int?> modifyFloor(String content, int? floorId) async {
-    return (await dio.put("$_BASE_URL/floors/$floorId",
-            data: {
-              "content": content,
-              //"mention": findMention(content),
-            },
-            options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors/$floorId",
+        method: "PUT",
+        data: {
+          "content": content,
+          //"mention": findMention(content),
+        },
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   /// Delete a floor
   Future<int?> deleteFloor(int? floorId) async {
-    return (await dio.delete("$_BASE_URL/floors/$floorId",
-            options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors/$floorId",
+        method: "DELETE",
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   /// Get user's punishment history
   Future<List<OTPunishment>?> getPunishmentHistory() async {
-    final Response<List<dynamic>> response = await dio.get(
-        "$_BASE_URL/users/me/punishments",
-        options: Options(headers: _tokenHeader));
+    final options = RequestOptions(
+        path: "$_BASE_URL/users/me/punishments",
+        method: "GET",
+        headers: _tokenHeader);
+    final Response<List<dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.data?.map((e) => OTPunishment.fromJson(e)).toList();
   }
 
   /// Admin API below
   Future<List<OTReport>?> adminGetReports(int startReport,
       [int length = 10]) async {
-    final response = await dio.get("$_BASE_URL/reports",
+    final options = RequestOptions(
+        path: "$_BASE_URL/reports",
+        method: "GET",
         queryParameters: {"offset": startReport, "size": length},
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    final response = await WebvpnProxy.requestWithProxy(dio, options);
     final result = response.data;
     return result.map<OTReport>((e) => OTReport.fromJson(e)).toList();
   }
 
   Future<List<OTAudit>?> adminGetAuditFloors(DateTime startTime, bool open,
       [int length = 10]) async {
-    final response = await dio.get("$_BASE_URL/floors/_sensitive",
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors/_sensitive",
+        method: "GET",
         queryParameters: {
           "offset": startTime.toUtc().toIso8601String(),
           "size": length,
@@ -707,127 +806,165 @@ class ForumRepository extends BaseRepositoryWithDio {
           "open": open,
           "order_by": "time_created"
         },
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    final response = await WebvpnProxy.requestWithProxy(dio, options);
     final result = response.data;
     return result.map<OTAudit>((e) => OTAudit.fromJson(e)).toList();
   }
 
   Future<int?> adminSetAuditFloor(int floorId, bool isActualSensitive) async {
-    return (await dio.put("$_BASE_URL/floors/$floorId/_sensitive",
-            data: {"is_actual_sensitive": isActualSensitive},
-            options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors/$floorId/_sensitive",
+        method: "PUT",
+        data: {"is_actual_sensitive": isActualSensitive},
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   Future<int?> adminDeleteFloor(int? floorId, String? deleteReason) async {
-    return (await dio.delete("$_BASE_URL/floors/$floorId",
-            data: {
-              if (deleteReason?.isNotEmpty == true)
-                "delete_reason": deleteReason ?? ""
-            },
-            options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors/$floorId",
+        method: "DELETE",
+        data: {
+          if (deleteReason?.isNotEmpty == true)
+            "delete_reason": deleteReason ?? ""
+        },
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   Future<List<OTHistory>?> getHistory(int? floorId) async {
-    final Response<List<dynamic>> response = await dio.get(
-        "$_BASE_URL/floors/$floorId/history",
-        options: Options(headers: _tokenHeader));
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors/$floorId/history",
+        method: "GET",
+        headers: _tokenHeader);
+    final Response<List<dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.data?.map((e) => OTHistory.fromJson(e)).toList();
   }
 
   Future<int?> adminDeleteHole(int? holeId) async {
-    return (await dio.delete("$_BASE_URL/holes/$holeId",
-            options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/holes/$holeId",
+        method: "DELETE",
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   Future<int?> adminLockHole(int? holeId, bool lock) async {
-    return (await dio.put("$_BASE_URL/holes/$holeId",
-            data: {"lock": lock}, options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/holes/$holeId",
+        method: "PUT",
+        data: {"lock": lock},
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   Future<int?> adminUndeleteHole(int? holeId) async {
-    return (await dio.put("$_BASE_URL/holes/$holeId",
-            data: {"unhidden": true}, options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/holes/$holeId",
+        method: "PUT",
+        data: {"unhidden": true},
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   @Deprecated("Use adminAddPenaltyDays instead")
   Future<int?> adminAddPenalty(int? floorId, int penaltyLevel) async {
-    return (await dio.post("$_BASE_URL/penalty/$floorId",
-            data: jsonEncode({"penalty_level": penaltyLevel}),
-            options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/penalty/$floorId",
+        method: "POST",
+        data: jsonEncode({"penalty_level": penaltyLevel}),
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   Future<int?> adminAddPenaltyDays(int? floorId, int penaltyDays) async {
-    return (await dio.post("$_BASE_URL/penalty/$floorId",
-            data: jsonEncode({"days": penaltyDays}),
-            options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/penalty/$floorId",
+        method: "POST",
+        data: jsonEncode({"days": penaltyDays}),
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   Future<int?> adminModifyDivision(
       int id, String? name, String? description, List<int>? pinned) async {
-    return (await dio.put("$_BASE_URL/divisions/$id",
-            data: jsonEncode({
-              if (name != null) "name": name,
-              if (description != null) "description": description,
-              if (pinned != null) "pinned": pinned,
-            }),
-            options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/divisions/$id",
+        method: "PUT",
+        data: jsonEncode({
+          if (name != null) "name": name,
+          if (description != null) "description": description,
+          if (pinned != null) "pinned": pinned,
+        }),
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   Future<int?> adminAddSpecialTag(String tag, int? floorId) async {
-    return (await dio.put("$_BASE_URL/floors/$floorId",
-            data: {
-              "special_tag": tag,
-            },
-            options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors/$floorId",
+        method: "PUT",
+        data: {
+          "special_tag": tag,
+        },
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   Future<int?> adminUpdateTagAndDivision(
       List<OTTag> tag, int? holeId, int? divisionId) async {
-    return (await dio.put("$_BASE_URL/holes/$holeId",
-            data: {"tags": tag, "division_id": divisionId},
-            options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/holes/$holeId",
+        method: "PUT",
+        data: {"tags": tag, "division_id": divisionId},
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   Future<int?> adminFoldFloor(List<String> fold, int? floorId) async {
-    return (await dio.put("$_BASE_URL/floors/$floorId",
-            data: {"fold": fold}, options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors/$floorId",
+        method: "PUT",
+        data: {"fold": fold},
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   Future<int?> adminChangePassword(String email, String password) async {
-    return (await dio.patch("$_BASE_URL/register",
-            data: {"email": email, "password": password},
-            options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/register",
+        method: "PATCH",
+        data: {"email": email, "password": password},
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   Future<int?> adminSendMessage(String message, List<int> ids) async {
-    return (await dio.post("$_BASE_URL/messages",
-            data: {"description": message, "recipients": ids},
-            options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/messages",
+        method: "POST",
+        data: {"description": message, "recipients": ids},
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   Future<int?> adminSetReportDealt(int reportId) async {
-    return (await dio.delete("$_BASE_URL/reports/$reportId",
-            options: Options(headers: _tokenHeader)))
-        .statusCode;
+    final options = RequestOptions(
+        path: "$_BASE_URL/reports/$reportId",
+        method: "DELETE",
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
   Future<List<String>?> adminGetPunishmentHistory(int floorId) async {
-    final Response<List<dynamic>> response = await dio.get(
-        "$_BASE_URL/floors/$floorId/punishment",
-        options: Options(headers: _tokenHeader));
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors/$floorId/punishment",
+        method: "GET",
+        headers: _tokenHeader);
+    final Response<List<dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.data?.map((e) => e as String).toList();
   }
 
@@ -836,33 +973,46 @@ class ForumRepository extends BaseRepositoryWithDio {
       String token, String id, PushNotificationServiceType service) async {
     if (provider.isUserInitialized) {
       lastUploadToken = token;
-      await dio.put("$_BASE_URL/users/push-tokens",
+      final options = RequestOptions(
+          path: "$_BASE_URL/users/push-tokens",
+          method: "PUT",
           data: {
             "service": service.toStringRepresentation(),
             "device_id": id,
             "token": token,
           },
-          options: Options(headers: _tokenHeader));
+          headers: _tokenHeader);
+      await WebvpnProxy.requestWithProxy(dio, options);
     } else {
       _pushNotificationRegData = PushNotificationRegData(id, token, service);
     }
   }
 
   Future<void> deletePushNotificationToken(String deviceId) async {
-    await dio.delete("$_BASE_URL/users/push-tokens",
-        data: {"device_id": deviceId}, options: Options(headers: _tokenHeader));
+    final options = RequestOptions(
+        path: "$_BASE_URL/users/push-tokens",
+        method: "DELETE",
+        data: {"device_id": deviceId},
+        headers: _tokenHeader);
+    await WebvpnProxy.requestWithProxy(dio, options);
   }
 
   Future<int?> deleteAllPushNotificationToken() async {
-    final resp = await dio.delete("$_BASE_URL/users/push-tokens/_all",
-        options: Options(headers: _tokenHeader));
+    final options = RequestOptions(
+        path: "$_BASE_URL/users/push-tokens/_all",
+        method: "DELETE",
+        headers: _tokenHeader);
+    final resp = await WebvpnProxy.requestWithProxy(dio, options);
     return resp.statusCode;
   }
 
   Future<(List<QuizQuestion>?, int)> getPostRegisterQuestions() async {
-    final Response<Map<String, dynamic>> response = await dio.get(
-        "$_BASE_AUTH_URL/register/questions",
-        options: Options(headers: _tokenHeader));
+    final options = RequestOptions(
+        path: "$_BASE_AUTH_URL/register/questions",
+        method: "GET",
+        headers: _tokenHeader);
+    final Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     final List<QuizQuestion>? questionList = response.data?["questions"]
         .map((e) => QuizQuestion.fromJson(e))
         .toList()
@@ -874,13 +1024,16 @@ class ForumRepository extends BaseRepositoryWithDio {
   // Empty list means all-correct
   Future<List<int>?> submitAnswers(
       List<QuizAnswer> answers, int version) async {
-    final Response<Map<String, dynamic>> response = await dio.post(
-        "$_BASE_AUTH_URL/register/questions/_answer",
+    final options = RequestOptions(
+        path: "$_BASE_AUTH_URL/register/questions/_answer",
+        method: "POST",
         data: {
           "answers": answers.map((e) => e.toJson()).toList(),
           "version": version
         },
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    final Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
 
     if (response.data?["correct"]) {
       provider.token = SettingsProvider.getInstance().forumToken =

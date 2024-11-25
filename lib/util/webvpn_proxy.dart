@@ -102,12 +102,12 @@ class WebvpnProxy {
     }
   }
 
-  static Future<T> requestWithProxy<T>(Dio dio, RequestOptions options) async {
+  static Future<Response<T>> requestWithProxy<T>(Dio dio, RequestOptions options) async {
     // Try direct link once
     if (!directLinkFailed || !SettingsProvider.getInstance().useWebVpn) {
       try {
-        final response = await dio.fetch(options);
-        return jsonDecode(response.data!);
+        final response = await dio.fetch<T>(options);
+        return response;
       } on DioException catch (e) {
         debugPrint(
             "Direct connection failed, trying to connect through proxy: $e");
@@ -137,9 +137,9 @@ class WebvpnProxy {
     await loginWebVpn(dio);
 
     // First attempt
-    Response<dynamic> response = await dio.fetch(options);
+    Response<T> response = await dio.fetch<T>(options);
     if (checkResponse(response)) {
-      return jsonDecode(response.data!);
+      return response;
     }
 
     // Re-login
@@ -147,9 +147,9 @@ class WebvpnProxy {
     await loginWebVpn(dio);
 
     // Second attempt
-    response = await dio.fetch(options);
+    response = await dio.fetch<T>(options);
     if (checkResponse(response)) {
-      return jsonDecode(response.data!);
+      return response;
     }
 
     // All attempts failed
