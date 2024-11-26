@@ -120,8 +120,8 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
   Future<int?> modifyReview(
       int reviewId, CourseReviewEditorText updatedReview) async {
     final options = RequestOptions(
-        path: "$_BASE_URL/reviews/$reviewId",
-        method: "PUT",
+        path: "$_BASE_URL/reviews/$reviewId/_webvpn",
+        method: "PATCH",
         data: {
           'title': updatedReview.title,
           'content': updatedReview.content,

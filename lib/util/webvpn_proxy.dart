@@ -161,12 +161,6 @@ class WebvpnProxy {
       };
     }
 
-    // See: https://github.com/DanXi-Dev/DanXi/issues/362#issuecomment-2267446801
-    if (options.method == "PUT") {
-      options.method = "PATCH";
-      options.path += "/_webvpn";
-    }
-
     // Try logging in first, will return immediately if we've already logged in
     await loginWebvpn(dio);
 

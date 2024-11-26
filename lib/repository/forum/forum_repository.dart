@@ -557,8 +557,8 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   Future<OTUser?> updateUserProfile() async {
     final options = RequestOptions(
-        path: "$_BASE_URL/users/${provider.userInfo!.user_id}",
-        method: "PUT",
+        path: "$_BASE_URL/users/${provider.userInfo!.user_id}/_webvpn",
+        method: "PATCH",
         data: provider.userInfo!.toJson(),
         headers: _tokenHeader);
     final Response<Map<String, dynamic>> response =
@@ -605,8 +605,8 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   Future<void> clearMessages() async {
     final options = RequestOptions(
-        path: "$_BASE_URL/messages",
-        method: "PUT",
+        path: "$_BASE_URL/messages/_webvpn",
+        method: "PATCH",
         data: {
           "clear_all": true,
         },
@@ -751,8 +751,8 @@ class ForumRepository extends BaseRepositoryWithDio {
   /// Modify a floor
   Future<int?> modifyFloor(String content, int? floorId) async {
     final options = RequestOptions(
-        path: "$_BASE_URL/floors/$floorId",
-        method: "PUT",
+        path: "$_BASE_URL/floors/$floorId/_webvpn",
+        method: "PATCH",
         data: {
           "content": content,
           //"mention": findMention(content),
@@ -814,8 +814,8 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   Future<int?> adminSetAuditFloor(int floorId, bool isActualSensitive) async {
     final options = RequestOptions(
-        path: "$_BASE_URL/floors/$floorId/_sensitive",
-        method: "PUT",
+        path: "$_BASE_URL/floors/$floorId/_sensitive/_webvpn",
+        method: "PATCH",
         data: {"is_actual_sensitive": isActualSensitive},
         headers: _tokenHeader);
     return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
@@ -853,8 +853,8 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   Future<int?> adminLockHole(int? holeId, bool lock) async {
     final options = RequestOptions(
-        path: "$_BASE_URL/holes/$holeId",
-        method: "PUT",
+        path: "$_BASE_URL/holes/$holeId/_webvpn",
+        method: "PATCH",
         data: {"lock": lock},
         headers: _tokenHeader);
     return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
@@ -862,8 +862,8 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   Future<int?> adminUndeleteHole(int? holeId) async {
     final options = RequestOptions(
-        path: "$_BASE_URL/holes/$holeId",
-        method: "PUT",
+        path: "$_BASE_URL/holes/$holeId/_webvpn",
+        method: "PATCH",
         data: {"unhidden": true},
         headers: _tokenHeader);
     return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
@@ -891,8 +891,8 @@ class ForumRepository extends BaseRepositoryWithDio {
   Future<int?> adminModifyDivision(
       int id, String? name, String? description, List<int>? pinned) async {
     final options = RequestOptions(
-        path: "$_BASE_URL/divisions/$id",
-        method: "PUT",
+        path: "$_BASE_URL/divisions/$id/_webvpn",
+        method: "PATCH",
         data: jsonEncode({
           if (name != null) "name": name,
           if (description != null) "description": description,
@@ -904,8 +904,8 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   Future<int?> adminAddSpecialTag(String tag, int? floorId) async {
     final options = RequestOptions(
-        path: "$_BASE_URL/floors/$floorId",
-        method: "PUT",
+        path: "$_BASE_URL/floors/$floorId/_webvpn",
+        method: "PATCH",
         data: {
           "special_tag": tag,
         },
@@ -916,8 +916,8 @@ class ForumRepository extends BaseRepositoryWithDio {
   Future<int?> adminUpdateTagAndDivision(
       List<OTTag> tag, int? holeId, int? divisionId) async {
     final options = RequestOptions(
-        path: "$_BASE_URL/holes/$holeId",
-        method: "PUT",
+        path: "$_BASE_URL/holes/$holeId/_webvpn",
+        method: "PATCH",
         data: {"tags": tag, "division_id": divisionId},
         headers: _tokenHeader);
     return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
@@ -925,8 +925,8 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   Future<int?> adminFoldFloor(List<String> fold, int? floorId) async {
     final options = RequestOptions(
-        path: "$_BASE_URL/floors/$floorId",
-        method: "PUT",
+        path: "$_BASE_URL/floors/$floorId/_webvpn",
+        method: "PATCH",
         data: {"fold": fold},
         headers: _tokenHeader);
     return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
@@ -974,8 +974,8 @@ class ForumRepository extends BaseRepositoryWithDio {
     if (provider.isUserInitialized) {
       lastUploadToken = token;
       final options = RequestOptions(
-          path: "$_BASE_URL/users/push-tokens",
-          method: "PUT",
+          path: "$_BASE_URL/users/push-tokens/_webvpn",
+          method: "PATCH",
           data: {
             "service": service.toStringRepresentation(),
             "device_id": id,
