@@ -20,7 +20,7 @@ import 'dart:io';
 // ignore: implementation_imports
 import 'package:cookie_jar/cookie_jar.dart';
 // ignore: implementation_imports
-import 'package:dan_xi/repository/independent_cookie_jar.dart';
+import 'package:dan_xi/repository/cookie/independent_cookie_jar.dart';
 
 /// A copy of [DefaultCookieJar], but denies any writing, to avoid being modified or overwritten by mistake. 
 /// Cookies could only be copied from another cookie jar. 

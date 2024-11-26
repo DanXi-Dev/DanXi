@@ -1,8 +1,8 @@
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
-import 'package:dan_xi/repository/independent_cookie_jar.dart';
-import 'package:dan_xi/repository/readonly_cookie_jar.dart';
+import 'package:dan_xi/repository/cookie/independent_cookie_jar.dart';
+import 'package:dan_xi/repository/cookie/readonly_cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
