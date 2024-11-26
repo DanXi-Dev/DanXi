@@ -237,8 +237,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
         "https://github.com/50431040/device_identity"),
     LicenseItem("tutorial_coach_mark", LICENSE_MIT,
         "https://github.com/RafaelBarbosatec/tutorial_coach_mark"),
-    LicenseItem("toml", LICENSE_MIT,
-        "https://github.com/just95/toml.dart"),
+    LicenseItem("toml", LICENSE_MIT, "https://github.com/just95/toml.dart"),
     LicenseItem("pub_semver", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/dart-lang/pub_semver"),
   ];
@@ -501,18 +500,18 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                   S.of(context).proxy_setting_unset),
                           leading: const Icon(Icons.network_ping),
                           onTap: () async {
-                            String? email = await Noticing.showInputDialog(
+                            String? addr = await Noticing.showInputDialog(
                                 context,
                                 S.of(context).proxy_setting_input_title,
                                 initialText:
                                     context.read<SettingsProvider>().proxy,
                                 hintText:
                                     S.of(context).proxy_setting_input_hint);
-                            if (!context.mounted || email == null) {
+                            if (!context.mounted || addr == null) {
                               return; // return if cancelled
                             }
-                            if (email.isEmpty) email = null;
-                            context.read<SettingsProvider>().proxy = email;
+                            if (addr.isEmpty) addr = null;
+                            context.read<SettingsProvider>().proxy = addr;
                             await Noticing.showNotice(context,
                                 S.of(context).proxy_setting_set_successfully);
                           },
@@ -531,6 +530,17 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                 .read<SettingsProvider>()
                                 .hiddenNotifications = [],
                           ),
+                        SwitchListTile.adaptive(
+                            title: Text(S.of(context).use_webvpn_title),
+                            secondary: const Icon(Icons.network_cell),
+                            subtitle: Text(
+                                S.of(context).use_webvpn_description),
+                            value: context.select<SettingsProvider, bool>(
+                                (s) => s.useWebvpn),
+                            onChanged: (bool value) async {
+                              context.read<SettingsProvider>().useWebvpn =
+                                  value;
+                            })
                       ],
                     ),
                   ),

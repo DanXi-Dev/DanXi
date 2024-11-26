@@ -1,14 +1,15 @@
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/repository/independent_cookie_jar.dart';
+import 'package:dan_xi/repository/readonly_cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
-class WebvpnLoginException implements Exception {
+class WebvpnRequestException implements Exception {
   final String? message;
 
-  WebvpnLoginException([this.message]);
+  WebvpnRequestException([this.message]);
 
   @override
   String toString() {
@@ -22,6 +23,9 @@ class WebvpnProxy {
   static Future<void>? loginSession;
   static bool isLoggedIn = false;
   static bool directLinkFailed = false;
+
+  // Cookies related with webvpn
+  static final ReadonlyCookieJar webvpnCookieJar = ReadonlyCookieJar();
 
   static const String WEBVPN_LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fwebvpn.fudan.edu.cn%2Flogin%3Fcas_login%3Dtrue";
@@ -38,6 +42,8 @@ class WebvpnProxy {
     "image.fduhole.com":
         "https://webvpn.fudan.edu.cn/https/77726476706e69737468656265737421f9fa409b227e6e546b0086a09d1b203ab8"
   };
+
+  static PersonInfo? _personInfo;
 
   static String getWebvpnUri(String uri) {
     Uri? u = Uri.tryParse(uri);
@@ -77,7 +83,10 @@ class WebvpnProxy {
     return true;
   }
 
-  /// Guard after
+  static void initPerson(PersonInfo? personInfo) async {
+    _personInfo = personInfo;
+  }
+
   static Future<void> loginWebvpn(Dio dio) async {
     if (!isLoggedIn) {
       // Another concurrent task is running
@@ -87,28 +96,35 @@ class WebvpnProxy {
       }
 
       debugPrint("Logging into WebVPN");
+
+      // Temporary cookie jar
+      IndependentCookieJar workJar = IndependentCookieJar();
       loginSession = UISLoginTool.loginUIS(
           dio,
-          WebvpnProxy.WEBVPN_LOGIN_URL,
-          BaseRepositoryWithDio.webvpnCookieJar,
-          StateProvider.personInfo.value);
+          WEBVPN_LOGIN_URL,
+          workJar,
+          _personInfo);
       await loginSession;
+
+      // Clone from temp jar to our dedicated webvpn jar
+      webvpnCookieJar.cloneFrom(workJar);
       loginSession = null;
       isLoggedIn = true;
     }
   }
 
   static Future<Response<T>> requestWithProxy<T>(Dio dio, RequestOptions options) async {
-    // Try direct link once
-    if (!directLinkFailed || !SettingsProvider.getInstance().useWebvpn) {
+    // If we haven't tried direct link, or webvpn is not enabled in settings, or UIS isn't logged in,
+    // we should try to request directly. 
+    if (!directLinkFailed || !SettingsProvider.getInstance().useWebvpn || _personInfo == null) {
       try {
         final response = await dio.fetch<T>(options);
         return response;
       } on DioException catch (e) {
         debugPrint(
             "Direct connection failed, trying to connect through proxy: $e");
-        // Throw immediately if `useProxy` is false
-        if (!SettingsProvider.getInstance().useWebvpn) {
+        // Do not continue to try with WebVPN if webvpn isn't enabled or UIS isn't logged in
+        if (!SettingsProvider.getInstance().useWebvpn || _personInfo == null) {
           rethrow;
         }
       } catch (e) {
@@ -155,6 +171,6 @@ class WebvpnProxy {
     }
 
     // All attempts failed
-    throw WebvpnLoginException(options.method);
+    throw WebvpnRequestException("Request through WebVPN failed after two attempts to login and request");
   }
 }

@@ -19,7 +19,6 @@ import 'dart:io';
 
 import 'package:dan_xi/model/forum/jwt.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
-import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dio/dio.dart';
@@ -39,7 +38,7 @@ class JWTInterceptor extends QueuedInterceptor {
 
   JWTInterceptor(this.refreshUrl, this.tokenGetter, [this.tokenSetter]) {
     /// Add global cookies, since to make [_dio] compatible with webvpn
-    _dio.interceptors.add(CookieManager(BaseRepositoryWithDio.webvpnCookieJar));
+    _dio.interceptors.add(CookieManager(WebvpnProxy.webvpnCookieJar));
   }
 
   static _rewriteRequestOptionsWithToken(

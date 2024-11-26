@@ -45,6 +45,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
+import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dan_xi/widget/dialogs/login_dialog.dart';
 import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
 import 'package:dan_xi/widget/forum/post_render.dart';
@@ -629,6 +630,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       LoginDialog.showLoginDialog(
           context, preferences, StateProvider.personInfo, false);
     }
+
+    // Forward the person info to webvpn services
+    WebvpnProxy.initPerson(StateProvider.personInfo.value);
   }
 
   /// Show an empty container, if no person info is set.

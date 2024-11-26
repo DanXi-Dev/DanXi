@@ -227,7 +227,7 @@
   "koowz_description": "Danta Developer",
   "lan_connection_issue_1": "Failed to connect to the Campus Intranet",
   "lan_connection_issue_1_action": "Campus VPN",
-  "lan_connection_issue_1_description": "Unable to connect to the Fudan Campus Intranet, some features will not be available.\n\nYou can use the campus VPN (Easy Connect) to access the Campus Intranet.",
+  "lan_connection_issue_1_description": "Unable to connect to the Fudan Campus Intranet, some features may not be available. However, if you have `Use WebVPN` enabled, you may still access those feature directly. \n\nIf this doesn't work, you may have to use the campus VPN (Easy Connect) to access the Campus Intranet.",
   "lan_connection_issue_1_guide_content": "3 simple steps:\n\n1. [Click here](https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common) to download the app.\n2. Open the installed app and type in the Address stuvpn.fudan.edu.cn\n3. Enter your UIS account & password.\n\nThen all features of Danta will work normally.",
   "lan_connection_issue_1_guide_title": "How to use the VPN？",
   "last_15_days": "Last 15 days",
@@ -540,5 +540,7 @@
   "proxy_setting_unset": "Not Set",
   "proxy_setting_input_title": "Input HTTP Proxy",
   "proxy_setting_input_hint": "e.g. 127.0.0.1:1234 (Leave blank to disable)",
-  "proxy_setting_set_successfully": "Proxy settings saved, restart the app to take effect."
+  "proxy_setting_set_successfully": "Proxy settings saved, restart the app to take effect.",
+  "use_webvpn_title": "Use WebVPN proxy",
+  "use_webvpn_description": "When enabled, certain functions could be accessed directly without Fudan LAN (restart required)"
 }

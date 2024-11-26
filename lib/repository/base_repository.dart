@@ -15,17 +15,14 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/repository/independent_cookie_jar.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
+import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dio/dio.dart';
 import 'package:dio5_log/interceptor/diox_log_interceptor.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -55,9 +52,9 @@ abstract class BaseRepositoryWithDio {
       _dios[linkHost]!.interceptors.add(LimitedQueuedInterceptor.getInstance());
       _dios[linkHost]!.interceptors.add(UserAgentInterceptor(
           userAgent: SettingsProvider.getInstance().customUserAgent));
-      // _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
-      if (isWebvpnApplicable) {
-        _dios[linkHost]!.interceptors.add(CookieManager(webvpnCookieJar));
+      _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
+      if (isWebvpnApplicable && SettingsProvider.getInstance().useWebvpn) {
+        _dios[linkHost]!.interceptors.add(CookieManager(WebvpnProxy.webvpnCookieJar));
       }
       DioLogInterceptor.enablePrintLog = false;
       _dios[linkHost]!.interceptors.add(DioLogInterceptor());
@@ -79,8 +76,6 @@ abstract class BaseRepositoryWithDio {
     }
   }
 
-  // Cookies related with webvpn
-  static final IndependentCookieJar webvpnCookieJar = IndependentCookieJar();
   static final Map<String, IndependentCookieJar> _cookieJars = {};
   static final Map<String, Dio> _dios = {};
 }
