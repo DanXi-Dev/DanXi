@@ -169,4 +169,7 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
 
   @override
   String get linkHost => 'danke.fduhole.com';
+
+  @override
+  bool get isWebvpnApplicable => true;
 }

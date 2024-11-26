@@ -741,14 +741,14 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  bool get useWebVpn{
+  bool get useWebvpn{
     if (preferences!.containsKey(KEY_USE_WEBVPN)) {
       return preferences!.getBool(KEY_USE_WEBVPN)!;
     }
     return true;
   }
 
-  set useWebVpn(bool value){
+  set useWebvpn(bool value){
     preferences!.setBool(KEY_USE_WEBVPN, value);
     notifyListeners();
   }

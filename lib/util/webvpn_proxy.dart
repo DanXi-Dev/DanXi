@@ -1,18 +1,14 @@
-import 'dart:io';
-import 'dart:convert';
-
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:mutex/mutex.dart';
 
-class WebVpnLoginException implements Exception {
+class WebvpnLoginException implements Exception {
   final String? message;
 
-  WebVpnLoginException([this.message]);
+  WebvpnLoginException([this.message]);
 
   @override
   String toString() {
@@ -43,7 +39,7 @@ class WebvpnProxy {
         "https://webvpn.fudan.edu.cn/https/77726476706e69737468656265737421f9fa409b227e6e546b0086a09d1b203ab8"
   };
 
-  static String getWebVpnUri(String uri) {
+  static String getWebvpnUri(String uri) {
     Uri? u = Uri.tryParse(uri);
     if (u == null) {
       return uri;
@@ -82,7 +78,7 @@ class WebvpnProxy {
   }
 
   /// Guard after
-  static Future<void> loginWebVpn(Dio dio) async {
+  static Future<void> loginWebvpn(Dio dio) async {
     if (!isLoggedIn) {
       // Another concurrent task is running
       if (loginSession != null) {
@@ -94,7 +90,7 @@ class WebvpnProxy {
       loginSession = UISLoginTool.loginUIS(
           dio,
           WebvpnProxy.WEBVPN_LOGIN_URL,
-          BaseRepositoryWithDio.globalCookieJar,
+          BaseRepositoryWithDio.webvpnCookieJar,
           StateProvider.personInfo.value);
       await loginSession;
       loginSession = null;
@@ -104,7 +100,7 @@ class WebvpnProxy {
 
   static Future<Response<T>> requestWithProxy<T>(Dio dio, RequestOptions options) async {
     // Try direct link once
-    if (!directLinkFailed || !SettingsProvider.getInstance().useWebVpn) {
+    if (!directLinkFailed || !SettingsProvider.getInstance().useWebvpn) {
       try {
         final response = await dio.fetch<T>(options);
         return response;
@@ -112,7 +108,7 @@ class WebvpnProxy {
         debugPrint(
             "Direct connection failed, trying to connect through proxy: $e");
         // Throw immediately if `useProxy` is false
-        if (!SettingsProvider.getInstance().useWebVpn) {
+        if (!SettingsProvider.getInstance().useWebvpn) {
           rethrow;
         }
       } catch (e) {
@@ -124,7 +120,7 @@ class WebvpnProxy {
     // Turn to the proxy
     directLinkFailed = true;
     // Replace path with translated path
-    options.path = WebvpnProxy.getWebVpnUri(options.path);
+    options.path = WebvpnProxy.getWebvpnUri(options.path);
 
     // Protect `POST` against 302 exceptions
     if (options.method == "POST") {
@@ -133,8 +129,14 @@ class WebvpnProxy {
       };
     }
 
+    // See: https://github.com/DanXi-Dev/DanXi/issues/362#issuecomment-2267446801
+    if (options.method == "PUT"){
+      options.method = "PATCH";
+      options.path += "/_webvpn";
+    }
+
     // Try logging in first, will return immediately if we've already logged in
-    await loginWebVpn(dio);
+    await loginWebvpn(dio);
 
     // First attempt
     Response<T> response = await dio.fetch<T>(options);
@@ -144,7 +146,7 @@ class WebvpnProxy {
 
     // Re-login
     isLoggedIn = false;
-    await loginWebVpn(dio);
+    await loginWebvpn(dio);
 
     // Second attempt
     response = await dio.fetch<T>(options);
@@ -153,6 +155,6 @@ class WebvpnProxy {
     }
 
     // All attempts failed
-    throw WebVpnLoginException(options.method);
+    throw WebvpnLoginException(options.method);
   }
 }

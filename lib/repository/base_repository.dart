@@ -40,6 +40,9 @@ abstract class BaseRepositoryWithDio {
   /// the cookies which can be shared among multiple domains should come with the same [linkHost].
   String get linkHost;
 
+  /// Whether or not this repository may require webvpn to be accessed
+  bool get isWebvpnApplicable => false;
+
   @protected
   Dio get dio {
     if (!_dios.containsKey(linkHost)) {
@@ -53,8 +56,9 @@ abstract class BaseRepositoryWithDio {
       _dios[linkHost]!.interceptors.add(UserAgentInterceptor(
           userAgent: SettingsProvider.getInstance().customUserAgent));
       // _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
-      // Cookies related with webvpn
-      _dios[linkHost]!.interceptors.add(CookieManager(globalCookieJar));
+      if (isWebvpnApplicable) {
+        _dios[linkHost]!.interceptors.add(CookieManager(webvpnCookieJar));
+      }
       DioLogInterceptor.enablePrintLog = false;
       _dios[linkHost]!.interceptors.add(DioLogInterceptor());
     }
@@ -75,7 +79,8 @@ abstract class BaseRepositoryWithDio {
     }
   }
 
-  static final IndependentCookieJar globalCookieJar = IndependentCookieJar();
+  // Cookies related with webvpn
+  static final IndependentCookieJar webvpnCookieJar = IndependentCookieJar();
   static final Map<String, IndependentCookieJar> _cookieJars = {};
   static final Map<String, Dio> _dios = {};
 }

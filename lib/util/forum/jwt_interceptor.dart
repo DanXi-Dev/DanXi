@@ -38,8 +38,8 @@ class JWTInterceptor extends QueuedInterceptor {
   final Function? tokenSetter;
 
   JWTInterceptor(this.refreshUrl, this.tokenGetter, [this.tokenSetter]) {
-    // Add global cookies, since to make [_dio] compatible with webvpn
-    _dio.interceptors.add(CookieManager(BaseRepositoryWithDio.globalCookieJar));
+    /// Add global cookies, since to make [_dio] compatible with webvpn
+    _dio.interceptors.add(CookieManager(BaseRepositoryWithDio.webvpnCookieJar));
   }
 
   static _rewriteRequestOptionsWithToken(

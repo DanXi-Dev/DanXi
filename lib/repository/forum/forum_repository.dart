@@ -1046,6 +1046,9 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   @override
   String get linkHost => "api.fduhole.com";
+
+  @override
+  bool get isWebvpnApplicable => true;
 }
 
 enum PushNotificationServiceType { APNS, MIPUSH }
