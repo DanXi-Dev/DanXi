@@ -45,6 +45,9 @@ class WebvpnProxy {
 
   static PersonInfo? _personInfo;
 
+  /// Keep track with the previous listener added so that it won't be lost
+  static VoidCallback? _prevListener;
+
   static String getWebvpnUri(String uri) {
     Uri? u = Uri.tryParse(uri);
     if (u == null) {
@@ -83,8 +86,21 @@ class WebvpnProxy {
     return true;
   }
 
-  static void initPerson(PersonInfo? personInfo) async {
-    _personInfo = personInfo;
+  /// Bind WebVPN proxy to a person info so that it updates automatically when [personInfo] changes.
+  /// If you want to unbind, call this function with set [unbind] set to true.
+  static void bindPersonInfo(ValueNotifier<PersonInfo?> personInfo) async {
+    // Remove any previously added listener to avoid having more than one listener at a time
+    if (_prevListener != null) {
+      personInfo.removeListener(_prevListener!);
+    }
+
+    // Listener that enforces webvpn to re-login when UIS info changes
+    _prevListener = () {
+      isLoggedIn = false;
+      _personInfo = personInfo.value;
+    };
+
+    personInfo.addListener(_prevListener!);
   }
 
   static Future<void> loginWebvpn(Dio dio) async {
@@ -99,11 +115,8 @@ class WebvpnProxy {
 
       // Temporary cookie jar
       IndependentCookieJar workJar = IndependentCookieJar();
-      loginSession = UISLoginTool.loginUIS(
-          dio,
-          WEBVPN_LOGIN_URL,
-          workJar,
-          _personInfo);
+      loginSession =
+          UISLoginTool.loginUIS(dio, WEBVPN_LOGIN_URL, workJar, _personInfo);
       await loginSession;
 
       // Clone from temp jar to our dedicated webvpn jar
@@ -113,10 +126,13 @@ class WebvpnProxy {
     }
   }
 
-  static Future<Response<T>> requestWithProxy<T>(Dio dio, RequestOptions options) async {
+  static Future<Response<T>> requestWithProxy<T>(
+      Dio dio, RequestOptions options) async {
     // If we haven't tried direct link, or webvpn is not enabled in settings, or UIS isn't logged in,
-    // we should try to request directly. 
-    if (!directLinkFailed || !SettingsProvider.getInstance().useWebvpn || _personInfo == null) {
+    // we should try to request directly.
+    if (!directLinkFailed ||
+        !SettingsProvider.getInstance().useWebvpn ||
+        _personInfo == null) {
       try {
         final response = await dio.fetch<T>(options);
         return response;
@@ -146,7 +162,7 @@ class WebvpnProxy {
     }
 
     // See: https://github.com/DanXi-Dev/DanXi/issues/362#issuecomment-2267446801
-    if (options.method == "PUT"){
+    if (options.method == "PUT") {
       options.method = "PATCH";
       options.path += "/_webvpn";
     }
@@ -171,6 +187,7 @@ class WebvpnProxy {
     }
 
     // All attempts failed
-    throw WebvpnRequestException("Request through WebVPN failed after two attempts to login and request");
+    throw WebvpnRequestException(
+        "Request through WebVPN failed after two attempts to login and request");
   }
 }

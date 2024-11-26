@@ -620,6 +620,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ///
   /// If user hasn't logged in before, request him to do so.
   void _loadPersonInfoOrLogin() {
+    /// Register person info at [WebvpnProxy] to enable webvpn services to use it
+    WebvpnProxy.bindPersonInfo(StateProvider.personInfo);
+
     var preferences = SettingsProvider.getInstance().preferences;
 
     if (PersonInfo.verifySharedPreferences(preferences!)) {
@@ -630,9 +633,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       LoginDialog.showLoginDialog(
           context, preferences, StateProvider.personInfo, false);
     }
-
-    // Forward the person info to webvpn services
-    WebvpnProxy.initPerson(StateProvider.personInfo.value);
   }
 
   /// Show an empty container, if no person info is set.
