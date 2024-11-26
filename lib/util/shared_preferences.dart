@@ -15,6 +15,8 @@
  *     along with thFlutterSecureStorageis program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:encrypt/encrypt.dart';
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -67,7 +69,7 @@ class XSharedPreferences {
       }
       String key = (await _instance!._keyStore.read(key: KEY_CIPHER))!;
       // initialize the encrypted preferences.
-      await EncryptedSharedPreferences.initialize(key);
+      await EncryptedSharedPreferences.initialize(key, encryptor: LegacyAESEncryptor());
       _instance!._preferences = EncryptedSharedPreferences.getInstance();
       // migrate the data from [SharedPreferences] to [EncryptedSharedPreferences]
       // if the data has not been flagged as migrated.
@@ -101,7 +103,7 @@ class XSharedPreferences {
 
   Future<bool> remove(String key) => _preferences.remove(key);
 
-  Future<Set<String>> getKeys() => _preferences.getKeys();
+  FutureOr<Set<String>> getKeys() => _preferences.getKeys();
 
   Future<bool> setString(String dataKey, String? dataValue) =>
       _preferences.setString(dataKey, dataValue);
@@ -139,5 +141,34 @@ class XSharedPreferences {
     } catch (_) {
       return false;
     }
+  }
+}
+
+
+/// @w568w (2024-11-26):
+/// encrypt_shared_preferences quietly changed the default AES Encryptor to use SIC mode from CBC mode.
+/// This is obviously a breaking change, but it is mentioned nowhere in the changelog. Average noob developer.
+///
+/// So this class is an implementation of the legacy AES Encryptor.
+class LegacyAESEncryptor extends IEncryptor{
+  @override
+  String encrypt(String key, String plainText) {
+    assert(key.length == 16);
+    final cipherKey = Key.fromUtf8(key);
+    final encryptService = Encrypter(AES(cipherKey, mode: AESMode.cbc));
+    final initVector = IV.fromUtf8(key);
+
+    Encrypted encryptedData = encryptService.encrypt(plainText, iv: initVector);
+    return encryptedData.base64;
+  }
+
+  @override
+  String decrypt(String key, String encryptedData) {
+    assert(key.length == 16);
+    final cipherKey = Key.fromUtf8(key);
+    final encryptService = Encrypter(AES(cipherKey, mode: AESMode.cbc));
+    final initVector = IV.fromUtf8(key);
+
+    return encryptService.decrypt(Encrypted.fromBase64(encryptedData), iv: initVector);
   }
 }
