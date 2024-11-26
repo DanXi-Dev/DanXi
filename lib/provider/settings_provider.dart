@@ -84,6 +84,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_IMAGE_BASE_URL = "image_base_url";
   static const String KEY_DANKE_BASE_URL = "danke_base_url";
   static const String KEY_PROXY = "proxy";
+  static const String KEY_TIMETABLE_LAST_UPDATED = "timetable_last_updated";
 
   SettingsProvider._();
 
@@ -93,6 +94,22 @@ class SettingsProvider with ChangeNotifier {
   /// of widget tree.
   /// If you need to get access to a [SettingsProvider], call [context.read<SettingsProvider>()] instead.
   factory SettingsProvider.getInstance() => _instance;
+
+  String? get timetableLastUpdated {
+    if (preferences!.containsKey(KEY_TIMETABLE_LAST_UPDATED)) {
+      return preferences!.getString(KEY_TIMETABLE_LAST_UPDATED);
+    }
+    return null;
+  }
+
+  set timetableLastUpdated(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_TIMETABLE_LAST_UPDATED, value);
+    } else {
+      preferences!.remove(KEY_TIMETABLE_LAST_UPDATED);
+    }
+    notifyListeners();
+  }
 
   String? get proxy {
     if (preferences!.containsKey(KEY_PROXY)) {

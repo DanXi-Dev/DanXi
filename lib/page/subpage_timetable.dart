@@ -503,6 +503,9 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   }
 
   Widget _buildPage(TimeTable table) {
+    String? timetableLastUpdated = SettingsProvider.getInstance().timetableLastUpdated;
+    DateTime? lastUpdatedTime = timetableLastUpdated != null ? DateTime.tryParse(timetableLastUpdated) : null;
+
     const TimetableStyle style = TimetableStyle();
     _table = table;
     _showingTime ??= _table!.now();
@@ -553,6 +556,13 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
             _showingTime!.week,
             tapCallback: _onTapCourse,
           ),
+          SizedBox(height: 10,),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(S.of(context).timetable_last_updated),
+            lastUpdatedTime == null
+                ? Text(S.of(context).timetable_no_last_updated)
+                : Text(DateFormat("yyyy-MM-dd HH:mm").format(lastUpdatedTime))
+          ]),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text(S.of(context).semester_start_date),
             StartDateSelectionButton(

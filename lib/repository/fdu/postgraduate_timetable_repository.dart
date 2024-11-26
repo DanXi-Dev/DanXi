@@ -107,12 +107,14 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
       {DateTime? startTime, bool forceLoadFromRemote = false}) {
     startTime ??= TimeTable.defaultStartTime;
     if (forceLoadFromRemote) {
-      return Cache.getRemotely<TimeTable>(
+      Future<TimeTable?> result = Cache.getRemotely<TimeTable>(
           TimeTableRepository.KEY_TIMETABLE_CACHE,
           () async => (await loadTimeTableRemotely(info, callback,
               startTime: startTime))!,
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
+      SettingsProvider.getInstance().timetableLastUpdated = DateTime.now().toIso8601String();
+      return result;
     } else {
       return Cache.get<TimeTable>(
           TimeTableRepository.KEY_TIMETABLE_CACHE,
