@@ -101,7 +101,14 @@ class XSharedPreferences {
 
   // Proxy methods for [EncryptedSharedPreferences]
 
-  Future<bool> clear() => _preferences.clear();
+  Future<bool> clear() async {
+    bool success = await _preferences.clear();
+    if (success) {
+      // mark the data as migrated after clearing. Or the data written after clearing will be re-migrated.
+      await _instance!.setBool(KEY_MIGRATED, true);
+    }
+    return success;
+  }
 
   Future<bool> remove(String key) => _preferences.remove(key);
 
