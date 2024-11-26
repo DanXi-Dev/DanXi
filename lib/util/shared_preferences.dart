@@ -37,7 +37,9 @@ class XSharedPreferences {
   final FlutterSecureStorage _keyStore;
   late final EncryptedSharedPreferences _preferences;
 
-  XSharedPreferences._() : _keyStore = const FlutterSecureStorage();
+  XSharedPreferences._() : _keyStore = const FlutterSecureStorage(
+    wOptions: WindowsOptions(useBackwardCompatibility: true),
+  );
 
   static XSharedPreferences? _instance;
 
