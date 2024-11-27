@@ -85,6 +85,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_DANKE_BASE_URL = "danke_base_url";
   static const String KEY_PROXY = "proxy";
   static const String KEY_TIMETABLE_LAST_UPDATED = "timetable_last_updated";
+  static const String KEY_USE_WEBVPN = "use_webvpn";
 
   SettingsProvider._();
 
@@ -757,6 +758,18 @@ class SettingsProvider with ChangeNotifier {
 
   set isMarkdownRenderingEnabled(bool value) {
     preferences!.setBool(KEY_MARKDOWN_ENABLED, value);
+    notifyListeners();
+  }
+
+  bool get useWebvpn{
+    if (preferences!.containsKey(KEY_USE_WEBVPN)) {
+      return preferences!.getBool(KEY_USE_WEBVPN)!;
+    }
+    return true;
+  }
+
+  set useWebvpn(bool value){
+    preferences!.setBool(KEY_USE_WEBVPN, value);
     notifyListeners();
   }
 }
