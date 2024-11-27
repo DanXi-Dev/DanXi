@@ -46,6 +46,7 @@ import 'package:dan_xi/widget/forum/ottag_selector.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
@@ -135,8 +136,7 @@ class OTEditor {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
     try {
-      await ForumRepository.getInstance()
-          .newFloor(discussionId, content);
+      await ForumRepository.getInstance().newFloor(discussionId, content);
     } catch (e, st) {
       Noticing.showErrorDialog(context, e, trace: st);
       return false;
@@ -283,8 +283,7 @@ class OTEditor {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).uploading_image, context: context);
     try {
-      String? url =
-          await ForumRepository.getInstance().uploadImage(File(file));
+      String? url = await ForumRepository.getInstance().uploadImage(File(file));
       if (url != null) controller.text += "![]($url)";
       // "showAnim: true" makes it crash. Don't know the reason.
       progressDialog.dismiss(showAnim: false);
@@ -327,45 +326,69 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
       GlobalKey<OTTagSelectorState>();
 
   Future<T?> _buildStickersSheet<T>(BuildContext context) {
+    int stickerSheetColumns = 5;
+    int stickerSheetRows =
+        (Stickers.values.length / stickerSheetColumns).ceil();
+
     return showPlatformModalSheet(
         context: context,
         builder: (BuildContext context) {
           final Widget body = Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListTile(
-                        leading: const Icon(Icons.emoji_emotions), title: Text(S.of(context).sticker)),
-                    // const Divider(),
-                    Wrap(
-                      children: Stickers.values
-                          .map((e) => Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 4, horizontal: 4),
-                                child: InkWell(
-                                  onTap: () {
-                                    // insert sticker into the current cursor position
-                                    var cursorPosition =
-                                        widget.controller.selection.base.offset;
-                                    widget.controller.text =
-                                        "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
-                                    // close the modal sheet
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Image.asset(
-                                    getStickerAssetPath(e.name)!,
-                                    width: 60,
-                                    height: 60,
-                                  ),
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                      leading: const Icon(Icons.emoji_emotions),
+                      title: Text(S.of(context).sticker)),
+                  // const Divider(),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: LayoutGrid(
+                          columnSizes: List.filled(stickerSheetColumns, 1.fr),
+                          rowSizes: List.filled(stickerSheetRows, auto),
+                          rowGap: 8,
+                          columnGap: 8,
+                          children: Stickers.values.map((e) {
+                            return SizedBox(
+                              width: 60,
+                              height: 60,
+                              child: InkWell(
+                                onTap: () {
+                                  var cursorPosition =
+                                      widget.controller.selection.base.offset;
+                                  cursorPosition = cursorPosition == -1
+                                      ? widget.controller.text.length
+                                      : cursorPosition;
+                                  widget.controller.text =
+                                      "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
+                                  Navigator.of(context).pop();
+                                },
+                                child: Image.asset(
+                                  getStickerAssetPath(e.name)!,
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.cover,
                                 ),
-                              ))
-                          .toList(),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
                     ),
-                  ]),
-            );
-          return PlatformX.isCupertino(context) ? Card(child: body) : body;
+                  ),
+                ]),
+          );
+          return PlatformX.isCupertino(context)
+              ? ConstrainedBox(
+                  constraints: BoxConstraints(
+                      maxHeight: 0.66 * MediaQuery.of(context).size.height),
+                  child: Card(child: body))
+              : body;
         });
   }
 
@@ -501,29 +524,31 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                   },
                   selector: (_, model) => model.isTagSuggestionEnabled),
             ],
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildIntroButton(
-                    context,
-                    IconFont.markdown,
-                    S.of(context).markdown_enabled,
-                    S.of(context).markdown_description),
-                _buildIntroButton(
-                    context,
-                    IconFont.tex,
-                    S.of(context).latex_enabled,
-                    S.of(context).latex_description),
-                PlatformTextButton(
-                  child: Text(S.of(context).community_convention),
-                  onPressed: () => BrowserUtil.openUrl(
-                      "https://www.fduhole.com/doc", context),
-                ),
-                PlatformTextButton(
-                  child: Text(S.of(context).sticker),
-                  onPressed: () => _buildStickersSheet(context),
-                )
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildIntroButton(
+                      context,
+                      IconFont.markdown,
+                      S.of(context).markdown_enabled,
+                      S.of(context).markdown_description),
+                  _buildIntroButton(
+                      context,
+                      IconFont.tex,
+                      S.of(context).latex_enabled,
+                      S.of(context).latex_description),
+                  PlatformTextButton(
+                    child: Text(S.of(context).community_convention),
+                    onPressed: () => BrowserUtil.openUrl(
+                        "https://www.fduhole.com/doc", context),
+                  ),
+                  PlatformTextButton(
+                    child: Text(S.of(context).sticker),
+                    onPressed: () => _buildStickersSheet(context),
+                  ),
+                ],
+              ),
             ),
             textField,
             const Divider(),
@@ -556,8 +581,7 @@ class TagSuggestionWidget extends StatefulWidget {
 
 Future<List<String>?> getTagSuggestions(String content) async {
   try {
-    return await forumChannel.invokeListMethod(
-        "get_tag_suggestions", content);
+    return await forumChannel.invokeListMethod("get_tag_suggestions", content);
   } on PlatformException catch (_) {
     return null;
   } on MissingPluginException catch (_) {

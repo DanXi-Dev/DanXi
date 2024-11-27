@@ -449,6 +449,8 @@
   "theme_type_system": "跟随系统",
   "timetable": "日程",
   "timetable_refresh_error": "新学期的课表现已可用，但我们无法从复旦服务器下载新的课表。\n\n请确保您已连接到复旦校园内网，然后尝试手动刷新课表。\n\n提示：您可以在“日程”页面下拉刷新课表。",
+  "timetable_last_updated": "最后刷新时间：",
+  "timetable_no_last_updated": "暂无",
   "tip_that_danxi_is_not_fdu": "注意：旦挞账号和复旦大学无关，请不要在这里尝试您的复旦邮箱密码（或「统一身份认证」密码）。",
   "today_course": "今日课程",
   "try_visitor_mode": "不想登录 UIS？您可以仅使用茶楼",

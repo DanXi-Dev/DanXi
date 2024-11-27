@@ -112,15 +112,17 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   }
 
   Future<TimeTable?> loadTimeTable(PersonInfo? info,
-      {DateTime? startTime, bool forceLoadFromRemote = false}) {
+      {DateTime? startTime, bool forceLoadFromRemote = false}) async {
     startTime ??= TimeTable.defaultStartTime;
     if (forceLoadFromRemote) {
-      return Cache.getRemotely<TimeTable>(
+      TimeTable? result = await Cache.getRemotely<TimeTable>(
           KEY_TIMETABLE_CACHE,
           () async =>
               (await loadTimeTableRemotely(info, startTime: startTime))!,
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
+      SettingsProvider.getInstance().timetableLastUpdated = DateTime.now();
+      return result;
     } else {
       return Cache.get<TimeTable>(
           KEY_TIMETABLE_CACHE,

@@ -416,7 +416,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       successBuilder:
           (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) {
         if (snapshot.hasData) {
-          return _buildPage(snapshot.data!);
+          return _buildPage(context, snapshot.data!);
         } else {
           return const CircularProgressIndicator();
         }
@@ -502,7 +502,9 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     );
   }
 
-  Widget _buildPage(TimeTable table) {
+  Widget _buildPage(BuildContext context, TimeTable table) {
+    DateTime? lastUpdatedTime = context.select<SettingsProvider, DateTime?>((value) => value.timetableLastUpdated);
+
     const TimetableStyle style = TimetableStyle();
     _table = table;
     _showingTime ??= _table!.now();
@@ -553,6 +555,13 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
             _showingTime!.week,
             tapCallback: _onTapCourse,
           ),
+          SizedBox(height: 10,),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(S.of(context).timetable_last_updated),
+            lastUpdatedTime == null
+                ? Text(S.of(context).timetable_no_last_updated)
+                : Text(DateFormat("yyyy-MM-dd HH:mm").format(lastUpdatedTime))
+          ]),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text(S.of(context).semester_start_date),
             StartDateSelectionButton(
