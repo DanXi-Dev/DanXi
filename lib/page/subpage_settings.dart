@@ -237,8 +237,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
         "https://github.com/50431040/device_identity"),
     LicenseItem("tutorial_coach_mark", LICENSE_MIT,
         "https://github.com/RafaelBarbosatec/tutorial_coach_mark"),
-    LicenseItem("toml", LICENSE_MIT,
-        "https://github.com/just95/toml.dart"),
+    LicenseItem("toml", LICENSE_MIT, "https://github.com/just95/toml.dart"),
     LicenseItem("pub_semver", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/dart-lang/pub_semver"),
   ];
@@ -252,10 +251,10 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
       await ForumRepository.getInstance().logout();
     } finally {
       progressDialog.dismiss(showAnim: false);
-      SettingsProvider.getInstance()
-          .preferences
-          ?.clear()
-          .then((value) => FlutterApp.restartApp(context));
+      await SettingsProvider.getInstance().preferences?.clear();
+      if (mounted) {
+        FlutterApp.restartApp(context);
+      }
     }
   }
 

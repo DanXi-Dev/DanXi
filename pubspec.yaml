@@ -91,12 +91,9 @@ dependencies:
     git:
       url: https://github.com/w568w/receive_intent.git
 
-  # These two libraries are used to encrypt shared preferences.
-  # They introduced breaking changes in their latest versions,
-  # making them unable to read the old encrypted data.
-  # Therefore, we have to pin them at the these versions.
-  flutter_secure_storage: ^8.0.0
-  encrypt_shared_preferences: ^0.3.5
+  flutter_secure_storage: ^9.0.0
+  encrypt_shared_preferences: ^0.8.1
+  encrypt: any
   device_identity: ^1.0.0
   tutorial_coach_mark: ^1.2.9
   flutter_platform_widgets: ^7.0.0
