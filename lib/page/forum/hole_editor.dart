@@ -349,6 +349,9 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                                     // insert sticker into the current cursor position
                                     var cursorPosition =
                                         widget.controller.selection.base.offset;
+                                    cursorPosition = cursorPosition == -1
+                                        ? widget.controller.text.length
+                                        : cursorPosition;
                                     widget.controller.text =
                                         "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
                                     // close the modal sheet
