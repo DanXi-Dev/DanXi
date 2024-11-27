@@ -32,7 +32,7 @@ import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/forum/clean_mode_filter.dart';
-import 'package:dan_xi/util/io/cache_manager_with_proxy.dart';
+import 'package:dan_xi/util/io/cache_manager_with_webvpn.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -812,7 +812,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                   subtitle: Text(_clearCacheSubtitle ??
                       S.of(context).clear_cache_description),
                   onTap: () async {
-                    await DefaultCacheManagerWithProxy().emptyCache();
+                    await DefaultCacheManagerWithWebvpn().emptyCache();
                     setState(() {
                       _clearCacheSubtitle = S.of(context).cache_cleared;
                     });
