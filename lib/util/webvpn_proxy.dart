@@ -20,7 +20,7 @@ class WebvpnRequestException implements Exception {
 }
 
 class WebvpnProxy {
-  // These async session objects work like a semaphore, which only allow one concurrent action and blocks all other requesters until the action completes
+  // These async session objects work like a mutex with `try_acquire`, which only allow one concurrent action and blocks all other requesters until the action completes
   static Future<void>? loginSession;
   static Future<bool>? tryDirectSession;
 
