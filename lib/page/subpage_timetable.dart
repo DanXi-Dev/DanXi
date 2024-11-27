@@ -503,9 +503,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   }
 
   Widget _buildPage(BuildContext context, TimeTable table) {
-    DateTime? lastUpdatedTime = context.select<SettingsProvider, DateTime?>((value) {
-      return value.timetableLastUpdated;
-    });
+    DateTime? lastUpdatedTime = context.select<SettingsProvider, DateTime?>((value) => value.timetableLastUpdated);
 
     const TimetableStyle style = TimetableStyle();
     _table = table;
