@@ -331,43 +331,46 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
         context: context,
         builder: (BuildContext context) {
           final Widget body = Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListTile(
-                        leading: const Icon(Icons.emoji_emotions), title: Text(S.of(context).sticker)),
-                    // const Divider(),
-                    Wrap(
-                      children: Stickers.values
-                          .map((e) => Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 4, horizontal: 4),
-                                child: InkWell(
-                                  onTap: () {
-                                    // insert sticker into the current cursor position
-                                    var cursorPosition =
-                                        widget.controller.selection.base.offset;
-                                    cursorPosition = cursorPosition == -1
-                                        ? widget.controller.text.length
-                                        : cursorPosition;
-                                    widget.controller.text =
-                                        "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
-                                    // close the modal sheet
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Image.asset(
-                                    getStickerAssetPath(e.name)!,
-                                    width: 60,
-                                    height: 60,
-                                  ),
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                      leading: const Icon(Icons.emoji_emotions),
+                      title: Text(S.of(context).sticker)),
+                  // const Divider(),
+                  Expanded(
+                      child: SingleChildScrollView(
+                          child: Wrap(
+                    children: Stickers.values
+                        .map((e) => Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 4, horizontal: 4),
+                              child: InkWell(
+                                onTap: () {
+                                  // insert sticker into the current cursor position
+                                  var cursorPosition =
+                                      widget.controller.selection.base.offset;
+                                  cursorPosition = cursorPosition == -1
+                                      ? widget.controller.text.length
+                                      : cursorPosition;
+                                  widget.controller.text =
+                                      "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
+                                  // close the modal sheet
+                                  Navigator.of(context).pop();
+                                },
+                                child: Image.asset(
+                                  getStickerAssetPath(e.name)!,
+                                  width: 60,
+                                  height: 60,
                                 ),
-                              ))
-                          .toList(),
-                    ),
-                  ]),
-            );
+                              ),
+                            ))
+                        .toList(),
+                  ))),
+                ]),
+          );
           return PlatformX.isCupertino(context) ? Card(child: body) : body;
         });
   }
