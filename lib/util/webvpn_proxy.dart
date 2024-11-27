@@ -3,6 +3,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/repository/cookie/independent_cookie_jar.dart';
 import 'package:dan_xi/repository/cookie/readonly_cookie_jar.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
@@ -19,14 +20,18 @@ class WebvpnRequestException implements Exception {
 }
 
 class WebvpnProxy {
-  // Mutex used to guarantee that only one concurrent request performs the login action
+  // These async session objects work like a semaphore, which only allow one concurrent action and blocks all other requesters until the action completes
   static Future<void>? loginSession;
+  static Future<bool>? tryDirectSession;
+
   static bool isLoggedIn = false;
-  static bool directLinkFailed = false;
+  static bool? canConnectDirectly;
 
   // Cookies related with webvpn
   static final ReadonlyCookieJar webvpnCookieJar = ReadonlyCookieJar();
 
+  static const String DIRECT_CONNECT_TEST_URL = "https://danta.fudan.edu.cn";
+  
   static const String WEBVPN_LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fwebvpn.fudan.edu.cn%2Flogin%3Fcas_login%3Dtrue";
 
@@ -126,31 +131,88 @@ class WebvpnProxy {
     }
   }
 
+  /// Check if we are able to connect to the service directly (without WebVPN).
+  /// This method uses a low-timeout dio to reduce wait time.
+  static Future<bool> tryDirect<T>() async {
+    final dioOptions = BaseOptions(
+        receiveDataWhenStatusError: true,
+        connectTimeout: const Duration(seconds: 1),
+        receiveTimeout: const Duration(seconds: 1),
+        sendTimeout: const Duration(seconds: 1));
+    // A low-timeout dio
+    Dio fastDio = DioUtils.newDioWithProxy(dioOptions);
+
+    try {
+      await fastDio.get(DIRECT_CONNECT_TEST_URL);
+      // Request succeeds
+      return true;
+    } on DioException catch (e) {
+      // Under these circumstances, at least we can find the server successfully, so we can assume that direct request does work.
+      if (e.type == DioExceptionType.badResponse ||
+          e.type == DioExceptionType.badCertificate) {
+        return true;
+      }
+
+      // We cannot even connect to the server
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.connectionError) {
+        debugPrint(
+            "Direct connection timeout, trying to connect through proxy: $e");
+        return false;
+      }
+
+      // Misc errors, not related to connectivity to danta server, just leave a log and return `false`
+      debugPrint("Direct connection failed due to an unexpected reason: $e");
+      return false;
+    } catch (e) {
+      debugPrint("Unknown problem when trying direct access: $e");
+      return false;
+    }
+  }
+
+  /// Request with auto-fallback to WebVPN (if enabled in settings)
   static Future<Response<T>> requestWithProxy<T>(
       Dio dio, RequestOptions options) async {
-    // If we haven't tried direct link, or webvpn is not enabled in settings, or UIS isn't logged in,
-    // we should try to request directly.
-    if (!directLinkFailed ||
+    // Try with direct connect if we haven't even tried
+    if (canConnectDirectly == null) {
+      // The first request submits the job to evaluate if direct connection works and waits for result.
+      // Other concurrent requests just simply wait for the result.
+      tryDirectSession ??= tryDirect();
+      canConnectDirectly = await tryDirectSession!;
+    }
+
+    // If we can connect through direct request, or webvpn is not enabled in settings, or UIS isn't logged in, we should try to request directly.
+    if (canConnectDirectly! ||
         !SettingsProvider.getInstance().useWebvpn ||
         _personInfo == null) {
       try {
         final response = await dio.fetch<T>(options);
         return response;
       } on DioException catch (e) {
-        debugPrint(
-            "Direct connection failed, trying to connect through proxy: $e");
-        // Do not continue to try with WebVPN if webvpn isn't enabled or UIS isn't logged in
-        if (!SettingsProvider.getInstance().useWebvpn || _personInfo == null) {
+        // Connection timeout, may happen when we were connected to Fudan LAN when making the first request but later disconnected
+        if (e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.connectionError) {
+          // Not allowed to use WebVPN, we have to rethrow
+          if (!SettingsProvider.getInstance().useWebvpn ||
+              _personInfo == null) {
+            rethrow;
+          }
+
+          canConnectDirectly = false;
+          debugPrint(
+              "Direct connection timeout, trying to connect through proxy: $e");
+        } else {
+          // Misc Internet error, just rethrow
           rethrow;
         }
       } catch (e) {
-        debugPrint("Connection failed with unknown exception: $e");
+        // Misc error, just rethrow
+        debugPrint("Unknown problem when trying direct access: $e");
         rethrow;
       }
     }
 
     // Turn to the proxy
-    directLinkFailed = true;
     // Replace path with translated path
     options.path = WebvpnProxy.getWebvpnUri(options.path);
 
