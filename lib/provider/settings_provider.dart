@@ -95,16 +95,19 @@ class SettingsProvider with ChangeNotifier {
   /// If you need to get access to a [SettingsProvider], call [context.read<SettingsProvider>()] instead.
   factory SettingsProvider.getInstance() => _instance;
 
-  String? get timetableLastUpdated {
+  DateTime? get timetableLastUpdated {
     if (preferences!.containsKey(KEY_TIMETABLE_LAST_UPDATED)) {
-      return preferences!.getString(KEY_TIMETABLE_LAST_UPDATED);
+      String? timetableLastUpdated = preferences!.getString(KEY_TIMETABLE_LAST_UPDATED);
+      if (timetableLastUpdated != null) {
+        return DateTime.tryParse(timetableLastUpdated);
+      }
     }
     return null;
   }
 
-  set timetableLastUpdated(String? value) {
+  set timetableLastUpdated(DateTime? value) {
     if (value != null) {
-      preferences!.setString(KEY_TIMETABLE_LAST_UPDATED, value);
+      preferences!.setString(KEY_TIMETABLE_LAST_UPDATED, value.toIso8601String());
     } else {
       preferences!.remove(KEY_TIMETABLE_LAST_UPDATED);
     }

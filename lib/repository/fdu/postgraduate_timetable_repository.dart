@@ -113,7 +113,7 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
               startTime: startTime))!,
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
-      SettingsProvider.getInstance().timetableLastUpdated = DateTime.now().toIso8601String();
+      SettingsProvider.getInstance().timetableLastUpdated = DateTime.now();
       return result;
     } else {
       return Cache.get<TimeTable>(

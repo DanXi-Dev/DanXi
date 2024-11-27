@@ -416,7 +416,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       successBuilder:
           (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) {
         if (snapshot.hasData) {
-          return _buildPage(snapshot.data!);
+          return _buildPage(context, snapshot.data!);
         } else {
           return const CircularProgressIndicator();
         }
@@ -502,9 +502,10 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     );
   }
 
-  Widget _buildPage(TimeTable table) {
-    String? timetableLastUpdated = SettingsProvider.getInstance().timetableLastUpdated;
-    DateTime? lastUpdatedTime = timetableLastUpdated != null ? DateTime.tryParse(timetableLastUpdated) : null;
+  Widget _buildPage(BuildContext context, TimeTable table) {
+    DateTime? lastUpdatedTime = context.select<SettingsProvider, DateTime?>((value) {
+      return value.timetableLastUpdated;
+    });
 
     const TimetableStyle style = TimetableStyle();
     _table = table;
