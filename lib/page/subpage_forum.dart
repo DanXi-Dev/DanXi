@@ -95,7 +95,7 @@ void onLogout() {
 final RegExp latexRegExp = RegExp(r"<(tex|texLine)>.*?</(tex|texLine)>",
     multiLine: true, dotAll: true);
 final RegExp mentionRegExp =
-    RegExp(r"<(floor|hole)_mention>(.*?)</(floor|hole)_mention>");
+    RegExp(r"<(floor|hole)Mention>(.*?)</(floor|hole)Mention>");
 
 /// Render the text from a clip of [content].
 /// Also supports adding image tag to markdown posts
