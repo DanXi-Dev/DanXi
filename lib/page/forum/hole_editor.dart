@@ -46,6 +46,7 @@ import 'package:dan_xi/widget/forum/ottag_selector.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
@@ -135,8 +136,7 @@ class OTEditor {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
     try {
-      await ForumRepository.getInstance()
-          .newFloor(discussionId, content);
+      await ForumRepository.getInstance().newFloor(discussionId, content);
     } catch (e, st) {
       Noticing.showErrorDialog(context, e, trace: st);
       return false;
@@ -283,8 +283,7 @@ class OTEditor {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).uploading_image, context: context);
     try {
-      String? url =
-          await ForumRepository.getInstance().uploadImage(File(file));
+      String? url = await ForumRepository.getInstance().uploadImage(File(file));
       if (url != null) controller.text += "![]($url)";
       // "showAnim: true" makes it crash. Don't know the reason.
       progressDialog.dismiss(showAnim: false);
@@ -340,35 +339,40 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                       leading: const Icon(Icons.emoji_emotions),
                       title: Text(S.of(context).sticker)),
                   // const Divider(),
-                  Expanded(
-                      child: SingleChildScrollView(
-                          child: Wrap(
-                    children: Stickers.values
-                        .map((e) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 4, horizontal: 4),
+                  SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: LayoutGrid(
+                          columnSizes: [auto, auto, auto, auto, auto],
+                          rowSizes: [auto, auto, auto, auto,auto, auto, auto, auto],
+                          rowGap: 8,
+                          columnGap: 8,
+                          children: Stickers.values.map((e) {
+                            return SizedBox(
+                              width: 60,
+                              height: 60,
                               child: InkWell(
                                 onTap: () {
-                                  // insert sticker into the current cursor position
-                                  var cursorPosition =
-                                      widget.controller.selection.base.offset;
+                                  var cursorPosition = widget.controller.selection.base.offset;
                                   cursorPosition = cursorPosition == -1
                                       ? widget.controller.text.length
                                       : cursorPosition;
                                   widget.controller.text =
-                                      "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
-                                  // close the modal sheet
+                                  "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
                                   Navigator.of(context).pop();
                                 },
                                 child: Image.asset(
                                   getStickerAssetPath(e.name)!,
                                   width: 60,
                                   height: 60,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
-                            ))
-                        .toList(),
-                  ))),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
                 ]),
           );
           return PlatformX.isCupertino(context) ? Card(child: body) : body;
