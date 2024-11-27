@@ -343,41 +343,47 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                       leading: const Icon(Icons.emoji_emotions),
                       title: Text(S.of(context).sticker)),
                   // const Divider(),
-                  SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: LayoutGrid(
-                        columnSizes: List.filled(stickerSheetColumns, 1.fr),
-                        rowSizes: List.filled(stickerSheetRows, auto),
-                        rowGap: 8,
-                        columnGap: 8,
-                        children: Stickers.values.map((e) {
-                          return SizedBox(
-                            width: 60,
-                            height: 60,
-                            child: InkWell(
-                              onTap: () {
-                                var cursorPosition =
-                                    widget.controller.selection.base.offset;
-                                cursorPosition = cursorPosition == -1
-                                    ? widget.controller.text.length
-                                    : cursorPosition;
-                                widget.controller.text =
-                                    "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
-                                Navigator.of(context).pop();
-                              },
-                              child: Image.asset(
-                                getStickerAssetPath(e.name)!,
-                                width: 60,
-                                height: 60,
-                                fit: BoxFit.cover,
-                              ),
+                  ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: 300.0),
+                      child: Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: LayoutGrid(
+                              columnSizes:
+                                  List.filled(stickerSheetColumns, 1.fr),
+                              rowSizes: List.filled(stickerSheetRows, auto),
+                              rowGap: 8,
+                              columnGap: 8,
+                              children: Stickers.values.map((e) {
+                                return SizedBox(
+                                  width: 60,
+                                  height: 60,
+                                  child: InkWell(
+                                    onTap: () {
+                                      var cursorPosition = widget
+                                          .controller.selection.base.offset;
+                                      cursorPosition = cursorPosition == -1
+                                          ? widget.controller.text.length
+                                          : cursorPosition;
+                                      widget.controller.text =
+                                          "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Image.asset(
+                                      getStickerAssetPath(e.name)!,
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
                             ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
+                          ),
+                        ),
+                      ))
                 ]),
           );
           return PlatformX.isCupertino(context) ? Card(child: body) : body;
