@@ -224,7 +224,7 @@
   "koowz_description": "旦挞开发者",
   "lan_connection_issue_1": "未能连接到校园内网",
   "lan_connection_issue_1_action": "校园 VPN",
-  "lan_connection_issue_1_description": "无法连接到复旦内部网络，部分功能不可用。您是否在校外或使用了移动数据链接？\n\n您可以使用校园 VPN(Easy Connect) 或链接 Eduroam 热点以访问内网资源。",
+  "lan_connection_issue_1_description": "无法连接到复旦内部网络，部分功能可能不可用。然而，如果你开启了“自动使用 WebVPN 代理”，并且登录了 UIS 账号，你仍然可以直接使用这些功能。\n\n如果不起作用，请尝试使用校园 VPN (EasyConnect) 或链接 Eduroam 热点以访问内网资源。",
   "lan_connection_issue_1_guide_content": "三步走即可：\n\n1. [点击这里](https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common)去 VPN 下载界面，选择对应平台安装。\n2. 打开安装的软件，在地址栏输入 stuvpn.fudan.edu.cn ，点击确定。\n3. 弹出登录界面，输入自己的 UIS 账号，点击连接。\n\n然后就可以正常使用旦挞各项功能了！",
   "lan_connection_issue_1_guide_title": "如何使用校园 VPN？",
   "last_15_days": "过去 15 天",
@@ -536,5 +536,7 @@
   "proxy_setting_unset": "未设置",
   "proxy_setting_input_title": "输入 HTTP 代理地址",
   "proxy_setting_input_hint": "如 127.0.0.1:1234（留空以关闭代理）",
-  "proxy_setting_set_successfully": "代理设置已保存，重启应用后生效"
+  "proxy_setting_set_successfully": "代理设置已保存，重启应用后生效",
+  "use_webvpn_title": "自动使用 WebVPN 代理",
+  "use_webvpn_description": "启动该项后，允许在非校园网环境下直接访问茶楼、评教等功能（需要重启应用）"
 }
