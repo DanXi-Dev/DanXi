@@ -39,18 +39,18 @@ class HttpFileServiceWithWebvpn extends FileService {
         headers: headers,
         responseType: ResponseType.bytes);
     final res = await WebvpnProxy.requestWithProxy(_dio, options);
-    final List<int> rawBytes = res.data!;
-    final byteStream = ByteStream.fromBytes(rawBytes);
+    final byteStream = ByteStream.fromBytes(res.data!);
 
     return HttpGetResponse(StreamedResponse(byteStream, res.statusCode!,
-        contentLength: rawBytes.length,
+        contentLength:
+            int.tryParse(res.headers[Headers.contentLengthHeader]?.first ?? ""),
         headers: headers ?? {},
         isRedirect: res.isRedirect));
   }
 }
 
-/// Exactly the same as [DefaultCacheManager], but backed by dio. 
-/// This means that it supports proxy and can fallback to WebVPN. 
+/// Exactly the same as [DefaultCacheManager], but backed by dio.
+/// This means that it supports proxy and can fallback to WebVPN.
 class DefaultCacheManagerWithWebvpn extends CacheManager
     with ImageCacheManager {
   static const key = DefaultCacheManager.key;
