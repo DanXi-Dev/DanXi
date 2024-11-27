@@ -58,7 +58,7 @@
   "clear": "Clear",
   "clear_cache": "Clear Image Cache",
   "clear_cache_description": "Images will reload next time you view them",
-  "community_convention": "Community Convention",
+  "community_convention": "Community Norm",
   "confirm": "Confirm",
   "connection_cancelled": "Connection cancelled unexpectedly",
   "connection_failed": "Connection failed. Check your Internet connection and try again.\nIf using iOS, make sure to grant WLAN & Cellular permission when prompted.\nIt's usually caused by weak network. Please try 3~5 times.",

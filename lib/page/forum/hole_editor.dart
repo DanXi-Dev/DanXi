@@ -516,29 +516,31 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                   },
                   selector: (_, model) => model.isTagSuggestionEnabled),
             ],
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildIntroButton(
-                    context,
-                    IconFont.markdown,
-                    S.of(context).markdown_enabled,
-                    S.of(context).markdown_description),
-                _buildIntroButton(
-                    context,
-                    IconFont.tex,
-                    S.of(context).latex_enabled,
-                    S.of(context).latex_description),
-                PlatformTextButton(
-                  child: Text(S.of(context).community_convention),
-                  onPressed: () => BrowserUtil.openUrl(
-                      "https://www.fduhole.com/doc", context),
-                ),
-                PlatformTextButton(
-                  child: Text(S.of(context).sticker),
-                  onPressed: () => _buildStickersSheet(context),
-                )
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildIntroButton(
+                      context,
+                      IconFont.markdown,
+                      S.of(context).markdown_enabled,
+                      S.of(context).markdown_description),
+                  _buildIntroButton(
+                      context,
+                      IconFont.tex,
+                      S.of(context).latex_enabled,
+                      S.of(context).latex_description),
+                  PlatformTextButton(
+                    child: Text(S.of(context).community_convention),
+                    onPressed: () => BrowserUtil.openUrl(
+                        "https://www.fduhole.com/doc", context),
+                  ),
+                  PlatformTextButton(
+                    child: Text(S.of(context).sticker),
+                    onPressed: () => _buildStickersSheet(context),
+                  ),
+                ],
+              ),
             ),
             textField,
             const Divider(),
