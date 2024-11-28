@@ -46,7 +46,7 @@ String? getStickerAssetPath(String stickerName) {
   try {
     Stickers sticker = Stickers.values.firstWhere(
             (e) => e.name.toString() == stickerName);
-    return "assets/graphics/stickers/${sticker.name}.jpg";
+    return "assets/graphics/stickers/${sticker.name}.webp";
   } catch (error) {
     return null;
   }
