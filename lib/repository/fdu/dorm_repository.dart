@@ -63,7 +63,7 @@ class FudanDormRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "zlapp.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }
 
 /// This class represents the electricity info of a dorm. It's an interface for

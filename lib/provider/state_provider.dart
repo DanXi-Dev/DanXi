@@ -16,7 +16,7 @@
  */
 
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
@@ -36,8 +36,8 @@ class StateProvider {
   static String? onlineUserAgent;
 
   static void initialize(BuildContext context) {
-    FDUHoleProvider provider = context.read<FDUHoleProvider>();
-    provider.currentDivision = null;
+    ForumProvider provider = context.read<ForumProvider>();
+    provider.currentDivisionId = null;
     personInfo.value = null;
     isForeground = true;
     needScreenshotWarning = showingScreenshotWarning = false;

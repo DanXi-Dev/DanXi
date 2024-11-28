@@ -17,7 +17,7 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
@@ -88,10 +88,6 @@ class PagedListView<T> extends StatefulWidget {
   /// If not null, will use this data source instead. Using this will turn PagedListView into a regular ListView with customizations.
   final Future<List<T>?>? allDataReceiver;
 
-  /// Whether this should scroll to end upon loading complete
-  /// Will be executed only once
-  final bool? shouldScrollToEnd;
-
   final EdgeInsets? padding;
 
   /// If non-null, items will be slidable.
@@ -114,7 +110,6 @@ class PagedListView<T> extends StatefulWidget {
       this.scrollController,
       this.withScrollbar = false,
       this.allDataReceiver,
-      this.shouldScrollToEnd,
       this.noneItem,
       this.fatalErrorBuilder,
       this.padding,
@@ -139,7 +134,6 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   bool _isRefreshing = false;
   bool _isEnded = false;
   bool _hasHeadWidget = false;
-  bool _scrollToEndQueued = false;
   bool _hasError = false;
 
   /// Whether the ListView should clear old data after refreshing.
@@ -149,6 +143,8 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   GlobalKey<dynamic> headKey = GlobalKey();
   List<StateKey<T>> valueKeys = [];
   Future<List<T>?>? _futureData;
+
+  Function()? _loadCompleteCallback;
 
   ScrollController? get currentController =>
       widget.scrollController ?? PrimaryScrollController.of(context);
@@ -176,35 +172,28 @@ class PagedListViewState<T> extends State<PagedListView<T>>
       return NotificationListener<ScrollNotification>(
         onNotification: scrollToEnd,
         child: WithScrollbar(
-          child: _buildListBody(),
           controller: widget.scrollController,
+          child: _buildListBody(),
         ),
       );
     } else {
       return NotificationListener<ScrollNotification>(
-        child: _buildListBody(),
         onNotification: scrollToEnd,
+        child: _buildListBody(),
       );
     }
   }
 
-  _buildListBody() {
+  Widget _buildListBody() {
     return FutureWidget<List<T>?>(
         future: _futureData,
         successBuilder: (_, AsyncSnapshot<List<T>?> snapshot) {
           if (_dataClearQueued) _clearData();
-          // Handle Scroll To End Requests
+          // Handle load complete callbacks
           WidgetsBinding.instance.addPostFrameCallback((_) async {
-            if (_scrollToEndQueued) {
-              while (currentController!.position.pixels <
-                  currentController!.position.maxScrollExtent) {
-                currentController!
-                    .jumpTo(currentController!.position.maxScrollExtent);
-
-                // TODO: Evil hack to wait for new contents to load
-                await Future.delayed(const Duration(milliseconds: 100));
-              }
-              if (_isEnded) _scrollToEndQueued = false;
+            if (_loadCompleteCallback != null) {
+              _loadCompleteCallback!();
+              _loadCompleteCallback = null;
             }
           });
           _isRefreshing = false;
@@ -236,7 +225,8 @@ class PagedListViewState<T> extends State<PagedListView<T>>
           if (snapshot.error != null &&
               snapshot.error is FatalException &&
               widget.fatalErrorBuilder != null) {
-            _clearData();
+            // We cannot clear the error here
+            _clearData(clearError: false);
             pageIndex = widget.startPage;
             return widget.fatalErrorBuilder!.call(context, snapshot.error);
           } else {
@@ -255,7 +245,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
       error = "Unknown Error";
     } else {
       if (snapshot.error is LoginExpiredError) {
-        SettingsProvider.getInstance().deleteAllFduholeData();
+        SettingsProvider.getInstance().deleteAllForumData();
       }
       if (snapshot.error is NotLoginError) {
         error = (snapshot.error as NotLoginError).errorMessage;
@@ -314,18 +304,13 @@ class PagedListViewState<T> extends State<PagedListView<T>>
       );
     }
 
-    final realWidgetCount = _data.length +
-        (_isRefreshing ? 1 : 0) +
-        (_isEnded ? 1 : 0) +
-        (_hasError ? 1 : 0) +
-        (_hasHeadWidget ? 1 : 0);
     return SuperListView.builder(
       key: _scrollKey,
       padding: widget.padding,
       controller: widget.scrollController,
       listController: currentListController,
       physics: const AlwaysScrollableScrollPhysics(),
-      itemCount: realWidgetCount,
+      itemCount: _calculateRealWidgetCount(),
       itemBuilder: (context, index) => _getListItemAt(index, snapshot),
     );
   }
@@ -399,6 +384,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
     }
   }
 
+  // [queueDataClear] indicates where to replace the data when load completed (aka queued), or to cleat it immediately
   void initialize({useInitialData = true, queueDataClear = false}) {
     _hasHeadWidget = widget.headBuilder != null;
     if (queueDataClear) {
@@ -411,11 +397,15 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   /// Clear all the data saved.
-  void _clearData() {
+  /// We don't want to clear the error if this function is called from an error handler, 
+  /// so we add separate control for whether to clear [_hasError]
+  void _clearData({bool clearError = true}) {
     _data.clear();
     valueKeys.clear();
-    _hasError = false;
     _dataClearQueued = false;
+    if(clearError){
+      _hasError = false;
+    }
   }
 
   @override
@@ -437,7 +427,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   ///
   /// Note: [_futureData] will be discarded after called. Call [notifyUpdate] to rebuild it and go back
   /// to normal mode.
-  replaceDataWith(List<T> data) {
+  replaceAllDataWith(List<T> data) {
     setState(() {
       // @w568w (2022-1-25): NEVER USE A REFERENCE-ONLY COPY OF LIST.
       // `_data = data;` makes me struggle with a weird bug
@@ -463,16 +453,22 @@ class PagedListViewState<T> extends State<PagedListView<T>>
     });
   }
 
-  queueScrollToEnd() {
-    _scrollToEndQueued = true;
+  replaceDatumWith(T data, int index) {
+    setState(() {
+      _data[index] = data;
+    });
   }
 
-  scrollToItem(T item, [Duration duration = kDuration, Curve curve = kCurve]) =>
+  // Scroll to end, assumes that the item is already loaded
+  Future<void> scrollToItem(T item,
+          [Duration duration = kDuration, Curve curve = kCurve]) =>
       scrollToIndex(valueKeys.indexWhere((element) => element.value == item),
           duration, curve);
 
-  scrollToIndex(int index,
+  Future<void> scrollToIndex(int index,
       [Duration duration = kDuration, Curve curve = kCurve]) async {
+    // Flutter issue: https://github.com/flutter/flutter/issues/129768
+    // We have to wait for flutter to build the items below
     if (kDuration.inMicroseconds == 0) {
       currentListController.jumpToItem(
           index: index, scrollController: currentController!, alignment: 0);
@@ -486,10 +482,35 @@ class PagedListViewState<T> extends State<PagedListView<T>>
     }
   }
 
+  int _calculateRealWidgetCount() {
+    return _data.length +
+        (_isRefreshing ? 1 : 0) +
+        (_isEnded ? 1 : 0) +
+        (_hasError ? 1 : 0) +
+        (_hasHeadWidget ? 1 : 0);
+  }
+
+  // Scroll to end, assumes that the list has already ended
+  Future<void> scrollToEnd(
+      [Duration duration = kDuration, Curve curve = kCurve]) {
+    return scrollToIndex(_calculateRealWidgetCount() - 1, duration, curve);
+  }
+
   Future<void> scrollDelta(double pixels,
           [Duration duration = kDuration, Curve curve = kCurve]) =>
       currentController!.animateTo(currentController!.offset + pixels,
           duration: duration, curve: curve);
+
+  // Schedule a callback after load completed
+  void scheduleLoadedCallback(Function() callback, {bool rebuild = false}) {
+    if (rebuild) {
+      setState(() {
+        _loadCompleteCallback = callback;
+      });
+    } else {
+      _loadCompleteCallback = callback;
+    }
+  }
 
   ScrollController? getScrollController() => currentController;
 
@@ -498,11 +519,6 @@ class PagedListViewState<T> extends State<PagedListView<T>>
     super.initState();
     widget.pagedController?.setListener(this);
     initialize();
-
-    // This ensures that scroll to end is not called upon rebuild.
-    if (widget.shouldScrollToEnd == true) {
-      _scrollToEndQueued = true;
-    }
   }
 
   @override
@@ -552,6 +568,14 @@ class PagedListViewController<T> implements ListProvider<T> {
     return true;
   }
 
+  Future<void> scrollToEnd(
+      [Duration duration = kDuration, Curve curve = kCurve]) async {
+    await _state.scrollToEnd(duration, curve);
+  }
+
+  void scheduleLoadedCallback(Function() callback, {bool rebuild = false}) =>
+      _state.scheduleLoadedCallback(callback, rebuild: rebuild);
+
   Future<void> scrollToIndex(int index,
       [Duration duration = kDuration, Curve curve = kCurve]) async {
     await _state.scrollToIndex(index, duration, curve);
@@ -564,18 +588,18 @@ class PagedListViewController<T> implements ListProvider<T> {
 
   ScrollController? getScrollController() => _state.getScrollController();
 
-  queueScrollToEnd() {
-    _state.queueScrollToEnd();
-  }
-
   /// Replace all data, either loaded with [initialData] or [dataReceiver], with the provided data
   /// Will no longer load content on scroll after this is called.
-  replaceDataWith(List<T> data) {
-    _state.replaceDataWith(data);
+  void replaceAllDataWith(List<T> data) {
+    _state.replaceAllDataWith(data);
   }
 
   replaceDataInRangeWith(Iterable<T> data, int start) {
     _state.replaceDataInRangeWith(data, start);
+  }
+
+  replaceDatumWith(T oldData, T newData) {
+    _state.replaceDatumWith(newData, _state._data.indexOf(oldData));
   }
 
   replaceInitialData(Iterable<T> data) {
@@ -601,6 +625,7 @@ class PagedListViewController<T> implements ListProvider<T> {
   int length() => _state.length();
 }
 
+// HydrogenC: Naming isn't clear enough, should be something like `ListViewFailureException`
 class FatalException implements Exception {}
 
 mixin ListProvider<T> {

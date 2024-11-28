@@ -1,7 +1,7 @@
 [中文版](README.md) English Version
 [Official Website(Chinese Only)](https://danxi.fduhole.com)
 
-# DanXi
+# Danta
 
 [![CI](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml)
 [![Deploy to GitHub Pages](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml)
@@ -14,13 +14,13 @@ again.)
 
 Maybe the best all-rounded service app for Fudan University students!
 
-**DanXi only support Chinese (Simplified) and English language at the moment. Come to help us!**
+**Danta only support Chinese (Simplified) and English language at the moment. Come to help us!**
 
 - Campus card balance and transactions
 - Dining hall traffic
 - Shortcut for Fudan QR Code (with support for Apple Watch)
 - View empty classrooms
-- Tree Hole
+- Student forum
 - View compulsory-exercise records
 - View timetable and export as .ics file
 - Show Notices from Academic Affairs Office
@@ -33,7 +33,7 @@ This application is still at active development stage, we will be happy if you c
 # Install
 
 If you meet abnormal behavior in
-DanXi，Please [create an issue](https://github.com/DanXi-Dev/DanXi/issues/new/choose)
+Danta, Please [create an issue](https://github.com/DanXi-Dev/DanXi/issues/new/choose)
 or [create a new pull request](https://github.com/DanXi-Dev/DanXi/compare).
 
 ## Windows
@@ -70,10 +70,10 @@ mount it.
 
 ```shell
 $ flutter --version
-Flutter 3.19.2 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 7482962148 (8 days ago) • 2024-02-27 16:51:22 -0500
-Engine • revision 04817c99c9
-Tools • Dart 3.3.0 • DevTools 2.31.1
+Flutter 3.24.5 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision dec2ee5c1f (4 days ago) • 2024-11-13 11:13:06 -0800
+Engine • revision a18df97ca5
+Tools • Dart 3.5.4 • DevTools 2.37.3
 ```
 
 ## Notes on compilation
@@ -91,8 +91,10 @@ If you are building for `iOS/iPadOS`, you should also [install and configure](ht
 Run the command 
 
 ```
-dart run build_runner build --delete-conflicting-outputs
+flutter pub get
+flutter pub global activate intl_utils
 dart run intl_utils:generate
+dart run build_runner build --delete-conflicting-outputs
 ```
 
 and then  `flutter run [ios/android]` to start the app.

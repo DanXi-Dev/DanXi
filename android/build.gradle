@@ -6,6 +6,36 @@ allprojects {
 }
 
 rootProject.buildDir = '../build'
+
+
+subprojects {
+    afterEvaluate { project ->
+        // override the android compileSdkVersion and namespace for each dependencies to compile with the latest Gradle
+        if (project.plugins.hasPlugin("com.android.application") ||
+                project.plugins.hasPlugin("com.android.library")) {
+            project.android.compileSdkVersion = 34
+            if (project.android.namespace == null) {
+                def manifest = new XmlSlurper().parse(file(project.android.sourceSets.main.manifest.srcFile))
+                def packageName = manifest.@package.text()
+                println("Setting ${packageName} as android namespace")
+                project.android.namespace = packageName
+            }
+            // override the kotlin language version for each dependencies to 2.0.20
+            if (project.buildscript.configurations.hasProperty("classpath")) {
+                def found = false
+                project.buildscript.configurations.classpath.getDependencies().each { dep ->
+                    if (dep.group == "org.jetbrains.kotlin" && dep.name == "kotlin-gradle-plugin") {
+                        found = true
+                    }
+                }
+                if (found) {
+                    project.buildscript.dependencies.add("classpath", "org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.20")
+                }
+            }
+        }
+    }
+}
+
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }

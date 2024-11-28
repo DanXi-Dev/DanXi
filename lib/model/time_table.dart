@@ -237,20 +237,9 @@ class TimeTable {
       table[i] = [];
     }
     for (var course in courses!) {
-      // if the course is available in this week
-      if (course.availableWeeks!.contains(week)) {
-        for (var courseTime in course.times!) {
-          if (courseTime.weekDay != 6) {
-            table[courseTime.weekDay]!.add(Event(course, courseTime));
-          }
-        }
-      }
-      // or the course is available in the next week and the course is on Sunday
-      if (course.availableWeeks!.contains(week + 1)) {
-        for (var courseTime in course.times!) {
-          if (courseTime.weekDay == 6) {
-            table[courseTime.weekDay]!.add(Event(course, courseTime));
-          }
+      for (var courseTime in course.times!) {
+        if (course.availableWeeks!.contains(week)) {
+          table[courseTime.weekDay]!.add(Event(course, courseTime));
         }
       }
     }
@@ -341,6 +330,7 @@ class Course {
     return newCourse
       ..courseName = PGPart["KCMC"]
       ..roomName = PGPart["JASMC"]
+      ..roomName ??= ' '
       // The 0th digit of Postgraduates ZCBH mean the 1st week. Add a prefix zero to work with [_parseWeeksFromString].
       ..availableWeeks = _parseWeeksFromString("0" + PGPart["ZCBH"])
       ..times = [CourseTime(PGPart["XQ"] - 1, PGPart["KSJCDM"] - 1)]

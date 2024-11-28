@@ -19,12 +19,12 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
 import 'package:dan_xi/page/danke/course_review_editor.dart';
-import 'package:dan_xi/page/opentreehole/hole_detail.dart';
+import 'package:dan_xi/page/forum/hole_detail.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:dan_xi/widget/danke/review_vote_widget.dart';
-import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
+import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -156,6 +156,7 @@ class ReviewHeader extends StatelessWidget {
             child: const Wrap(
               // todo this is the badge list of the user
               spacing: 3,
+              runSpacing: 2,
               alignment: WrapAlignment.end,
               children: [
                 // rating
@@ -183,7 +184,8 @@ class ReviewHeader extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Wrap(
           // todo this is the badge list of the user
-          spacing: 4,
+          spacing: 3,
+          runSpacing: 2,
           alignment: WrapAlignment.start,
           children: [
             // rating
@@ -214,6 +216,15 @@ class ReviewFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final overallWord =
+        S.of(context).curriculum_ratings_overall_words.split(';');
+    final contentWord =
+        S.of(context).curriculum_ratings_content_words.split(';');
+    final workloadWord =
+        S.of(context).curriculum_ratings_workload_words.split(';');
+    final assessmentWord =
+        S.of(context).curriculum_ratings_assessment_words.split(';');
+
     const labelStyle = TextStyle(color: Colors.grey, fontSize: 12);
 
     return Wrap(
@@ -229,7 +240,7 @@ class ReviewFooter extends StatelessWidget {
               width: 6,
             ),
             Text(
-              overallWord![overallLevel],
+              overallWord[overallLevel],
               style: TextStyle(color: wordColor[overallLevel], fontSize: 12),
             )
           ],
@@ -242,7 +253,7 @@ class ReviewFooter extends StatelessWidget {
               width: 6,
             ),
             Text(
-              contentWord![styleLevel],
+              contentWord[styleLevel],
               style: TextStyle(color: wordColor[styleLevel], fontSize: 12),
             )
           ],
@@ -255,7 +266,7 @@ class ReviewFooter extends StatelessWidget {
               width: 6,
             ),
             Text(
-              workloadWord![workloadLevel],
+              workloadWord[workloadLevel],
               style: TextStyle(color: wordColor[workloadLevel], fontSize: 12),
             )
           ],
@@ -269,7 +280,7 @@ class ReviewFooter extends StatelessWidget {
               width: 6,
             ),
             Text(
-              assessmentWord![assessmentLevel],
+              assessmentWord[assessmentLevel],
               style: TextStyle(color: wordColor[assessmentLevel], fontSize: 12),
             )
           ],

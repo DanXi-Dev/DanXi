@@ -17,18 +17,16 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
-import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
-import 'package:dan_xi/page/subpage_treehole.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/page/subpage_forum.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/widget/danke/course_list_widget.dart';
 import 'package:dan_xi/widget/danke/course_search_bar.dart';
-import 'package:dan_xi/widget/danke/course_widgets.dart';
 import 'package:dan_xi/widget/danke/random_review_widgets.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
@@ -59,14 +57,7 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
 
   @override
   Widget buildPage(BuildContext context) {
-    if (overallWord == null) {
-      overallWord = S.of(context).curriculum_ratings_overall_words.split(';');
-      contentWord = S.of(context).curriculum_ratings_content_words.split(';');
-      workloadWord = S.of(context).curriculum_ratings_workload_words.split(';');
-      assessmentWord =
-          S.of(context).curriculum_ratings_assessment_words.split(';');
-    }
-
+    
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     return Container(
       // padding top
@@ -109,9 +100,8 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
   }
 
   Future<CourseReview?> _loadRandomReview({bool forceRefetch = false}) async {
-    if (!context.read<FDUHoleProvider>().isUserInitialized) {
-      await OpenTreeHoleRepository.getInstance().initializeUser();
-      settingsPageKey.currentState?.setState(() {});
+    if (!context.read<ForumProvider>().isUserInitialized) {
+      await ForumRepository.getInstance().initializeUser();
     }
 
     if (forceRefetch) {

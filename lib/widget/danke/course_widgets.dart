@@ -18,11 +18,9 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
-import 'package:dan_xi/widget/libraries/round_chip.dart';
-import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
+import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:flutter/material.dart';
 
-List<String>? overallWord, contentWord, workloadWord, assessmentWord;
 const List<Color> wordColor = [
   Colors.red,
   Colors.orange,
@@ -95,9 +93,9 @@ class CourseGroupCardWidget extends StatelessWidget {
                           spacing: 5,
                           // for each credit in credits create a text
                           children: <Widget>[
-                            ...courseGroup.credits!.map((e) => OTLeadingTag(
+                            ...courseGroup.credits!.map((e) => LeadingChip(
                                   color: Colors.orange,
-                                  text:
+                                  label:
                                       "${e.toStringAsFixed(1)} ${S.of(context).credits}",
                                 )),
                           ],
@@ -137,7 +135,7 @@ class CourseGroupCardWidget extends StatelessWidget {
               Row(
                 children: [
                   Icon(
-                      // fixme PlatformX.isMaterial(context) treehole_widgets.dart: 234
+                      // fixme PlatformX.isMaterial(context) forum_widgets.dart: 234
                       Icons.comment,
                       size: infoStyle.fontSize,
                       color: infoStyle.color),
@@ -216,7 +214,7 @@ class FilterListWidgetState<T> extends State<FilterListWidget<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(spacing: 4, runSpacing: 4, children: [
+    return Wrap(spacing: 3, runSpacing: 2, children: [
       ...widget.filters.map(
         (e) => FilterTagWidget(
             color: e.filter == selectedTag!.filter

@@ -2,7 +2,7 @@ import UIKit
 import Flutter
 import WatchConnectivity
 
-@UIApplicationMain
+@main
 @objc class AppDelegate: FlutterAppDelegate, WCSessionDelegate {
     let defaults = UserDefaults.standard
     

@@ -66,7 +66,7 @@ class BusFeature extends Feature {
   _loadBusList(PersonInfo? personInfo) async {
     _status = ConnectionStatus.CONNECTING;
     _busList = await FudanBusRepository.getInstance()
-        .loadBusList(personInfo, holiday: isHoliday);
+        .loadBusList(personInfo, holiday: isHoliday!);
     _status = ConnectionStatus.DONE;
     notifyUpdate();
   }

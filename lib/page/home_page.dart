@@ -16,25 +16,26 @@
  */
 import 'dart:async';
 
+import 'package:app_links/app_links.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/extra.dart';
-import 'package:dan_xi/model/opentreehole/hole.dart';
+import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_danke.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
+import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
-import 'package:dan_xi/page/subpage_treehole.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/test/test.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/flutter_app.dart';
@@ -43,39 +44,39 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
+import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dan_xi/widget/dialogs/login_dialog.dart';
 import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
+import 'package:dan_xi/widget/forum/post_render.dart';
+import 'package:dan_xi/widget/forum/render/render_impl.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/platform_nav_bar_m3.dart';
-import 'package:dan_xi/widget/opentreehole/post_render.dart';
-import 'package:dan_xi/widget/opentreehole/render/render_impl.dart';
-import 'package:dio_log/overlay_draggable_button.dart';
+import 'package:dio5_log/overlay_draggable_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:provider/provider.dart';
+import 'package:pub_semver/pub_semver.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:screen_capture_event/screen_capture_event.dart';
-import 'package:uni_links/uni_links.dart';
 
-const fduholeChannel = MethodChannel('fduhole');
+const forumChannel = MethodChannel('fduhole');
 
 void sendFduholeTokenToWatch(String? token) {
-  fduholeChannel.invokeMethod("send_token", token);
+  forumChannel.invokeMethod("send_token", token);
 }
 
 GlobalKey<NavigatorState> detailNavigatorKey = GlobalKey();
-GlobalKey<State<SettingsSubpage>> settingsPageKey = GlobalKey();
-GlobalKey<TreeHoleSubpageState> treeholePageKey = GlobalKey();
+GlobalKey<ForumSubpageState> forumPageKey = GlobalKey();
 GlobalKey<DankeSubPageState> dankePageKey = GlobalKey();
 GlobalKey<HomeSubpageState> dashboardPageKey = GlobalKey();
 GlobalKey<TimetableSubPageState> timetablePageKey = GlobalKey();
 const QuickActions quickActions = QuickActions();
 
-/// The main page of DanXi.
+/// The main page of Danta.
 /// It is a container for [PlatformSubpage].
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -127,12 +128,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
         HomeSubpage(key: dashboardPageKey),
       if (!SettingsProvider.getInstance().hideHole)
-        TreeHoleSubpage(key: treeholePageKey),
+        ForumSubpage(key: forumPageKey),
       // Don't show Timetable in visitor mode
       DankeSubPage(key: dankePageKey),
       if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
         TimetableSubPage(key: timetablePageKey),
-      SettingsSubpage(key: settingsPageKey),
+      const SettingsSubpage(),
     ];
   }
 
@@ -243,7 +244,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void didHaveMemoryPressure() {
     super.didHaveMemoryPressure();
-    OpenTreeHoleRepository.getInstance().reduceFloorCache();
+    ForumRepository.getInstance().reduceFloorCache();
   }
 
   @override
@@ -276,11 +277,11 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (!PlatformX.isWindows) return;
     // We first init the systray menu and then add the menu entries
     await _systemTray.initSystemTray(
-        title: 'DanXi',
+        title: 'Danta',
         iconPath: PlatformX.createPlatformFile(
                 "${PlatformX.getPathFromFile(Platform.resolvedExecutable)}/data/flutter_assets/assets/graphics/app_icon.ico")
             .path,
-        toolTip: "DanXi is here~");
+        toolTip: "Danta is here~");
     late List<tray.MenuItemBase> showingMenu, hidingMenu;
     showingMenu = [
       tray.MenuItem(
@@ -340,12 +341,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // is recognized as an invalid path by [dealWithUri] now. Improve it later.
     if (PlatformX.isWeb) return;
 
-    Uri? initialUri;
-    initialUri = await getInitialUri();
+    final appLinks = AppLinks();
+    Uri? initialUri = await appLinks.getInitialLink();
     if (initialUri != null) await dealWithUri(initialUri);
 
     _uniLinksSubscription.bindOnlyInvalid(
-        uriLinkStream.listen((Uri? uri) async {
+        appLinks.uriLinkStream.listen((Uri? uri) async {
           if (uri != null) await dealWithUri(uri);
         }, onError: (Object error) {
           // Handle exception by warning the user their action did not succeed
@@ -364,24 +365,24 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     // Do a quick initialization and push
     // Throw an error if the user is not logged in
-    if (!context.read<FDUHoleProvider>().isUserInitialized) {
+    if (!context.read<ForumProvider>().isUserInitialized) {
       try {
-        await OpenTreeHoleRepository.getInstance().initializeRepo();
+        await ForumRepository.getInstance().initializeRepo();
       } catch (ignored) {}
     }
     try {
       if (element == 'hole') {
-        final OTHole hole = (await OpenTreeHoleRepository.getInstance()
-            .loadSpecificHole(postId))!;
+        final OTHole hole =
+            (await ForumRepository.getInstance().loadSpecificHole(postId))!;
         if (mounted) {
           smartNavigatorPush(context, "/bbs/postDetail", arguments: {
             "post": hole,
           });
         }
       } else if (element == 'floor') {
-        final floor = (await OpenTreeHoleRepository.getInstance()
-            .loadSpecificFloor(postId))!;
-        final OTHole hole = (await OpenTreeHoleRepository.getInstance()
+        final floor =
+            (await ForumRepository.getInstance().loadSpecificFloor(postId))!;
+        final OTHole hole = (await ForumRepository.getInstance()
             .loadSpecificHole(floor.hole_id!))!;
         if (mounted) {
           smartNavigatorPush(context, "/bbs/postDetail", arguments: {
@@ -423,10 +424,10 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     String? code,
     Map<String, dynamic>? data,
   ) async {
-    if (!context.read<FDUHoleProvider>().isUserInitialized) {
+    if (!context.read<ForumProvider>().isUserInitialized) {
       // Do a quick initialization and push
       try {
-        OpenTreeHoleRepository.getInstance().initializeToken();
+        ForumRepository.getInstance().initializeToken();
       } catch (_) {}
     }
     smartNavigatorPush(context, '/bbs/messages',
@@ -471,10 +472,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       });
     }
     // Configure watch listeners on iOS.
-    if (_needSendToWatch &&
-        SettingsProvider.getInstance().fduholeToken != null) {
+    if (_needSendToWatch && SettingsProvider.getInstance().forumToken != null) {
       sendFduholeTokenToWatch(
-          SettingsProvider.getInstance().fduholeToken!.access!);
+          SettingsProvider.getInstance().forumToken!.access!);
       // Only send once.
       _needSendToWatch = false;
     }
@@ -487,7 +487,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             icon: 'ic_launcher'),
       ]);
     }
-    fduholeChannel.setMethodCallHandler((MethodCall call) async {
+    forumChannel.setMethodCallHandler((MethodCall call) async {
       switch (call.method) {
         case "launch_from_notification":
           Map<String, dynamic> map =
@@ -503,11 +503,10 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           break;
         case "upload_apns_token":
           try {
-            await OpenTreeHoleRepository.getInstance()
-                .updatePushNotificationToken(
-                    call.arguments["token"],
-                    await PlatformX.getUniqueDeviceId(),
-                    PushNotificationServiceType.APNS);
+            await ForumRepository.getInstance().updatePushNotificationToken(
+                call.arguments["token"],
+                await PlatformX.getUniqueDeviceId(),
+                PushNotificationServiceType.APNS);
           } catch (e, st) {
             if (mounted) {
               Noticing.showNotice(
@@ -521,9 +520,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           }
           break;
         case 'get_token':
-          if (SettingsProvider.getInstance().fduholeToken != null) {
+          if (SettingsProvider.getInstance().forumToken != null) {
             sendFduholeTokenToWatch(
-                SettingsProvider.getInstance().fduholeToken!.access!);
+                SettingsProvider.getInstance().forumToken!.access!);
           } else {
             // Notify that we should send the token to watch later
             _needSendToWatch = true;
@@ -613,6 +612,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ///
   /// If user hasn't logged in before, request him to do so.
   void _loadPersonInfoOrLogin() {
+    /// Register person info at [WebvpnProxy] to enable webvpn services to use it
+    WebvpnProxy.bindPersonInfo(StateProvider.personInfo);
+
     var preferences = SettingsProvider.getInstance().preferences;
 
     if (PersonInfo.verifySharedPreferences(preferences!)) {
@@ -648,7 +650,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget _buildBody(Widget title) {
     // Show debug button for [Dio].
     if (PlatformX.isDebugMode(SettingsProvider.getInstance().preferences)) {
-      showDebugBtn(context);
+      showDebugBtn(context, btnSize: 50);
     }
 
     return MultiProvider(
@@ -739,10 +741,13 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> _loadUpdate() async {
     //We don't need to check for update on iOS platform.
     if (PlatformX.isIOS) return;
-    final UpdateInfo updateInfo =
+    final UpdateInfo? updateInfo =
         AnnouncementRepository.getInstance().checkVersion();
-    if (updateInfo.isAfter(
-        Pubspec.version.major, Pubspec.version.minor, Pubspec.version.patch)) {
+    if (updateInfo == null) {
+      return;
+    }
+
+    if (updateInfo.isAfter(Version.parse(Pubspec.version.canonical))) {
       await showPlatformDialog(
           context: context,
           builder: (BuildContext context) => PlatformAlertDialog(
@@ -828,6 +833,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Future<void> _loadCelebration() async {
     SettingsProvider.getInstance().celebrationWords =
-        AnnouncementRepository.getInstance().getCelebrations();
+        AnnouncementRepository.getInstance().getCelebrations() ?? [];
   }
 }

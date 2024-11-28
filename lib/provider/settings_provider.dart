@@ -25,10 +25,10 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
 import 'package:dan_xi/model/extra.dart';
-import 'package:dan_xi/model/opentreehole/jwt.dart';
-import 'package:dan_xi/model/opentreehole/tag.dart';
+import 'package:dan_xi/model/forum/jwt.dart';
+import 'package:dan_xi/model/forum/tag.dart';
 import 'package:dan_xi/model/time_table.dart';
-import 'package:dan_xi/page/opentreehole/hole_editor.dart';
+import 'package:dan_xi/page/forum/hole_editor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:flutter/material.dart';
@@ -46,11 +46,11 @@ class SettingsProvider with ChangeNotifier {
   //static const String KEY_AUTOTICK_LAST_CANCEL_DATE =
   //    "autotick_last_cancel_date";
   //static const String KEY_PREFERRED_THEME = "theme";
-  static const String KEY_FDUHOLE_TOKEN = "fduhole_token_v3";
-  static const String KEY_FDUHOLE_SORTORDER = "fduhole_sortorder";
+  static const String KEY_FORUM_TOKEN = "fduhole_token_v3";
+  static const String KEY_FORUM_SORTORDER = "fduhole_sortorder";
   static const String KEY_EMPTY_CLASSROOM_LAST_BUILDING_CHOICE =
       "ec_last_choice";
-  static const String KEY_FDUHOLE_FOLDBEHAVIOR = "fduhole_foldbehavior";
+  static const String KEY_FORUM_FOLDBEHAVIOR = "fduhole_foldbehavior";
   static const String KEY_DASHBOARD_WIDGETS = "dashboard_widgets_json";
   static const String KEY_THIS_SEMESTER_START_DATE = "this_semester_start_date";
   static const String KEY_SEMESTER_START_DATES = "semester_start_dates";
@@ -58,7 +58,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_DEBUG_MODE = "DEBUG";
   static const String KEY_AD_ENABLED = "ad_enabled";
   static const String KEY_HIDDEN_TAGS = "hidden_tags";
-  static const String KEY_HIDDEN_TREEHOLE = "hidden_hole";
+  static const String KEY_HIDE_FORUM = "hide_fduhole";
   static const String KEY_ACCESSIBILITY_COLORING = "accessibility_coloring";
   static const String KEY_CELEBRATION = "celebration";
   static const String KEY_BACKGROUND_IMAGE_PATH = "background";
@@ -79,10 +79,13 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_THEME_TYPE = "theme_type";
   static const String KEY_MARKDOWN_ENABLED = "markdown_rendering_enabled";
   static const String KEY_VISITED_TIMETABLE = "visited_timetable";
-  static const String KEY_FDUHOLE_BASE_URL = "fduhole_base_url";
+  static const String KEY_FORUM_BASE_URL = "fduhole_base_url";
   static const String KEY_AUTH_BASE_URL = "auth_base_url";
   static const String KEY_IMAGE_BASE_URL = "image_base_url";
   static const String KEY_DANKE_BASE_URL = "danke_base_url";
+  static const String KEY_PROXY = "proxy";
+  static const String KEY_TIMETABLE_LAST_UPDATED = "timetable_last_updated";
+  static const String KEY_USE_WEBVPN = "use_webvpn";
 
   SettingsProvider._();
 
@@ -92,6 +95,41 @@ class SettingsProvider with ChangeNotifier {
   /// of widget tree.
   /// If you need to get access to a [SettingsProvider], call [context.read<SettingsProvider>()] instead.
   factory SettingsProvider.getInstance() => _instance;
+
+  DateTime? get timetableLastUpdated {
+    if (preferences!.containsKey(KEY_TIMETABLE_LAST_UPDATED)) {
+      String? timetableLastUpdated = preferences!.getString(KEY_TIMETABLE_LAST_UPDATED);
+      if (timetableLastUpdated != null) {
+        return DateTime.tryParse(timetableLastUpdated);
+      }
+    }
+    return null;
+  }
+
+  set timetableLastUpdated(DateTime? value) {
+    if (value != null) {
+      preferences!.setString(KEY_TIMETABLE_LAST_UPDATED, value.toIso8601String());
+    } else {
+      preferences!.remove(KEY_TIMETABLE_LAST_UPDATED);
+    }
+    notifyListeners();
+  }
+
+  String? get proxy {
+    if (preferences!.containsKey(KEY_PROXY)) {
+      return preferences!.getString(KEY_PROXY);
+    }
+    return null;
+  }
+
+  set proxy(String? value) {
+    if (value != null) {
+      preferences!.setString(KEY_PROXY, value);
+    } else {
+      preferences!.remove(KEY_PROXY);
+    }
+    notifyListeners();
+  }
 
   List<String> get searchHistory {
     if (preferences!.containsKey(KEY_SEARCH_HISTORY)) {
@@ -134,21 +172,28 @@ class SettingsProvider with ChangeNotifier {
   }
 
   /// Set and get _BASE_URL, _BASE_AUTH_URL, _IMAGE_BASE_URL, _DANKE_BASE_URL for debug
-  String get fduholeBaseUrl {
-    if (preferences!.containsKey(KEY_FDUHOLE_BASE_URL)) {
-      String? fduholeBaseUrl = preferences!.getString(KEY_FDUHOLE_BASE_URL);
-      if (fduholeBaseUrl != null) {
-        return fduholeBaseUrl;
+  String get forumBaseUrl {
+    if (preferences!.containsKey(KEY_FORUM_BASE_URL)) {
+      String? url = preferences!.getString(KEY_FORUM_BASE_URL);
+      
+      // Override the legacy server address
+      if (url == Constant.FORUM_BASE_URL_LEGACY){
+        preferences!.setString(KEY_FORUM_BASE_URL, Constant.FORUM_BASE_URL);
+        return Constant.FORUM_BASE_URL;
+      }
+      
+      if (url != null) {
+        return url;
       }
     }
-    return Constant.FDUHOLE_BASE_URL;
+    return Constant.FORUM_BASE_URL;
   }
 
-  set fduholeBaseUrl(String? value) {
+  set forumBaseUrl(String? value) {
     if (value != null) {
-      preferences!.setString(KEY_FDUHOLE_BASE_URL, value);
+      preferences!.setString(KEY_FORUM_BASE_URL, value);
     } else {
-      preferences!.setString(KEY_FDUHOLE_BASE_URL, Constant.FDUHOLE_BASE_URL);
+      preferences!.setString(KEY_FORUM_BASE_URL, Constant.FORUM_BASE_URL);
     }
     notifyListeners();
   }
@@ -416,31 +461,31 @@ class SettingsProvider with ChangeNotifier {
       preferences!.setString(KEY_LAST_PUSH_TOKEN, value!);*/
 
   // Token. If token is invalid, return null.
-  JWToken? get fduholeToken {
-    if (preferences!.containsKey(KEY_FDUHOLE_TOKEN)) {
+  JWToken? get forumToken {
+    if (preferences!.containsKey(KEY_FORUM_TOKEN)) {
       try {
         return JWToken.fromJsonWithVerification(
-            jsonDecode(preferences!.getString(KEY_FDUHOLE_TOKEN)!));
+            jsonDecode(preferences!.getString(KEY_FORUM_TOKEN)!));
       } catch (_) {}
     }
     return null;
   }
 
-  set fduholeToken(JWToken? value) {
+  set forumToken(JWToken? value) {
     if (value != null) {
-      preferences!.setString(KEY_FDUHOLE_TOKEN, jsonEncode(value));
+      preferences!.setString(KEY_FORUM_TOKEN, jsonEncode(value));
     } else {
-      preferences!.remove(KEY_FDUHOLE_TOKEN);
+      preferences!.remove(KEY_FORUM_TOKEN);
     }
     notifyListeners();
   }
 
-  void deleteAllFduholeData() {
-    preferences!.remove(KEY_FDUHOLE_TOKEN);
+  void deleteAllForumData() {
+    preferences!.remove(KEY_FORUM_TOKEN);
     //preferences!.remove(KEY_LAST_PUSH_TOKEN);
-    preferences!.remove(KEY_FDUHOLE_FOLDBEHAVIOR);
-    preferences!.remove(KEY_FDUHOLE_SORTORDER);
-    preferences!.remove(KEY_HIDDEN_TREEHOLE);
+    preferences!.remove(KEY_FORUM_FOLDBEHAVIOR);
+    preferences!.remove(KEY_FORUM_SORTORDER);
+    preferences!.remove(KEY_HIDE_FORUM);
     preferences!.remove(KEY_HIDDEN_TAGS);
   }
 
@@ -458,10 +503,10 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  //FDUHOLE Default Sorting Order
-  SortOrder? get fduholeSortOrder {
-    if (preferences!.containsKey(KEY_FDUHOLE_SORTORDER)) {
-      String? str = preferences!.getString(KEY_FDUHOLE_SORTORDER);
+  //Forum Default Sorting Order
+  SortOrder? get forumSortOrder {
+    if (preferences!.containsKey(KEY_FORUM_SORTORDER)) {
+      String? str = preferences!.getString(KEY_FORUM_SORTORDER);
       if (str == SortOrder.LAST_CREATED.getInternalString()) {
         return SortOrder.LAST_CREATED;
       } else if (str == SortOrder.LAST_REPLIED.getInternalString()) {
@@ -471,17 +516,17 @@ class SettingsProvider with ChangeNotifier {
     return null;
   }
 
-  set fduholeSortOrder(SortOrder? value) {
-    preferences!.setString(KEY_FDUHOLE_SORTORDER, value.getInternalString()!);
+  set forumSortOrder(SortOrder? value) {
+    preferences!.setString(KEY_FORUM_SORTORDER, value.getInternalString()!);
     notifyListeners();
   }
 
-  /// FDUHOLE Folded Post Behavior
+  /// Forum Folded Post Behavior
 
   /// NOTE: This getter defaults to a FOLD and won't return [null]
-  FoldBehavior get fduholeFoldBehavior {
-    if (preferences!.containsKey(KEY_FDUHOLE_FOLDBEHAVIOR)) {
-      int? savedPref = preferences!.getInt(KEY_FDUHOLE_FOLDBEHAVIOR);
+  FoldBehavior get forumFoldBehavior {
+    if (preferences!.containsKey(KEY_FORUM_FOLDBEHAVIOR)) {
+      int? savedPref = preferences!.getInt(KEY_FORUM_FOLDBEHAVIOR);
       return FoldBehavior.values.firstWhere(
         (element) => element.index == savedPref,
         orElse: () => FoldBehavior.FOLD,
@@ -490,8 +535,8 @@ class SettingsProvider with ChangeNotifier {
     return FoldBehavior.FOLD;
   }
 
-  set fduholeFoldBehavior(FoldBehavior value) {
-    preferences!.setInt(KEY_FDUHOLE_FOLDBEHAVIOR, value.index);
+  set forumFoldBehavior(FoldBehavior value) {
+    preferences!.setInt(KEY_FORUM_FOLDBEHAVIOR, value.index);
     notifyListeners();
   }
 
@@ -526,17 +571,17 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Hide FDUHole
+  /// Hide Forum
   bool get hideHole {
-    if (preferences!.containsKey(KEY_HIDDEN_TREEHOLE)) {
-      return preferences!.getBool(KEY_HIDDEN_TREEHOLE)!;
+    if (preferences!.containsKey(KEY_HIDE_FORUM)) {
+      return preferences!.getBool(KEY_HIDE_FORUM)!;
     } else {
       return false;
     }
   }
 
   set hideHole(bool mode) {
-    preferences!.setBool(KEY_HIDDEN_TREEHOLE, mode);
+    preferences!.setBool(KEY_HIDE_FORUM, mode);
     notifyListeners();
   }
 
@@ -606,7 +651,7 @@ class SettingsProvider with ChangeNotifier {
   }
 
   /// Primary color used by the app.
-  int get primarySwatch_V2 {
+  int get primarySwatch {
     if (preferences!.containsKey(KEY_PRIMARY_SWATCH_V2)) {
       int? color = preferences!.getInt(KEY_PRIMARY_SWATCH_V2);
       return Color(color!).value;
@@ -615,7 +660,7 @@ class SettingsProvider with ChangeNotifier {
   }
 
   /// Set primary swatch by color name defined in [Constant.TAG_COLOR_LIST].
-  void setPrimarySwatch_V2(int value) {
+  void setPrimarySwatch(int value) {
     preferences!.setInt(KEY_PRIMARY_SWATCH_V2, Color(value).value);
     notifyListeners();
   }
@@ -715,6 +760,18 @@ class SettingsProvider with ChangeNotifier {
     preferences!.setBool(KEY_MARKDOWN_ENABLED, value);
     notifyListeners();
   }
+
+  bool get useWebvpn{
+    if (preferences!.containsKey(KEY_USE_WEBVPN)) {
+      return preferences!.getBool(KEY_USE_WEBVPN)!;
+    }
+    return true;
+  }
+
+  set useWebvpn(bool value){
+    preferences!.setBool(KEY_USE_WEBVPN, value);
+    notifyListeners();
+  }
 }
 
 enum SortOrder { LAST_REPLIED, LAST_CREATED }
@@ -743,7 +800,7 @@ extension SortOrderEx on SortOrder? {
   }
 }
 
-//FDUHOLE Folded Post Behavior
+//Forum Folded Post Behavior
 enum FoldBehavior { SHOW, FOLD, HIDE }
 
 extension FoldBehaviorEx on FoldBehavior {
@@ -783,15 +840,15 @@ FoldBehavior foldBehaviorFromInternalString(String? str) {
   }
 }
 
-enum OTNotificationTypes { MENTION, FAVORITE, REPORT }
+enum OTNotificationTypes { MENTION, SUBSCRIPTION, REPORT }
 
 extension OTNotificationTypesEx on OTNotificationTypes {
   String? displayTitle(BuildContext context) {
     switch (this) {
       case OTNotificationTypes.MENTION:
         return S.of(context).notification_mention;
-      case OTNotificationTypes.FAVORITE:
-        return S.of(context).notification_favorite;
+      case OTNotificationTypes.SUBSCRIPTION:
+        return S.of(context).notification_subscription;
       case OTNotificationTypes.REPORT:
         return S.of(context).notification_reported;
     }
@@ -801,8 +858,8 @@ extension OTNotificationTypesEx on OTNotificationTypes {
     switch (this) {
       case OTNotificationTypes.MENTION:
         return S.of(context).notification_mention_s;
-      case OTNotificationTypes.FAVORITE:
-        return S.of(context).notification_favorite_s;
+      case OTNotificationTypes.SUBSCRIPTION:
+        return S.of(context).notification_subscription_s;
       case OTNotificationTypes.REPORT:
         return S.of(context).notification_reported_s;
     }
@@ -812,8 +869,8 @@ extension OTNotificationTypesEx on OTNotificationTypes {
     switch (this) {
       case OTNotificationTypes.MENTION:
         return 'mention';
-      case OTNotificationTypes.FAVORITE:
-        return 'favorite';
+      case OTNotificationTypes.SUBSCRIPTION:
+        return 'favorite'; // keep 'favorite' here for backward support
       case OTNotificationTypes.REPORT:
         return 'report';
     }
@@ -825,7 +882,7 @@ OTNotificationTypes? notificationTypeFromInternalString(String str) {
     case 'mention':
       return OTNotificationTypes.MENTION;
     case 'favorite':
-      return OTNotificationTypes.FAVORITE;
+      return OTNotificationTypes.SUBSCRIPTION;
     case 'report':
       return OTNotificationTypes.REPORT;
     default:

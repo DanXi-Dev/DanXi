@@ -59,15 +59,15 @@ class TimeTableRepository extends BaseRepositoryWithDio {
       UISLoginTool.tryAsyncWithAuth(dio, LOGIN_URL, cookieJar!, info,
           () => _loadTimeTableRemotely(startTime: startTime));
 
-  Future<String?> getDefaultSemesterId(PersonInfo? info) =>
-      Retrier.tryAsyncWithFix(() async {
-        await dio.get(ID_URL);
-        return (await cookieJar!.loadForRequest(Uri.parse(HOST)))
-            .firstWhere((element) => element.name == "semester.id")
-            .value;
-      },
-          (exception) => UISLoginTool.fixByLoginUIS(
-              dio, LOGIN_URL, cookieJar!, info, true));
+  Future<String?> getDefaultSemesterId(PersonInfo? info) {
+    return UISLoginTool.tryAsyncWithAuth(dio, LOGIN_URL, cookieJar!, info,
+        () async {
+      await dio.get(ID_URL);
+      return (await cookieJar!.loadForRequest(Uri.parse(HOST)))
+          .firstWhere((element) => element.name == "semester.id")
+          .value;
+    });
+  }
 
   Future<TimeTable?> _loadTimeTableRemotely({DateTime? startTime}) async {
     Future<String?> getAppropriateSemesterId() async {
@@ -92,24 +92,37 @@ class TimeTableRepository extends BaseRepositoryWithDio {
           "semester.id": await getAppropriateSemesterId()
         },
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    return TimeTable.fromHtml(
+    TimeTable timetable = TimeTable.fromHtml(
         startTime ??
             DateTime.tryParse(
                 SettingsProvider.getInstance().thisSemesterStartDate ?? "") ??
             Constant.DEFAULT_SEMESTER_START_DATE,
         tablePage.data!);
+    for (var course in timetable.courses!) {
+      for (var weekday in course.times!) {
+        if (weekday.weekDay == 6) {
+          for (int i = 0; i < course.availableWeeks!.length; i++) {
+            course.availableWeeks![i] = course.availableWeeks![i] - 1;
+          }
+          break;
+        }
+      }
+    }
+    return timetable;
   }
 
   Future<TimeTable?> loadTimeTable(PersonInfo? info,
-      {DateTime? startTime, bool forceLoadFromRemote = false}) {
+      {DateTime? startTime, bool forceLoadFromRemote = false}) async {
     startTime ??= TimeTable.defaultStartTime;
     if (forceLoadFromRemote) {
-      return Cache.getRemotely<TimeTable>(
+      TimeTable? result = await Cache.getRemotely<TimeTable>(
           KEY_TIMETABLE_CACHE,
           () async =>
               (await loadTimeTableRemotely(info, startTime: startTime))!,
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
+      SettingsProvider.getInstance().timetableLastUpdated = DateTime.now();
+      return result;
     } else {
       return Cache.get<TimeTable>(
           KEY_TIMETABLE_CACHE,
@@ -121,7 +134,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "jwfw.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }
 
 class Test {

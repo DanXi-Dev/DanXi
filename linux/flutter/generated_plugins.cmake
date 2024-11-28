@@ -8,6 +8,8 @@ list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_linux
   flutter_js
   flutter_secure_storage_linux
+  gtk
+  open_file_linux
   platform_device_id_linux
   tray_manager
   url_launcher_linux

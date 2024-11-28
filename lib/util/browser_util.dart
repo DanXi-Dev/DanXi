@@ -18,7 +18,7 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/independent_cookie_jar.dart';
+import 'package:dan_xi/repository/cookie/independent_cookie_jar.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -163,7 +163,7 @@ class CustomInAppBrowser extends InAppBrowser {
                 document.forms[0].submit();
             }
             catch (e) {
-                window.alert("DanXi: Failed to auto login UIS");
+                window.alert("Danta: Failed to auto login UIS");
             }
         }''';
 

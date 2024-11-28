@@ -31,7 +31,7 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/repository/fdu/postgraduate_timetable_repository.dart';
 import 'package:dan_xi/repository/fdu/time_table_repository.dart';
-import 'package:dan_xi/repository/opentreehole/opentreehole_repository.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -57,6 +57,7 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import '../widget/dialogs/manually_add_course_dialog.dart';
 
+/// Keys to locate buttons in the interactive tutorial.
 GlobalKey keyButton = GlobalKey();
 GlobalKey keyButton1 = GlobalKey();
 GlobalKey keyButton2 = GlobalKey();
@@ -64,6 +65,12 @@ GlobalKey keyButton2 = GlobalKey();
 const kCompatibleUserGroup = [
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
   UserGroup.FUDAN_POSTGRADUATE_STUDENT
+];
+
+/// Only some user groups can select the semester.
+/// For other user groups, the semester selection button should be hidden.
+const kSemesterSelectionCompatibleUserGroup = [
+  UserGroup.FUDAN_UNDERGRADUATE_STUDENT
 ];
 
 class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
@@ -96,17 +103,18 @@ class TimetableSubPage extends PlatformSubpage<TimetableSubPage> {
 
   @override
   Create<List<AppBarButtonItem>> get leading => (cxt) => [
-        AppBarButtonItem(
-            S.of(cxt).select_semester,
-            SemesterSelectionButton(
-              key: keyButton1,
-              onSelectionUpdate: () {
-                timetablePageKey.currentState?.indicatorKey.currentState
-                    ?.show();
-              },
-            ),
-            null,
-            useCustomWidget: true),
+        if (checkGroup(kSemesterSelectionCompatibleUserGroup))
+          AppBarButtonItem(
+              S.of(cxt).select_semester,
+              SemesterSelectionButton(
+                key: keyButton1,
+                onSelectionUpdate: () {
+                  timetablePageKey.currentState?.indicatorKey.currentState
+                      ?.show();
+                },
+              ),
+              null,
+              useCustomWidget: true),
       ];
 }
 
@@ -139,19 +147,20 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
 
   List<Course> newCourses = [];
 
-  List<int> courseAvailableList = <int>[];
+  List<int> courseAvailableList = [];
 
   final GlobalKey<RefreshIndicatorState> indicatorKey =
       GlobalKey<RefreshIndicatorState>();
-
-  void pageRefresh() {
-    refreshSelf();
-  }
 
   List<Course> getCourseList() {
     return SettingsProvider.getInstance().manualAddedCourses;
   }
 
+  /// Set the future that fetches the content.
+  ///
+  /// Note: in this method, when forceLoadFromRemote = false (i.e. called from [initState]),
+  /// [context] is NOT available. DO NOT use [context] in that case.
+  /// For example, instead of using [S.of(context)], use [S.current].
   void _setContent() {
     newCourses = getCourseList();
     if (checkGroup(kCompatibleUserGroup)) {
@@ -196,13 +205,13 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           // If throw an error, it means we don't have a valid timetable.
         } catch (_) {
           _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
-              NotLoginError(S.of(context).postgraduates_need_login)));
+              NotLoginError(S.current.postgraduates_need_login)));
         }
       }
       forceLoadFromRemote = false;
     } else {
-      _contentFuture = LazyFuture.pack(Future<TimeTable?>.error(
-          NotLoginError(S.of(context).not_fudan_student)));
+      _contentFuture = LazyFuture.pack(
+          Future<TimeTable?>.error(NotLoginError(S.current.not_fudan_student)));
     }
     _contentFuture?.then(
         (value) => TimeTable.mergeManuallyAddedCourses(value, newCourses));
@@ -267,6 +276,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     _shareSubscription.bindOnlyInvalid(
         Constant.eventBus.on<ShareTimetableEvent>().listen((_) {
           if (_table == null) return;
+          if (!mounted) return;
           showPlatformModalSheet(
             context: context,
             builder: (BuildContext context) => PlatformContextMenu(
@@ -281,7 +291,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
         hashCode);
     _addCourseSubscription.bindOnlyInvalid(
         Constant.eventBus.on<ManuallyAddCourseEvent>().listen((_) async {
-          //if (_table == null) return;
+          if (_table == null) return;
+          if (!mounted) return;
           newCourses = (await showPlatformDialog<Course?>(
             context: context,
             builder: (_) => ManuallyAddCourseDialog(courseAvailableList),
@@ -405,7 +416,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       successBuilder:
           (BuildContext context, AsyncSnapshot<TimeTable?> snapshot) {
         if (snapshot.hasData) {
-          return _buildPage(snapshot.data!);
+          return _buildPage(context, snapshot.data!);
         } else {
           return const CircularProgressIndicator();
         }
@@ -446,12 +457,15 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    event.course.courseName!,
+                    event.course.courseName ?? "null",
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  Text((event.course.teacherNames ?? []).join(",")),
-                  Text(event.course.roomName!),
-                  Text(event.course.courseId!),
+                  if (event.course.teacherNames != null)
+                    Text(event.course.teacherNames!.join(",")),
+                  if (event.course.roomName != null)
+                    Text(event.course.roomName!),
+                  if (event.course.courseId != null)
+                    Text(event.course.courseId!),
                 ],
               )),
               if (event.course.roomId == "999999") ...[
@@ -488,7 +502,9 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     );
   }
 
-  Widget _buildPage(TimeTable table) {
+  Widget _buildPage(BuildContext context, TimeTable table) {
+    DateTime? lastUpdatedTime = context.select<SettingsProvider, DateTime?>((value) => value.timetableLastUpdated);
+
     const TimetableStyle style = TimetableStyle();
     _table = table;
     _showingTime ??= _table!.now();
@@ -539,6 +555,13 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
             _showingTime!.week,
             tapCallback: _onTapCourse,
           ),
+          SizedBox(height: 10,),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(S.of(context).timetable_last_updated),
+            lastUpdatedTime == null
+                ? Text(S.of(context).timetable_no_last_updated)
+                : Text(DateFormat("yyyy-MM-dd HH:mm").format(lastUpdatedTime))
+          ]),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text(S.of(context).semester_start_date),
             StartDateSelectionButton(
@@ -551,6 +574,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   }
 }
 
+/// Show a button to select the semester.
 class SemesterSelectionButton extends StatefulWidget {
   final void Function()? onSelectionUpdate;
 

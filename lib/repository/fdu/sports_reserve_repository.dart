@@ -110,7 +110,7 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "elife.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }
 
 class StadiumData {

@@ -17,13 +17,14 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/ecard_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
-import 'package:dan_xi/widget/opentreehole/tag_selector/selector.dart';
-import 'package:dan_xi/widget/opentreehole/tag_selector/tag.dart';
+import 'package:dan_xi/widget/forum/tag_selector/selector.dart';
+import 'package:dan_xi/widget/forum/tag_selector/tag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -102,7 +103,7 @@ class CardDetailPageState extends State<CardDetailPage> {
                   _selectable = false;
                 });
                 _cardInfo!.records = await CardRepository.getInstance()
-                    .loadCardRecord(_tagDays[index]);
+                    .loadCardRecord(StateProvider.personInfo.value, _tagDays[index]);
                 setState(() {
                   tag.checkedIcon = PlatformX.isMaterial(context)
                       ? Icons.check

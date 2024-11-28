@@ -20,7 +20,7 @@ import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/lazy_future.dart';
-import 'package:dan_xi/util/opentreehole/human_duration.dart';
+import 'package:dan_xi/util/forum/human_duration.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
@@ -80,8 +80,8 @@ class AnnouncementListState extends State<AnnouncementList> {
         future: _future,
         successBuilder: (_, snapShot) {
           _data = _showingLatest
-              ? AnnouncementRepository.getInstance().getAnnouncements()
-              : AnnouncementRepository.getInstance().getAllAnnouncements();
+              ? AnnouncementRepository.getInstance().getAnnouncements() ?? []
+              : AnnouncementRepository.getInstance().getAllAnnouncements() ?? [];
           return Column(
             children: [
               Expanded(

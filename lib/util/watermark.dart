@@ -17,7 +17,7 @@
 
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/opentreehole/flutter_watermark_widget.dart';
+import 'package:dan_xi/widget/forum/flutter_watermark_widget.dart';
 import 'package:flutter/material.dart';
 
 class Watermark {
@@ -43,7 +43,7 @@ class Watermark {
                       SettingsProvider.getInstance().darkWatermarkColor)
                       : Color(SettingsProvider.getInstance()
                       .lightWatermarkColor),
-                  fontSize: 36,
+                  fontSize: 48,
                   decoration: TextDecoration.none),
         ));
 

@@ -26,19 +26,18 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
-import 'package:dan_xi/util/opentreehole/paged_listview_helper.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/widget/danke/course_review_widget.dart';
 import 'package:dan_xi/widget/danke/course_widgets.dart';
+import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
-import 'package:dan_xi/widget/opentreehole/treehole_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -88,6 +87,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   CourseReview? locateReview;
   Future<CourseGroup?>? _courseGroupFuture;
   Future<List<CourseReview>?>? _reviewListFuture;
+  bool shouldScrollToEnd = false;
 
   /// Reload/load the (new) content
   Future<List<CourseReview>?> _loadContent() async {
@@ -110,15 +110,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
         });
       }
     }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (locateReview != null && mounted) {
-        // Scroll to the specific floor
-        await PagedListViewHelper.scrollToItem(
-            context, _listViewController, locateReview, ScrollDirection.DOWN);
-        locateReview = null;
-      }
-    });
 
     return result;
   }
@@ -158,9 +149,15 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
 
     await _courseGroupFuture;
     await refreshSelf();
-    if (scrollToEnd) _listViewController.queueScrollToEnd();
-    return _listViewController.notifyUpdate(
+
+    await _listViewController.notifyUpdate(
         useInitialData: false, queueDataClear: true);
+
+    if (scrollToEnd) {
+      setState(() {
+        shouldScrollToEnd = true;
+      });
+    }
   }
 
   Future<CourseGroup?> _fetchCourseGroup({bool forceRefetch = false}) async {
@@ -188,11 +185,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
           // Attach information about its parent course for each review
           rev.linkCourse(elem.getSummary());
 
-          // Convert grades to client format
-          if (!rev.rank!.isClientFormat) {
-            rev.rank = rev.rank?.convertFormat();
-          }
-
           // calculate average score
           totalScore += rev.rank!.overall!;
         }
@@ -213,6 +205,31 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     _courseGroupFuture ??= _fetchCourseGroup();
     _reviewListFuture ??= _loadContent();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (mounted) {
+        if (locateReview != null) {
+          // Scroll to the specific floor.
+          final floorToJump = locateReview!;
+          _listViewController.scheduleLoadedCallback(
+              () async => await _listViewController.scrollToItem(floorToJump),
+              rebuild: true);
+          locateReview = null;
+        }
+
+        if (shouldScrollToEnd) {
+          try {
+            // Scroll to end.
+            _listViewController.scheduleLoadedCallback(
+                () async => await _listViewController.scrollToEnd(),
+                rebuild: true);
+            shouldScrollToEnd = false;
+          } catch (_) {
+            // we don't care if we failed to scroll to the end.
+          }
+        }
+      }
+    });
 
     return PlatformScaffold(
       iosContentPadding: false,
@@ -310,6 +327,9 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
   }
 
   Widget _buildHead(BuildContext context) {
+    final overallWord =
+        S.of(context).curriculum_ratings_overall_words.split(';');
+
     var wildCard = S.of(context).all;
     var teacherList = [
       FilterTag(wildCard, "*"),
@@ -341,9 +361,9 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                                 color: Colors.grey)),
                         ..._courseGroup!.credits!.map((e) => Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: OTLeadingTag(
+                            child: LeadingChip(
                               color: Colors.orange,
-                              text:
+                              label:
                                   "${e.toStringAsFixed(1)} ${S.of(context).credits}",
                             )))
                       ],
@@ -359,7 +379,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                     ),
                     averageOverallLevel >= 0
                         ? Text(
-                            overallWord![averageOverallLevel],
+                            overallWord[averageOverallLevel],
                             style: TextStyle(
                                 color: wordColor[averageOverallLevel],
                                 fontSize: 15),
@@ -406,9 +426,9 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
 
   Future<void> _onTapScrollToEnd(_) async {
     try {
-      _listViewController.queueScrollToEnd();
-      _listViewController.notifyUpdate(
-          useInitialData: false, queueDataClear: false);
+      setState(() {
+        shouldScrollToEnd = true;
+      });
     } catch (error, st) {
       Noticing.showErrorDialog(context, error, trace: st);
     }

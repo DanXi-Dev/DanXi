@@ -24,8 +24,8 @@ import 'package:dan_xi/model/danke/course.dart';
 import 'package:dan_xi/model/danke/course_grade.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
-import 'package:dan_xi/page/opentreehole/hole_detail.dart';
-import 'package:dan_xi/provider/fduhole_provider.dart';
+import 'package:dan_xi/page/forum/hole_detail.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
@@ -37,10 +37,10 @@ import 'package:dan_xi/widget/libraries/linkify_x.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 
 typedef PostInterceptor = Future<bool> Function(
     BuildContext context, CourseReviewEditorText? text);
@@ -77,7 +77,7 @@ final PostInterceptor _kStopWordInterceptor = (context, text) async {
 
 class CourseReviewEditorText with ChangeNotifier {
   int _courseId = -1;
-  CourseGrade _grade = CourseGrade(0, 0, 0, 0, isClientFormat: true);
+  CourseGrade _grade = CourseGrade(0, 0, 0, 0);
   String? _content, _title;
 
   int get courseId => _courseId;
@@ -129,12 +129,6 @@ class CourseReviewEditorText with ChangeNotifier {
         _inRange(_grade.assessment ?? 0);
   }
 
-  // The server and client handles the content and workload scores reversely, the function does the convertion
-  CourseReviewEditorText convertFormat() {
-    return CourseReviewEditorText(
-        _content, _title, _courseId, _grade.convertFormat());
-  }
-
   static bool _inRange(int val, [int min = 1, int max = 5]) {
     return val >= min && val <= max;
   }
@@ -170,7 +164,7 @@ class CourseReviewEditor {
       progressDialog.dismiss(showAnim: false);
     }
     context
-        .read<FDUHoleProvider>()
+        .read<ForumProvider>()
         .courseReviewEditorCache
         .remove(courseGroup.code);
     return true;
@@ -184,12 +178,12 @@ class CourseReviewEditor {
         originalContent.title!,
         originalContent.courseInfo.id,
         originalContent.rank!);
-    final CourseReviewEditorText? content = (await _showEditor(
+    final CourseReviewEditorText? content = await _showEditor(
         context, S.of(context).modify_to(originalContent.reviewId!),
         initialContent: initialContent,
         interceptor: _kStopWordInterceptor.mergeWith(interceptor),
         courseGroup: courseGroup,
-        isModify: true));
+        isModify: true);
     if (content == null) return false;
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).posting, context: context);
@@ -204,7 +198,7 @@ class CourseReviewEditor {
       progressDialog.dismiss(showAnim: false);
     }
     context
-        .read<FDUHoleProvider>()
+        .read<ForumProvider>()
         .courseReviewEditorCache
         .remove(courseGroup.code);
     return true;
@@ -338,6 +332,18 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
       teacherFilterNotifier.value = selectedCourse.teachers!;
     }
 
+    final overallWord =
+        S.of(context).curriculum_ratings_overall_words.split(';');
+    final contentWord =
+        S.of(context).curriculum_ratings_content_words.split(';');
+    final workloadWord =
+        S.of(context).curriculum_ratings_workload_words.split(';');
+    final assessmentWord =
+        S.of(context).curriculum_ratings_assessment_words.split(';');
+
+    // Reduce the line height to fit into the dropdown list
+    final listItemStyle = const TextStyle(height: 1.0);
+
     return ChangeNotifierProvider(
         create: (_) => review.grade.clone(),
         child: SingleChildScrollView(
@@ -367,8 +373,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                             teacherFilterNotifier.value = e!;
                           },
                           itemBuilder: (e) => DropdownMenuItem(
-                              value: e,
-                              child: Text(e, overflow: TextOverflow.ellipsis)),
+                              value: e, child: Flexible(child: Text(e, style: listItemStyle,))),
                         )),
                     Expanded(
                         flex: 1,
@@ -388,8 +393,8 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                                   },
                                   itemBuilder: (e) => DropdownMenuItem(
                                       value: e,
-                                      child: Text(e.formatTime(),
-                                          overflow: TextOverflow.ellipsis))),
+                                      child: Flexible(
+                                          child: Text(e.formatTime(), style: listItemStyle,)))),
                           valueListenable: teacherFilterNotifier,
                         )),
                   ]),
@@ -425,14 +430,14 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                     PlatformTextButton(
                       child: Text(S.of(context).community_convention),
                       onPressed: () => BrowserUtil.openUrl(
-                          "https://www.fduhole.com/#/licence", context),
+                          "https://www.fduhole.com/doc", context),
                     )
                   ],
                 ),
                 textField,
                 const Divider(),
                 LayoutGrid(
-                  columnSizes: [auto, 1.fr, auto],
+                  columnSizes: [1.fr, auto, 1.fr],
                   rowSizes: const [auto, auto, auto, auto],
                   children: [
                     Center(
@@ -450,7 +455,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                             )),
                     Consumer<CourseGrade>(
                         builder: (ctx, grade, _) => RatingTextWidget(
-                            words: overallWord!, rating: grade.overall ?? 0)),
+                            words: overallWord, rating: grade.overall ?? 0)),
                     Center(
                         child: Text(S.of(context).curriculum_ratings_content)),
                     Builder(
@@ -465,7 +470,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                             })),
                     Consumer<CourseGrade>(
                         builder: (ctx, grade, _) => RatingTextWidget(
-                            words: contentWord!, rating: grade.content ?? 0)),
+                            words: contentWord, rating: grade.content ?? 0)),
                     Center(
                         child: Text(S.of(context).curriculum_ratings_workload)),
                     Builder(
@@ -481,7 +486,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                             )),
                     Consumer<CourseGrade>(
                         builder: (ctx, grade, _) => RatingTextWidget(
-                            words: workloadWord!, rating: grade.workload ?? 0)),
+                            words: workloadWord, rating: grade.workload ?? 0)),
                     Center(
                         child:
                             Text(S.of(context).curriculum_ratings_assessment)),
@@ -498,7 +503,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                             )),
                     Consumer<CourseGrade>(
                         builder: (ctx, grade, _) => RatingTextWidget(
-                            words: assessmentWord!,
+                            words: assessmentWord,
                             rating: grade.assessment ?? 0)),
                   ],
                 ),
@@ -719,20 +724,20 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
     } else {
       review.addListener(() {
         context
-            .read<FDUHoleProvider>()
+            .read<ForumProvider>()
             .courseReviewEditorCache[_courseGroup.code]!
             .copyValuesFrom(review);
       });
       if (context
-          .read<FDUHoleProvider>()
+          .read<ForumProvider>()
           .courseReviewEditorCache
           .containsKey(_courseGroup.code)) {
         review.copyValuesFrom(context
-            .read<FDUHoleProvider>()
+            .read<ForumProvider>()
             .courseReviewEditorCache[_courseGroup.code]!);
       } else {
         context
-                .read<FDUHoleProvider>()
+                .read<ForumProvider>()
                 .courseReviewEditorCache[_courseGroup.code] =
             CourseReviewEditorText.newInstance();
       }
@@ -798,7 +803,7 @@ class CourseReviewEditorPageState extends State<CourseReviewEditorPage> {
     if (!review.isValid()) return;
 
     if ((await _interceptor?.call(context, review)) ?? true) {
-      Navigator.pop<CourseReviewEditorText>(context, review.convertFormat());
+      Navigator.pop<CourseReviewEditorText>(context, review);
     }
   }
 }

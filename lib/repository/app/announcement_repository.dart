@@ -15,39 +15,34 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
-
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/celebration.dart';
 import 'package:dan_xi/model/extra.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dio/dio.dart';
+import 'package:pub_semver/pub_semver.dart';
+import 'package:toml/toml.dart';
 
 class AnnouncementRepository {
   static const KEY_SEEN_ANNOUNCEMENT = "seen_announcement";
-  static const _ID_START_DATE = -1;
-  static const _ID_LATEST_VERSION = -2;
-  static const _ID_CHANGE_LOG = -3;
-  static const _ID_CELEBRATION = -4;
-  static const _ID_EXTRA_DATA = -5;
 
   AnnouncementRepository._();
-
-  static const _URL = "https://danxi-static.fduhole.com/all.json";
+  static const _URL =
+      "https://danxi-static.fduhole.com/tmp_wait_for_json_editor.toml";
 
   static final _instance = AnnouncementRepository._();
 
   factory AnnouncementRepository.getInstance() => _instance;
-  List<Announcement>? _announcementCache;
+  Map<String, dynamic>? _tomlCache;
 
   Future<bool?> loadAnnouncements() async {
-    final Response<List<dynamic>> response = await Dio().get(_URL);
-    _announcementCache =
-        response.data?.map((e) => Announcement.fromJson(e)).toList() ?? [];
-    return _announcementCache?.isNotEmpty ?? false;
+    final Response<dynamic> response =
+        await DioUtils.newDioWithProxy().get(_URL);
+    _tomlCache = TomlDocument.parse(response.data).toMap();
+    return _tomlCache?.isNotEmpty ?? false;
   }
 
   Future<Announcement?> getLastNewAnnouncement() async {
@@ -72,66 +67,109 @@ class AnnouncementRepository {
   }
 
   Announcement? getLastAnnouncement() {
-    List<Announcement> list = getAnnouncements();
-    return list.firstOrNull;
+    List<Announcement>? list = getAnnouncements();
+    return list?.firstOrNull;
   }
 
-  List<Announcement> getAnnouncements() {
+  List<Announcement>? getAnnouncements() {
+    if (_tomlCache == null){
+      return null;
+    }
+
     final version = int.tryParse(Pubspec.version.build.single) ?? 0;
-    return _announcementCache
-        .filter((element) => element.maxVersion! >= version);
+    if (_tomlCache!['dev_notice'] == null) {
+      return [];
+    }
+    final list = (_tomlCache!['dev_notice'] as List<Map<String, dynamic>>)
+        .where((element) => (element['maxVersion'] as int) >= version)
+        .toList();
+    return list.map<Announcement>((e) => Announcement.fromToml(e)).toList();
   }
 
-  List<Announcement> getAllAnnouncements() =>
-      _announcementCache.filter((element) => element.maxVersion! >= 0);
+  List<Announcement>? getAllAnnouncements() {
+    if (_tomlCache == null){
+      return null;
+    }
 
-  @Deprecated(
-      "Never use single startDate any more. Call getStartDates() instead")
-  DateTime getStartDate() => DateTime.parse(_announcementCache!
-      .firstWhere((element) => element.maxVersion == _ID_START_DATE)
-      .content!);
+    if (_tomlCache!['dev_notice'] == null) {
+      return [];
+    }
+    return _tomlCache!['dev_notice']
+        .map<Announcement>((e) => Announcement.fromToml(e))
+        .toList();
+  }
 
   TimeTableExtra? getStartDates() {
-    return getExtra()?.timetable;
+    if (_tomlCache == null){
+      return null;
+    }
+
+    final fduUg = _tomlCache!['semester_start_date']
+        .entries
+        .map<TimeTableStartTimeItem>(
+            (entry) => TimeTableStartTimeItem(entry.key, entry.value))
+        .toList();
+    return TimeTableExtra(fduUg);
   }
 
   String? getUserAgent() {
-    return getExtra()?.userAgent;
+    if (_tomlCache == null){
+      return null;
+    }
+
+    return _tomlCache!['user_agent'];
   }
 
   List<String?>? getStopWords() {
-    return getExtra()?.stopWords;
+    if (_tomlCache == null){
+      return null;
+    }
+
+    return _tomlCache!['stop_words'].cast<String>();
   }
 
   List<BannerExtra?>? getBannerExtras() {
-    return getExtra()?.banners;
+    if (_tomlCache == null){
+      return null;
+    }
+
+    return _tomlCache!['banners']
+        .map<BannerExtra>((banner) =>
+            BannerExtra(banner['title'], banner['button'], banner['action']))
+        .toList();
   }
 
-  List<String?>? getCareWords(){
-    return getExtra()?.careWords;
+  List<String?>? getCareWords() {
+    if (_tomlCache == null){
+      return null;
+    }
+
+    return _tomlCache!['care_words'].cast<String>();
   }
 
-  Extra? getExtra() {
-    return _announcementCache.apply((p0) => Extra.fromJson(jsonDecode(p0
-        .firstWhere((element) => element.maxVersion == _ID_EXTRA_DATA)
-        .content!)));
-  }
+  UpdateInfo? checkVersion() {
+    if (_tomlCache == null){
+      return null;
+    }
 
-  UpdateInfo checkVersion() {
     return UpdateInfo(
-        _announcementCache!
-            .firstWhere((element) => element.maxVersion == _ID_LATEST_VERSION)
-            .content,
-        _announcementCache!
-            .firstWhere((element) => element.maxVersion == _ID_CHANGE_LOG)
-            .content);
+        _tomlCache!['latest_version']['flutter'], _tomlCache!['change_log']);
   }
 
-  List<Celebration> getCelebrations() {
-    List<Map<String, dynamic>> celebrationJson = jsonDecode(_announcementCache!
-        .firstWhere((element) => element.maxVersion == _ID_CELEBRATION)
-        .content!);
-    return celebrationJson.map((e) => Celebration.fromJson(e)).toList();
+  Celebration parseCelebration(Map<String, dynamic> m) {
+    String date = m['date'];
+    int type = date.contains('-') ? 3 : 1;
+    return Celebration(type, date, m['words'].cast<String>());
+  }
+
+  List<Celebration>? getCelebrations() {
+    if (_tomlCache == null){
+      return null;
+    }
+
+    return _tomlCache!['celebrations']
+        .map<Celebration>((e) => parseCelebration(e))
+        .toList();
   }
 }
 
@@ -146,23 +184,5 @@ class UpdateInfo {
 
   UpdateInfo(this.latestVersion, this.changeLog);
 
-  bool isAfter(int major, int minor, int patch) {
-    List<int?> versions =
-        latestVersion!.split(".").map((e) => int.tryParse(e)).toList();
-    if (versions[0]! > major) {
-      return true;
-    } else if (versions[0]! < major) {
-      return false;
-    }
-
-    if (versions[1]! > minor) {
-      return true;
-    } else if (versions[1]! < minor) {
-      return false;
-    }
-
-    if (versions[2]! > patch) return true;
-
-    return false;
-  }
+  bool isAfter(Version version) => Version.parse(latestVersion!) > version;
 }
