@@ -4,7 +4,7 @@ const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
 const RESOURCES = {"flutter.js": "f393d3c16b631f36852323de8e583132",
-"main.dart.js": "13d10d859e50c224c5ac245e174bc03d",
+"main.dart.js": "5fc5353cc5b9eb64abb1d92e3db474ea",
 "assets/FontManifest.json": "e8992b70c205310bdb1568e9790e27a1",
 "assets/AssetManifest.bin": "b920a8779dd4517ae98a56f377b7d356",
 "assets/fonts/MaterialIcons-Regular.otf": "f08a44907e395a2ccf4dcfc69be3a05c",
@@ -78,12 +78,12 @@ const RESOURCES = {"flutter.js": "f393d3c16b631f36852323de8e583132",
 "assets/assets/texts/tips.dat": "b38397c625ee54578753dadccd05e4f8",
 "assets/assets/texts/care_words.dat": "52b374fed441176c3d31182005c3bbb9",
 "assets/assets/texts/stop_words.dat": "654361d38d55c99cbac298d4566ac719",
-"assets/NOTICES": "2f0f89c39bfd2dbe86f01c91e53fa415",
+"assets/NOTICES": "5879504a0d86e6d3ed4c85f52d0da120",
 "assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8cb9b6ce",
 "assets/AssetManifest.json": "0c2dddc9a70cab70fd49982e32420c96",
 "assets/AssetManifest.bin.json": "05dca8c3d77e0a16906ed0fe58bb9742",
-"index.html": "36f00256f68513081b9cf623d577823d",
-"/": "36f00256f68513081b9cf623d577823d",
+"index.html": "c31d988d61c86957eed59b0b56a7b7ea",
+"/": "c31d988d61c86957eed59b0b56a7b7ea",
 "manifest.json": "012d91b9edf492757ddf24dd1b15d03e",
 "canvaskit/canvaskit.js": "66177750aff65a66cb07bb44b8c6422b",
 "canvaskit/canvaskit.js.symbols": "48c83a2ce573d9692e8d970e288d75f7",
@@ -96,8 +96,8 @@ const RESOURCES = {"flutter.js": "f393d3c16b631f36852323de8e583132",
 "canvaskit/skwasm.wasm": "9f0c0c02b82a910d12ce0543ec130e60",
 "canvaskit/skwasm.worker.js": "89990e8c92bcb123999aa81f7e203b1c",
 "favicon.webp": "5d8a19c576a1ba2a24af3b99f340237d",
-"version.json": "64b640ac5cbb330d1d57029c9daa112b",
-"flutter_bootstrap.js": "ae0802b6860b7cfdcd61d7ac65778665"};
+"version.json": "ebd1271e201c001bfdb7b680663c9f95",
+"flutter_bootstrap.js": "d44978cfb4501f867f2751aed873dabe"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",
