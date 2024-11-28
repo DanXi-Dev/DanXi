@@ -354,9 +354,8 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                           rowGap: 8,
                           columnGap: 8,
                           children: Stickers.values.map((e) {
-                            return SizedBox(
-                              width: 60,
-                              height: 60,
+                            return Container(
+                              alignment: Alignment.center,
                               child: InkWell(
                                 onTap: () {
                                   var cursorPosition =
