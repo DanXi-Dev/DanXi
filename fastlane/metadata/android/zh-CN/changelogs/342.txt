@@ -1,0 +1,1 @@
+半年以来的问题修复累积。更新日志请看 https://github.com/DanXi-Dev/DanXi/releases。

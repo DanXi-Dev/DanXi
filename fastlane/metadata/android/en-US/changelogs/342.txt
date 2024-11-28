@@ -1,0 +1,1 @@
+The accumulated issue fixes in the past half year. For update logs, please see https://github.com/DanXi-Dev/DanXi/releases.
