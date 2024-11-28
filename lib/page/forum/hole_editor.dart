@@ -372,7 +372,7 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                                   getStickerAssetPath(e.name)!,
                                   width: 60,
                                   height: 60,
-                                  fit: BoxFit.cover,
+                                  fit: BoxFit.contain,
                                 ),
                               ),
                             );
