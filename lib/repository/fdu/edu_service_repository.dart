@@ -56,7 +56,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   };
 
   @override
-  String get linkHost => "jwfw.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 
   EduServiceRepository._();
 

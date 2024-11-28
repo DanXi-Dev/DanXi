@@ -32,7 +32,7 @@ import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/flutter_app.dart';
 import 'package:dan_xi/util/forum/clean_mode_filter.dart';
-import 'package:dan_xi/util/io/cache_manager_with_proxy.dart';
+import 'package:dan_xi/util/io/cache_manager_with_webvpn.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -234,9 +234,12 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     LicenseItem("encrypt_shared_preferences", LICENSE_APACHE_2_0,
         "https://github.com/xaldarof/encrypted-shared-preferences"),
     LicenseItem("device_identity", LICENSE_MIT,
-        "https://devgit.starschina.com/flutter_open_srouce/device_identity"),
+        "https://github.com/50431040/device_identity"),
     LicenseItem("tutorial_coach_mark", LICENSE_MIT,
-        "https://github.com/RafaelBarbosatec/tutorial_coach_mark")
+        "https://github.com/RafaelBarbosatec/tutorial_coach_mark"),
+    LicenseItem("toml", LICENSE_MIT, "https://github.com/just95/toml.dart"),
+    LicenseItem("pub_semver", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/dart-lang/pub_semver"),
   ];
 
   String? _clearCacheSubtitle;
@@ -248,10 +251,10 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
       await ForumRepository.getInstance().logout();
     } finally {
       progressDialog.dismiss(showAnim: false);
-      SettingsProvider.getInstance()
-          .preferences
-          ?.clear()
-          .then((value) => FlutterApp.restartApp(context));
+      await SettingsProvider.getInstance().preferences?.clear();
+      if (mounted) {
+        FlutterApp.restartApp(context);
+      }
     }
   }
 
@@ -497,18 +500,18 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                   S.of(context).proxy_setting_unset),
                           leading: const Icon(Icons.network_ping),
                           onTap: () async {
-                            String? email = await Noticing.showInputDialog(
+                            String? addr = await Noticing.showInputDialog(
                                 context,
                                 S.of(context).proxy_setting_input_title,
                                 initialText:
                                     context.read<SettingsProvider>().proxy,
                                 hintText:
                                     S.of(context).proxy_setting_input_hint);
-                            if (!context.mounted || email == null) {
+                            if (!context.mounted || addr == null) {
                               return; // return if cancelled
                             }
-                            if (email.isEmpty) email = null;
-                            context.read<SettingsProvider>().proxy = email;
+                            if (addr.isEmpty) addr = null;
+                            context.read<SettingsProvider>().proxy = addr;
                             await Noticing.showNotice(context,
                                 S.of(context).proxy_setting_set_successfully);
                           },
@@ -527,6 +530,17 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                 .read<SettingsProvider>()
                                 .hiddenNotifications = [],
                           ),
+                        SwitchListTile.adaptive(
+                            title: Text(S.of(context).use_webvpn_title),
+                            secondary: const Icon(Icons.network_cell),
+                            subtitle: Text(
+                                S.of(context).use_webvpn_description),
+                            value: context.select<SettingsProvider, bool>(
+                                (s) => s.useWebvpn),
+                            onChanged: (bool value) async {
+                              context.read<SettingsProvider>().useWebvpn =
+                                  value;
+                            })
                       ],
                     ),
                   ),
@@ -798,7 +812,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                   subtitle: Text(_clearCacheSubtitle ??
                       S.of(context).clear_cache_description),
                   onTap: () async {
-                    await DefaultCacheManagerWithProxy().emptyCache();
+                    await DefaultCacheManagerWithWebvpn().emptyCache();
                     setState(() {
                       _clearCacheSubtitle = S.of(context).cache_cleared;
                     });
@@ -879,7 +893,6 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       while (auxiliaryNavigatorState?.canPop() == true) {
                         auxiliaryNavigatorState?.pop();
                       }
-                      settingsPageKey.currentState?.setState(() {});
                       forumPageKey.currentState?.listViewController
                           .notifyUpdate();
                     } finally {
@@ -1031,6 +1044,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         render: kMarkdownRenderFactory(null),
                         content: S.of(context).acknowledgements_markdown,
                         hasBackgroundImage: false,
+                        onTapLink: (url) => BrowserUtil.openUrl(url!, null),
                       ),
 
                       const SizedBox(height: 16),
@@ -1054,7 +1068,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         alignment: Alignment.centerRight,
                         child: Text(
                           '${S.of(context).version} ${FlutterApp.versionName} build ${Pubspec.version.build.single} #${const String.fromEnvironment("GIT_HASH", defaultValue: "?")}',
-                          textScaleFactor: 0.7,
+                          textScaler: const TextScaler.linear(0.7),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),

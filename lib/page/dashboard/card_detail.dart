@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/ecard_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -102,7 +103,7 @@ class CardDetailPageState extends State<CardDetailPage> {
                   _selectable = false;
                 });
                 _cardInfo!.records = await CardRepository.getInstance()
-                    .loadCardRecord(_tagDays[index]);
+                    .loadCardRecord(StateProvider.personInfo.value, _tagDays[index]);
                 setState(() {
                   tag.checkedIcon = PlatformX.isMaterial(context)
                       ? Icons.check

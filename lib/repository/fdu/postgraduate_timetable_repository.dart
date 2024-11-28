@@ -104,15 +104,17 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
   }
 
   Future<TimeTable?> loadTimeTable(PersonInfo info, OnCaptchaCallback callback,
-      {DateTime? startTime, bool forceLoadFromRemote = false}) {
+      {DateTime? startTime, bool forceLoadFromRemote = false}) async {
     startTime ??= TimeTable.defaultStartTime;
     if (forceLoadFromRemote) {
-      return Cache.getRemotely<TimeTable>(
+      TimeTable? result = (await Cache.getRemotely<TimeTable>(
           TimeTableRepository.KEY_TIMETABLE_CACHE,
           () async => (await loadTimeTableRemotely(info, callback,
               startTime: startTime))!,
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
-          (object) => jsonEncode(object.toJson()));
+          (object) => jsonEncode(object.toJson())));
+      SettingsProvider.getInstance().timetableLastUpdated = DateTime.now();
+      return result;
     } else {
       return Cache.get<TimeTable>(
           TimeTableRepository.KEY_TIMETABLE_CACHE,
@@ -136,7 +138,7 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "yjsxk.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }
 
 typedef OnCaptchaCallback = Future<String> Function(String imageUrl);

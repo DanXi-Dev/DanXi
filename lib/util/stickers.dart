@@ -31,14 +31,22 @@ enum Stickers {
   dx_swim,
   dx_thrill,
   dx_touch_fish,
-  dx_twin;
+  dx_twin,
+  dx_kiss,
+  dx_onlooker,
+  dx_craving,
+  dx_caught,
+  dx_worn,
+  dx_murderous,
+  dx_confused,
+  dx_like;
 }
 
 String? getStickerAssetPath(String stickerName) {
   try {
     Stickers sticker = Stickers.values.firstWhere(
             (e) => e.name.toString() == stickerName);
-    return "assets/graphics/stickers/${sticker.name}.jpg";
+    return "assets/graphics/stickers/${sticker.name}.webp";
   } catch (error) {
     return null;
   }

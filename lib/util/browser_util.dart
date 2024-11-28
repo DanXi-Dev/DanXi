@@ -21,7 +21,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/independent_cookie_jar.dart';
+import 'package:dan_xi/repository/cookie/independent_cookie_jar.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:flutter/material.dart';

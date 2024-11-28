@@ -98,6 +98,7 @@ class DioUtils {
     return true;
   }
 
+  /// Create a new [Dio] instance with the proxy set to the one in [SettingsProvider].
   static Dio newDioWithProxy([BaseOptions? options]) {
     Dio dio = Dio(options);
     setProxy(dio, SettingsProvider.getInstance().proxy);

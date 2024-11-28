@@ -26,11 +26,13 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/forum/jwt_interceptor.dart';
+import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dio/dio.dart';
 
 class CurriculumBoardRepository extends BaseRepositoryWithDio {
   static final String _BASE_URL = SettingsProvider.getInstance().dankeBaseUrl;
-  static final String _BASE_AUTH_URL = SettingsProvider.getInstance().authBaseUrl;
+  static final String _BASE_AUTH_URL =
+      SettingsProvider.getInstance().authBaseUrl;
 
   CurriculumBoardRepository._() {
     dio.interceptors.add(JWTInterceptor(
@@ -44,9 +46,9 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
     // First fetch of the course list is VERY SLOW
     dio.options = BaseOptions(
         receiveDataWhenStatusError: true,
-        connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 30),
-        sendTimeout: const Duration(seconds: 10));
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 15),
+        sendTimeout: const Duration(seconds: 5));
   }
 
   /// Short name for the provider singleton
@@ -66,77 +68,108 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
   // Return raw json string
   Future<CourseSearchResults?> searchCourseGroups(String keyword,
       {int? page, int pageLength = Constant.SEARCH_COUNT_PER_PAGE}) async {
-    Response<Map<String, dynamic>> response = await dio.get(
-        "$_BASE_URL/v3/course_groups/search",
+    final options = RequestOptions(
+        path: "$_BASE_URL/v3/course_groups/search",
+        method: "GET",
         queryParameters: {
           'query': keyword,
           'page': page ?? 1,
           'page_size': pageLength
         },
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return CourseSearchResults.fromJson(response.data!);
   }
 
   Future<CourseGroup?> getCourseGroup(int groupId) async {
-    Response<Map<String, dynamic>> response = await dio.get(
-        "$_BASE_URL/v3/course_groups/$groupId",
-        options: Options(headers: _tokenHeader));
+    final options = RequestOptions(
+        path: "$_BASE_URL/v3/course_groups/$groupId",
+        method: "GET",
+        headers: _tokenHeader);
+    Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return CourseGroup.fromJson(response.data!);
   }
 
   Future<CourseReview?> addReview(CourseReviewEditorText review) async {
-    Response<Map<String, dynamic>> response = await dio.post(
-        "$_BASE_URL/courses/${review.courseId}/reviews",
+    final options = RequestOptions(
+        path: "$_BASE_URL/courses/${review.courseId}/reviews",
+        method: "POST",
         data: {
           'title': review.title,
           'content': review.content,
           'rank': review.grade
         },
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return CourseReview.fromJson(response.data!);
   }
 
   Future<int?> removeReview(int reviewId) async {
-    Response<String> response = await dio.delete("$_BASE_URL/reviews/$reviewId",
-        options: Options(headers: _tokenHeader));
+    final options = RequestOptions(
+        path: "$_BASE_URL/reviews/$reviewId",
+        method: "DELETE",
+        headers: _tokenHeader);
+    Response<String> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.statusCode;
   }
 
   Future<int?> modifyReview(
       int reviewId, CourseReviewEditorText updatedReview) async {
-    Response<String> response = await dio.put("$_BASE_URL/reviews/$reviewId",
+    final options = RequestOptions(
+        path: "$_BASE_URL/reviews/$reviewId/_webvpn",
+        method: "PATCH",
         data: {
           'title': updatedReview.title,
           'content': updatedReview.content,
           'rank': updatedReview.grade
         },
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    Response<String> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.statusCode;
   }
 
   Future<CourseReview> voteReview(int reviewId, bool upVote) async {
-    Response<dynamic> response = await dio.patch("$_BASE_URL/reviews/$reviewId",
+    final options = RequestOptions(
+        path: "$_BASE_URL/reviews/$reviewId",
+        method: "PATCH",
         data: {
           'upvote': upVote,
         },
-        options: Options(headers: _tokenHeader));
+        headers: _tokenHeader);
+    Response<dynamic> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return CourseReview.fromJson(response.data ?? "");
   }
 
   Future<List<CourseReview>?> getReviews(String courseId) async {
-    Response<List<dynamic>> response = await dio.get(
-        "$_BASE_URL/courses/$courseId/reviews",
-        options: Options(headers: _tokenHeader));
+    final options = RequestOptions(
+        path: "$_BASE_URL/courses/$courseId/reviews",
+        method: "GET",
+        headers: _tokenHeader);
+    Response<List<dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return response.data?.map((e) => CourseReview.fromJson(e)).toList();
   }
 
   Future<CourseReview?> getRandomReview() async {
+    final options = RequestOptions(
+        path: "$_BASE_URL/reviews/random",
+        method: "GET",
+        headers: _tokenHeader);
     // debugPrint(SettingsProvider.getInstance().forumToken!.access!);
-    Response<dynamic> response = await dio.get("$_BASE_URL/reviews/random",
-        options: Options(headers: _tokenHeader));
+    Response<dynamic> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
     return CourseReview.fromJson(response.data ?? "");
   }
 
   @override
   String get linkHost => 'danke.fduhole.com';
+
+  @override
+  bool get isWebvpnApplicable => true;
 }

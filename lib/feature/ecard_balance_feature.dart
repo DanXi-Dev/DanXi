@@ -46,9 +46,7 @@ class EcardBalanceFeature extends Feature {
 
   Future<void> _loadCard(PersonInfo? info) async {
     _status = ConnectionStatus.CONNECTING;
-    _cardInfo = await Retrier.tryAsyncWithFix(
-        () => CardRepository.getInstance().loadCardInfo(0),
-        (exception) => CardRepository.getInstance().init(info));
+    _cardInfo = await CardRepository.getInstance().loadCardInfo(info, 0);
     _balance = _cardInfo!.cash;
 
     // If there's any transaction, we'll show it in the subtitle

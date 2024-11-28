@@ -214,7 +214,7 @@ class FilterListWidgetState<T> extends State<FilterListWidget<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(spacing: 4, runSpacing: 4, children: [
+    return Wrap(spacing: 3, runSpacing: 2, children: [
       ...widget.filters.map(
         (e) => FilterTagWidget(
             color: e.filter == selectedTag!.filter

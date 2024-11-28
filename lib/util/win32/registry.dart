@@ -90,8 +90,9 @@ class Registry {
 
       switch (status) {
         case WIN32_ERROR.ERROR_SUCCESS:
-          if (lpType.value != REG_VALUE_TYPE.REG_SZ)
+          if (lpType.value != REG_VALUE_TYPE.REG_SZ) {
             throw Exception('Non-string content.');
+          }
           return RegistryKeyValuePair(
               lpValueName.toDartString(), lpData.cast<Utf16>().toDartString());
 

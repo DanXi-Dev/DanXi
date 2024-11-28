@@ -224,7 +224,7 @@
   "koowz_description": "旦挞开发者",
   "lan_connection_issue_1": "未能连接到校园内网",
   "lan_connection_issue_1_action": "校园 VPN",
-  "lan_connection_issue_1_description": "无法连接到复旦内部网络，部分功能不可用。您是否在校外或使用了移动数据链接？\n\n您可以使用校园 VPN(Easy Connect) 或链接 Eduroam 热点以访问内网资源。",
+  "lan_connection_issue_1_description": "无法连接到复旦内部网络，部分功能可能不可用。然而，如果你开启了“自动使用 WebVPN 代理”，并且登录了 UIS 账号，你仍然可以直接使用这些功能。\n\n如果不起作用，请尝试使用校园 VPN (EasyConnect) 或链接 Eduroam 热点以访问内网资源。",
   "lan_connection_issue_1_guide_content": "三步走即可：\n\n1. [点击这里](https://stuvpn.fudan.edu.cn/com/installClient.html#auto-common)去 VPN 下载界面，选择对应平台安装。\n2. 打开安装的软件，在地址栏输入 stuvpn.fudan.edu.cn ，点击确定。\n3. 弹出登录界面，输入自己的 UIS 账号，点击连接。\n\n然后就可以正常使用旦挞各项功能了！",
   "lan_connection_issue_1_guide_title": "如何使用校园 VPN？",
   "last_15_days": "过去 15 天",
@@ -318,7 +318,7 @@
   "obtaining_information": "正在获取信息……",
   "ok": "好",
   "older_announcement": "往期公告",
-  "only_show_dz": "只看洞主",
+  "only_show_dz": "只看楼主",
   "open_source_software_licenses": "开源软件许可协议",
   "operation_failed": "操作失败",
   "operation_successful": "操作成功",
@@ -449,6 +449,8 @@
   "theme_type_system": "跟随系统",
   "timetable": "日程",
   "timetable_refresh_error": "新学期的课表现已可用，但我们无法从复旦服务器下载新的课表。\n\n请确保您已连接到复旦校园内网，然后尝试手动刷新课表。\n\n提示：您可以在“日程”页面下拉刷新课表。",
+  "timetable_last_updated": "最后刷新时间：",
+  "timetable_no_last_updated": "暂无",
   "tip_that_danxi_is_not_fdu": "注意：旦挞账号和复旦大学无关，请不要在这里尝试您的复旦邮箱密码（或「统一身份认证」密码）。",
   "today_course": "今日课程",
   "try_visitor_mode": "不想登录 UIS？您可以仅使用茶楼",
@@ -534,5 +536,7 @@
   "proxy_setting_unset": "未设置",
   "proxy_setting_input_title": "输入 HTTP 代理地址",
   "proxy_setting_input_hint": "如 127.0.0.1:1234（留空以关闭代理）",
-  "proxy_setting_set_successfully": "代理设置已保存，重启应用后生效"
+  "proxy_setting_set_successfully": "代理设置已保存，重启应用后生效",
+  "use_webvpn_title": "自动使用 WebVPN 代理",
+  "use_webvpn_description": "启动该项后，允许在非校园网环境下直接访问茶楼、评教等功能（需要重启应用）"
 }

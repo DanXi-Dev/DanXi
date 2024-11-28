@@ -25,9 +25,9 @@ import 'package:dan_xi/model/forum/division.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/model/forum/tag.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/forum/hole_editor.dart';
 import 'package:dan_xi/page/forum/quiz.dart';
+import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -39,15 +39,15 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
+import 'package:dan_xi/widget/forum/auto_banner.dart';
+import 'package:dan_xi/widget/forum/forum_widgets.dart';
+import 'package:dan_xi/widget/forum/login_widgets.dart';
+import 'package:dan_xi/widget/forum/render/render_impl.dart';
+import 'package:dan_xi/widget/forum/tag_selector/selector.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
-import 'package:dan_xi/widget/forum/auto_banner.dart';
-import 'package:dan_xi/widget/forum/login_widgets.dart';
-import 'package:dan_xi/widget/forum/render/render_impl.dart';
-import 'package:dan_xi/widget/forum/tag_selector/selector.dart';
-import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -95,7 +95,7 @@ void onLogout() {
 final RegExp latexRegExp = RegExp(r"<(tex|texLine)>.*?</(tex|texLine)>",
     multiLine: true, dotAll: true);
 final RegExp mentionRegExp =
-    RegExp(r"<(floor|hole)_mention>(.*?)</(floor|hole)_mention>");
+    RegExp(r"<(floor|hole)Mention>(.*?)</(floor|hole)Mention>");
 
 /// Render the text from a clip of [content].
 /// Also supports adding image tag to markdown posts
@@ -131,9 +131,7 @@ String renderText(String content, String imagePlaceholder,
 
   // If we have reduce the text to nothing, we would rather not remove mention texts.
   if (result.isEmpty && removeMentions) {
-    return renderText(originalContent,
-        imagePlaceholder,
-        formulaPlaceholder,
+    return renderText(originalContent, imagePlaceholder, formulaPlaceholder,
         stickerPlaceholder,
         removeMentions: false);
   } else {
@@ -360,16 +358,11 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     if (!context.read<ForumProvider>().isUserInitialized) {
       await ForumRepository.getInstance().initializeRepo();
       context.read<ForumProvider>().currentDivisionId =
-          ForumRepository.getInstance()
-              .getDivisions()
-              .firstOrNull
-              ?.division_id;
-      settingsPageKey.currentState?.setState(() {});
+          ForumRepository.getInstance().getDivisions().firstOrNull?.division_id;
     }
 
     bool answered =
-        await ForumRepository.getInstance().hasAnsweredQuestions() ??
-            true;
+        await ForumRepository.getInstance().hasAnsweredQuestions() ?? true;
     if (!answered) {
       throw QuizUnansweredError(
           "User hasn't finished the quiz of forum rules yet. ");
@@ -449,8 +442,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
       } else if (_postsType == PostsType.SUBSCRIBED_DISCUSSION) {
         await ForumRepository.getInstance().getSubscribedHoleId();
       } else if (context.read<ForumProvider>().isUserInitialized) {
-        await ForumRepository.getInstance()
-            .loadDivisions(useCache: false);
+        await ForumRepository.getInstance().loadDivisions(useCache: false);
         await refreshSelf();
       }
     } finally {

@@ -148,7 +148,7 @@ class EhallEmptyClassroomRepository extends BaseRepositoryWithDio {
   }
 
   @override
-  String get linkHost => "zlapp.fudan.edu.cn";
+  String get linkHost => "fudan.edu.cn";
 }
 
 class RoomInfo {
