@@ -42,7 +42,7 @@ class Announcement {
 
   // FIXME: Use updatedAt as objectId requires updatedAt to be unique
   Announcement.fromToml(Map<String, dynamic> notice){
-    updatedAt = notice['updatedAt'];
+    updatedAt = notice['updated_at'];
     content = notice['content'];
     maxVersion = notice['build'];
     createdAt = updatedAt;
