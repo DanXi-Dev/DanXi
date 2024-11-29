@@ -17,6 +17,7 @@
 
 import 'dart:async';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/icon_fonts.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -373,7 +374,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                             teacherFilterNotifier.value = e!;
                           },
                           itemBuilder: (e) => DropdownMenuItem(
-                              value: e, child: Flexible(child: Text(e, style: listItemStyle,))),
+                              value: e, child: AutoSizeText(e, style: listItemStyle,)),
                         )),
                     Expanded(
                         flex: 1,
@@ -393,8 +394,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                                   },
                                   itemBuilder: (e) => DropdownMenuItem(
                                       value: e,
-                                      child: Flexible(
-                                          child: Text(e.formatTime(), style: listItemStyle,)))),
+                                      child: AutoSizeText(e.formatTime(), style: listItemStyle,))),
                           valueListenable: teacherFilterNotifier,
                         )),
                   ]),
