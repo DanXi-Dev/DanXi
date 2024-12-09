@@ -538,5 +538,6 @@
   "proxy_setting_input_hint": "如 127.0.0.1:1234（留空以关闭代理）",
   "proxy_setting_set_successfully": "代理设置已保存，重启应用后生效",
   "use_webvpn_title": "自动使用 WebVPN 代理",
-  "use_webvpn_description": "启动该项后，允许在非校园网环境下直接访问茶楼、评教等功能（需要重启应用）"
+  "use_webvpn_description": "启动该项后，允许在非校园网环境下直接访问茶楼、评教等功能（需要重启应用）",
+  "show_this_person": "只看此人"
 }
