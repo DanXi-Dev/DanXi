@@ -319,7 +319,6 @@ class OTFloorWidget extends StatelessWidget {
     this.onTapImage,
     this.searchKeyWord,
   });
-
   @override
   Widget build(BuildContext context) {
     const int foldLimit = 500;
