@@ -306,7 +306,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
         trailingActions: [
           if (_renderModel
-              case Normal(hole: var hole, onlyShowDZ: var onlyShowDZ)) ...[
+              case Normal(hole: var hole, selectedPerson: var selectedPerson)) ...[
             _buildSubscribeActionButton(),
             _buildFavoredActionButton(),
             PlatformIconButton(
@@ -327,12 +327,18 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                     label: S.of(context).scroll_to_end,
                     onTap: _onTapScrollToEnd),
                 PopupMenuOption(
-                    label: onlyShowDZ
+                    label: selectedPerson == hole.floors?.first_floor?.anonyname
                         ? S.of(context).show_all_replies
                         : S.of(context).only_show_dz,
                     onTap: (_) {
-                      setState(() =>
-                          (_renderModel as Normal).onlyShowDZ = !onlyShowDZ);
+                      setState(() {
+                        if ((_renderModel as Normal).selectedPerson != hole.floors?.first_floor?.anonyname) {
+                          (_renderModel as Normal).selectedPerson = hole.floors?.first_floor?.anonyname;
+                        }
+                        else {
+                          (_renderModel as Normal).selectedPerson = null;
+                        }
+                      });
                       refreshListView();
                     }),
                 PopupMenuOption(
@@ -880,6 +886,20 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       ),
       PlatformContextMenuItem(
         menuContext: menuContext,
+        onPressed: () async {
+          if ((_renderModel as Normal).selectedPerson != null) {
+            (_renderModel as Normal).selectedPerson = null;
+            refreshListView();
+          } else {
+            setState(() =>
+            (_renderModel as Normal).selectedPerson = e.anonyname);
+            refreshListView();
+          }
+        },
+        child: Text((_renderModel as Normal).selectedPerson == e.anonyname ? S.of(context).show_all_replies : S.of(context).show_this_person),
+      ),
+      PlatformContextMenuItem(
+        menuContext: menuContext,
         isDestructive: true,
         onPressed: () async {
           if (await OTEditor.reportPost(context, e.floor_id)) {
@@ -1009,9 +1029,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   Widget _getListItems(BuildContext context, ListProvider<OTFloor> dataProvider,
       int index, OTFloor floor,
       {bool isNested = false}) {
-    if (_renderModel case Normal(onlyShowDZ: var onlyShowDZ, hole: var hole)) {
-      if (onlyShowDZ &&
-          floor.anonyname != hole.floors?.first_floor?.anonyname) {
+    if (_renderModel case Normal(selectedPerson: var selectedPerson, hole: var hole)) {
+      if (selectedPerson != null &&
+        floor.anonyname != selectedPerson) {
         return nil;
       }
     }
@@ -1190,7 +1210,7 @@ sealed class RenderModel {}
 class Normal extends RenderModel {
   OTHole hole;
   bool? isFavored, isSubscribed;
-  bool onlyShowDZ = false;
+  String? selectedPerson = null;
 
   Normal(this.hole);
 

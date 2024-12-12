@@ -544,5 +544,6 @@
   "proxy_setting_input_hint": "e.g. 127.0.0.1:1234 (Leave blank to disable)",
   "proxy_setting_set_successfully": "Proxy settings saved, restart the app to take effect.",
   "use_webvpn_title": "Use WebVPN proxy",
-  "use_webvpn_description": "When enabled, certain functions could be accessed directly without Fudan LAN (restart required)"
+  "use_webvpn_description": "When enabled, certain functions could be accessed directly without Fudan LAN (restart required)",
+  "show_this_person": "Filter by this user"
 }
