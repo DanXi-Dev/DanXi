@@ -1210,8 +1210,7 @@ sealed class RenderModel {}
 class Normal extends RenderModel {
   OTHole hole;
   bool? isFavored, isSubscribed;
-
-  String? selectedPerson;
+  String? selectedPerson = null;
 
   Normal(this.hole);
 

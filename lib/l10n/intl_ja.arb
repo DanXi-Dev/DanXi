@@ -527,5 +527,5 @@
   "proxy_setting_set_successfully": "プロキシ設定が保存されました。再起動すると有効になります。",
   "use_webvpn_title": "WebVPN を自動的に使う",
   "use_webvpn_description": "有効時、一部の機能はFudan LANなしで、直接に連接するのができます (再起動が必要)",
-  "show_this_person": "この人を見てください"
+  "show_this_person": "この人だけ"
 }

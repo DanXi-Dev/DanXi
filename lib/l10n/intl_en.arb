@@ -545,5 +545,5 @@
   "proxy_setting_set_successfully": "Proxy settings saved, restart the app to take effect.",
   "use_webvpn_title": "Use WebVPN proxy",
   "use_webvpn_description": "When enabled, certain functions could be accessed directly without Fudan LAN (restart required)",
-  "show_this_person": "Show this person"
+  "show_this_person": "Filter by this user"
 }
