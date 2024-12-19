@@ -94,7 +94,7 @@
   "curriculum_ratings_workload_words": "巨大;多い;中;少ない;とても少ない",
   "curriculum_ratings_assessment": "試験の要求",
   "curriculum_ratings_assessment_words": "とても厳格;厳格;中;気楽;とても気楽",
-  "curriculum_search_hint": "授業名称・授業番号",
+  "curriculum_search_hint": "授業名称・授業番号・教師名",
   "curriculum_select_teacher": "教員名を選んでください",
   "curriculum_select_time": "授業時間を選んでください",
   "curriculum_unknown_rating": "知らない",

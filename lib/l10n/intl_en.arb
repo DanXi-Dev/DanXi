@@ -96,7 +96,7 @@
   "curriculum_ratings_workload_words": "Enormous;Large;Medium;Light;Super light",
   "curriculum_ratings_assessment": "Assessment",
   "curriculum_ratings_assessment_words": "Very strict;Strict;Medium;Loose;Very loose",
-  "curriculum_search_hint": "Class name or Class ID",
+  "curriculum_search_hint": "Class name or Class ID or Teacher name",
   "curriculum_select_teacher": "Please select teacher",
   "curriculum_select_time": "Please select course time",
   "curriculum_unknown_rating": "Unknown",

@@ -94,7 +94,7 @@
   "curriculum_ratings_workload_words": "非常大;较大;中等;较小;非常小",
   "curriculum_ratings_assessment": "考核要求",
   "curriculum_ratings_assessment_words": "非常严格;严格;中等;宽松;非常宽松",
-  "curriculum_search_hint": "课程名称 或 课程代码",
+  "curriculum_search_hint": "课程名称、代码 或 教师姓名",
   "curriculum_select_teacher": "请选择教师",
   "curriculum_select_time": "请选择上课时间",
   "curriculum_unknown_rating": "未知",
