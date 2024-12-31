@@ -58,14 +58,8 @@ class BusPageState extends State<BusPage> {
   /// Start location.
   Campus? _startSelectItem = Campus.NONE;
 
-  /// The slide bar's position of start location.
-  int? _startSliding;
-
   /// End location.
   Campus? _endSelectItem = Campus.NONE;
-
-  /// The slide bar's position of end location.
-  int? _endSliding;
 
   /// By default, only buses after DateTime.now() is displayed.
   /// Set this to true to display all buses.
@@ -135,11 +129,9 @@ class BusPageState extends State<BusPage> {
 
     // Default to HanDan
     _startSelectItem = Campus.HANDAN_CAMPUS;
-    _startSliding = _startSelectItem!.index;
     _onStartLocationChanged(_startSelectItem);
 
     _endSelectItem = SettingsProvider.getInstance().campus;
-    _endSliding = _endSelectItem!.index;
     _onEndLocationChanged(_endSelectItem);
   }
 
@@ -257,11 +249,10 @@ class BusPageState extends State<BusPage> {
                       padding: const EdgeInsets.only(top: 8, bottom: 4),
                       child: CupertinoSlidingSegmentedControl<int>(
                         onValueChanged: (int? value) {
-                          _startSliding = value;
                           _onStartLocationChanged(
-                              Campus.values[_startSliding!]);
+                              Campus.values[value!]);
                         },
-                        groupValue: _startSliding,
+                        groupValue: _startSelectItem?.index,
                         children: _getCupertinoItems(),
                       ),
                     ),
@@ -279,10 +270,9 @@ class BusPageState extends State<BusPage> {
                       padding: const EdgeInsets.only(top: 8, bottom: 4),
                       child: CupertinoSlidingSegmentedControl<int>(
                         onValueChanged: (int? value) {
-                          _endSliding = value;
-                          _onEndLocationChanged(Campus.values[_endSliding!]);
+                          _onEndLocationChanged(Campus.values[value!]);
                         },
-                        groupValue: _endSliding,
+                        groupValue: _endSelectItem?.index,
                         children: _getCupertinoItems(),
                       ),
                     ),
