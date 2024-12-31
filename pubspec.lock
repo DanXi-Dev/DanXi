@@ -1683,10 +1683,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "882839a03f33c3745cd11ad2134fdd8afdf0b207"
+      resolved-ref: afa8b29ec82af50c3aa19bd50754bac8a0141bc6
       url: "https://github.com/w568w/receive_intent.git"
     source: git
-    version: "0.2.4"
+    version: "0.2.5"
   rxdart:
     dependency: transitive
     description:

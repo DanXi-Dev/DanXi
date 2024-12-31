@@ -37,7 +37,7 @@ gradle.taskGraph.whenReady {
     }
 }
 android {
-    compileSdkVersion 34
+    compileSdkVersion 35
 
     ndkVersion "28.0.12433566"
 
@@ -50,7 +50,7 @@ android {
         applicationId "io.github.danxi_dev.dan_xi"
         namespace "io.github.danxi_dev.dan_xi"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
