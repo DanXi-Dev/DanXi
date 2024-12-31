@@ -23,6 +23,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/bus_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
@@ -31,6 +32,7 @@ import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
 
@@ -153,6 +155,14 @@ class BusPageState extends State<BusPage> {
     });
   }
 
+  void _onLocationSwapped() {
+    setState(() {
+      final temp = _startSelectItem;
+      _startSelectItem = _endSelectItem;
+      _endSelectItem = temp;
+    });
+  }
+
   void swapBusDetails(BusScheduleItem element) {
     final start = element.start;
     element.start = element.end;
@@ -219,10 +229,20 @@ class BusPageState extends State<BusPage> {
                   },
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              LayoutGrid(
+                areas: '''
+                start_title start swap
+                dest_title  dest  swap
+                ''',
+                gridFit: GridFit.loose,
+                columnSizes: [auto, auto, auto],
+                rowSizes: [auto, auto],
+                columnGap: 8,
                 children: [
-                  Text(S.of(context).bus_start),
+                  Center(child: Text(S.of(context).bus_start))
+                      .inGridArea('start_title'),
+                  Center(child: Text(S.of(context).bus_dest))
+                      .inGridArea('dest_title'),
                   PlatformWidget(
                     material: (_, __) => DropdownButton<Campus>(
                       items: _getItems(),
@@ -245,13 +265,7 @@ class BusPageState extends State<BusPage> {
                         children: _getCupertinoItems(),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(S.of(context).bus_dest),
+                  ).inGridArea('start'),
                   PlatformWidget(
                     material: (_, __) => DropdownButton<Campus>(
                       items: _getItems(),
@@ -272,7 +286,15 @@ class BusPageState extends State<BusPage> {
                         children: _getCupertinoItems(),
                       ),
                     ),
-                  ),
+                  ).inGridArea('dest'),
+                  Center(
+                    child: PlatformIconButton(
+                      icon: Icon(PlatformX.isCupertino(context)
+                          ? CupertinoIcons.arrow_swap
+                          : Icons.swap_vert),
+                      onPressed: _onLocationSwapped,
+                    ),
+                  ).inGridArea('swap'),
                 ],
               ),
               Expanded(
