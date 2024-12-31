@@ -347,7 +347,7 @@ class BusPageState extends State<BusPage> {
                   children: [
                     Text(
                       item.start.displayTitle(context),
-                      textScaleFactor: 1.2,
+                      textScaler: TextScaler.linear(1.2),
                     ),
                     const SizedBox(
                       height: 4,
@@ -357,14 +357,14 @@ class BusPageState extends State<BusPage> {
                 ),
                 Text(
                   item.direction.toText()!,
-                  textScaleFactor: 1.5,
+                  textScaler: TextScaler.linear(1.5),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       item.end.displayTitle(context),
-                      textScaleFactor: 1.2,
+                      textScaler: TextScaler.linear(1.2),
                     ),
                     const SizedBox(
                       height: 4,
