@@ -356,7 +356,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   label: S.of(context).share_hole,
                   onTap: (_) async {
                     if (await _shareHoleAsUri(hole.hole_id)) {
-                      if (mounted) {
+                      if (context.mounted) {
                         Noticing.showMaterialNotice(
                             context, S.of(context).shareHoleSuccess);
                       }
@@ -367,7 +367,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   label: S.of(context).copy_hole_id,
                   onTap: (_) async {
                     await FlutterClipboard.copy('#${hole.hole_id}');
-                    if (mounted) {
+                    if (context.mounted) {
                       Noticing.showMaterialNotice(
                           context, S.of(context).copy_hole_id_success);
                     }
@@ -386,7 +386,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                           list.add(hole.hole_id!);
                           SettingsProvider.getInstance().hiddenHoles = list;
                         }
-                        if (mounted) {
+                        if (context.mounted) {
                           Noticing.showNotice(
                               context, S.of(context).hide_hole_success);
                         }
@@ -790,7 +790,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           onPressed: () async {
             if (await OTEditor.modifyReply(
                 context, e.hole_id, e.floor_id, e.content)) {
-              if (!context.mounted) return;
+              if (!mounted) return;
               Noticing.showMaterialNotice(
                   context, S.of(context).request_success);
               ForumRepository.getInstance().invalidateFloorCache(e.floor_id!);
@@ -837,7 +837,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           child: Text(postTimeStr),
           onPressed: () async {
             await FlutterClipboard.copy(postTimeStr);
-            if (mounted) {
+            if (mounted && menuContext.mounted) {
               Noticing.showMaterialNotice(
                   context, S.of(menuContext).copy_success);
             }
@@ -854,7 +854,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           onPressed: () async {
             await FlutterClipboard.copy(
                 renderText(e.filteredContent!, '', '', ''));
-            if (mounted) {
+            if (mounted && menuContext.mounted) {
               Noticing.showMaterialNotice(
                   context, S.of(menuContext).copy_success);
             }
@@ -900,7 +900,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         isDestructive: true,
         onPressed: () async {
           if (await OTEditor.reportPost(context, e.floor_id)) {
-            if (!context.mounted) return;
+            if (!mounted) return;
             Noticing.showMaterialNotice(context, S.of(context).report_success);
           }
         },
@@ -1026,7 +1026,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   Widget _getListItems(BuildContext context, ListProvider<OTFloor> dataProvider,
       int index, OTFloor floor,
       {bool isNested = false}) {
-    if (_renderModel case Normal(selectedPerson: var selectedPerson, hole: var hole)) {
+    if (_renderModel case Normal(selectedPerson: var selectedPerson, hole: _)) {
       if (selectedPerson != null &&
         floor.anonyname != selectedPerson) {
         return nil;
@@ -1140,7 +1140,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           Positioned.fill(
             child: IgnorePointer(
               child: Container(
-                color: Theme.of(context).colorScheme.secondary.withOpacity(0.5),
+                color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.5),
               ),
             ),
           ),
@@ -1207,7 +1207,7 @@ sealed class RenderModel {}
 class Normal extends RenderModel {
   OTHole hole;
   bool? isFavored, isSubscribed;
-  String? selectedPerson = null;
+  String? selectedPerson;
 
   Normal(this.hole);
 
