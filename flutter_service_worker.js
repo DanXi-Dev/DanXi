@@ -48,10 +48,10 @@ const RESOURCES = {"assets/assets/texts/tips.dat": "b38397c625ee54578753dadccd05
 "assets/AssetManifest.bin": "b920a8779dd4517ae98a56f377b7d356",
 "assets/NOTICES": "d0b97505efcd05defe34f9b04a84a2dc",
 "assets/AssetManifest.json": "0c2dddc9a70cab70fd49982e32420c96",
-"assets/fonts/MaterialIcons-Regular.otf": "f08a44907e395a2ccf4dcfc69be3a05c",
+"assets/fonts/MaterialIcons-Regular.otf": "0dfcffaba47f89910e50346f6dafa87f",
 "assets/packages/fluttertoast/assets/toastify.js": "56e2c9cedd97f10e7e5f1cebd85d53e3",
 "assets/packages/fluttertoast/assets/toastify.css": "a85675050054f179444bc5ad70ffc635",
-"assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "ba5b4a233ccd96b811d1ffc4d0c2ca64",
+"assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "68fc77f5ca411754489b8d5285dcfd28",
 "assets/packages/flutter_js/assets/js/fetch.js": "277e0c5ec36810cbe57371a4b7e26be0",
 "assets/packages/flutter_math_fork/lib/katex_fonts/fonts/KaTeX_Script-Regular.ttf": "55d2dcd4778875a53ff09320a85a5296",
 "assets/packages/flutter_math_fork/lib/katex_fonts/fonts/KaTeX_Caligraphic-Regular.ttf": "7ec92adfa4fe03eb8e9bfb60813df1fa",
@@ -93,11 +93,11 @@ const RESOURCES = {"assets/assets/texts/tips.dat": "b38397c625ee54578753dadccd05
 "canvaskit/canvaskit.wasm": "e7602c687313cfac5f495c5eac2fb324",
 "canvaskit/canvaskit.js": "26eef3024dbc64886b7f48e1b6fb05cf",
 "favicon.webp": "5d8a19c576a1ba2a24af3b99f340237d",
-"index.html": "af5d1f006cfae4b2c38ef089319ae2db",
-"/": "af5d1f006cfae4b2c38ef089319ae2db",
+"index.html": "b6407af2cd7d8047bbb5293e5f42b82d",
+"/": "b6407af2cd7d8047bbb5293e5f42b82d",
 "flutter.js": "4b2350e14c6650ba82871f60906437ea",
-"flutter_bootstrap.js": "67d2f2cf788a4b4fea088a36c5073b3c",
-"main.dart.js": "24dc8de8923b31e5a97acedda70cf314"};
+"flutter_bootstrap.js": "a96f73f44bd035c9f5a59be6eec8aa72",
+"main.dart.js": "508c4036f2afa646a4e361a43570bc5a"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",
