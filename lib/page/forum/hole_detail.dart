@@ -334,12 +334,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                       setState(() {
                         if ((_renderModel as Normal).selectedPerson != hole.floors?.first_floor?.anonyname) {
                           (_renderModel as Normal).selectedPerson = hole.floors?.first_floor?.anonyname;
-                        }
-                        else {
+                        } else {
                           (_renderModel as Normal).selectedPerson = null;
                         }
                       });
-                      refreshListView();
                     }),
                 PopupMenuOption(
                     label: _multiSelectMode
@@ -887,16 +885,15 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       PlatformContextMenuItem(
         menuContext: menuContext,
         onPressed: () async {
-          if ((_renderModel as Normal).selectedPerson != null) {
-            (_renderModel as Normal).selectedPerson = null;
-            refreshListView();
-          } else {
-            setState(() =>
-            (_renderModel as Normal).selectedPerson = e.anonyname);
-            refreshListView();
-          }
+          setState(() {
+            if ((_renderModel as Normal).selectedPerson != null) {
+              (_renderModel as Normal).selectedPerson = null;
+            } else {
+              (_renderModel as Normal).selectedPerson = e.anonyname;
+            }
+          });
         },
-        child: Text((_renderModel as Normal).selectedPerson == e.anonyname ? S.of(context).show_all_replies : S.of(context).show_this_person),
+        child: Text((_renderModel as Normal).selectedPerson != null ? S.of(context).show_all_replies : S.of(context).show_this_person),
       ),
       PlatformContextMenuItem(
         menuContext: menuContext,
