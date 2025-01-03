@@ -68,7 +68,7 @@ String preprocessContentForDisplay(String content) {
     if (element is UrlElement) {
       // Only add tag if tag has not yet been added.
       if (RegExp("\\[.*?\\]\\(${RegExp.escape(element.url)}\\)")
-              .hasMatch(content) ||
+          .hasMatch(content) ||
           RegExp("\\[.*?${RegExp.escape(element.url)}.*?\\]\\(http.*?\\)")
               .hasMatch(content)) {
         result += element.url;
@@ -121,7 +121,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   OTFloor? locateFloor;
 
   final PagedListViewController<OTFloor> _listViewController =
-      PagedListViewController<OTFloor>();
+  PagedListViewController<OTFloor>();
 
   /// Reload/load the (new) content and set the [_content] future.
   Future<List<OTFloor>?> _loadContent(int page) async {
@@ -141,7 +141,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           .loadFloors(hole, startFloor: page * Constant.POST_COUNT_PER_PAGE),
       Search(keyword: var searchKeyword) => await ForumRepository.getInstance()
           .loadSearchResults(searchKeyword,
-              startFloor: _listViewController.length()),
+          startFloor: _listViewController.length()),
       MyReplies() => await ForumRepository.getInstance()
           .loadUserFloors(startFloor: _listViewController.length()),
       PunishmentHistory() => await loadPunishmentHistory(page),
@@ -203,7 +203,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   /// Refresh the list view.
-  Future<void> refreshListView({bool scrollToEnd = false}) async {
+  Future<void> refreshListView({bool scrollToEnd = false, required selectedPerson, required VoidCallback func}) async {
+    if (!scrollToEnd && selectedPerson != null) {
+      func();
+    }
     _allDataLoaded = false;
     await _listViewController.notifyUpdate(queueDataClear: true);
 
@@ -247,7 +250,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             }
             // scroll to end.
             _listViewController.scheduleLoadedCallback(
-                () async => await _listViewController.scrollToEnd(),
+                    () async => await _listViewController.scrollToEnd(),
                 rebuild: true);
             shouldScrollToEnd = false;
           } catch (_) {
@@ -273,7 +276,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           padding: const EdgeInsets.only(bottom: 16),
           child: switch (_renderModel) {
             Normal(hole: var hole) when (hole.view ?? -1) >= 0 =>
-              Text(S.of(context).view_count(hole.view.toString())),
+                Text(S.of(context).view_count(hole.view.toString())),
             _ => Text(S.of(context).end_reached),
           },
         ),
@@ -281,11 +284,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       // Only show empty message when searching, for now.
       emptyBuilder: switch (_renderModel) {
         Search() => (context) => Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(S.of(context).no_data),
-              ),
-            ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(S.of(context).no_data),
+          ),
+        ),
         _ => null,
       },
     );
@@ -306,7 +309,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
         trailingActions: [
           if (_renderModel
-              case Normal(hole: var hole, selectedPerson: var selectedPerson)) ...[
+          case Normal(hole: var hole, selectedPerson: var selectedPerson)) ...[
             _buildSubscribeActionButton(),
             _buildFavoredActionButton(),
             PlatformIconButton(
@@ -317,7 +320,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               onPressed: () async {
                 if (await OTEditor.createNewReply(
                     context, hole.hole_id, null)) {
-                  refreshListView(scrollToEnd: true);
+                  refreshListView(scrollToEnd: true, selectedPerson: null, func: (){});
                 }
               },
             ),
@@ -409,8 +412,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           decoration: _backgroundImage == null
               ? null
               : BoxDecoration(
-                  image: DecorationImage(
-                      image: _backgroundImage!, fit: BoxFit.cover)),
+              image: DecorationImage(
+                  image: _backgroundImage!, fit: BoxFit.cover)),
           child: switch (_renderModel) {
             Normal() => RefreshIndicator(
                 edgeOffset: MediaQuery.of(context).padding.top,
@@ -418,7 +421,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 backgroundColor: Theme.of(context).dialogBackgroundColor,
                 onRefresh: () async {
                   HapticFeedback.mediumImpact();
-                  await refreshListView();
+                  await refreshListView(selectedPerson: (_renderModel as Normal).selectedPerson, func: () {
+                    (_renderModel as Normal).selectedPerson = null;
+                  });
                 },
                 child: pagedListView),
             _ => pagedListView,
@@ -471,8 +476,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           bool? isFavored = snapshot.data;
           return isFavored!
               ? Icon(PlatformX.isMaterial(context)
-                  ? Icons.star
-                  : CupertinoIcons.star_fill)
+              ? Icons.star
+              : CupertinoIcons.star_fill)
               : notFavoredIcon;
         },
         errorBuilder: () => Icon(
@@ -486,10 +491,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         setState(() => normalModel.isFavored = !normalModel.isFavored!);
         await ForumRepository.getInstance()
             .setFavorite(
-                normalModel.isFavored!
-                    ? SetStatusMode.ADD
-                    : SetStatusMode.DELETE,
-                normalModel.hole.hole_id)
+            normalModel.isFavored!
+                ? SetStatusMode.ADD
+                : SetStatusMode.DELETE,
+            normalModel.hole.hole_id)
             .onError((dynamic error, stackTrace) {
           Noticing.showNotice(context, error.toString(),
               title: S.of(context).operation_failed, useSnackBar: false);
@@ -515,8 +520,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           bool? isSubscribed = snapshot.data;
           return isSubscribed!
               ? Icon(PlatformX.isMaterial(context)
-                  ? Icons.visibility
-                  : CupertinoIcons.eye)
+              ? Icons.visibility
+              : CupertinoIcons.eye)
               : notSubscribedIcon;
         },
         errorBuilder: () => Icon(
@@ -530,10 +535,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         setState(() => normalModel.isSubscribed = !normalModel.isSubscribed!);
         await ForumRepository.getInstance()
             .setSubscription(
-                normalModel.isSubscribed!
-                    ? SetStatusMode.ADD
-                    : SetStatusMode.DELETE,
-                normalModel.hole.hole_id)
+            normalModel.isSubscribed!
+                ? SetStatusMode.ADD
+                : SetStatusMode.DELETE,
+            normalModel.hole.hole_id)
             .onError((dynamic error, stackTrace) {
           Noticing.showNotice(context, error.toString(),
               title: S.of(context).operation_failed, useSnackBar: false);
@@ -599,9 +604,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             if (hide != null) {
               int? result = hide
                   ? await ForumRepository.getInstance()
-                      .adminDeleteHole(e.hole_id)
+                  .adminDeleteHole(e.hole_id)
                   : await ForumRepository.getInstance()
-                      .adminUndeleteHole(e.hole_id);
+                  .adminUndeleteHole(e.hole_id);
               if (result != null && result < 300 && mounted) {
                 Noticing.showMaterialNotice(
                     context, S.of(context).operation_successful);
@@ -686,7 +691,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 .getDivisions()
                 .firstWhere(
                     (element) => element.division_id == hole.division_id,
-                    orElse: () => OTDivision(hole.division_id, '', '', null));
+                orElse: () => OTDivision(hole.division_id, '', '', null));
 
             List<Widget> buildDivisionOptionsList(BuildContext cxt) {
               List<Widget> list = [];
@@ -720,21 +725,21 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                               .isNotEmpty) {
                         selectedDivision =
                             (await showPlatformModalSheet<OTDivision>(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      final Widget content = Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: ListView(
-                                              shrinkWrap: true,
-                                              primary: false,
-                                              children:
-                                                  buildDivisionOptionsList(
-                                                      context)));
-                                      return PlatformX.isCupertino(context)
-                                          ? SafeArea(
-                                              child: Card(child: content))
-                                          : SafeArea(child: content);
-                                    })) ??
+                                context: context,
+                                builder: (BuildContext context) {
+                                  final Widget content = Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: ListView(
+                                          shrinkWrap: true,
+                                          primary: false,
+                                          children:
+                                          buildDivisionOptionsList(
+                                              context)));
+                                  return PlatformX.isCupertino(context)
+                                      ? SafeArea(
+                                      child: Card(child: content))
+                                      : SafeArea(child: content);
+                                })) ??
                                 selectedDivision;
                         setState(() {});
                       }
@@ -766,7 +771,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             if (confirmChanged ?? false) {
               int? result = await ForumRepository.getInstance()
                   .adminUpdateTagAndDivision(
-                      newTagsList, hole.hole_id, selectedDivision.division_id);
+                  newTagsList, hole.hole_id, selectedDivision.division_id);
               if (result != null && result < 300 && mounted) {
                 Noticing.showMaterialNotice(
                     context, S.of(context).operation_successful);
@@ -809,9 +814,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           onPressed: () async {
             if (await Noticing.showConfirmationDialog(context,
-                    S.of(context).about_to_delete_floor(e.floor_id ?? "null"),
-                    title: S.of(context).are_you_sure,
-                    isConfirmDestructive: true) ==
+                S.of(context).about_to_delete_floor(e.floor_id ?? "null"),
+                title: S.of(context).are_you_sure,
+                isConfirmDestructive: true) ==
                 true) {
               if (!context.mounted) return;
               try {
@@ -953,14 +958,14 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         PlatformContextMenuItem(
           onPressed: () async {
             if (await Noticing.showConfirmationDialog(
-                    context, S.of(context).are_you_sure,
-                    isConfirmDestructive: true) ==
+                context, S.of(context).are_you_sure,
+                isConfirmDestructive: true) ==
                 true) {
               final reason = await Noticing.showInputDialog(
                   context, S.of(context).input_reason);
               await multiExecution(
                   _selectedFloors,
-                  (floor) async => await ForumRepository.getInstance()
+                      (floor) async => await ForumRepository.getInstance()
                       .adminDeleteFloor(floor.floor_id, reason));
             }
           },
@@ -977,7 +982,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             }
             await multiExecution(
                 _selectedFloors,
-                (floor) async => await ForumRepository.getInstance()
+                    (floor) async => await ForumRepository.getInstance()
                     .adminAddSpecialTag(tag, floor.floor_id));
           },
           menuContext: menuContext,
@@ -992,9 +997,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             }
             await multiExecution(
                 _selectedFloors,
-                (floor) async => await ForumRepository.getInstance()
+                    (floor) async => await ForumRepository.getInstance()
                     .adminFoldFloor(
-                        reason.isEmpty ? [] : [reason], floor.floor_id));
+                    reason.isEmpty ? [] : [reason], floor.floor_id));
           },
           menuContext: menuContext,
           child: Text(S.of(context).fold_floor),
@@ -1028,7 +1033,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       {bool isNested = false}) {
     if (_renderModel case Normal(selectedPerson: var selectedPerson, hole: _)) {
       if (selectedPerson != null &&
-        floor.anonyname != selectedPerson) {
+          floor.anonyname != selectedPerson) {
         return nil;
       }
     }
@@ -1038,16 +1043,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       List<OTFloor>? result = switch (_renderModel) {
         Normal(hole: var hole) => await ForumRepository.getInstance()
             .loadFloors(hole,
-                startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
+            startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
         Search(keyword: var searchKeyword) =>
-          await ForumRepository.getInstance().loadSearchResults(searchKeyword,
-              startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
+        await ForumRepository.getInstance().loadSearchResults(searchKeyword,
+            startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
         MyReplies() => (await ForumRepository.getInstance().loadUserFloors(
             startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE)),
         PunishmentHistory() =>
-          (await ForumRepository.getInstance().getPunishmentHistory())
-              ?.map((e) => e.floor!)
-              .toList(),
+            (await ForumRepository.getInstance().getPunishmentHistory())
+                ?.map((e) => e.floor!)
+                .toList(),
       };
 
       if (result == null || result.isEmpty) {
@@ -1085,40 +1090,40 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       },
       onTap: _multiSelectMode
           ? () {
-              // If we are in multi-select mode, we should (un)select the floor.
-              setState(() {
-                if (_selectedFloors.contains(floor)) {
-                  _selectedFloors.remove(floor);
-                } else if (floor.floor_id != null) {
-                  _selectedFloors.add(floor);
-                }
-              });
-            }
+        // If we are in multi-select mode, we should (un)select the floor.
+        setState(() {
+          if (_selectedFloors.contains(floor)) {
+            _selectedFloors.remove(floor);
+          } else if (floor.floor_id != null) {
+            _selectedFloors.add(floor);
+          }
+        });
+      }
           : () async {
-              switch (_renderModel) {
-                case Normal(hole: var hole):
-                  int? replyId;
-                  // Set the replyId to null when tapping on the first reply.
-                  if (hole.floors?.first_floor?.floor_id != floor.floor_id) {
-                    replyId = floor.floor_id;
-                    ForumRepository.getInstance().cacheFloor(floor);
-                  }
-                  if (await OTEditor.createNewReply(
-                      context, hole.hole_id, replyId)) {
-                    await refreshListView(scrollToEnd: true);
-                  }
-                  break;
-                default:
-                  await OTFloorMentionWidget.jumpToFloorInNewPage(
-                      context, floor);
-              }
-            },
+        switch (_renderModel) {
+          case Normal(hole: var hole):
+            int? replyId;
+            // Set the replyId to null when tapping on the first reply.
+            if (hole.floors?.first_floor?.floor_id != floor.floor_id) {
+              replyId = floor.floor_id;
+              ForumRepository.getInstance().cacheFloor(floor);
+            }
+            if (await OTEditor.createNewReply(
+                context, hole.hole_id, replyId)) {
+              await refreshListView(scrollToEnd: true, selectedPerson: null, func: (){});
+            }
+            break;
+          default:
+            await OTFloorMentionWidget.jumpToFloorInNewPage(
+                context, floor);
+        }
+      },
       onTapImage: (String? url, Object heroTag) {
         final int length = _listViewController.length();
         smartNavigatorPush(context, '/image/detail', arguments: {
           'preview_url': url,
           'hd_url':
-              ForumRepository.getInstance().extractHighDefinitionImageUrl(url!),
+          ForumRepository.getInstance().extractHighDefinitionImageUrl(url!),
           'hero_tag': heroTag,
           'image_list': extractAllImages(),
           'loader': loadPageImage,
@@ -1214,7 +1219,7 @@ class Normal extends RenderModel {
   Future<bool> isHoleFavorite() async {
     if (isFavored != null) return isFavored!;
     final List<int>? favorites =
-        await (ForumRepository.getInstance().getFavoriteHoleId());
+    await (ForumRepository.getInstance().getFavoriteHoleId());
     isFavored = favorites!.any((elementId) => elementId == hole.hole_id);
     return isFavored!;
   }
@@ -1222,7 +1227,7 @@ class Normal extends RenderModel {
   Future<bool> isHoleSubscribed() async {
     if (isSubscribed != null) return isSubscribed!;
     final List<int>? subscriptions =
-        await (ForumRepository.getInstance().getSubscribedHoleId());
+    await (ForumRepository.getInstance().getSubscribedHoleId());
     isSubscribed = subscriptions!.any((elementId) => elementId == hole.hole_id);
     return isSubscribed!;
   }
