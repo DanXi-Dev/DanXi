@@ -203,10 +203,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   /// Refresh the list view.
-  Future<void> refreshListView({bool scrollToEnd = false, required selectedPerson, required VoidCallback func}) async {
-    if (!scrollToEnd && selectedPerson != null) {
-      func();
-    }
+  Future<void> refreshListView({bool scrollToEnd = false}) async {
     _allDataLoaded = false;
     await _listViewController.notifyUpdate(queueDataClear: true);
 
@@ -320,7 +317,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               onPressed: () async {
                 if (await OTEditor.createNewReply(
                     context, hole.hole_id, null)) {
-                  refreshListView(scrollToEnd: true, selectedPerson: null, func: (){});
+                  refreshListView(scrollToEnd: true);
                 }
               },
             ),
@@ -421,9 +418,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 backgroundColor: Theme.of(context).dialogBackgroundColor,
                 onRefresh: () async {
                   HapticFeedback.mediumImpact();
-                  await refreshListView(selectedPerson: (_renderModel as Normal).selectedPerson, func: () {
-                    (_renderModel as Normal).selectedPerson = null;
-                  });
+                  (_renderModel as Normal).selectedPerson = null;
+                  await refreshListView();
                 },
                 child: pagedListView),
             _ => pagedListView,
@@ -1110,7 +1106,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             }
             if (await OTEditor.createNewReply(
                 context, hole.hole_id, replyId)) {
-              await refreshListView(scrollToEnd: true, selectedPerson: null, func: (){});
+              await refreshListView(scrollToEnd: true);
             }
             break;
           default:
