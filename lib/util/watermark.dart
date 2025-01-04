@@ -39,7 +39,7 @@ class Watermark {
 
   /// Add a watermark to the screen.
   static void addWatermark(BuildContext context,
-      {int rowCount = 3, int columnCount = 10, TextStyle? textStyle}) async {
+      {int rowCount = 4, int columnCount = 8, TextStyle? textStyle}) async {
     if (overlayEntry != null) {
       // If the watermark is already added, remove it first so that the new one can be added.
       overlayEntry!.remove();

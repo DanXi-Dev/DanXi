@@ -657,7 +657,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           await AnnouncementRepository.getInstance().loadAnnouncements();
           bannerKey.currentState?.updateBannerList();
           // ... and scroll it to the top.
-          if (!mounted) return;
+          if (!context.mounted) return;
           try {
             await PrimaryScrollController.of(context).animateTo(0,
                 duration: const Duration(milliseconds: 200),
