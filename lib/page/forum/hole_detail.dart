@@ -418,6 +418,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 backgroundColor: Theme.of(context).dialogBackgroundColor,
                 onRefresh: () async {
                   HapticFeedback.mediumImpact();
+                  (_renderModel as Normal).selectedPerson = null;
                   await refreshListView();
                 },
                 child: pagedListView),
