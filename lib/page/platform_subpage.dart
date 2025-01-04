@@ -42,7 +42,7 @@ abstract class PlatformSubpage<T> extends StatefulWidget {
   void onDoubleTapOnTab() {}
 
   @mustCallSuper
-  void onViewStateChanged(SubpageViewState state) =>
+  void onViewStateChanged(BuildContext parentContext, SubpageViewState state) =>
       Constant.eventBus.fire(_ViewStateChangedNotification<T>(state));
 }
 
