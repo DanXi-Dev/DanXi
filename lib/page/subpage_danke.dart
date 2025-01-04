@@ -51,7 +51,8 @@ class DankeSubPage extends PlatformSubpage<DankeSubPage> {
     switch (state) {
       case SubpageViewState.VISIBLE:
       // Subpage is always mounted even if it is invisible.
-      // So we have to count on reattachItself/detachItself hooks to add/remove watermark.
+      // Monitoring within State lifecycle methods like `initState` and `dispose` isn't effective.
+      // So we have to count on the onViewStateChanged hook to add/remove watermark.
         Watermark.addWatermark(parentContext);
         break;
       case SubpageViewState.INVISIBLE:
