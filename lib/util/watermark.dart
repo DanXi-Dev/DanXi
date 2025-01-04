@@ -20,13 +20,28 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/forum/flutter_watermark_widget.dart';
 import 'package:flutter/material.dart';
 
+/// A reference-counted full-screen watermark that shows user ID overlay on the screen.
 class Watermark {
   static OverlayEntry? overlayEntry;
 
+  /// The reference count of the watermark. When it is 0, the watermark will be removed.
+  static int refCount = 0;
+
+  static void remove() {
+    assert(refCount > 0, 'The watermark reference count is already 0.');
+    refCount--;
+    if (refCount == 0) {
+      assert(overlayEntry != null, 'The watermark overlay entry is null.');
+      overlayEntry?.remove();
+      overlayEntry = null;
+    }
+  }
+
   /// Add a watermark to the screen.
   static void addWatermark(BuildContext context,
-      {int rowCount = 3, int columnCount = 10, TextStyle? textStyle}) async {
+      {int rowCount = 4, int columnCount = 8, TextStyle? textStyle}) async {
     if (overlayEntry != null) {
+      // If the watermark is already added, remove it first so that the new one can be added.
       overlayEntry!.remove();
     }
 
@@ -48,5 +63,42 @@ class Watermark {
         ));
 
     overlayState.insert(overlayEntry!);
+    refCount++;
   }
+}
+
+/// A state widget that shows a full-screen watermark when the child widget is shown,
+/// and removes the watermark when the child widget is destroyed.
+///
+/// You can use the [withWatermarkRegion] extension method to wrap a widget with a watermark region.
+class WatermarkRegion extends StatefulWidget {
+  final Widget child;
+  const WatermarkRegion({super.key, required this.child});
+
+  @override
+  State<WatermarkRegion> createState() => _WatermarkRegionState();
+}
+
+class _WatermarkRegionState extends State<WatermarkRegion> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      Watermark.addWatermark(context);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+
+  @override
+  void dispose() {
+    Watermark.remove();
+    super.dispose();
+  }
+}
+
+extension WatermarkRegionExtension on Widget {
+  /// Wrap the widget with a watermark region.
+  Widget withWatermarkRegion() => WatermarkRegion(child: this);
 }

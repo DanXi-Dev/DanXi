@@ -22,6 +22,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/forum/message.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
+import 'package:dan_xi/util/watermark.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
@@ -144,6 +145,6 @@ class OTMessagesPageState extends State<OTMessagesPage> {
           ),
         ),
       ),
-    );
+    ).withWatermarkRegion();
   }
 }
