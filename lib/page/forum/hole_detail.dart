@@ -418,7 +418,14 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 backgroundColor: Theme.of(context).dialogBackgroundColor,
                 onRefresh: () async {
                   HapticFeedback.mediumImpact();
-                  (_renderModel as Normal).selectedPerson = null;
+
+                  // when users pull to refresh under "only this person" mode,
+                  // the mode should be quited since if the floor is deep
+                  // the initial request won't fetch them, and the page will be blank.
+                  if ((_renderModel as Normal).selectedPerson !=
+                      (_renderModel as Normal).hole.floors?.first_floor?.anonyname) {
+                    (_renderModel as Normal).selectedPerson = null;
+                  }
                   await refreshListView();
                 },
                 child: pagedListView),
