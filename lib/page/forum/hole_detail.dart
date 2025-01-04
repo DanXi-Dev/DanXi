@@ -37,6 +37,7 @@ import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/watermark.dart';
 import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:dan_xi/widget/forum/ottag_selector.dart';
 import 'package:dan_xi/widget/forum/post_render.dart';
@@ -430,7 +431,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           },
         ),
       ),
-    );
+    ).withWatermarkRegion();
   }
 
   // Load all floors, in case we have to scroll to end or to a specific floor

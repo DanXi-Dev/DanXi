@@ -25,6 +25,7 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
+import 'package:dan_xi/util/watermark.dart';
 import 'package:dan_xi/widget/danke/course_list_widget.dart';
 import 'package:dan_xi/widget/danke/course_search_bar.dart';
 import 'package:dan_xi/widget/danke/random_review_widgets.dart';
@@ -43,6 +44,21 @@ class DankeSubPage extends PlatformSubpage<DankeSubPage> {
 
   @override
   Create<Widget> get title => (cxt) => Text(S.of(cxt).curriculum);
+
+  @override
+  void onViewStateChanged(BuildContext parentContext, SubpageViewState state) {
+    super.onViewStateChanged(parentContext, state);
+    switch (state) {
+      case SubpageViewState.VISIBLE:
+      // Subpage is always mounted even if it is invisible.
+      // So we have to count on reattachItself/detachItself hooks to add/remove watermark.
+        Watermark.addWatermark(parentContext);
+        break;
+      case SubpageViewState.INVISIBLE:
+        Watermark.remove();
+        break;
+    }
+  }
 }
 
 class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {

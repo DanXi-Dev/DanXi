@@ -279,6 +279,21 @@ class ForumSubpage extends PlatformSubpage<ForumSubpage> {
 
   @override
   void onDoubleTapOnTab() => RefreshListEvent().fire();
+
+  @override
+  void onViewStateChanged(BuildContext parentContext, SubpageViewState state) {
+    super.onViewStateChanged(parentContext, state);
+    switch (state) {
+      case SubpageViewState.VISIBLE:
+        // Subpage is always mounted even if it is invisible.
+        // So we have to count on reattachItself/detachItself hooks to add/remove watermark.
+        Watermark.addWatermark(parentContext);
+        break;
+      case SubpageViewState.INVISIBLE:
+        Watermark.remove();
+        break;
+    }
+  }
 }
 
 class CreateNewPostEvent {}
@@ -541,9 +556,6 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           });
         }),
         hashCode);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Watermark.addWatermark(context, rowCount: 4, columnCount: 8);
-    });
   }
 
   @override
