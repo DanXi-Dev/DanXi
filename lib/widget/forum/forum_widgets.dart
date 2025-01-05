@@ -32,6 +32,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
+import 'package:dan_xi/util/watermark.dart';
 import 'package:dan_xi/widget/forum/render/base_render.dart';
 import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
@@ -675,7 +676,7 @@ class OTFloorMentionWidget extends StatelessWidget {
                 ),
               ),
             ],
-          );
+          ).withWatermarkRegion();
           if (PlatformX.isCupertino(context)) {
             return SafeArea(
               child: Card(

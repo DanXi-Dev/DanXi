@@ -42,7 +42,7 @@ abstract class PlatformSubpage<T> extends StatefulWidget {
   void onDoubleTapOnTab() {}
 
   @mustCallSuper
-  void onViewStateChanged(SubpageViewState state) =>
+  void onViewStateChanged(BuildContext parentContext, SubpageViewState state) =>
       Constant.eventBus.fire(_ViewStateChangedNotification<T>(state));
 }
 
@@ -93,11 +93,13 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
 
   Widget buildPage(BuildContext context);
 
+  @mustCallSuper
   void detachItself() {
     _isOnShow = false;
     _thisPrimaryScrollController?.detachPosition.call();
   }
 
+  @mustCallSuper
   void reattachItself() {
     _isOnShow = true;
     _thisPrimaryScrollController?.reattachPosition.call();
@@ -166,8 +168,7 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
             cupertino: (_, __) => CupertinoNavigationBarData(
               title: MediaQuery(
                   data: MediaQueryData(
-                      textScaler: TextScaler.linear(
-                          MediaQuery.textScaleFactorOf(context))),
+                      textScaler: MediaQuery.textScalerOf(context)),
                   child: TopController(child: widget.title(context))),
             ),
             material: (_, __) => MaterialAppBarData(

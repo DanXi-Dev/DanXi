@@ -118,16 +118,19 @@ class WebvpnProxy {
 
       debugPrint("Logging into WebVPN");
 
-      // Temporary cookie jar
-      IndependentCookieJar workJar = IndependentCookieJar();
-      loginSession =
-          UISLoginTool.loginUIS(dio, WEBVPN_LOGIN_URL, workJar, _personInfo);
-      await loginSession;
-
-      // Clone from temp jar to our dedicated webvpn jar
-      webvpnCookieJar.cloneFrom(workJar);
-      loginSession = null;
-      isLoggedIn = true;
+      try {
+        // Temporary cookie jar
+        IndependentCookieJar workJar = IndependentCookieJar();
+        loginSession =
+            UISLoginTool.loginUIS(dio, WEBVPN_LOGIN_URL, workJar, _personInfo);
+        await loginSession;
+        // Clone from temp jar to our dedicated webvpn jar
+        webvpnCookieJar.cloneFrom(workJar);
+        isLoggedIn = true;
+      } finally {
+        loginSession = null;
+      }
+      // Any exception thrown won't be catched and will be propagated to widgets
     }
   }
 

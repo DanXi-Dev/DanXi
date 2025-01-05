@@ -72,7 +72,7 @@ class AnnouncementRepository {
   }
 
   List<Announcement>? getAnnouncements() {
-    if (_tomlCache == null){
+    if (_tomlCache == null) {
       return null;
     }
 
@@ -81,26 +81,33 @@ class AnnouncementRepository {
       return [];
     }
     final list = (_tomlCache!['dev_notice'] as List<Map<String, dynamic>>)
-        .where((element) => (element['maxVersion'] as int) >= version)
+        .where((element) => (element['build'] as int) >= version)
         .toList();
-    return list.map<Announcement>((e) => Announcement.fromToml(e)).toList();
+    final announcements =
+        list.map<Announcement>((e) => Announcement.fromToml(e)).toList();
+    announcements.sort((a, b) =>
+        (DateTime.parse(b.updatedAt!)).compareTo(DateTime.parse(a.updatedAt!)));
+    return announcements;
   }
 
   List<Announcement>? getAllAnnouncements() {
-    if (_tomlCache == null){
+    if (_tomlCache == null) {
       return null;
     }
 
     if (_tomlCache!['dev_notice'] == null) {
       return [];
     }
-    return _tomlCache!['dev_notice']
+    final announcements = _tomlCache!['dev_notice']
         .map<Announcement>((e) => Announcement.fromToml(e))
         .toList();
+    announcements?.sort((a, b) =>
+        (DateTime.parse(b.updatedAt!)).compareTo(DateTime.parse(a.updatedAt!)));
+    return announcements;
   }
 
   TimeTableExtra? getStartDates() {
-    if (_tomlCache == null){
+    if (_tomlCache == null) {
       return null;
     }
 
@@ -113,7 +120,7 @@ class AnnouncementRepository {
   }
 
   String? getUserAgent() {
-    if (_tomlCache == null){
+    if (_tomlCache == null) {
       return null;
     }
 
@@ -121,7 +128,7 @@ class AnnouncementRepository {
   }
 
   List<String?>? getStopWords() {
-    if (_tomlCache == null){
+    if (_tomlCache == null) {
       return null;
     }
 
@@ -129,7 +136,7 @@ class AnnouncementRepository {
   }
 
   List<BannerExtra?>? getBannerExtras() {
-    if (_tomlCache == null){
+    if (_tomlCache == null) {
       return null;
     }
 
@@ -140,7 +147,7 @@ class AnnouncementRepository {
   }
 
   List<String?>? getCareWords() {
-    if (_tomlCache == null){
+    if (_tomlCache == null) {
       return null;
     }
 
@@ -148,7 +155,7 @@ class AnnouncementRepository {
   }
 
   UpdateInfo? checkVersion() {
-    if (_tomlCache == null){
+    if (_tomlCache == null) {
       return null;
     }
 
@@ -163,7 +170,7 @@ class AnnouncementRepository {
   }
 
   List<Celebration>? getCelebrations() {
-    if (_tomlCache == null){
+    if (_tomlCache == null) {
       return null;
     }
 

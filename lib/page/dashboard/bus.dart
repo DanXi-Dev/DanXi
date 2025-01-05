@@ -23,6 +23,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/bus_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
@@ -31,6 +32,7 @@ import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
 
@@ -56,14 +58,8 @@ class BusPageState extends State<BusPage> {
   /// Start location.
   Campus? _startSelectItem = Campus.NONE;
 
-  /// The slide bar's position of start location.
-  int? _startSliding;
-
   /// End location.
   Campus? _endSelectItem = Campus.NONE;
-
-  /// The slide bar's position of end location.
-  int? _endSliding;
 
   /// By default, only buses after DateTime.now() is displayed.
   /// Set this to true to display all buses.
@@ -133,11 +129,9 @@ class BusPageState extends State<BusPage> {
 
     // Default to HanDan
     _startSelectItem = Campus.HANDAN_CAMPUS;
-    _startSliding = _startSelectItem!.index;
     _onStartLocationChanged(_startSelectItem);
 
     _endSelectItem = SettingsProvider.getInstance().campus;
-    _endSliding = _endSelectItem!.index;
     _onEndLocationChanged(_endSelectItem);
   }
 
@@ -150,6 +144,14 @@ class BusPageState extends State<BusPage> {
   void _onEndLocationChanged(Campus? e) {
     setState(() {
       _endSelectItem = e;
+    });
+  }
+
+  void _onLocationSwapped() {
+    setState(() {
+      final temp = _startSelectItem;
+      _startSelectItem = _endSelectItem;
+      _endSelectItem = temp;
     });
   }
 
@@ -219,10 +221,20 @@ class BusPageState extends State<BusPage> {
                   },
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              LayoutGrid(
+                areas: '''
+                start_title start swap
+                dest_title  dest  swap
+                ''',
+                gridFit: GridFit.loose,
+                columnSizes: [auto, auto, auto],
+                rowSizes: [auto, auto],
+                columnGap: 8,
                 children: [
-                  Text(S.of(context).bus_start),
+                  Center(child: Text(S.of(context).bus_start))
+                      .inGridArea('start_title'),
+                  Center(child: Text(S.of(context).bus_dest))
+                      .inGridArea('dest_title'),
                   PlatformWidget(
                     material: (_, __) => DropdownButton<Campus>(
                       items: _getItems(),
@@ -237,21 +249,14 @@ class BusPageState extends State<BusPage> {
                       padding: const EdgeInsets.only(top: 8, bottom: 4),
                       child: CupertinoSlidingSegmentedControl<int>(
                         onValueChanged: (int? value) {
-                          _startSliding = value;
                           _onStartLocationChanged(
-                              Campus.values[_startSliding!]);
+                              Campus.values[value!]);
                         },
-                        groupValue: _startSliding,
+                        groupValue: _startSelectItem?.index,
                         children: _getCupertinoItems(),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(S.of(context).bus_dest),
+                  ).inGridArea('start'),
                   PlatformWidget(
                     material: (_, __) => DropdownButton<Campus>(
                       items: _getItems(),
@@ -265,14 +270,21 @@ class BusPageState extends State<BusPage> {
                       padding: const EdgeInsets.only(top: 8, bottom: 4),
                       child: CupertinoSlidingSegmentedControl<int>(
                         onValueChanged: (int? value) {
-                          _endSliding = value;
-                          _onEndLocationChanged(Campus.values[_endSliding!]);
+                          _onEndLocationChanged(Campus.values[value!]);
                         },
-                        groupValue: _endSliding,
+                        groupValue: _endSelectItem?.index,
                         children: _getCupertinoItems(),
                       ),
                     ),
-                  ),
+                  ).inGridArea('dest'),
+                  Center(
+                    child: PlatformIconButton(
+                      icon: Icon(PlatformX.isCupertino(context)
+                          ? CupertinoIcons.arrow_swap
+                          : Icons.swap_vert),
+                      onPressed: _onLocationSwapped,
+                    ),
+                  ).inGridArea('swap'),
                 ],
               ),
               Expanded(
@@ -285,7 +297,7 @@ class BusPageState extends State<BusPage> {
         ));
   }
 
-  List<Widget> _getListWidgets(List<BusScheduleItem>? filteredBusList) {
+  List<Widget> _getListWidgets(List<BusScheduleItem> filteredBusList) {
     final currentTime = DateTime.now();
     final format = NumberFormat("00");
     List<Widget> widgets = [
@@ -308,7 +320,6 @@ class BusPageState extends State<BusPage> {
         ),
       )
     ];
-    if (filteredBusList == null) return [const SizedBox()];
     for (var value in filteredBusList) {
       if (_showAll ||
           value.realStartTime == null ||
@@ -335,7 +346,7 @@ class BusPageState extends State<BusPage> {
                   children: [
                     Text(
                       item.start.displayTitle(context),
-                      textScaleFactor: 1.2,
+                      textScaler: TextScaler.linear(1.2),
                     ),
                     const SizedBox(
                       height: 4,
@@ -345,14 +356,14 @@ class BusPageState extends State<BusPage> {
                 ),
                 Text(
                   item.direction.toText()!,
-                  textScaleFactor: 1.5,
+                  textScaler: TextScaler.linear(1.5),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       item.end.displayTitle(context),
-                      textScaleFactor: 1.2,
+                      textScaler: TextScaler.linear(1.2),
                     ),
                     const SizedBox(
                       height: 4,

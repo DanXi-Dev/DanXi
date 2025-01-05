@@ -94,7 +94,7 @@
   "curriculum_ratings_workload_words": "非常大;较大;中等;较小;非常小",
   "curriculum_ratings_assessment": "考核要求",
   "curriculum_ratings_assessment_words": "非常严格;严格;中等;宽松;非常宽松",
-  "curriculum_search_hint": "课程名称 或 课程代码",
+  "curriculum_search_hint": "课程名称、代码 或 教师姓名",
   "curriculum_select_teacher": "请选择教师",
   "curriculum_select_time": "请选择上课时间",
   "curriculum_unknown_rating": "未知",
@@ -538,5 +538,6 @@
   "proxy_setting_input_hint": "如 127.0.0.1:1234（留空以关闭代理）",
   "proxy_setting_set_successfully": "代理设置已保存，重启应用后生效",
   "use_webvpn_title": "自动使用 WebVPN 代理",
-  "use_webvpn_description": "启动该项后，允许在非校园网环境下直接访问茶楼、评教等功能（需要重启应用）"
+  "use_webvpn_description": "启动该项后，允许在非校园网环境下直接访问茶楼、评教等功能（需要重启应用）",
+  "show_this_person": "只看此人"
 }

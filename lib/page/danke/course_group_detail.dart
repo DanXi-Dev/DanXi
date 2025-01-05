@@ -206,31 +206,6 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
     _courseGroupFuture ??= _fetchCourseGroup();
     _reviewListFuture ??= _loadContent();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (mounted) {
-        if (locateReview != null) {
-          // Scroll to the specific floor.
-          final floorToJump = locateReview!;
-          _listViewController.scheduleLoadedCallback(
-              () async => await _listViewController.scrollToItem(floorToJump),
-              rebuild: true);
-          locateReview = null;
-        }
-
-        if (shouldScrollToEnd) {
-          try {
-            // Scroll to end.
-            _listViewController.scheduleLoadedCallback(
-                () async => await _listViewController.scrollToEnd(),
-                rebuild: true);
-            shouldScrollToEnd = false;
-          } catch (_) {
-            // we don't care if we failed to scroll to the end.
-          }
-        }
-      }
-    });
-
     return PlatformScaffold(
       iosContentPadding: false,
       iosContentBottomPadding: false,
@@ -294,6 +269,31 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
         child: FutureWidget<CourseGroup?>(
             future: _courseGroupFuture,
             successBuilder: (context, snapshot) {
+              WidgetsBinding.instance.addPostFrameCallback((_) async {
+                if (mounted) {
+                  if (locateReview != null) {
+                    // Scroll to the specific floor.
+                    final floorToJump = locateReview!;
+                    _listViewController.scheduleLoadedCallback(
+                            () async => await _listViewController.scrollToItem(floorToJump),
+                        rebuild: true);
+                    locateReview = null;
+                  }
+
+                  if (shouldScrollToEnd) {
+                    try {
+                      // Scroll to end.
+                      _listViewController.scheduleLoadedCallback(
+                              () async => await _listViewController.scrollToEnd(),
+                          rebuild: true);
+                      shouldScrollToEnd = false;
+                    } catch (_) {
+                      // we don't care if we failed to scroll to the end.
+                    }
+                  }
+                }
+              });
+
               return PagedListView<CourseReview>(
                 pagedController: _listViewController,
                 withScrollbar: true,

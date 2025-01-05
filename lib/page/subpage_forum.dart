@@ -280,6 +280,22 @@ class ForumSubpage extends PlatformSubpage<ForumSubpage> {
 
   @override
   void onDoubleTapOnTab() => RefreshListEvent().fire();
+
+  @override
+  void onViewStateChanged(BuildContext parentContext, SubpageViewState state) {
+    super.onViewStateChanged(parentContext, state);
+    switch (state) {
+      case SubpageViewState.VISIBLE:
+        // Subpage is always mounted even if it is invisible.
+        // Monitoring within State lifecycle methods like `initState` and `dispose` isn't effective.
+        // So we have to count on the onViewStateChanged hook to add/remove watermark.
+        Watermark.addWatermark(parentContext);
+        break;
+      case SubpageViewState.INVISIBLE:
+        Watermark.remove();
+        break;
+    }
+  }
 }
 
 class CreateNewPostEvent {}
@@ -542,9 +558,6 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           });
         }),
         hashCode);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Watermark.addWatermark(context, rowCount: 4, columnCount: 8);
-    });
   }
 
   @override
@@ -646,7 +659,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           await AnnouncementRepository.getInstance().loadAnnouncements();
           bannerKey.currentState?.updateBannerList();
           // ... and scroll it to the top.
-          if (!mounted) return;
+          if (!context.mounted) return;
           try {
             await PrimaryScrollController.of(context).animateTo(0,
                 duration: const Duration(milliseconds: 200),
