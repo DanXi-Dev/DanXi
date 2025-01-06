@@ -307,7 +307,7 @@ class ExamListState extends State<ExamList> {
                 snapShot.data!
                     .firstWhere((element) => element.id == _info!.id)
                     .gpa,
-                textScaleFactor: 1.25,
+                textScaler: TextScaler.linear(1.25),
                 style: const TextStyle(color: Colors.white),
               );
             },
@@ -393,7 +393,7 @@ class ExamListState extends State<ExamList> {
           ),
         ),
         Center(
-          child: Text(score!, textScaleFactor: 0.6),
+          child: Text(score!, textScaler: TextScaler.linear(0.6)),
         ),
       ]));
   
@@ -411,7 +411,7 @@ class ExamListState extends State<ExamList> {
                   children: [
                     Text(
                       "${value.testCategory} ${value.type}",
-                      textScaleFactor: 0.8,
+                      textScaler: TextScaler.linear(0.8),
                       style: TextStyle(color: Theme.of(context).hintColor),
                     ),
                     Text(
@@ -427,7 +427,7 @@ class ExamListState extends State<ExamList> {
                           if (value.date != "" || value.time != "") ...[
                             Text(
                               "${value.date} ${value.time}",
-                              textScaleFactor: 0.8,
+                              textScaler: TextScaler.linear(0.8)
                             ),
                             const SizedBox(
                               width: 8,
@@ -436,14 +436,14 @@ class ExamListState extends State<ExamList> {
                             ...[],
                           Text(
                             "${value.location} ",
-                            textScaleFactor: 0.8,
+                            textScaler: TextScaler.linear(0.8)
                           ),
                         ],
                       ),
                     if (value.note.trim() != "")
                       Text(
                         value.note,
-                        textScaleFactor: 0.8,
+                        textScaler: TextScaler.linear(0.8),
                         style: TextStyle(color: Theme.of(context).hintColor),
                       ),
                   ],
@@ -512,7 +512,7 @@ class ExamListState extends State<ExamList> {
                     children: [
                       Text(
                         value.type,
-                        textScaleFactor: 0.8,
+                        textScaler: TextScaler.linear(0.8),
                         style: TextStyle(color: Theme.of(context).hintColor),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

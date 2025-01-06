@@ -102,7 +102,7 @@ class EcardBalanceFeature extends Feature {
     } else if (_status == ConnectionStatus.DONE) {
       return Text(
         Constant.yuanSymbol(_balance),
-        textScaleFactor: 1.2,
+        textScaler: TextScaler.linear(1.2),
         style: TextStyle(
             color: num.tryParse(_balance!) == null
                 ? null

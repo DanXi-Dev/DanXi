@@ -64,7 +64,7 @@ class HomeSubpage extends PlatformSubpage<HomeSubpage> {
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(
             S.of(cxt).dashboard_layout,
-            Text(S.of(cxt).edit, textScaleFactor: 1.2),
+            Text(S.of(cxt).edit, textScaler: TextScaler.linear(1.2)),
             () => smartNavigatorPush(cxt, '/dashboard/reorder').then(
                 (value) => RefreshHomepageEvent(onlyRefreshOrder: true).fire()))
       ];
