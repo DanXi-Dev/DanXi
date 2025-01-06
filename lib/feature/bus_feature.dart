@@ -131,6 +131,7 @@ class BusFeature extends Feature {
   BusScheduleItem? nextBusForCampus(Campus campus) {
     // Split dual-direction bus with different start times into two single-direction buses to avoid confusion.
     final List<BusScheduleItem> filteredBusList = _busList!
+        .where((element) => (element.start == campus || element.end == campus))
         .expand(((element) => (element.direction == BusDirection.DUAL &&
                 !element.startTime!
                     .toExactTime()
@@ -141,7 +142,6 @@ class BusFeature extends Feature {
                     .copyWith(direction: BusDirection.FORWARD)
               ]
             : [element]))
-        .where((element) => (element.start == campus || element.end == campus))
         .toList();
     // Get the next bus time
     filteredBusList.sort();
