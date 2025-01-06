@@ -70,7 +70,7 @@ class AnnouncementListState extends State<AnnouncementList> {
                   ? S.of(context).older_announcement
                   : S.of(context).latest_announcement,
               softWrap: true,
-              textScaleFactor: MediaQuery.textScaleFactorOf(context),
+              textScaler: MediaQuery.textScalerOf(context),
             ),
             onPressed: () => setState(() => _showingLatest = !_showingLatest),
           )

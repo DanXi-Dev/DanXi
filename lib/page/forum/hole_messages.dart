@@ -97,7 +97,7 @@ class OTMessagesPageState extends State<OTMessagesPage> {
                   ? S.of(context).show_all
                   : S.of(context).show_unread,
               softWrap: true,
-              textScaleFactor: MediaQuery.textScaleFactorOf(context),
+              textScaler: MediaQuery.textScalerOf(context),
             ),
             onPressed: () async {
               setState(() {

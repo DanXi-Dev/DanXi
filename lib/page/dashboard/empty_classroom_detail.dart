@@ -386,11 +386,11 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                     children: [
                       Text(
                         element.roomName!,
-                        textScaleFactor: 1,
+                        textScaler: TextScaler.linear(1)
                       ),
                       Text(
                         S.of(context).seats(element.seats ?? "?"),
-                        textScaleFactor: 0.8,
+                        textScaler: TextScaler.linear(0.8),
                         style: TextStyle(color: Theme.of(context).hintColor),
                       ),
                     ],

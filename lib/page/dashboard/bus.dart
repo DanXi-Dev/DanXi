@@ -155,28 +155,20 @@ class BusPageState extends State<BusPage> {
     });
   }
 
-  void swapBusDetails(BusScheduleItem element) {
-    final start = element.start;
-    element.start = element.end;
-    element.end = start;
-    final startTime = element.startTime;
-    element.startTime = element.endTime;
-    element.endTime = startTime;
-  }
-
   List<BusScheduleItem> _filterBus(List<BusScheduleItem> origBusList) {
     // Normalize all backward entries and reversed dual entries
-    for (var element in origBusList) {
-      if (element.direction == BusDirection.BACKWARD) {
-        swapBusDetails(element);
-        element.direction = BusDirection.FORWARD;
-      } else if (element.direction == BusDirection.DUAL &&
-          element.start == _endSelectItem &&
-          element.end == _startSelectItem) {
-        swapBusDetails(element);
-      }
-    }
     return origBusList
+        .map((element) {
+          if (element.direction == BusDirection.BACKWARD) {
+            return BusScheduleItem.reversed(element);
+          } else if (element.direction == BusDirection.DUAL &&
+              element.start == _endSelectItem &&
+              element.end == _startSelectItem) {
+            return BusScheduleItem.reversed(element);
+          } else {
+            return element;
+          }
+        })
         .where((element) => (element.start == _startSelectItem &&
             element.end == _endSelectItem))
         .toList();
@@ -249,8 +241,7 @@ class BusPageState extends State<BusPage> {
                       padding: const EdgeInsets.only(top: 8, bottom: 4),
                       child: CupertinoSlidingSegmentedControl<int>(
                         onValueChanged: (int? value) {
-                          _onStartLocationChanged(
-                              Campus.values[value!]);
+                          _onStartLocationChanged(Campus.values[value!]);
                         },
                         groupValue: _startSelectItem?.index,
                         children: _getCupertinoItems(),

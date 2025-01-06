@@ -22,7 +22,6 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/retrier.dart';
 import 'package:dan_xi/util/vague_time.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
@@ -94,6 +93,20 @@ class BusScheduleItem implements Comparable<BusScheduleItem> {
     return VagueTime.onlyHHmm(time.replaceAll(".", ":"));
   }
 
+  BusScheduleItem.reversed(BusScheduleItem original)
+      : id = original.id,
+        start = original.end,
+        end = original.start,
+        startTime = original.endTime,
+        endTime = original.startTime,
+        direction = original.direction.reverse(),
+        holidayRun = original.holidayRun;
+
+  BusScheduleItem copyWith({BusDirection? direction}) {
+    return BusScheduleItem(id, start, end, startTime, endTime,
+        direction ?? this.direction, holidayRun);
+  }
+
   @override
   int compareTo(BusScheduleItem other) =>
       realStartTime!.compareTo(other.realStartTime!);
@@ -130,6 +143,17 @@ extension BusDirectionExtension on BusDirection {
         return DUAL_ARROW;
       default:
         return null;
+    }
+  }
+
+  BusDirection reverse() {
+    switch (this) {
+      case BusDirection.FORWARD:
+        return BusDirection.BACKWARD;
+      case BusDirection.BACKWARD:
+        return BusDirection.FORWARD;
+      default:
+        return this;
     }
   }
 }

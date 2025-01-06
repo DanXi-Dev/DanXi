@@ -991,7 +991,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       //Description
                       Text(
                         S.of(context).app_description_title,
-                        textScaleFactor: 1.1,
+                        textScaler: TextScaler.linear(1.1)
                       ),
                       Divider(
                         color: originalDividerColor,
@@ -1001,7 +1001,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       //Terms and Conditions
                       Text(
                         S.of(context).terms_and_conditions_title,
-                        textScaleFactor: 1.1,
+                        textScaler: TextScaler.linear(1.1)
                       ),
                       Divider(
                         color: originalDividerColor,
@@ -1037,7 +1037,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       //Acknowledgement
                       Text(
                         S.of(context).acknowledgements,
-                        textScaleFactor: 1.1,
+                        textScaler: TextScaler.linear(1.1)
                       ),
                       Divider(color: originalDividerColor),
                       PostRenderWidget(
@@ -1052,7 +1052,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       // Authors
                       Text(
                         S.of(context).authors,
-                        textScaleFactor: 1.1,
+                        textScaler: TextScaler.linear(1.1)
                       ),
                       Divider(color: originalDividerColor),
                       const SizedBox(height: 4),
@@ -1078,7 +1078,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         children: <Widget>[
                           Text(
                             S.of(context).author_descriptor,
-                            textScaleFactor: 0.7,
+                            textScaler: TextScaler.linear(0.7),
                             textAlign: TextAlign.right,
                           )
                         ],

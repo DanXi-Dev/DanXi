@@ -25,7 +25,6 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/io/cache.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
-import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as dom;
 
