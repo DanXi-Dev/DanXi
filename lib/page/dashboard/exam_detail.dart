@@ -377,6 +377,27 @@ class ExamListState extends State<ExamList> {
         Expanded(child: Divider(color: color)),
       ]));
 
+  Widget _buildGradeContainer(String level, String? score) => Container(
+      height: 36,
+      width: 36,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.white,
+          width: 1,
+        ),
+      ),
+      child: Column(children: [
+        Center(
+          child: Text(
+            level,
+          ),
+        ),
+        Center(
+          child: Text(score!, textScaleFactor: 0.6),
+        ),
+      ]));
+  
+  // Grade card with exam data
   Widget _buildCardHybrid(Exam value, BuildContext context) => Card(
         child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -449,33 +470,15 @@ class ExamListState extends State<ExamList> {
                                 const SizedBox(
                                   width: 8,
                                 ),
-                                Container(
-                                    height: 36,
-                                    width: 36,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Column(children: [
-                                      Center(
-                                        child: Text(
-                                          _cachedScoreData!
-                                              .firstWhere((element) =>
-                                                  element.id == value.id)
-                                              .level,
-                                        ),
-                                      ),
-                                      Center(
-                                        child: Text(
-                                            _cachedScoreData!
-                                                .firstWhere((element) =>
-                                                    element.id == value.id)
-                                                .score!,
-                                            textScaleFactor: 0.6),
-                                      ),
-                                    ]))
+                                _buildGradeContainer(
+                                    _cachedScoreData!
+                                        .firstWhere(
+                                            (element) => element.id == value.id)
+                                        .level,
+                                    _cachedScoreData!
+                                        .firstWhere(
+                                            (element) => element.id == value.id)
+                                        .score)
                               ],
                             );
                             // If we cannot find such an element, we will build an empty SizedBox.
@@ -494,6 +497,7 @@ class ExamListState extends State<ExamList> {
             )),
       );
 
+  // Grade card without exam data
   Widget _buildCardGrade(ExamScore value, BuildContext context) => Card(
         child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -521,16 +525,7 @@ class ExamListState extends State<ExamList> {
                     ],
                   ),
                 ),
-                Container(
-                  width: 28,
-                  alignment: Alignment.centerLeft,
-                  child: Center(
-                    child: Text(
-                      value.level,
-                      textScaleFactor: 1.2,
-                    ),
-                  ),
-                ),
+                _buildGradeContainer(value.level, value.score)
               ],
             )),
       );
