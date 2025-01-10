@@ -124,7 +124,7 @@ class Registry {
         REG_VALUE_TYPE.REG_SZ,
         nativeValue.cast<Uint8>(), nativeValue.length * WCHAR_SIZE);
     switch (status) {
-      case NO_ERROR:
+      case WIN32_ERROR.NO_ERROR:
         break;
       case WIN32_ERROR.ERROR_ACCESS_DENIED:
         throw Exception("Access denied");
@@ -142,7 +142,7 @@ class Registry {
   static void deleteStringKey(int hKey, String keyName) {
     int status = RegDeleteValue(hKey, keyName.toNativeUtf16());
     switch (status) {
-      case NO_ERROR:
+      case WIN32_ERROR.NO_ERROR:
         break;
       case WIN32_ERROR.ERROR_ACCESS_DENIED:
         throw Exception("Access denied");

@@ -222,7 +222,9 @@ class ScheduleViewState extends State<ScheduleView> {
     for (ScheduleBlock block in result) {
       // Skip blocks that needn't be reordered
       if (block.event.first.enabled ||
-          block.event.every((element) => !element.enabled)) continue;
+          block.event.every((element) => !element.enabled)) {
+        continue;
+      }
 
       Event firstEnabledCourse =
           block.event.firstWhere((element) => element.enabled);

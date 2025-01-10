@@ -16,7 +16,7 @@
  */
 
 @JS()
-library js;
+library;
 
 import 'package:js/js.dart';
 

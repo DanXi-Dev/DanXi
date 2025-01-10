@@ -264,13 +264,17 @@ class _ExpansionTileXState extends State<ExpansionTileX>
 
   Widget? _buildLeadingIcon(BuildContext context) {
     if (_effectiveAffinity(widget.controlAffinity) !=
-        ListTileControlAffinity.leading) return null;
+        ListTileControlAffinity.leading) {
+      return null;
+    }
     return _buildIcon(context);
   }
 
   Widget? _buildTrailingIcon(BuildContext context) {
     if (_effectiveAffinity(widget.controlAffinity) !=
-        ListTileControlAffinity.trailing) return null;
+        ListTileControlAffinity.trailing) {
+      return null;
+    }
     return _buildIcon(context);
   }
 

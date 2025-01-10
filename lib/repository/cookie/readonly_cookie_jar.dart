@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:io';
 
 // ignore: implementation_imports
 import 'package:cookie_jar/cookie_jar.dart';
