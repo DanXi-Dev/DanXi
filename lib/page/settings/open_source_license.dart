@@ -68,7 +68,7 @@ class OpenSourceListState extends State<OpenSourceLicenseList> {
       body: Column(children: [
         Expanded(
             child: WithScrollbar(
-              controller: PrimaryScrollController.of(context),
+          controller: PrimaryScrollController.of(context),
           child: ListView(
             controller: PrimaryScrollController.of(context),
             children: _getListWidgets(),

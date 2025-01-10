@@ -52,12 +52,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   @override
   void initState() {
     super.initState();
-    diagnoses = [
-      diagnoseForum,
-      diagnoseGoogleAds,
-      diagnoseDanXi,
-      diagnoseUrl
-    ];
+    diagnoses = [diagnoseForum, diagnoseGoogleAds, diagnoseDanXi, diagnoseUrl];
     unawaited(diagnose());
   }
 
@@ -105,8 +100,8 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   Future<void> diagnoseUrl() async {
     _console.writeln(
         "Base Auth URL: ${SettingsProvider.getInstance().authBaseUrl}");
-    _console
-        .writeln("Forum Base URL: ${SettingsProvider.getInstance().forumBaseUrl}");
+    _console.writeln(
+        "Forum Base URL: ${SettingsProvider.getInstance().forumBaseUrl}");
     _console.writeln(
         "Image Base URL: ${SettingsProvider.getInstance().imageBaseUrl}");
     _console.writeln(
@@ -116,8 +111,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   Future<void> diagnoseDanXi() async {
     _console.writeln(
         "User Agent used by Danta for UIS: ${UserAgentInterceptor.defaultUsedUserAgent}");
-    _console
-        .writeln("User Agent used by Danta for Forum: ${Constant.version}");
+    _console.writeln("User Agent used by Danta for Forum: ${Constant.version}");
     _console.writeln("Media Query: ${MediaQuery.of(context)}");
 
     _console.writeln("Everything we stored in the local device:");
@@ -211,8 +205,8 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     final idList = (jsonDecode("[$ids]") as List<dynamic>)
         .map<int>((e) => e as int)
         .toList(growable: false);
-    int? result = await ForumRepository.getInstance()
-        .adminSendMessage(message!, idList);
+    int? result =
+        await ForumRepository.getInstance().adminSendMessage(message!, idList);
     if (result != null && result < 300 && mounted) {
       Noticing.showModalNotice(context,
           message: S.of(context).operation_successful);
@@ -232,8 +226,8 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
 
   Future<void> deleteAllPushToken() async {
     try {
-      final ret = await ForumRepository.getInstance()
-          .deleteAllPushNotificationToken();
+      final ret =
+          await ForumRepository.getInstance().deleteAllPushNotificationToken();
       Noticing.showNotice(context, "Status code $ret");
     } catch (e) {
       Noticing.showNotice(context, "$e");

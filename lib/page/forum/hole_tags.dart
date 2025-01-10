@@ -79,8 +79,7 @@ class BBSTagsPageState extends State<BBSTagsPage> {
                       stackTrace: snapShot.stackTrace,
                       onTap: () => setState(() {
                             _content = LazyFuture.pack(
-                                ForumRepository.getInstance()
-                                    .loadTags());
+                                ForumRepository.getInstance().loadTags());
                           })),
               loadingBuilder: Center(
                 child: PlatformCircularProgressIndicator(),

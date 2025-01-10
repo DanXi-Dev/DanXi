@@ -116,10 +116,10 @@ class PlatformAppBarX extends PlatformAppBar {
     var trailing = trailingActions?.isEmpty ?? true
         ? null
         : Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: trailingActions!,
-    );
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: trailingActions!,
+          );
 
     final heroTag = data?.heroTag;
     if (heroTag != null) {

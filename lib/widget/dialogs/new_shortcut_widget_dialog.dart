@@ -28,7 +28,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// Allows user to create custom dashboard widgets that link to certain websites.
 class NewShortcutDialog extends StatefulWidget {
-
   const NewShortcutDialog({super.key});
 
   @override
@@ -51,7 +50,7 @@ class NewShortcutDialogState extends State<NewShortcutDialog> {
       await DioUtils.newDioWithProxy().head(_linkTextFieldController.text);
       SettingsProvider.getInstance().dashboardWidgetsSequence =
           SettingsProvider.getInstance().dashboardWidgetsSequence.followedBy([
-            DashboardCard(Constant.FEATURE_CUSTOM_CARD,
+        DashboardCard(Constant.FEATURE_CUSTOM_CARD,
             _nameTextFieldController.text, _linkTextFieldController.text, true)
       ]).toList();
       if (mounted) Navigator.of(context).pop();

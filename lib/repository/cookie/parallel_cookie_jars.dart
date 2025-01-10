@@ -21,7 +21,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 /// According to the implementation of [CookieManager], having multiple [CookieManager]s on the same [Dio] doesn't work as expected (that is to say only the last will take effect).
 /// This class is created to enable loading multiple [CookieJar]s on the same [Dio].
 /// The cookies will be merged on request and broadcasted to every [CookieJar] on receive.
-/// 
+///
 /// If the same cookie entries in different [CookieJar]s conflict with each other, the last [CookieJar] in list will take effect.
 /// If you want some cookie jars to remain unchanged, see [ReadonlyCookieJar].
 class ParallelCookieJars implements CookieJar {

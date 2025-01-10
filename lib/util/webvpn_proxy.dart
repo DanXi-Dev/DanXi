@@ -31,7 +31,7 @@ class WebvpnProxy {
   static final ReadonlyCookieJar webvpnCookieJar = ReadonlyCookieJar();
 
   static const String DIRECT_CONNECT_TEST_URL = "https://danta.fudan.edu.cn";
-  
+
   static const String WEBVPN_LOGIN_URL =
       "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fwebvpn.fudan.edu.cn%2Flogin%3Fcas_login%3Dtrue";
 

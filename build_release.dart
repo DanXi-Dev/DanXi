@@ -114,7 +114,8 @@ Future<int> runDartProcess(List<String> args) async {
   return await buildProcess.exitCode;
 }
 
-Future<void> buildAndroid(String? versionCode, String gitHash, {String? target}) async {
+Future<void> buildAndroid(String? versionCode, String gitHash,
+    {String? target}) async {
   print('Build for Android...');
   await runFlutterProcess([
     'build',

@@ -319,7 +319,7 @@ class DanxiApp extends StatelessWidget {
     // Init FDUHoleProvider. This object provides some global states about
     // FDUHole such as the current division and the json web token.
     var fduHoleProvider = ForumProvider();
-    // Init ForumRepository with the provider. This is the api implementations of the forum. 
+    // Init ForumRepository with the provider. This is the api implementations of the forum.
     ForumProvider.init(fduHoleProvider);
 
     // Wrap the whole app with [Phoenix] to enable fast reload. When user

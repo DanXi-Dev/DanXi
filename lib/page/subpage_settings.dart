@@ -533,8 +533,8 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         SwitchListTile.adaptive(
                             title: Text(S.of(context).use_webvpn_title),
                             secondary: const Icon(Icons.network_cell),
-                            subtitle: Text(
-                                S.of(context).use_webvpn_description),
+                            subtitle:
+                                Text(S.of(context).use_webvpn_description),
                             value: context.select<SettingsProvider, bool>(
                                 (s) => s.useWebvpn),
                             onChanged: (bool value) async {
@@ -989,20 +989,16 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       //Description
-                      Text(
-                        S.of(context).app_description_title,
-                        textScaler: TextScaler.linear(1.1)
-                      ),
+                      Text(S.of(context).app_description_title,
+                          textScaler: TextScaler.linear(1.1)),
                       Divider(
                         color: originalDividerColor,
                       ),
                       Text(S.of(context).app_description),
                       const SizedBox(height: 16),
                       //Terms and Conditions
-                      Text(
-                        S.of(context).terms_and_conditions_title,
-                        textScaler: TextScaler.linear(1.1)
-                      ),
+                      Text(S.of(context).terms_and_conditions_title,
+                          textScaler: TextScaler.linear(1.1)),
                       Divider(
                         color: originalDividerColor,
                       ),
@@ -1035,10 +1031,8 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       ])),
                       const SizedBox(height: 16),
                       //Acknowledgement
-                      Text(
-                        S.of(context).acknowledgements,
-                        textScaler: TextScaler.linear(1.1)
-                      ),
+                      Text(S.of(context).acknowledgements,
+                          textScaler: TextScaler.linear(1.1)),
                       Divider(color: originalDividerColor),
                       PostRenderWidget(
                         render: kMarkdownRenderFactory(null),
@@ -1050,10 +1044,8 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       const SizedBox(height: 16),
 
                       // Authors
-                      Text(
-                        S.of(context).authors,
-                        textScaler: TextScaler.linear(1.1)
-                      ),
+                      Text(S.of(context).authors,
+                          textScaler: TextScaler.linear(1.1)),
                       Divider(color: originalDividerColor),
                       const SizedBox(height: 4),
                       LayoutGrid(

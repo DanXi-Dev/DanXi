@@ -20,11 +20,11 @@ class _CareDialogState extends State<CareDialog> {
     return PlatformAlertDialog(
       title: Text(S.of(context).danxi_care),
       content: SingleChildScrollView(
-        child: PostRenderWidget(
-          content: S.of(context).danxi_care_message,
-          render: kMarkdownRender,
-          onTapLink: (url) => BrowserUtil.openUrl(url!, null),
-          hasBackgroundImage: false,
+          child: PostRenderWidget(
+        content: S.of(context).danxi_care_message,
+        render: kMarkdownRender,
+        onTapLink: (url) => BrowserUtil.openUrl(url!, null),
+        hasBackgroundImage: false,
       )),
       actions: [
         PlatformDialogAction(

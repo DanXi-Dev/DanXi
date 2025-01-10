@@ -91,11 +91,11 @@ class RandomReviewWidgets extends StatelessWidget {
                               const SizedBox(
                                 width: 3,
                               ),
-                               Text(
+                              Text(
                                 "${review.remark}",
                                 textAlign: TextAlign.left,
-                                style:
-                                   const TextStyle(fontSize: 10, color: Colors.grey),
+                                style: const TextStyle(
+                                    fontSize: 10, color: Colors.grey),
                               ),
                             ],
                           ),

@@ -33,7 +33,9 @@ class NotificationProvider with ChangeNotifier {
     }
     if (SettingsProvider.getInstance()
         .hiddenNotifications
-        .contains(feature.runtimeType.toString())) return;
+        .contains(feature.runtimeType.toString())) {
+      return;
+    }
 
     _notifications.add(feature);
     notifyListeners();

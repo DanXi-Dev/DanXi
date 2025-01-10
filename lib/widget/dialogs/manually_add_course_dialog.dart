@@ -157,9 +157,8 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                           child: CircleAvatar(
                             key: ObjectKey(e),
                             radius: 15.0,
-                            backgroundColor: Color(context
-                                .read<SettingsProvider>()
-                                .primarySwatch),
+                            backgroundColor: Color(
+                                context.read<SettingsProvider>().primarySwatch),
                             foregroundColor: Colors.white,
                             child: widget.courseAvailableList.contains(e)
                                 ? Icon(PlatformX.isMaterial(context)

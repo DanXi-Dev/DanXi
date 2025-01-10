@@ -198,8 +198,9 @@ class OTHoleWidget extends StatelessWidget {
                         : postContentWidget,
                     const SizedBox(height: 4),
                     if (!isFolded &&
-              postElement.floors?.last_floor != postElement.floors?.first_floor)
-            _buildCommentView(context, postElement)
+                        postElement.floors?.last_floor !=
+                            postElement.floors?.first_floor)
+                      _buildCommentView(context, postElement)
                   ]),
               subtitle:
                   Column(mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -255,21 +256,23 @@ class OTHoleWidget extends StatelessWidget {
         },
         // Use IntrinsicHeight to make the row stretch to the height of the child with the largest height,
         // so that the ColoredBox below can be stretched to the height of that child.
-        child: IntrinsicHeight(child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 8, 0, 8), child:Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ColoredBox(
-                color: Theme.of(context).hintColor,
-                child: const SizedBox(width: 2)),
-            const SizedBox(width: 8),
-            Expanded(
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
+        child: IntrinsicHeight(
+            child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ColoredBox(
+                        color: Theme.of(context).hintColor,
+                        child: const SizedBox(width: 2)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                        child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
                           S.of(context).latest_reply(
                               postElement.floors!.last_floor!.anonyname ?? "?",
                               HumanDuration.tryFormat(
@@ -279,17 +282,20 @@ class OTHoleWidget extends StatelessWidget {
                                       .toLocal())),
                           style: TextStyle(color: Theme.of(context).hintColor),
                         ),
-                const SizedBox(height: 4),
-                LinkifyX(
-                        text: lastReplyContent,
-                        style: TextStyle(fontSize: 14, color: Theme.of(context).hintColor),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        onOpen: (link) => launchUrlWithNotice(context, link)),
-              ],
-            ))
-          ],
-        ))));
+                        const SizedBox(height: 4),
+                        LinkifyX(
+                            text: lastReplyContent,
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: Theme.of(context).hintColor),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            onOpen: (link) =>
+                                launchUrlWithNotice(context, link)),
+                      ],
+                    ))
+                  ],
+                ))));
   }
 }
 

@@ -30,7 +30,8 @@ class CourseSearchResults {
 
   CourseSearchResults(this.page, this.pageSize, this.extra, this.items);
 
-  factory CourseSearchResults.fromJson(Map<String, dynamic> json) => _$CourseSearchResultsFromJson(json);
+  factory CourseSearchResults.fromJson(Map<String, dynamic> json) =>
+      _$CourseSearchResultsFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseSearchResultsToJson(this);
 }

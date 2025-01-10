@@ -39,8 +39,9 @@ class FudanBusRepository extends BaseRepositoryWithDio {
   factory FudanBusRepository.getInstance() => _instance;
 
   Future<List<BusScheduleItem>?> loadBusList(PersonInfo? info,
-      {bool holiday = false}) => UISLoginTool.tryAsyncWithAuth(
-        dio, _LOGIN_URL, cookieJar!, info, () => _loadBusList(holiday: holiday));
+          {bool holiday = false}) =>
+      UISLoginTool.tryAsyncWithAuth(dio, _LOGIN_URL, cookieJar!, info,
+          () => _loadBusList(holiday: holiday));
 
   Future<List<BusScheduleItem>?> _loadBusList({bool holiday = false}) async {
     List<BusScheduleItem> items = [];

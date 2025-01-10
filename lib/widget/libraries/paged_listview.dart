@@ -397,13 +397,13 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   /// Clear all the data saved.
-  /// We don't want to clear the error if this function is called from an error handler, 
+  /// We don't want to clear the error if this function is called from an error handler,
   /// so we add separate control for whether to clear [_hasError]
   void _clearData({bool clearError = true}) {
     _data.clear();
     valueKeys.clear();
     _dataClearQueued = false;
-    if(clearError){
+    if (clearError) {
       _hasError = false;
     }
   }

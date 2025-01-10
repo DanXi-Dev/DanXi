@@ -30,7 +30,7 @@ class FudanLibraryCrowdednessFeature extends Feature {
   bool get loadOnTap => false;
 
   /// The numbers of each library visitors at the moment.
-  Map<String,String>? _libraryCrowdedness;
+  Map<String, String>? _libraryCrowdedness;
 
   /// Status of the request.
   ConnectionStatus _status = ConnectionStatus.NONE;

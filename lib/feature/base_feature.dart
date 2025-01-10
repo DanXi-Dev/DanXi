@@ -81,4 +81,5 @@ mixin FeatureContainerState {
 mixin FeatureContainer {
   Feature get childFeature;
 }
+
 enum FeatureEvent { CREATE, REMOVE }

@@ -37,9 +37,10 @@ class XSharedPreferences {
   final FlutterSecureStorage _keyStore;
   late final EncryptedSharedPreferences _preferences;
 
-  XSharedPreferences._() : _keyStore = const FlutterSecureStorage(
-    wOptions: WindowsOptions(useBackwardCompatibility: true),
-  );
+  XSharedPreferences._()
+      : _keyStore = const FlutterSecureStorage(
+          wOptions: WindowsOptions(useBackwardCompatibility: true),
+        );
 
   static XSharedPreferences? _instance;
 
@@ -71,7 +72,8 @@ class XSharedPreferences {
       }
       String key = (await _instance!._keyStore.read(key: KEY_CIPHER))!;
       // initialize the encrypted preferences.
-      await EncryptedSharedPreferences.initialize(key, encryptor: LegacyAESEncryptor());
+      await EncryptedSharedPreferences.initialize(key,
+          encryptor: LegacyAESEncryptor());
       _instance!._preferences = EncryptedSharedPreferences.getInstance();
       // migrate the data from [SharedPreferences] to [EncryptedSharedPreferences]
       // if the data has not been flagged as migrated.
@@ -153,13 +155,12 @@ class XSharedPreferences {
   }
 }
 
-
 /// @w568w (2024-11-26):
 /// encrypt_shared_preferences quietly changed the default AES Encryptor to use SIC mode from CBC mode.
 /// This is obviously a breaking change, but it is mentioned nowhere in the changelog. Average noob developer.
 ///
 /// So this class is an implementation of the legacy AES Encryptor.
-class LegacyAESEncryptor extends IEncryptor{
+class LegacyAESEncryptor extends IEncryptor {
   @override
   String encrypt(String key, String plainText) {
     assert(key.length == 16);
@@ -178,6 +179,7 @@ class LegacyAESEncryptor extends IEncryptor{
     final encryptService = Encrypter(AES(cipherKey, mode: AESMode.cbc));
     final initVector = IV.fromUtf8(key);
 
-    return encryptService.decrypt(Encrypted.fromBase64(encryptedData), iv: initVector);
+    return encryptService.decrypt(Encrypted.fromBase64(encryptedData),
+        iv: initVector);
   }
 }

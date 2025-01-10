@@ -103,7 +103,8 @@ class CardDetailPageState extends State<CardDetailPage> {
                   _selectable = false;
                 });
                 _cardInfo!.records = await CardRepository.getInstance()
-                    .loadCardRecord(StateProvider.personInfo.value, _tagDays[index]);
+                    .loadCardRecord(
+                        StateProvider.personInfo.value, _tagDays[index]);
                 setState(() {
                   tag.checkedIcon = PlatformX.isMaterial(context)
                       ? Icons.check

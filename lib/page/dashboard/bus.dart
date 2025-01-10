@@ -178,8 +178,7 @@ class BusPageState extends State<BusPage> {
         return DropdownMenuItem(value: e, child: Text(e.displayTitle(context)));
       }).toList(growable: false);
 
-  Map<int, Text> _getCupertinoItems() =>
-      Constant.CAMPUS_VALUES
+  Map<int, Text> _getCupertinoItems() => Constant.CAMPUS_VALUES
       .map((e) => Text(e.displayTitle(context)))
       .toList(growable: false)
       .asMap();
