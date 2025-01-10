@@ -156,7 +156,8 @@ class WelcomeFeature extends Feature {
         children: [
           status,
           const SizedBox(height: 2),
-          Text(S.of(context!).entry_permission, textScaler: TextScaler.linear(0.8))
+          Text(S.of(context!).entry_permission,
+              textScaler: TextScaler.linear(0.8))
         ],
       ),
       onTap: () {

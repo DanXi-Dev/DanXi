@@ -81,7 +81,8 @@ class AnnouncementListState extends State<AnnouncementList> {
         successBuilder: (_, snapShot) {
           _data = _showingLatest
               ? AnnouncementRepository.getInstance().getAnnouncements() ?? []
-              : AnnouncementRepository.getInstance().getAllAnnouncements() ?? [];
+              : AnnouncementRepository.getInstance().getAllAnnouncements() ??
+                  [];
           return Column(
             children: [
               Expanded(

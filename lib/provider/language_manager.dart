@@ -4,7 +4,6 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:flutter/material.dart';
 
 class LanguageManager {
-
   /// Convert the [Language] to language code for [Locale].
   static Locale toLocale(Language language) {
     if (language == Language.SIMPLE_CHINESE) return const Locale("zh", "CN");

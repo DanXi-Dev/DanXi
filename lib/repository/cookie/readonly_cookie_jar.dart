@@ -15,17 +15,16 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 // ignore: implementation_imports
 import 'package:cookie_jar/cookie_jar.dart';
 // ignore: implementation_imports
 import 'package:dan_xi/repository/cookie/independent_cookie_jar.dart';
 
-/// A copy of [DefaultCookieJar], but denies any writing, to avoid being modified or overwritten by mistake. 
-/// Cookies could only be copied from another cookie jar. 
+/// A copy of [DefaultCookieJar], but denies any writing, to avoid being modified or overwritten by mistake.
+/// Cookies could only be copied from another cookie jar.
 class ReadonlyCookieJar extends DefaultCookieJar {
   // Clear all cookies stored in RAM
-  Future<void> clearCookies() async{
+  Future<void> clearCookies() async {
     domainCookies.clear();
     hostCookies.clear();
   }
@@ -42,7 +41,7 @@ class ReadonlyCookieJar extends DefaultCookieJar {
   }
 
   /// Readonly cookie jar does not allow the [deleteAll] api
-  /// If you still want to clear all cookies stored, call [clearCookies] instead. 
+  /// If you still want to clear all cookies stored, call [clearCookies] instead.
   @override
   Future<void> deleteAll() async {
     // Do nothing

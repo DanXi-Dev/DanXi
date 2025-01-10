@@ -137,7 +137,7 @@ class PlatformPopupMenuX extends StatelessWidget {
                       Navigator.pop(context);
                       option.onTap?.call(option);
                     },
-                child: data?.child ?? Text(option.label??""),
+                child: data?.child ?? Text(option.label ?? ""),
               );
             },
           ).toList(),
@@ -175,7 +175,7 @@ class PlatformPopupMenuX extends StatelessWidget {
                     onTap: data?.onTap,
                     padding: data?.padding,
                     textStyle: data?.textStyle,
-                    child: data?.child ?? Text(option.label??""),
+                    child: data?.child ?? Text(option.label ?? ""),
                   );
                 },
               ).toList(),

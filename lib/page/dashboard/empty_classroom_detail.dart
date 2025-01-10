@@ -189,8 +189,8 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
               singleChoice: true,
               defaultChoice: _selectCampusIndex,
               onChoice: (Tag tag, list) {
-                int index = _campusTags!.indexWhere(
-                        (element) => element.tagTitle == tag.tagTitle);
+                int index = _campusTags!
+                    .indexWhere((element) => element.tagTitle == tag.tagTitle);
                 if (index >= 0 && index != _selectCampusIndex) {
                   _selectCampusIndex = index;
                   _selectBuildingIndex = 0;
@@ -224,8 +224,8 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
               singleChoice: true,
               defaultChoice: _selectBuildingIndex,
               onChoice: (Tag tag, list) {
-                int index = _buildingTags!.indexWhere(
-                        (element) => element.tagTitle == tag.tagTitle);
+                int index = _buildingTags!
+                    .indexWhere((element) => element.tagTitle == tag.tagTitle);
                 if (index >= 0 && index != _selectBuildingIndex) {
                   _selectBuildingIndex = index;
                   refreshSelf();
@@ -384,10 +384,7 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
                       child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        element.roomName!,
-                        textScaler: TextScaler.linear(1)
-                      ),
+                      Text(element.roomName!, textScaler: TextScaler.linear(1)),
                       Text(
                         S.of(context).seats(element.seats ?? "?"),
                         textScaler: TextScaler.linear(0.8),

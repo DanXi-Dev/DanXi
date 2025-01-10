@@ -275,7 +275,8 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                     // Scroll to the specific floor.
                     final floorToJump = locateReview!;
                     _listViewController.scheduleLoadedCallback(
-                            () async => await _listViewController.scrollToItem(floorToJump),
+                        () async =>
+                            await _listViewController.scrollToItem(floorToJump),
                         rebuild: true);
                     locateReview = null;
                   }
@@ -284,7 +285,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
                     try {
                       // Scroll to end.
                       _listViewController.scheduleLoadedCallback(
-                              () async => await _listViewController.scrollToEnd(),
+                          () async => await _listViewController.scrollToEnd(),
                           rebuild: true);
                       shouldScrollToEnd = false;
                     } catch (_) {

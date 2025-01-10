@@ -51,9 +51,8 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                         },
                         child: CircleAvatar(
                           radius: 24.0,
-                          backgroundColor: Color(context
-                              .read<SettingsProvider>()
-                              .primarySwatch),
+                          backgroundColor: Color(
+                              context.read<SettingsProvider>().primarySwatch),
                           foregroundColor: Colors.white,
                           child: e == selectedWeekDay
                               ? Icon(PlatformX.isMaterial(context)
@@ -81,9 +80,8 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                         },
                         child: CircleAvatar(
                           radius: 24.0,
-                          backgroundColor: Color(context
-                              .read<SettingsProvider>()
-                              .primarySwatch),
+                          backgroundColor: Color(
+                              context.read<SettingsProvider>().primarySwatch),
                           foregroundColor: Colors.white,
                           child: selectedSlots[e] == true
                               ? Icon(PlatformX.isMaterial(context)
@@ -107,10 +105,8 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
         PlatformDialogAction(
             child: Text(S.of(context).add),
             onPressed: () {
-              Navigator.pop(
-                  context,
-                  newCourseTimeGenerator(
-                      selectedWeekDay, selectedSlots));
+              Navigator.pop(context,
+                  newCourseTimeGenerator(selectedWeekDay, selectedSlots));
             }),
       ],
     );

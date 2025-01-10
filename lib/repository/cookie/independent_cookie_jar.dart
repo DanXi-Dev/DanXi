@@ -48,8 +48,8 @@ class IndependentCookieJar implements CookieJar {
 
   IndependentCookieJar({this.ignoreExpires = false});
 
-  Map<String?, Map<String, Map<String, SerializableCookie>>> get domainCookies =>
-      _cookies[0];
+  Map<String?, Map<String, Map<String, SerializableCookie>>>
+      get domainCookies => _cookies[0];
 
   Map<String?, Map<String, Map<String, SerializableCookie>>> get hostCookies =>
       _cookies[1];

@@ -122,7 +122,8 @@ class Registry {
         keyName.toNativeUtf16(),
         0,
         REG_VALUE_TYPE.REG_SZ,
-        nativeValue.cast<Uint8>(), nativeValue.length * WCHAR_SIZE);
+        nativeValue.cast<Uint8>(),
+        nativeValue.length * WCHAR_SIZE);
     switch (status) {
       case WIN32_ERROR.NO_ERROR:
         break;

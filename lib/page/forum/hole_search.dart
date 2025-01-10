@@ -273,8 +273,8 @@ Future<void> goToFloorIdResultPage(BuildContext context, int floorId) async {
   ProgressFuture progressDialog =
       showProgressDialog(loadingText: S.of(context).loading, context: context);
   try {
-    final floor = (await ForumRepository.getInstance()
-        .loadSpecificFloor(floorId))!;
+    final floor =
+        (await ForumRepository.getInstance().loadSpecificFloor(floorId))!;
     OTFloorMentionWidget.showFloorDetail(context, floor);
   } catch (error, st) {
     if (error is DioException &&

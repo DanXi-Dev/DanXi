@@ -292,7 +292,10 @@ class ReviewFooter extends StatelessWidget {
 
 class ModifyMenuWidget extends StatefulWidget {
   const ModifyMenuWidget(
-      {super.key, required this.originalReview, required this.courseGroup, required this.reviewOperationCallback});
+      {super.key,
+      required this.originalReview,
+      required this.courseGroup,
+      required this.reviewOperationCallback});
   final CourseReview originalReview;
   final CourseGroup courseGroup;
   final void Function(CourseReview?) reviewOperationCallback;

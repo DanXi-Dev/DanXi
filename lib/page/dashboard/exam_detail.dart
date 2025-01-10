@@ -396,7 +396,7 @@ class ExamListState extends State<ExamList> {
           child: Text(score!, textScaler: TextScaler.linear(0.6)),
         ),
       ]));
-  
+
   // Grade card with exam data
   Widget _buildCardHybrid(Exam value, BuildContext context) => Card(
         child: Padding(
@@ -425,19 +425,15 @@ class ExamListState extends State<ExamList> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           if (value.date != "" || value.time != "") ...[
-                            Text(
-                              "${value.date} ${value.time}",
-                              textScaler: TextScaler.linear(0.8)
-                            ),
+                            Text("${value.date} ${value.time}",
+                                textScaler: TextScaler.linear(0.8)),
                             const SizedBox(
                               width: 8,
                             ),
                           ] else
                             ...[],
-                          Text(
-                            "${value.location} ",
-                            textScaler: TextScaler.linear(0.8)
-                          ),
+                          Text("${value.location} ",
+                              textScaler: TextScaler.linear(0.8)),
                         ],
                       ),
                     if (value.note.trim() != "")

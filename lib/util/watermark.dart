@@ -49,18 +49,18 @@ class Watermark {
 
     overlayEntry = OverlayEntry(
         builder: (context) => FullScreenWatermark(
-          rowCount: rowCount,
-          columnCount: columnCount,
-          textStyle: textStyle ??
-              TextStyle(
-                  color: PlatformX.isDarkMode
-                      ? Color(
-                      SettingsProvider.getInstance().darkWatermarkColor)
-                      : Color(SettingsProvider.getInstance()
-                      .lightWatermarkColor),
-                  fontSize: 48,
-                  decoration: TextDecoration.none),
-        ));
+              rowCount: rowCount,
+              columnCount: columnCount,
+              textStyle: textStyle ??
+                  TextStyle(
+                      color: PlatformX.isDarkMode
+                          ? Color(
+                              SettingsProvider.getInstance().darkWatermarkColor)
+                          : Color(SettingsProvider.getInstance()
+                              .lightWatermarkColor),
+                      fontSize: 48,
+                      decoration: TextDecoration.none),
+            ));
 
     overlayState.insert(overlayEntry!);
     refCount++;

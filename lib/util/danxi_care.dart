@@ -7,8 +7,8 @@ Future<bool> detectCareWords(String? target) async {
 
   List<String> careWords = await Constant.careWords;
 
-  for(var word in careWords) {
-    if(target.contains(word)) {
+  for (var word in careWords) {
+    if (target.contains(word)) {
       return true;
     }
   }

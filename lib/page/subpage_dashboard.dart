@@ -137,7 +137,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
     List<Widget> widgets = [];
     NotificationProvider provider = context.watch<NotificationProvider>();
     widgets.addAll(provider.notifications.map((e) => FeatureCardItem(
-      feature: e,
+          feature: e,
           onDismissed: () async {
             final name = e.runtimeType.toString();
             provider.removeNotification(e);
