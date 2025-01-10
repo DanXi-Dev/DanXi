@@ -891,19 +891,22 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         },
         child: Text(S.of(context).share_floor),
       ),
-      PlatformContextMenuItem(
-        menuContext: menuContext,
-        onPressed: () async {
-          setState(() {
-            if ((_renderModel as Normal).selectedPerson != null) {
-              (_renderModel as Normal).selectedPerson = null;
-            } else {
-              (_renderModel as Normal).selectedPerson = e.anonyname;
-            }
-          });
-        },
-        child: Text((_renderModel as Normal).selectedPerson != null ? S.of(context).show_all_replies : S.of(context).show_this_person),
-      ),
+      if (_renderModel
+          case Normal(selectedPerson: var selectedPerson, hole: _)) ...[
+        PlatformContextMenuItem(
+          menuContext: menuContext,
+          onPressed: () async {
+            setState(() {
+              var model = _renderModel as Normal;
+              model.selectedPerson =
+                  model.selectedPerson != null ? null : e.anonyname;
+            });
+          },
+          child: Text(selectedPerson != null
+              ? S.of(context).show_all_replies
+              : S.of(context).show_this_person),
+        ),
+      ],
       PlatformContextMenuItem(
         menuContext: menuContext,
         isDestructive: true,
