@@ -39,7 +39,7 @@ gradle.taskGraph.whenReady {
 android {
     compileSdkVersion 35
 
-    ndkVersion "28.0.12433566"
+    ndkVersion "28.0.12674087"
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
