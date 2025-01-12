@@ -17,7 +17,6 @@
 #include <platform_device_id_windows/platform_device_id_windows_plugin.h>
 #include <screen_brightness_windows/screen_brightness_windows_plugin.h>
 #include <share_plus/share_plus_windows_plugin_c_api.h>
-#include <tray_manager/tray_manager_plugin.h>
 #include <url_launcher_windows/url_launcher_windows.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
@@ -43,8 +42,6 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("ScreenBrightnessWindowsPlugin"));
   SharePlusWindowsPluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("SharePlusWindowsPluginCApi"));
-  TrayManagerPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("TrayManagerPlugin"));
   UrlLauncherWindowsRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("UrlLauncherWindows"));
 }

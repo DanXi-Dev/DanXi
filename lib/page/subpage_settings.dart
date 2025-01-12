@@ -88,16 +88,12 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     LicenseItem("asn1lib", LICENSE_BSD, "https://github.com/wstrange/asn1lib"),
     LicenseItem("cached_network_image", LICENSE_MIT,
         "https://github.com/Baseflow/flutter_cached_network_image"),
-    LicenseItem("tray_manager", LICENSE_MIT,
-        "https://github.com/leanflutter/tray_manager"),
     LicenseItem(
         "win32", LICENSE_BSD_3_0_CLAUSE, "https://github.com/timsneath/win32"),
     LicenseItem("collection", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/dart-lang/collection"),
     LicenseItem(
         "meta", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dart-lang/sdk"),
-    LicenseItem("bitsdojo_window_v3", LICENSE_MIT,
-        "https://github.com/DartGit-dev/bitsdojo_window"),
     LicenseItem("flutter_layout_grid", LICENSE_MIT,
         "https://github.com/madewithfelt/flutter_layout_grid"),
     LicenseItem(
