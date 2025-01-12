@@ -4,7 +4,6 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
-  bitsdojo_window_windows
   desktop_window
   file_selector_windows
   flutter_inappwebview_windows
