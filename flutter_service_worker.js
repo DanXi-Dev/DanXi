@@ -46,7 +46,7 @@ const RESOURCES = {"assets/assets/texts/tips.dat": "b38397c625ee54578753dadccd05
 "assets/assets/graphics/HydrogenC.jpg": "a1f2259106c1331845dbac3248fd83a5",
 "assets/assets/fonts/iconfont.ttf": "10fc9d2c60416db178b25beedb6d22be",
 "assets/AssetManifest.bin": "b920a8779dd4517ae98a56f377b7d356",
-"assets/NOTICES": "d0b97505efcd05defe34f9b04a84a2dc",
+"assets/NOTICES": "9096abbabb7e50c0fa66974728e02c8c",
 "assets/AssetManifest.json": "0c2dddc9a70cab70fd49982e32420c96",
 "assets/fonts/MaterialIcons-Regular.otf": "0dfcffaba47f89910e50346f6dafa87f",
 "assets/packages/fluttertoast/assets/toastify.js": "56e2c9cedd97f10e7e5f1cebd85d53e3",
@@ -93,11 +93,11 @@ const RESOURCES = {"assets/assets/texts/tips.dat": "b38397c625ee54578753dadccd05
 "canvaskit/canvaskit.wasm": "e7602c687313cfac5f495c5eac2fb324",
 "canvaskit/canvaskit.js": "26eef3024dbc64886b7f48e1b6fb05cf",
 "favicon.webp": "5d8a19c576a1ba2a24af3b99f340237d",
-"index.html": "99120a00d79f94bf8c30e81e4f3f6605",
-"/": "99120a00d79f94bf8c30e81e4f3f6605",
+"index.html": "03416f89f828ccc2bd5aedc163f8a1b6",
+"/": "03416f89f828ccc2bd5aedc163f8a1b6",
 "flutter.js": "4b2350e14c6650ba82871f60906437ea",
-"flutter_bootstrap.js": "1e1d7863ec15ac0c2860928ca2042621",
-"main.dart.js": "2594673a5408ed5f4aaed6c73b96dc62"};
+"flutter_bootstrap.js": "b4da8b04356ad47b9d73e121d7c169f8",
+"main.dart.js": "b8845315d1fb798248e1167747e77c1b"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",
