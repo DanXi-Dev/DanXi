@@ -14,24 +14,33 @@ subprojects {
         if (project.plugins.hasPlugin("com.android.application") ||
                 project.plugins.hasPlugin("com.android.library")) {
             project.android.compileSdkVersion = 35
+
+            // override Java version to 23
+            project.android.compileOptions.sourceCompatibility = JavaVersion.VERSION_23
+            project.android.compileOptions.targetCompatibility = JavaVersion.VERSION_23
+
+            // override Kotlin JVM target to 23 too
+            project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                kotlinOptions {
+                    jvmTarget = "23"
+                }
+            }
+
             if (project.android.namespace == null) {
                 def manifest = new XmlSlurper().parse(file(project.android.sourceSets.main.manifest.srcFile))
                 def packageName = manifest.@package.text()
                 println("Setting ${packageName} as android namespace")
                 project.android.namespace = packageName
             }
-            // override the kotlin language version for each dependencies to 2.0.20
-            if (project.buildscript.configurations.hasProperty("classpath")) {
-                def found = false
-                project.buildscript.configurations.classpath.getDependencies().each { dep ->
-                    if (dep.group == "org.jetbrains.kotlin" && dep.name == "kotlin-gradle-plugin") {
-                        found = true
-                    }
-                }
-                if (found) {
-                    project.buildscript.dependencies.add("classpath", "org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21")
-                }
-            }
+        }
+    }
+}
+
+// override the kotlin language version for each dependencies to 2.1.0
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'org.jetbrains.kotlin' && details.requested.name == 'kotlin-gradle-plugin') {
+            details.useVersion '2.1.0'
         }
     }
 }
