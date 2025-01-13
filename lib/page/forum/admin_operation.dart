@@ -161,11 +161,12 @@ class AdminOperationPageState extends State<AdminOperationPage> {
                     const Divider(),
                     FutureFoledListWidget(
                         future: getModifyHistory(),
-                        itemBuilder: (e) => Card(
-                            child: ListTile(
-                                subtitle: Text(HumanDuration.tryFormat(context,
-                                    DateTime.tryParse(e.time_updated ?? ""))),
-                                title: Text(e.content!))),
+                        itemBuilder: (e) => OTFloorWidget(
+                            hasBackgroundImage: false,
+                            floor: _floor.copyWith(
+                                content: e.content,
+                                time_updated: e.time_updated,
+                                deleted: false)),
                         text: "历史修改"),
                     const Divider(),
                     PlatformTextField(
