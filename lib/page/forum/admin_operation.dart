@@ -164,7 +164,7 @@ class AdminOperationPageState extends State<AdminOperationPage> {
                             hasBackgroundImage: false,
                             floor: _floor.copyWith(
                                 content: e.content,
-                                time_updated: e.time_updated,
+                                time_created: e.time_updated,
                                 deleted: false)),
                         text: "历史修改"),
                     const Divider(),
