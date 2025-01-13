@@ -77,7 +77,7 @@ class ScheduleViewState extends State<ScheduleView> {
               margin: const EdgeInsets.all(2),
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
-                  color: Theme.of(context).hintColor.withOpacity(0.14),
+                  color: Theme.of(context).hintColor.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(4)),
             ).withRatio(ratio).withGridPlacement(
                 rowStart: index ~/ cols, columnStart: index % cols));

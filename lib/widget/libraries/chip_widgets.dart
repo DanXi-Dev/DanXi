@@ -40,13 +40,13 @@ class LeadingChip extends ChipWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-          color: color!.withOpacity(0.8),
+          color: color!.withValues(alpha: 0.8),
           borderRadius: const BorderRadius.all(Radius.circular(2.0))),
       child: Text(
         label!,
         style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: color!.withOpacity(0.8).computeLuminance() <= 0.5
+            color: color!.withValues(alpha: 0.8).computeLuminance() <= 0.5
                 ? Colors.white
                 : Colors.black,
             fontSize: 12),
@@ -78,7 +78,7 @@ class RectangularChip extends ChipWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
               decoration: BoxDecoration(
-                color: effectiveColor.withOpacity(0.3),
+                color: effectiveColor.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
               child: Center(
@@ -123,7 +123,7 @@ class RoundChip extends ChipWidget {
                 width: 1,
               ),
               color:
-                  PlatformX.isDarkMode ? effectiveColor.withOpacity(0.3) : null,
+                  PlatformX.isDarkMode ? effectiveColor.withValues(alpha: 0.3) : null,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(

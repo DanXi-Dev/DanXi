@@ -31,7 +31,7 @@ class SmallTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
       decoration: BoxDecoration(
-          color: Theme.of(context).hintColor.withOpacity(0.25),
+          color: Theme.of(context).hintColor.withValues(alpha: 0.25),
           borderRadius: const BorderRadius.all(Radius.circular(4.0))),
       child: Text(
         label!,

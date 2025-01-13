@@ -342,7 +342,7 @@ class CourseGroupDetailState extends State<CourseGroupDetail> {
     ];
 
     return Card(
-        color: Theme.of(context).cardTheme.color?.withOpacity(0.8),
+        color: Theme.of(context).cardTheme.color?.withValues(alpha: 0.8),
         child: ListTile(
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 5, horizontal: 3),

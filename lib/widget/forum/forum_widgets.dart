@@ -53,7 +53,7 @@ const String _kEllipsis = '\u2026';
 Color? getDefaultCardBackgroundColor(
         BuildContext context, bool hasBackgroundImage) =>
     hasBackgroundImage
-        ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
+        ? Theme.of(context).cardTheme.color?.withValues(alpha: 0.8)
         : null;
 
 enum ActionItem { Modify, Delete, Report }
@@ -124,7 +124,7 @@ class OTHoleWidget extends StatelessWidget {
 
     return Card(
       color: translucent
-          ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
+          ? Theme.of(context).cardTheme.color?.withValues(alpha: 0.8)
           : null,
       child: Column(
         children: [
@@ -477,7 +477,7 @@ class OTFloorWidget extends StatelessWidget {
       onLongPress: onLongPress,
       child: Card(
         color: isInMention && PlatformX.isCupertino(context)
-            ? Theme.of(context).dividerColor.withOpacity(0.05)
+            ? Theme.of(context).dividerColor.withValues(alpha: 0.05)
             : getDefaultCardBackgroundColor(context, hasBackgroundImage),
         child: (foldLongFloor ||
                 floor.deleted == true ||
