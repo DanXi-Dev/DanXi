@@ -181,7 +181,7 @@ class TagContainerState extends State<TagContainer> {
         ),
         selected: data.isSelected,
         selectedColor: data.tagColor,
-        // backgroundColor: data.tagColor?.withOpacity(0.5),
+        // backgroundColor: data.tagColor?.withValues(alpha: 0.5),
         avatar: data.icon != null ? Icon(data.icon) : null,
         // When [widget.enabled] is false, set [onSelected] to null so that this chip will act as disabled.
         onSelected: widget.enabled
