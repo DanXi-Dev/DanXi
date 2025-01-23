@@ -1,10 +1,14 @@
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/repository/cookie/independent_cookie_jar.dart';
 import 'package:dan_xi/repository/cookie/readonly_cookie_jar.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
+import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 class WebvpnRequestException implements Exception {
@@ -30,10 +34,13 @@ class WebvpnProxy {
   // Cookies related with webvpn
   static final ReadonlyCookieJar webvpnCookieJar = ReadonlyCookieJar();
 
-  static const String DIRECT_CONNECT_TEST_URL = "https://danta.fudan.edu.cn";
+  static const String DIRECT_CONNECT_TEST_URL = "https://forum.fudan.edu.cn";
 
-  static const String WEBVPN_LOGIN_URL =
-      "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fwebvpn.fudan.edu.cn%2Flogin%3Fcas_login%3Dtrue";
+  static const String WEBVPN_UIS_LOGIN_URL =
+      "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fid.fudan.edu.cn%2Fidp%2FthirdAuth%2Fcas";
+  static const String WEBVPN_ID_REQUEST_URL =
+      "https://id.fudan.edu.cn/idp/authCenter/authenticate?service=https%3A%2F%2Fwebvpn.fudan.edu.cn%2Flogin%3Fcas_login%3Dtrue";
+  static const String WEBVPN_LOGIN_URL = "https://webvpn.fudan.edu.cn/login";
 
   static final Map<String, String> _vpnPrefix = {
     "www.fduhole.com":
@@ -82,9 +89,7 @@ class WebvpnProxy {
       return false;
     }
 
-    if (response.realUri
-        .toString()
-        .startsWith("https://webvpn.fudan.edu.cn/login")) {
+    if (response.realUri.toString().startsWith(WEBVPN_LOGIN_URL)) {
       return false;
     }
 
@@ -119,19 +124,68 @@ class WebvpnProxy {
       debugPrint("Logging into WebVPN");
 
       try {
+        Dio newDio = DioUtils.newDioWithProxy();
+        newDio.options = BaseOptions(
+            receiveDataWhenStatusError: true,
+            connectTimeout: const Duration(seconds: 5),
+            receiveTimeout: const Duration(seconds: 5),
+            sendTimeout: const Duration(seconds: 5));
+        newDio.interceptors.add(UserAgentInterceptor(
+            userAgent: SettingsProvider.getInstance().customUserAgent));
         // Temporary cookie jar
         IndependentCookieJar workJar = IndependentCookieJar();
-        loginSession =
-            UISLoginTool.loginUIS(dio, WEBVPN_LOGIN_URL, workJar, _personInfo);
+        newDio.interceptors.add(CookieManager(workJar));
+
+        loginSession = _authenticateWebVPN(newDio, workJar, _personInfo);
         await loginSession;
-        // Clone from temp jar to our dedicated webvpn jar
+
         webvpnCookieJar.cloneFrom(workJar);
         isLoggedIn = true;
+      } catch (e) {
+        debugPrint("Failed to login to WebVPN: $e");
+        isLoggedIn = false;
+        rethrow;
       } finally {
         loginSession = null;
       }
       // Any exception thrown won't be catched and will be propagated to widgets
     }
+  }
+
+  static Future<void> _authenticateWebVPN(
+      Dio dio, IndependentCookieJar jar, PersonInfo? info) async {
+    Response<dynamic>? res = await dio.get(WEBVPN_ID_REQUEST_URL,
+        options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
+    if (res.statusCode == 302) {
+      await DioUtils.processRedirect(dio, res);
+      res = await UISLoginTool.loginUIS(dio, WEBVPN_UIS_LOGIN_URL, jar, info);
+      if (res == null) {
+        throw WebvpnRequestException("Failed to login to UIS");
+      }
+    }
+    final ticket = _retrieveTicket(res);
+
+    Map<String, dynamic> queryParams = {
+      'cas_login': 'true',
+      'ticket': ticket,
+    };
+
+    final response = await dio.get(WEBVPN_LOGIN_URL,
+        queryParameters: queryParams,
+        options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
+    await DioUtils.processRedirect(dio, response);
+  }
+
+  static String? _retrieveTicket(Response<dynamic> response) {
+    // Check if the URL host matches the expected value
+    if (response.realUri.host != "id.fudan.edu.cn") {
+      return null;
+    }
+
+    BeautifulSoup soup = BeautifulSoup(response.data!);
+
+    final element = soup.find('', selector: '#ticket');
+    return element?.attributes['value'];
   }
 
   /// Check if we are able to connect to the service directly (without WebVPN).
