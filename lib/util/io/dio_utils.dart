@@ -21,9 +21,6 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-
-import '../../repository/cookie/independent_cookie_jar.dart';
 
 /// Useful utils when processing network requests with dio.
 class DioUtils {
@@ -55,8 +52,7 @@ class DioUtils {
   /// Thus, some necessary headers (e.g. cookies) will be missing from the second
   /// request and on.
   static Future<Response<dynamic>> processRedirect(
-      Dio dio, Response<dynamic> response,
-      [IndependentCookieJar? jar]) async {
+      Dio dio, Response<dynamic> response) async {
     // Prevent the redirect being processed by HttpClient, with the 302 response caught manually.
     if (response.statusCode == 302 &&
         response.headers['location'] != null &&
@@ -65,9 +61,6 @@ class DioUtils {
       if (location.isEmpty) return response;
       if (!Uri.parse(location).isAbsolute) {
         location = '${response.requestOptions.uri.origin}/$location';
-      }
-      if (jar != null) {
-        dio.interceptors.add(CookieManager(jar));
       }
       return processRedirect(dio,
           await dio.get(location, options: NON_REDIRECT_OPTION_WITH_FORM_TYPE));

@@ -120,8 +120,6 @@ class UISLoginTool {
     workDio.interceptors.add(CookieManager(workJar));
     workDio.interceptors.add(DioLogInterceptor());
 
-    // Remove old cookies.
-    workJar.deleteAll();
     Map<String?, String?> data = {};
     Response<String> res = await workDio.get(serviceUrl);
     BeautifulSoup(res.data!).findAll("input").forEach((element) {
