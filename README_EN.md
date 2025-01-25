@@ -63,10 +63,10 @@ mount it.
 
 ```shell
 $ flutter --version
-Flutter 3.27.1 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 17025dd882 (3 weeks ago) • 2024-12-17 03:23:09 +0900
-Engine • revision cb4b5fff73
-Tools • Dart 3.6.0 • DevTools 2.40.2
+Flutter 3.27.3 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision c519ee916e (3 days ago) • 2025-01-21 10:32:23 -0800
+Engine • revision e672b006cb
+Tools • Dart 3.6.1 • DevTools 2.40.2
 ```
 
 ## Notes on compilation
