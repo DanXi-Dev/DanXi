@@ -68,7 +68,16 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             // Only used when building a released work.
-             signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
+        }
+    }
+    packagingOptions {
+        jniLibs {
+            // Enabling the compression of the native libraries, which is disabled by default for performance reasons.
+            // The option name, `useLegacyPackaging`, is a bit misleading. It's actually about the compression of the native libraries.
+            // We weight the size of the APK file more than the little performance gain, so we enable it.
+            // See https://developer.android.com/guide/practices/page-sizes for more information.
+            useLegacyPackaging true
         }
     }
     lint {
