@@ -126,12 +126,14 @@ Future<void> buildAndroid(String? versionCode, String gitHash,
   ]);
 
   print('Clean old files...');
-  File oldFile = File('build/app/DanXi-$versionCode-release.android.apk');
+  String targetPath =
+      'build/app/DanXi-$versionCode-${target != null ? "$target-" : ""}release.android.apk';
+  File oldFile = File(targetPath);
   if (oldFile.existsSync()) {
     oldFile.deleteSync();
   }
   print('Copy file...');
-  File newFile = File('build/app/DanXi-$versionCode-release.android.apk');
+  File newFile = File(targetPath);
   File sourceFile = File('build/app/outputs/flutter-apk/app-release.apk');
   sourceFile.copySync(newFile.path);
   print('Build success.');
