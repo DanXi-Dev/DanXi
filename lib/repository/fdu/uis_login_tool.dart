@@ -120,6 +120,9 @@ class UISLoginTool {
     workDio.interceptors.add(CookieManager(workJar));
     workDio.interceptors.add(DioLogInterceptor());
 
+    // workJar.deleteAll();
+    // fixme: delete cookie to fix 403 issue in [ExamList]
+    workJar.deleteCookiesByName("CASTGC");
     Map<String?, String?> data = {};
     Response<String> res = await workDio.get(serviceUrl);
     BeautifulSoup(res.data!).findAll("input").forEach((element) {
