@@ -42,8 +42,14 @@ class CourseGroup {
   @JsonKey(name: 'review_count')
   int? reviewCount;
 
-  CourseGroup({this.id, this.name, this.code, this.department, this.weekHour,
-      this.credits, this.courseList});
+  CourseGroup(
+      {this.id,
+      this.name,
+      this.code,
+      this.department,
+      this.weekHour,
+      this.credits,
+      this.courseList});
 
   @override
   String toString() {

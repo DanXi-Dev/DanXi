@@ -18,7 +18,6 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/page/danke/course_group_detail.dart';
@@ -112,14 +111,6 @@ void main() {
       });
     });
   });
-
-  // Init DesktopWindow on desktop environment.
-  if (PlatformX.isDesktop) {
-    doWhenWindowReady(() {
-      final win = appWindow;
-      win.show();
-    });
-  }
 }
 
 class TouchMouseScrollBehavior extends MaterialScrollBehavior {
@@ -315,7 +306,7 @@ class DanxiApp extends StatelessWidget {
     // Init FDUHoleProvider. This object provides some global states about
     // FDUHole such as the current division and the json web token.
     var fduHoleProvider = ForumProvider();
-    // Init ForumRepository with the provider. This is the api implementations of the forum. 
+    // Init ForumRepository with the provider. This is the api implementations of the forum.
     ForumProvider.init(fduHoleProvider);
 
     // Wrap the whole app with [Phoenix] to enable fast reload. When user

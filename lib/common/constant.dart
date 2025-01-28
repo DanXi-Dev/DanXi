@@ -68,8 +68,7 @@ class Constant {
   static const String FORUM_FORGOT_PASSWORD_URL =
       "https://auth.fduhole.com/register?type=forget_password";
 
-  static const String FORUM_REGISTER_URL =
-      "https://auth.fduhole.com/register";
+  static const String FORUM_REGISTER_URL = "https://auth.fduhole.com/register";
 
   /// The default start date of a semester.
   static final DEFAULT_SEMESTER_START_DATE = DateTime(2023, 2, 20);
@@ -88,7 +87,8 @@ class Constant {
   static const String DANKE_BASE_URL = "https://danke.fduhole.com/api";
 
   /// An link to the FAQ page of Danxi.
-  static const String FAQ_URL = "https://danxi-dev.feishu.cn/wiki/wikcnrPPGDCiTODBYRkdwLlHH65";
+  static const String FAQ_URL =
+      "https://danxi-dev.feishu.cn/wiki/wikcnrPPGDCiTODBYRkdwLlHH65";
 
   static const LINKIFY_THEME =
       TextStyle(color: Colors.blue, decoration: TextDecoration.none);

@@ -73,7 +73,7 @@ class PlatformAppBarX extends PlatformAppBar {
       bottom: data?.bottom,
       actions: data?.actions ?? trailingActions,
       automaticallyImplyLeading:
-      data?.automaticallyImplyLeading ?? automaticallyImplyLeading ?? true,
+          data?.automaticallyImplyLeading ?? automaticallyImplyLeading ?? true,
       bottomOpacity: data?.bottomOpacity ?? 1.0,
       toolbarTextStyle: data?.toolbarTextStyle,
       centerTitle: data?.centerTitle,
@@ -104,26 +104,22 @@ class PlatformAppBarX extends PlatformAppBar {
       // will push the list down. Adding some alpha value fixes it (in a hacky way)
       //backgroundColor: Colors.white.withAlpha(254),
       leading: MediaQuery(
-        data: MediaQueryData(
-            textScaler:
-                TextScaler.linear(MediaQuery.textScaleFactorOf(context))),
+        data: MediaQueryData(textScaler: MediaQuery.textScalerOf(context)),
         child: CupertinoNavigationBarBackButton(
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       title: MediaQuery(
-          data: MediaQueryData(
-              textScaler:
-                  TextScaler.linear(MediaQuery.textScaleFactorOf(context))),
+          data: MediaQueryData(textScaler: MediaQuery.textScalerOf(context)),
           child: data?.title ?? title!),
     );
     var trailing = trailingActions?.isEmpty ?? true
         ? null
         : Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: trailingActions!,
-    );
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: trailingActions!,
+          );
 
     final heroTag = data?.heroTag;
     if (heroTag != null) {
@@ -151,7 +147,7 @@ class PlatformAppBarX extends PlatformAppBar {
       middle: defaultData.title ?? title,
       backgroundColor: defaultData.backgroundColor ?? backgroundColor,
       automaticallyImplyLeading:
-      data?.automaticallyImplyLeading ?? automaticallyImplyLeading ?? true,
+          data?.automaticallyImplyLeading ?? automaticallyImplyLeading ?? true,
       automaticallyImplyMiddle: data?.automaticallyImplyMiddle ?? true,
       previousPageTitle: data?.previousPageTitle,
       padding: data?.padding,

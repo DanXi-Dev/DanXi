@@ -53,7 +53,7 @@ class CourseReviewWidget extends StatelessWidget {
   Widget _buildCard(BuildContext context) {
     return Card(
       color: translucent
-          ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
+          ? Theme.of(context).cardTheme.color?.withValues(alpha: 0.8)
           : null,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(8.0)),
@@ -292,7 +292,10 @@ class ReviewFooter extends StatelessWidget {
 
 class ModifyMenuWidget extends StatefulWidget {
   const ModifyMenuWidget(
-      {super.key, required this.originalReview, required this.courseGroup, required this.reviewOperationCallback});
+      {super.key,
+      required this.originalReview,
+      required this.courseGroup,
+      required this.reviewOperationCallback});
   final CourseReview originalReview;
   final CourseGroup courseGroup;
   final void Function(CourseReview?) reviewOperationCallback;

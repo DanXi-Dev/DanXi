@@ -709,8 +709,10 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
               itemChanged: (index) {
                 if (index != pageIndex) {
                   // Dispatch [SubpageViewState] events.
-                  _subpage[pageIndex].onViewStateChanged(context, SubpageViewState.INVISIBLE);
-                  _subpage[index].onViewStateChanged(context, SubpageViewState.VISIBLE);
+                  _subpage[pageIndex]
+                      .onViewStateChanged(context, SubpageViewState.INVISIBLE);
+                  _subpage[index]
+                      .onViewStateChanged(context, SubpageViewState.VISIBLE);
                   _pageIndex.value = index;
                 } else {
                   _subpage[index].onDoubleTapOnTab();

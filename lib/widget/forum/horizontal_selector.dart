@@ -55,7 +55,8 @@ class HorizontalSelector<T> extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                 child: Text(
                   e.toString(),
-                  textScaleFactor: selectedOption == e ? 1.25 : 1.0,
+                  textScaler:
+                      TextScaler.linear(selectedOption == e ? 1.25 : 1.0),
                   style: TextStyle(
                       color: selectedOption == e
                           ? null

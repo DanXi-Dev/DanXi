@@ -39,7 +39,7 @@ gradle.taskGraph.whenReady {
 android {
     compileSdkVersion 35
 
-    ndkVersion "28.0.12433566"
+    ndkVersion "28.0.12674087"
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -49,7 +49,7 @@ android {
     defaultConfig {
         applicationId "io.github.danxi_dev.dan_xi"
         namespace "io.github.danxi_dev.dan_xi"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -68,7 +68,16 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             // Only used when building a released work.
-             signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
+        }
+    }
+    packagingOptions {
+        jniLibs {
+            // Enabling the compression of the native libraries, which is disabled by default for performance reasons.
+            // The option name, `useLegacyPackaging`, is a bit misleading. It's actually about the compression of the native libraries.
+            // We weight the size of the APK file more than the little performance gain, so we enable it.
+            // See https://developer.android.com/guide/practices/page-sizes for more information.
+            useLegacyPackaging true
         }
     }
     lint {
@@ -82,6 +91,4 @@ flutter {
 
 dependencies {
     implementation 'com.google.android.material:material:1.12.0'
-    implementation 'com.google.errorprone:error_prone_annotations:2.36.0' // required by flutter_secure_storage
-    implementation 'com.github.spotbugs:spotbugs-annotations:4.8.6' // required by flutter_secure_storage for class javax.annotation.Nullable and javax.annotation.concurrent.GuardedBy
 }

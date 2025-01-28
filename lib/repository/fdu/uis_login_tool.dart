@@ -120,8 +120,9 @@ class UISLoginTool {
     workDio.interceptors.add(CookieManager(workJar));
     workDio.interceptors.add(DioLogInterceptor());
 
-    // Remove old cookies.
-    workJar.deleteAll();
+    // fixme: workaround by deleting `CASTGC` cookie before requesting the UIS page
+    // See https://github.com/DanXi-Dev/DanXi/issues/491 for details.
+    workJar.deleteCookiesByName("CASTGC");
     Map<String?, String?> data = {};
     Response<String> res = await workDio.get(serviceUrl);
     BeautifulSoup(res.data!).findAll("input").forEach((element) {

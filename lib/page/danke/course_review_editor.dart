@@ -374,7 +374,11 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                             teacherFilterNotifier.value = e!;
                           },
                           itemBuilder: (e) => DropdownMenuItem(
-                              value: e, child: AutoSizeText(e, style: listItemStyle,)),
+                              value: e,
+                              child: AutoSizeText(
+                                e,
+                                style: listItemStyle,
+                              )),
                         )),
                     Expanded(
                         flex: 1,
@@ -394,7 +398,10 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                                   },
                                   itemBuilder: (e) => DropdownMenuItem(
                                       value: e,
-                                      child: AutoSizeText(e.formatTime(), style: listItemStyle,))),
+                                      child: AutoSizeText(
+                                        e.formatTime(),
+                                        style: listItemStyle,
+                                      ))),
                           valueListenable: teacherFilterNotifier,
                         )),
                   ]),

@@ -98,7 +98,8 @@ class SettingsProvider with ChangeNotifier {
 
   DateTime? get timetableLastUpdated {
     if (preferences!.containsKey(KEY_TIMETABLE_LAST_UPDATED)) {
-      String? timetableLastUpdated = preferences!.getString(KEY_TIMETABLE_LAST_UPDATED);
+      String? timetableLastUpdated =
+          preferences!.getString(KEY_TIMETABLE_LAST_UPDATED);
       if (timetableLastUpdated != null) {
         return DateTime.tryParse(timetableLastUpdated);
       }
@@ -108,7 +109,8 @@ class SettingsProvider with ChangeNotifier {
 
   set timetableLastUpdated(DateTime? value) {
     if (value != null) {
-      preferences!.setString(KEY_TIMETABLE_LAST_UPDATED, value.toIso8601String());
+      preferences!
+          .setString(KEY_TIMETABLE_LAST_UPDATED, value.toIso8601String());
     } else {
       preferences!.remove(KEY_TIMETABLE_LAST_UPDATED);
     }
@@ -175,13 +177,13 @@ class SettingsProvider with ChangeNotifier {
   String get forumBaseUrl {
     if (preferences!.containsKey(KEY_FORUM_BASE_URL)) {
       String? url = preferences!.getString(KEY_FORUM_BASE_URL);
-      
+
       // Override the legacy server address
-      if (url == Constant.FORUM_BASE_URL_LEGACY){
+      if (url == Constant.FORUM_BASE_URL_LEGACY) {
         preferences!.setString(KEY_FORUM_BASE_URL, Constant.FORUM_BASE_URL);
         return Constant.FORUM_BASE_URL;
       }
-      
+
       if (url != null) {
         return url;
       }
@@ -761,14 +763,14 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  bool get useWebvpn{
+  bool get useWebvpn {
     if (preferences!.containsKey(KEY_USE_WEBVPN)) {
       return preferences!.getBool(KEY_USE_WEBVPN)!;
     }
     return true;
   }
 
-  set useWebvpn(bool value){
+  set useWebvpn(bool value) {
     preferences!.setBool(KEY_USE_WEBVPN, value);
     notifyListeners();
   }

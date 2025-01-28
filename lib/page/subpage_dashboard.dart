@@ -64,7 +64,7 @@ class HomeSubpage extends PlatformSubpage<HomeSubpage> {
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
         AppBarButtonItem(
             S.of(cxt).dashboard_layout,
-            Text(S.of(cxt).edit, textScaleFactor: 1.2),
+            Text(S.of(cxt).edit, textScaler: TextScaler.linear(1.2)),
             () => smartNavigatorPush(cxt, '/dashboard/reorder').then(
                 (value) => RefreshHomepageEvent(onlyRefreshOrder: true).fire()))
       ];
@@ -137,7 +137,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
     List<Widget> widgets = [];
     NotificationProvider provider = context.watch<NotificationProvider>();
     widgets.addAll(provider.notifications.map((e) => FeatureCardItem(
-      feature: e,
+          feature: e,
           onDismissed: () async {
             final name = e.runtimeType.toString();
             provider.removeNotification(e);

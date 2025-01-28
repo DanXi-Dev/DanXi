@@ -140,7 +140,7 @@ class NextCourseFeature extends Feature {
             ),
             Text(
               S.of(context!).exam_schedule,
-              textScaleFactor: 0.8,
+              textScaler: TextScaler.linear(0.8),
             ),
           ],
         ),

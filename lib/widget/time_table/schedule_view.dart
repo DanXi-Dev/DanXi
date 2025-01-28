@@ -77,7 +77,7 @@ class ScheduleViewState extends State<ScheduleView> {
               margin: const EdgeInsets.all(2),
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
-                  color: Theme.of(context).hintColor.withOpacity(0.14),
+                  color: Theme.of(context).hintColor.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(4)),
             ).withRatio(ratio).withGridPlacement(
                 rowStart: index ~/ cols, columnStart: index % cols));
@@ -222,7 +222,9 @@ class ScheduleViewState extends State<ScheduleView> {
     for (ScheduleBlock block in result) {
       // Skip blocks that needn't be reordered
       if (block.event.first.enabled ||
-          block.event.every((element) => !element.enabled)) continue;
+          block.event.every((element) => !element.enabled)) {
+        continue;
+      }
 
       Event firstEnabledCourse =
           block.event.firstWhere((element) => element.enabled);

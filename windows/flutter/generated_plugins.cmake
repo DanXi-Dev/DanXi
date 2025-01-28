@@ -4,7 +4,6 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
-  bitsdojo_window_windows
   desktop_window
   file_selector_windows
   flutter_inappwebview_windows
@@ -15,7 +14,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   platform_device_id_windows
   screen_brightness_windows
   share_plus
-  tray_manager
   url_launcher_windows
 )
 

@@ -797,7 +797,9 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
             !isSpecialView &&
             ForumRepository.getInstance()
                 .getPinned(getDivisionId(context))
-                .contains(postElement))) return const SizedBox();
+                .contains(postElement))) {
+      return const SizedBox();
+    }
     return OTHoleWidget(
         postElement: postElement,
         translucent: _backgroundImage != null,

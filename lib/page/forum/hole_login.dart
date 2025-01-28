@@ -99,7 +99,7 @@ class HoleLoginPageState extends State<HoleLoginPage> {
           return;
         }
         // If there is no more widgets to jump, then pop self
-        if(!jumpBackIgnoringBackable()){
+        if (!jumpBackIgnoringBackable()) {
           Navigator.of(context).pop();
         }
       },
@@ -546,8 +546,7 @@ class OTLicenseBodyState extends State<OTLicenseBody> {
               setState(() {
                 _agreed = newValue!;
                 if (_agreed) {
-                  BrowserUtil.openUrl(
-                      "https://www.fduhole.com/doc", context);
+                  BrowserUtil.openUrl("https://www.fduhole.com/doc", context);
                 }
               });
             }),

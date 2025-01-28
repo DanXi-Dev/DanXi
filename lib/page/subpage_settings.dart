@@ -87,16 +87,12 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     LicenseItem("asn1lib", LICENSE_BSD, "https://github.com/wstrange/asn1lib"),
     LicenseItem("cached_network_image", LICENSE_MIT,
         "https://github.com/Baseflow/flutter_cached_network_image"),
-    LicenseItem("tray_manager", LICENSE_MIT,
-        "https://github.com/leanflutter/tray_manager"),
     LicenseItem(
         "win32", LICENSE_BSD_3_0_CLAUSE, "https://github.com/timsneath/win32"),
     LicenseItem("collection", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/dart-lang/collection"),
     LicenseItem(
         "meta", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dart-lang/sdk"),
-    LicenseItem("bitsdojo_window_v3", LICENSE_MIT,
-        "https://github.com/DartGit-dev/bitsdojo_window"),
     LicenseItem("flutter_layout_grid", LICENSE_MIT,
         "https://github.com/madewithfelt/flutter_layout_grid"),
     LicenseItem(
@@ -532,8 +528,8 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         SwitchListTile.adaptive(
                             title: Text(S.of(context).use_webvpn_title),
                             secondary: const Icon(Icons.network_cell),
-                            subtitle: Text(
-                                S.of(context).use_webvpn_description),
+                            subtitle:
+                                Text(S.of(context).use_webvpn_description),
                             value: context.select<SettingsProvider, bool>(
                                 (s) => s.useWebvpn),
                             onChanged: (bool value) async {
@@ -987,20 +983,16 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       //Description
-                      Text(
-                        S.of(context).app_description_title,
-                        textScaleFactor: 1.1,
-                      ),
+                      Text(S.of(context).app_description_title,
+                          textScaler: TextScaler.linear(1.1)),
                       Divider(
                         color: originalDividerColor,
                       ),
                       Text(S.of(context).app_description),
                       const SizedBox(height: 16),
                       //Terms and Conditions
-                      Text(
-                        S.of(context).terms_and_conditions_title,
-                        textScaleFactor: 1.1,
-                      ),
+                      Text(S.of(context).terms_and_conditions_title,
+                          textScaler: TextScaler.linear(1.1)),
                       Divider(
                         color: originalDividerColor,
                       ),
@@ -1034,10 +1026,8 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       ])),
                       const SizedBox(height: 16),
                       //Acknowledgement
-                      Text(
-                        S.of(context).acknowledgements,
-                        textScaleFactor: 1.1,
-                      ),
+                      Text(S.of(context).acknowledgements,
+                          textScaler: TextScaler.linear(1.1)),
                       Divider(color: originalDividerColor),
                       PostRenderWidget(
                         render: kMarkdownRenderFactory(null),
@@ -1049,10 +1039,8 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       const SizedBox(height: 16),
 
                       // Authors
-                      Text(
-                        S.of(context).authors,
-                        textScaleFactor: 1.1,
-                      ),
+                      Text(S.of(context).authors,
+                          textScaler: TextScaler.linear(1.1)),
                       Divider(color: originalDividerColor),
                       const SizedBox(height: 4),
                       LayoutGrid(
@@ -1077,7 +1065,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                         children: <Widget>[
                           Text(
                             S.of(context).author_descriptor,
-                            textScaleFactor: 0.7,
+                            textScaler: TextScaler.linear(0.7),
                             textAlign: TextAlign.right,
                           )
                         ],

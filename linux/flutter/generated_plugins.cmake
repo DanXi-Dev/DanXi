@@ -3,7 +3,6 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  bitsdojo_window_linux
   desktop_window
   file_selector_linux
   flutter_js
@@ -11,7 +10,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   gtk
   open_file_linux
   platform_device_id_linux
-  tray_manager
   url_launcher_linux
 )
 

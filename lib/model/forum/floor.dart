@@ -81,6 +81,41 @@ class OTFloor {
       this.dislike,
       this.disliked);
 
+  OTFloor copyWith({
+    int? floor_id,
+    int? hole_id,
+    String? content,
+    String? anonyname,
+    String? time_updated,
+    String? time_created,
+    bool? deleted,
+    bool? is_me,
+    bool? liked,
+    List<String>? fold,
+    int? modified,
+    int? like,
+    List<OTFloor>? mention,
+    int? dislike,
+    bool? disliked,
+  }) {
+    return OTFloor(
+      floor_id ?? this.floor_id,
+      hole_id ?? this.hole_id,
+      content ?? this.content,
+      anonyname ?? this.anonyname,
+      time_updated ?? this.time_updated,
+      time_created ?? this.time_created,
+      deleted ?? this.deleted,
+      fold ?? this.fold,
+      modified ?? this.modified,
+      is_me ?? this.is_me,
+      liked ?? this.liked,
+      mention ?? this.mention,
+      dislike ?? this.dislike,
+      disliked ?? this.disliked,
+    );
+  }
+
   String? get filteredContent => SettingsProvider.getInstance().cleanMode
       ? CleanModeFilter.cleanText(content)
       : content;

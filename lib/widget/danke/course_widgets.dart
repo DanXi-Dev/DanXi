@@ -45,7 +45,7 @@ class CourseGroupCardWidget extends StatelessWidget {
 
     return Card(
       color: translucent
-          ? Theme.of(context).cardTheme.color?.withOpacity(0.8)
+          ? Theme.of(context).cardTheme.color?.withValues(alpha: 0.8)
           : null,
       // credits group
       child: Column(mainAxisSize: MainAxisSize.min, children: [

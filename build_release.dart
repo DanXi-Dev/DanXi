@@ -30,7 +30,7 @@ String dartExecutable = 'dart';
 void main(List<String> arguments) async {
   var parser = ArgParser()
     ..addOption("target",
-        allowed: ['android', 'windows', 'aab', 'linux'],
+        allowed: ['android', 'android-armv8', 'windows', 'aab', 'linux'],
         help: "The target to build for.",
         mandatory: true)
     ..addOption("versionCode",
@@ -83,6 +83,9 @@ void main(List<String> arguments) async {
     case 'android':
       await buildAndroid(versionCode, gitHash);
       break;
+    case 'android-armv8':
+      await buildAndroid(versionCode, gitHash, target: 'android-arm64');
+      break;
     case 'windows':
       await buildWindows(versionCode, gitHash);
       break;
@@ -111,22 +114,26 @@ Future<int> runDartProcess(List<String> args) async {
   return await buildProcess.exitCode;
 }
 
-Future<void> buildAndroid(String? versionCode, String gitHash) async {
+Future<void> buildAndroid(String? versionCode, String gitHash,
+    {String? target}) async {
   print('Build for Android...');
   await runFlutterProcess([
     'build',
     'apk',
     '--release',
     '--dart-define=GIT_HASH=$gitHash',
+    if (target != null) '--target-platform=$target',
   ]);
 
   print('Clean old files...');
-  File oldFile = File('build/app/DanXi-$versionCode-release.android.apk');
+  String targetPath =
+      'build/app/DanXi-$versionCode-${target != null ? "$target-" : ""}release.android.apk';
+  File oldFile = File(targetPath);
   if (oldFile.existsSync()) {
     oldFile.deleteSync();
   }
   print('Copy file...');
-  File newFile = File('build/app/DanXi-$versionCode-release.android.apk');
+  File newFile = File(targetPath);
   File sourceFile = File('build/app/outputs/flutter-apk/app-release.apk');
   sourceFile.copySync(newFile.path);
   print('Build success.');

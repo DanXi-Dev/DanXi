@@ -503,7 +503,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   }
 
   Widget _buildPage(BuildContext context, TimeTable table) {
-    DateTime? lastUpdatedTime = context.select<SettingsProvider, DateTime?>((value) => value.timetableLastUpdated);
+    DateTime? lastUpdatedTime = context.select<SettingsProvider, DateTime?>(
+        (value) => value.timetableLastUpdated);
 
     const TimetableStyle style = TimetableStyle();
     _table = table;
@@ -555,7 +556,9 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
             _showingTime!.week,
             tapCallback: _onTapCourse,
           ),
-          SizedBox(height: 10,),
+          SizedBox(
+            height: 10,
+          ),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text(S.of(context).timetable_last_updated),
             lastUpdatedTime == null

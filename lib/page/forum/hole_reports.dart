@@ -173,8 +173,8 @@ class BBSReportDetailState extends State<BBSReportDetail> {
     void onImageTap(String? url, Object heroTag) {
       smartNavigatorPush(context, '/image/detail', arguments: {
         'preview_url': url,
-        'hd_url': ForumRepository.getInstance()
-            .extractHighDefinitionImageUrl(url!),
+        'hd_url':
+            ForumRepository.getInstance().extractHighDefinitionImageUrl(url!),
         'hero_tag': heroTag
       });
     }
@@ -359,10 +359,11 @@ class AuditListState extends State<AuditList> {
       if (matchIndex != -1) {
         final String sensitiveLabel = detail.substring(0, sepLabelIndex);
         final String prefix = content.substring(0, matchIndex);
-        final String suffix = content.substring(matchIndex + detailContent.length);
+        final String suffix =
+            content.substring(matchIndex + detailContent.length);
         return '<audit>$sensitiveLabel</audit>\n$prefix<audit>$detailContent</audit>$suffix';
       }
-    // Old data without labels
+      // Old data without labels
     } else {
       final int matchIndex = content.indexOf(detail);
       if (matchIndex != -1) {
@@ -383,8 +384,8 @@ class AuditListState extends State<AuditList> {
     void onImageTap(String? url, Object heroTag) {
       smartNavigatorPush(context, '/image/detail', arguments: {
         'preview_url': url,
-        'hd_url': ForumRepository.getInstance()
-            .extractHighDefinitionImageUrl(url!),
+        'hd_url':
+            ForumRepository.getInstance().extractHighDefinitionImageUrl(url!),
         'hero_tag': heroTag
       });
     }
@@ -450,12 +451,10 @@ class AuditListState extends State<AuditList> {
                 ProgressFuture progressDialog = showProgressDialog(
                     loadingText: S.of(context).loading, context: context);
                 try {
-                  final OTHole? post =
-                      await ForumRepository.getInstance()
-                          .loadSpecificHole(e.hole_id);
-                  final OTFloor? floor =
-                      await ForumRepository.getInstance()
-                          .loadSpecificFloor(e.id);
+                  final OTHole? post = await ForumRepository.getInstance()
+                      .loadSpecificHole(e.hole_id);
+                  final OTFloor? floor = await ForumRepository.getInstance()
+                      .loadSpecificFloor(e.id);
                   if (!mounted) return;
                   smartNavigatorPush(context, "/bbs/postDetail",
                       arguments: {"post": post!, "locate": floor!});
@@ -469,15 +468,12 @@ class AuditListState extends State<AuditList> {
   }
 
   Widget _getDatePicker(BuildContext context) {
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        PlatformElevatedButton(
-            onPressed: () => _selectDate(context),
-            child: const Text("Select Date")),
-        Text(DateFormat('yyyy-MM-dd').format(_startDateTime))
-      ]
-    );
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+      PlatformElevatedButton(
+          onPressed: () => _selectDate(context),
+          child: const Text("Select Date")),
+      Text(DateFormat('yyyy-MM-dd').format(_startDateTime))
+    ]);
   }
 
   @override

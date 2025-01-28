@@ -48,8 +48,8 @@ class IndependentCookieJar implements CookieJar {
 
   IndependentCookieJar({this.ignoreExpires = false});
 
-  Map<String?, Map<String, Map<String, SerializableCookie>>> get domainCookies =>
-      _cookies[0];
+  Map<String?, Map<String, Map<String, SerializableCookie>>>
+      get domainCookies => _cookies[0];
 
   Map<String?, Map<String, Map<String, SerializableCookie>>> get hostCookies =>
       _cookies[1];
@@ -192,4 +192,21 @@ class IndependentCookieJar implements CookieJar {
 
   @override
   final bool ignoreExpires;
+
+  void deleteCookiesByName(String name) {
+    for (final domain in hostCookies.keys) {
+      final cookies = hostCookies[domain]!;
+      for (final path in cookies.keys) {
+        final values = cookies[path]!;
+        values.remove(name);
+      }
+    }
+    for (final domain in domainCookies.keys) {
+      final cookies = domainCookies[domain]!;
+      for (final path in cookies.keys) {
+        final values = cookies[path]!;
+        values.remove(name);
+      }
+    }
+  }
 }

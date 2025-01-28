@@ -50,9 +50,9 @@ class DankeSubPage extends PlatformSubpage<DankeSubPage> {
     super.onViewStateChanged(parentContext, state);
     switch (state) {
       case SubpageViewState.VISIBLE:
-      // Subpage is always mounted even if it is invisible.
-      // Monitoring within State lifecycle methods like `initState` and `dispose` isn't effective.
-      // So we have to count on the onViewStateChanged hook to add/remove watermark.
+        // Subpage is always mounted even if it is invisible.
+        // Monitoring within State lifecycle methods like `initState` and `dispose` isn't effective.
+        // So we have to count on the onViewStateChanged hook to add/remove watermark.
         Watermark.addWatermark(parentContext);
         break;
       case SubpageViewState.INVISIBLE:
@@ -74,7 +74,6 @@ class DankeSubPageState extends PlatformSubpageState<DankeSubPage> {
 
   @override
   Widget buildPage(BuildContext context) {
-    
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     return Container(
       // padding top

@@ -307,7 +307,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
         trailingActions: [
           if (_renderModel
-              case Normal(hole: var hole, selectedPerson: var selectedPerson)) ...[
+              case Normal(
+                hole: var hole,
+                selectedPerson: var selectedPerson
+              )) ...[
             _buildSubscribeActionButton(),
             _buildFavoredActionButton(),
             PlatformIconButton(
@@ -333,8 +336,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                         : S.of(context).only_show_dz,
                     onTap: (_) {
                       setState(() {
-                        if ((_renderModel as Normal).selectedPerson != hole.floors?.first_floor?.anonyname) {
-                          (_renderModel as Normal).selectedPerson = hole.floors?.first_floor?.anonyname;
+                        if ((_renderModel as Normal).selectedPerson !=
+                            hole.floors?.first_floor?.anonyname) {
+                          (_renderModel as Normal).selectedPerson =
+                              hole.floors?.first_floor?.anonyname;
                         } else {
                           (_renderModel as Normal).selectedPerson = null;
                         }
@@ -424,7 +429,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   // the mode should be quited since if the floor is deep
                   // the initial request won't fetch them, and the page will be blank.
                   if ((_renderModel as Normal).selectedPerson !=
-                      (_renderModel as Normal).hole.floors?.first_floor?.anonyname) {
+                      (_renderModel as Normal)
+                          .hole
+                          .floors
+                          ?.first_floor
+                          ?.anonyname) {
                     (_renderModel as Normal).selectedPerson = null;
                   }
                   await refreshListView();
@@ -891,19 +900,22 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         },
         child: Text(S.of(context).share_floor),
       ),
-      PlatformContextMenuItem(
-        menuContext: menuContext,
-        onPressed: () async {
-          setState(() {
-            if ((_renderModel as Normal).selectedPerson != null) {
-              (_renderModel as Normal).selectedPerson = null;
-            } else {
-              (_renderModel as Normal).selectedPerson = e.anonyname;
-            }
-          });
-        },
-        child: Text((_renderModel as Normal).selectedPerson != null ? S.of(context).show_all_replies : S.of(context).show_this_person),
-      ),
+      if (_renderModel
+          case Normal(selectedPerson: var selectedPerson, hole: _)) ...[
+        PlatformContextMenuItem(
+          menuContext: menuContext,
+          onPressed: () async {
+            setState(() {
+              var model = _renderModel as Normal;
+              model.selectedPerson =
+                  model.selectedPerson != null ? null : e.anonyname;
+            });
+          },
+          child: Text(selectedPerson != null
+              ? S.of(context).show_all_replies
+              : S.of(context).show_this_person),
+        ),
+      ],
       PlatformContextMenuItem(
         menuContext: menuContext,
         isDestructive: true,
@@ -1036,8 +1048,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       int index, OTFloor floor,
       {bool isNested = false}) {
     if (_renderModel case Normal(selectedPerson: var selectedPerson, hole: _)) {
-      if (selectedPerson != null &&
-        floor.anonyname != selectedPerson) {
+      if (selectedPerson != null && floor.anonyname != selectedPerson) {
         return nil;
       }
     }
@@ -1149,7 +1160,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           Positioned.fill(
             child: IgnorePointer(
               child: Container(
-                color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.5),
+                color: Theme.of(context)
+                    .colorScheme
+                    .secondary
+                    .withValues(alpha: 0.5),
               ),
             ),
           ),
