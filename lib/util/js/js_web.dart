@@ -18,7 +18,7 @@
 @JS()
 library;
 
-import 'package:js/js.dart';
+import 'dart:js_interop/js_interop.dart';
 
 @JS('window.eval')
 external dynamic eval(dynamic arg);
