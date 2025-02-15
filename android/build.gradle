@@ -36,11 +36,11 @@ subprojects {
     }
 }
 
-// override the kotlin language version for each dependencies to 2.1.0
+// override the kotlin language version for each dependencies to 2.1.10
 configurations.all {
     resolutionStrategy.eachDependency { details ->
         if (details.requested.group == 'org.jetbrains.kotlin' && details.requested.name == 'kotlin-gradle-plugin') {
-            details.useVersion '2.1.0'
+            details.useVersion '2.1.10'
         }
     }
 }
