@@ -15,9 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-@JS()
-library;
-
 import 'dart:js_interop/js_interop.dart';
 
 @JS('window.eval')
