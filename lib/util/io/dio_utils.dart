@@ -104,4 +104,39 @@ class DioUtils {
     setProxy(dio, SettingsProvider.getInstance().proxy);
     return dio;
   }
+
+  /// Fetch with the [options], but when T is JSON-like and the response is not,
+  /// throw a [DioException] WITH the response data.
+  /// (The original [fetch] will throw a [DioException] WITHOUT the response data when [FormatException] occurs.)
+  static Future<Response<T>> fetchWithJsonError<T>(
+      Dio dio, RequestOptions options) async {
+    Response<String> response = await dio.fetch(options);
+    if (T == String) {
+      return response as Response<T>;
+    } else {
+      try {
+        dynamic transformedResponseData = await dio.transformer
+            .transformResponse(
+                options.copyWith(responseType: ResponseType.json),
+                ResponseBody.fromString(response.data!, response.statusCode!,
+                    headers: response.headers.map,
+                    statusMessage: response.statusMessage));
+        return Response<T>(
+          data: transformedResponseData,
+          requestOptions: response.requestOptions,
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
+          isRedirect: response.isRedirect,
+          redirects: response.redirects,
+          headers: response.headers,
+        );
+      } catch (e) {
+        throw DioException(
+          requestOptions: options,
+          response: response,
+          error: e,
+        );
+      }
+    }
+  }
 }
