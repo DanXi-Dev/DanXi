@@ -79,21 +79,21 @@ class WebvpnProxy {
     }
   }
 
-  // Check if we have logged in to WebVPN, returns false if we haven't
-  static bool checkResponse(Response<dynamic> response) {
+  // Check if we should login to WebVPN. Return `true` if we should login now.
+  static bool isResponseRequiringLogin(Response<dynamic> response) {
     // When 302 is raised when the method is `POST`, it means that we haven't logged in
     if (response.requestOptions.method == "POST" &&
         response.statusCode == 302 &&
         response.headers['location'] != null &&
         response.headers['location']!.isNotEmpty) {
-      return false;
+      return true;
     }
 
     if (response.realUri.toString().startsWith(WEBVPN_LOGIN_URL)) {
-      return false;
+      return true;
     }
 
-    return true;
+    return false;
   }
 
   /// Bind WebVPN proxy to a person info so that it updates automatically when [personInfo] changes.
@@ -284,9 +284,18 @@ class WebvpnProxy {
     await loginWebvpn(dio);
 
     // First attempt
-    Response<T> response = await dio.fetch<T>(options);
-    if (checkResponse(response)) {
-      return response;
+    try {
+      Response<T> response = await DioUtils.fetchWithJsonError(dio, options);
+      if (!isResponseRequiringLogin(response)) {
+        return response;
+      }
+    } on DioException catch (e) {
+      if (e.response == null) {
+        rethrow;
+      }
+      if (!isResponseRequiringLogin(e.response!)) {
+        rethrow;
+      }
     }
 
     // Re-login
@@ -294,9 +303,18 @@ class WebvpnProxy {
     await loginWebvpn(dio);
 
     // Second attempt
-    response = await dio.fetch<T>(options);
-    if (checkResponse(response)) {
-      return response;
+    try {
+      Response<T> response = await DioUtils.fetchWithJsonError(dio, options);
+      if (!isResponseRequiringLogin(response)) {
+        return response;
+      }
+    } on DioException catch (e) {
+      if (e.response == null) {
+        rethrow;
+      }
+      if (!isResponseRequiringLogin(e.response!)) {
+        rethrow;
+      }
     }
 
     // All attempts failed
