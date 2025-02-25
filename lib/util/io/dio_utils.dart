@@ -110,6 +110,12 @@ class DioUtils {
   /// (The original [fetch] will throw a [DioException] WITHOUT the response data when [FormatException] occurs.)
   static Future<Response<T>> fetchWithJsonError<T>(
       Dio dio, RequestOptions options) async {
+    if (T == dynamic || options.responseType == ResponseType.bytes || options.responseType == ResponseType.stream) {
+      // If T is dynamic, or the caller wants bytes or stream, just call the original fetch.
+      // Because we are going to parse the response data as [String] below!
+      return await dio.fetch(options) as Response<T>;
+    }
+
     Response<String> response = await dio.fetch(options);
     if (T == String) {
       return response as Response<T>;
