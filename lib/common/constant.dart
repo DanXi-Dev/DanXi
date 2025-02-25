@@ -434,8 +434,7 @@ class Constant {
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(foregroundColor: const Color(0xFF007AFF)),
         ),
-        dialogBackgroundColor: const Color.fromRGBO(28, 28, 30, 1.0),
-        textTheme: Typography.whiteCupertino,
+        textTheme: Typography.whiteCupertino, dialogTheme: DialogThemeData(backgroundColor: const Color.fromRGBO(28, 28, 30, 1.0)),
       );
     }
     return ThemeData(
