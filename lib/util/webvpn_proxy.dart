@@ -52,7 +52,9 @@ class WebvpnProxy {
     "forum.fduhole.com":
         "https://webvpn.fudan.edu.cn/https/77726476706e69737468656265737421f6f853892a7e6e546b0086a09d1b203a46",
     "image.fduhole.com":
-        "https://webvpn.fudan.edu.cn/https/77726476706e69737468656265737421f9fa409b227e6e546b0086a09d1b203ab8"
+        "https://webvpn.fudan.edu.cn/https/77726476706e69737468656265737421f9fa409b227e6e546b0086a09d1b203ab8",
+    "yjsxk.fudan.edu.cn":
+        "https://webvpn.fudan.edu.cn/http/77726476706e69737468656265737421e9fd52842c7e6e457a0987e29d51367bba7b"
   };
 
   static PersonInfo? _personInfo;

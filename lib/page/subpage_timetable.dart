@@ -19,6 +19,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -32,6 +33,7 @@ import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/repository/fdu/postgraduate_timetable_repository.dart';
 import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
+import 'package:dan_xi/util/io/cache_manager_with_webvpn.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -183,7 +185,14 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Image.network(imageUrl),
+                        CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            cacheManager: DefaultCacheManagerWithWebvpn(),
+                            // Ensure shape is the same as the loading indicator
+                            fit: BoxFit.contain,
+                            progressIndicatorBuilder:
+                                (context, url, progress) =>
+                                    PlatformCircularProgressIndicator()),
                         TextField(controller: controller)
                       ],
                     ),
