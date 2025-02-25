@@ -148,7 +148,7 @@ class WebvpnProxy {
       } finally {
         loginSession = null;
       }
-      // Any exception thrown won't be catched and will be propagated to widgets
+      // Any exception thrown won't be caught and will be propagated to widgets
     }
   }
 
