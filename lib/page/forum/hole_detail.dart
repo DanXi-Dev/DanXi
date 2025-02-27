@@ -569,7 +569,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             Normal() => RefreshIndicator(
                 edgeOffset: MediaQuery.of(context).padding.top,
                 color: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).dialogBackgroundColor,
+                backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
                 onRefresh: () async {
                   HapticFeedback.mediumImpact();
 
