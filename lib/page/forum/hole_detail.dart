@@ -329,7 +329,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               options: [
                 PopupMenuOption(
                     label: S.of(context).scroll_to_end,
-                    onTap: _onTapScrollToEnd),
+                    onTap: (_) {
+                      setState(() {
+                        shouldScrollToEnd = true;
+                      });
+                    }),
                 PopupMenuOption(
                     label: selectedPerson == hole.floors?.first_floor?.anonyname
                         ? S.of(context).show_all_replies
@@ -446,9 +450,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     ).withWatermarkRegion();
   }
 
-  // Load all floors, in case we have to scroll to end or to a specific floor
-  Future<void> _loadAllContent() async {
-    // If we haven't loaded before, we need to load all floors.
+  // Load all floors, in case we have to scroll to end or to a specific floor.
+  Future<List<OTFloor>> _loadAllContent() async {
     final allFloors = await ForumRepository.getInstance()
         .loadFloors((_renderModel as Normal).hole, startFloor: 0, length: 0);
 
@@ -460,19 +463,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     _allDataLoaded = true;
   }
 
-  Future<void> _onTapScrollToEnd(_) async {
-    ProgressFuture dialog = showProgressDialog(
-        loadingText: S.of(context).loading, context: context);
-    try {
-      // The scrolling is actually performed in the post-build binding
-      setState(() {
-        shouldScrollToEnd = true;
-      });
-    } catch (error, st) {
-      Noticing.showErrorDialog(context, error, trace: st);
-    } finally {
-      dialog.dismiss(showAnim: false);
-    }
+    return allFloors;
   }
 
   Widget _buildFavoredActionButton() {
