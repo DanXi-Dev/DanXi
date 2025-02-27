@@ -37,6 +37,7 @@ import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/watermark.dart';
 import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:dan_xi/widget/forum/ottag_selector.dart';
@@ -151,30 +152,173 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     return results;
   }
 
-  // construct the uri of the floor and copy it to clipboard
-  Future<bool> _shareFloorAsUri(int? floorId) async {
-    // String uri = 'https://www.fduhole.com/floor/$floorId';
-    String uri = '##$floorId';
+  /// Build the text form of a floor for sharing.
+  String _renderFloorAsText(OTFloor floor, int index) {
+    StringBuffer shareText = StringBuffer();
+    String postTime = DateFormat("yyyy/MM/dd HH:mm")
+        .format(DateTime.tryParse(floor.time_created!)!.toLocal());
+    shareText.writeln("${floor.anonyname} 于 $postTime");
+    shareText.writeln("${index}F (##${floor.floor_id})");
+    shareText.write(renderText(
+        floor.filteredContent ?? "",
+        S.of(context).image_tag,
+        S.of(context).formula,
+        S.of(context).sticker_tag,
+        removeMentions: false));
+    return shareText.toString();
+  }
+
+  Future<bool> _shareFloorAsText(OTFloor floor, int index) async {
     try {
-      if (floorId == null) return false;
-      await FlutterClipboard.copy(uri);
+      await FlutterClipboard.copy(_renderFloorAsText(floor, index));
     } catch (e) {
       return false;
     }
     return true;
   }
 
-  // construct the uri of the hole and copy it to clipboard
-  Future<bool> _shareHoleAsUri(int? holeId) async {
-    // String uri = 'https://www.fduhole.com/hole/$holeId';
-    String uri = '#$holeId';
+  Future<bool> _shareHoleAsText() async {
+    // load the whole post
+    ProgressFuture dialog = showProgressDialog(
+        loadingText: S.of(context).loading, context: context);
+    List<OTFloor> allFloors;
     try {
-      if (holeId == null) return false;
-      await FlutterClipboard.copy(uri);
+      allFloors = await _loadAllContent();
+    } catch (error, st) {
+      if (mounted) Noticing.showErrorDialog(context, error, trace: st);
+      return false;
+    } finally {
+      dialog.dismiss(showAnim: false);
+    }
+
+    if (!mounted) return false;
+    final List<int> selectedFloors = [];
+    final result = await showPlatformModalSheet<List<int>>(
+        context: context,
+        builder: (_) {
+          return StatefulBuilder(builder: (context, setState) {
+            return ConstrainedBox(
+              constraints: BoxConstraints(
+                  maxHeight: ViewportUtils.getViewportHeight(context) * 0.85),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text(
+                      S.of(context).share_hole_title,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      primary: false,
+                      shrinkWrap: true,
+                      itemCount: allFloors.length,
+                      itemBuilder: (context, index) {
+                        final floor = allFloors[index];
+                        return Stack(
+                          children: [
+                            OTFloorWidget(
+                              hasBackgroundImage: false,
+                              floor: floor,
+                              isInMention: true,
+                              showToolBars: false,
+                              showBottomBar: true,
+                              parentHole: (_renderModel as Normal).hole,
+                              onTap: () {
+                                setState(() {
+                                  if (selectedFloors.contains(index)) {
+                                    selectedFloors.remove(index);
+                                  } else {
+                                    selectedFloors.add(index);
+                                  }
+                                });
+                              },
+                            ),
+                            if (selectedFloors.contains(index)) ...[
+                              Positioned.fill(
+                                child: IgnorePointer(
+                                  child: Container(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary
+                                        .withValues(alpha: 0.5),
+                                  ),
+                                ),
+                              ),
+                              Positioned.fill(
+                                child: IgnorePointer(
+                                  child: Center(
+                                    child: Icon(
+                                      PlatformX.isMaterial(context)
+                                          ? Icons.check_circle
+                                          : CupertinoIcons
+                                              .check_mark_circled_solid,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ]
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                  SafeArea(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        TextButton(
+                          child: Text(S.of(context).select_all),
+                          onPressed: () {
+                            setState(() {
+                              // if all floors are selected, clear the selection.
+                              // Otherwise, select all floors.
+                              bool hasSelectedAll =
+                                  selectedFloors.length == allFloors.length;
+                              selectedFloors.clear();
+                              if (!hasSelectedAll) {
+                                selectedFloors.addAll(List.generate(
+                                    allFloors.length, (index) => index));
+                              }
+                            });
+                          },
+                        ),
+                        TextButton(
+                          onPressed: selectedFloors.isNotEmpty
+                              ? () => Navigator.of(context).pop(selectedFloors)
+                              : null,
+                          child: Text(S.of(context).confirm),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          });
+        });
+    if (result == null || !mounted) return false;
+
+    // build share text
+    StringBuffer shareText = StringBuffer();
+    result.forEachIndexed((index, floorIndex) {
+      shareText.write(_renderFloorAsText(allFloors[floorIndex], floorIndex));
+      if (index != result.length - 1) {
+        shareText.writeln();
+        shareText.writeln();
+      }
+    });
+    try {
+      await FlutterClipboard.copy(shareText.toString());
+      return true;
     } catch (e) {
       return false;
     }
-    return true;
   }
 
   @override
@@ -365,7 +509,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 PopupMenuOption(
                   label: S.of(context).share_hole,
                   onTap: (_) async {
-                    if (await _shareHoleAsUri(hole.hole_id)) {
+                    if (await _shareHoleAsText()) {
                       if (context.mounted) {
                         Noticing.showMaterialNotice(
                             context, S.of(context).shareHoleSuccess);
@@ -461,7 +605,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
     _listViewController.replaceAllDataWith(allFloors);
     _allDataLoaded = true;
-  }
 
     return allFloors;
   }
@@ -556,7 +699,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   List<OTTag> deepCopyTagList(List<OTTag> list) =>
       list.map((e) => OTTag.fromJson(jsonDecode(jsonEncode(e)))).toList();
 
-  List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {
+  List<Widget> _buildContextMenu(
+      BuildContext menuContext, OTFloor e, int index) {
     List<Widget> buildAdminMenu(BuildContext menuContext, OTFloor e) {
       return [
         PlatformContextMenuItem(
@@ -882,7 +1026,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       PlatformContextMenuItem(
         menuContext: menuContext,
         onPressed: () async {
-          if (await _shareFloorAsUri(e.floor_id)) {
+          if (await _shareFloorAsText(e, index)) {
             if (mounted) {
               Noticing.showMaterialNotice(
                   context, S.of(context).shareFloorSuccess);
@@ -1088,7 +1232,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             builder: (BuildContext context) => PlatformContextMenu(
                 actions: _multiSelectMode
                     ? _buildMultiSelectContextMenu(context)
-                    : _buildContextMenu(context, floor),
+                    : _buildContextMenu(context, floor, index),
                 cancelButton: CupertinoActionSheetAction(
                   child: Text(S.of(context).cancel),
                   onPressed: () => Navigator.of(context).pop(),

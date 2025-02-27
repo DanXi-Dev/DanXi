@@ -503,8 +503,8 @@
   "your_gpa_subtitle": "Rank: {rank}, Credits: {credits}, Tap to View Details",
   "zhangjiang_campus": "Zhangjiang",
   "forum_message": "Message",
-  "share_floor": "Share Floor",
-  "share_hole": "Share Post",
+  "share_floor": "Share Floor As Text",
+  "share_hole": "Share Post As Text",
   "shareHoleSuccess": "Share Post success! Please check your clipboard.",
   "shareFloorSuccess": "Share floor success! Please check your clipboard.",
   "invalidUri": "Invalid uri",
@@ -545,5 +545,7 @@
   "proxy_setting_set_successfully": "Proxy settings saved, restart the app to take effect.",
   "use_webvpn_title": "Use WebVPN proxy",
   "use_webvpn_description": "When enabled, certain functions could be accessed directly without Fudan LAN (restart required)",
-  "show_this_person": "Filter by this user"
+  "show_this_person": "Filter by this user",
+  "select_all": "Select All",
+  "share_hole_title": "Select the floors to share"
 }

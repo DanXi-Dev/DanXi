@@ -493,8 +493,8 @@
   "your_gpa_subtitle": "総学点{credits}、ランキングは{rank}位です。詳細はこちらをご覧ください",
   "zhangjiang_campus": "張江キャンパス",
   "forum_message": "メッセージ",
-  "share_floor": "階層を分け合う",
-  "share_hole": "スレッドを分け合う",
+  "share_floor": "テキストで階層を分け合う",
+  "share_hole": "テキストでポストを分け合う",
   "shareHoleSuccess": "分け合うのは成功! クリップボードを見て",
   "shareFloorSuccess": "分け合うのは成功! クリップボードを見て",
   "invalidUri": "無効な Uri",
@@ -527,5 +527,7 @@
   "proxy_setting_set_successfully": "プロキシ設定が保存されました。再起動すると有効になります。",
   "use_webvpn_title": "WebVPN を自動的に使う",
   "use_webvpn_description": "有効時、一部の機能はFudan LANなしで、直接に連接するのができます (再起動が必要)",
-  "show_this_person": "この人だけ"
+  "show_this_person": "この人だけ",
+  "select_all": "全選択",
+  "share_hole_title": "分け合う階層を選択する"
 }
