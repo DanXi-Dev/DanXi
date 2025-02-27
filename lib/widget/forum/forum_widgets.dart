@@ -306,6 +306,8 @@ class OTFloorWidget extends StatelessWidget {
   final bool isInMention;
   final bool hasBackgroundImage;
   final bool showToolBars;
+
+  final bool showBottomBar;
   final OTHole? parentHole;
   final int? index;
   final void Function()? onTap;
@@ -318,6 +320,9 @@ class OTFloorWidget extends StatelessWidget {
     required this.floor,
     this.isInMention = false,
     this.showToolBars = true,
+
+    /// If [null], the default value is [showToolBars].
+    bool? showBottomBar,
     this.index,
     this.onTap,
     this.onLongPress,
@@ -325,7 +330,7 @@ class OTFloorWidget extends StatelessWidget {
     required this.hasBackgroundImage,
     this.onTapImage,
     this.searchKeyWord,
-  });
+  }) : showBottomBar = showBottomBar ?? showToolBars;
 
   @override
   Widget build(BuildContext context) {
@@ -464,7 +469,7 @@ class OTFloorWidget extends StatelessWidget {
                         onLinkTap,
                         onTapImage ?? defaultOnImageTap,
                         hasBackgroundImage)),
-            if (showToolBars) ...[
+            if (showBottomBar) ...[
               const SizedBox(height: 5),
               OTFloorWidgetBottomBar(floor: floor, index: index),
             ]
