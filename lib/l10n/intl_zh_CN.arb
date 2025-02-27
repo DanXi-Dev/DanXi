@@ -497,8 +497,8 @@
   "your_gpa_subtitle": "总学分数{credits}，绩点排名第{rank}名，点击查看详情",
   "zhangjiang_campus": "张江校区",
   "forum_message": "站内信",
-  "share_floor": "分享楼层",
-  "share_hole": "分享帖子",
+  "share_floor": "分享楼层为文本",
+  "share_hole": "分享帖子为文本",
   "shareHoleSuccess": "分享该洞成功！请检查剪贴板。",
   "shareFloorSuccess": "分享该楼层成功！请检查剪贴板。",
   "invalidUri": "无效的 URI",
@@ -539,5 +539,7 @@
   "proxy_setting_set_successfully": "代理设置已保存，重启应用后生效",
   "use_webvpn_title": "自动使用 WebVPN 代理",
   "use_webvpn_description": "启动该项后，允许在非校园网环境下直接访问茶楼、评教等功能（需要重启应用）",
-  "show_this_person": "只看此人"
+  "show_this_person": "只看此人",
+  "select_all": "全选",
+  "share_hole_title": "选择要分享的楼层"
 }
