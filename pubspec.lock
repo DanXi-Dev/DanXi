@@ -66,10 +66,10 @@ packages:
     dependency: "direct dev"
     description:
       name: archive
-      sha256: cb6a278ef2dbb298455e1a713bda08524a175630ec643a242c399c932a0a1f7d
+      sha256: "0c64e928dcbefddecd234205422bcfc2b5e6d31be0b86fef0d0dd48d7b4c9742"
       url: "https://pub.dev"
     source: hosted
-    version: "3.6.1"
+    version: "4.0.4"
   args:
     dependency: "direct dev"
     description:
@@ -466,10 +466,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: ab13ae8ef5580a411c458d6207b6774a6c237d77ac37011b13994879f68a8810
+      sha256: "7423298f08f6fc8cce05792bae329f9a93653fc9c08712831b1a55540127995d"
       url: "https://pub.dev"
     source: hosted
-    version: "8.3.7"
+    version: "9.0.2"
   file_selector_linux:
     dependency: transitive
     description:
@@ -953,8 +953,8 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "12454024d4a0cd3202887e54a14ad35087a24d51"
-      url: "https://github.com/dartclub/ical.git"
+      resolved-ref: e5eddf1a2ab52a1c004e75589756b959a45c3bb8
+      url: "https://github.com/Basis-Health/ical.git"
     source: git
     version: "0.3.0"
   image_picker:
@@ -1575,6 +1575,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.1"
+  posix:
+    dependency: transitive
+    description:
+      name: posix
+      sha256: a0117dc2167805aa9125b82eee515cc891819bac2f538c83646d355b16f58b9a
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.1"
   provider:
     dependency: "direct main"
     description:
