@@ -15,12 +15,10 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// fixme: json_serializable conflicts with @JS() annotation in [dart:js_interop]. (https://github.com/google/json_serializable.dart/issues/1391, https://github.com/google/json_serializable.dart/issues/1480)
-// As a workaround, we use the dart:_js_annotations library directly. It should be replaced with [dart:js_interop] when the issue is resolved.
-// ignore: IMPORT_INTERNAL_LIBRARY
-import 'dart:_js_annotations' as js;
+// ignore: deprecated_member_use
+import 'package:js/js.dart';
 
-@js.JS()
+@JS('window.eval')
 external dynamic eval(dynamic arg);
 
 String evaluate(String jsCode) {
