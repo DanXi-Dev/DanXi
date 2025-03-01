@@ -107,7 +107,7 @@ dependencies:
   tutorial_coach_mark: ^1.2.9
   flutter_platform_widgets: ^7.0.0
   intl: any
-  json_annotation: any
+  json_annotation: ^4.9.0
   flutter_cache_manager: any
   html: any
   cookie_jar: any
