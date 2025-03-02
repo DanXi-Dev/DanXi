@@ -851,15 +851,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  fluttertoast:
-    dependency: "direct overridden"
-    description:
-      path: "."
-      ref: master
-      resolved-ref: "0edb4c7adf86f7245d99ee6ef12987a06653304d"
-      url: "https://github.com/ponnamkarthik/FlutterToast.git"
-    source: git
-    version: "8.2.11"
   frontend_server_client:
     dependency: transitive
     description:
