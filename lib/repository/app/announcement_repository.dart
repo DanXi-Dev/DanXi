@@ -178,6 +178,14 @@ class AnnouncementRepository {
         .map<Celebration>((e) => parseCelebration(e))
         .toList();
   }
+
+  List<int> getHighlightedTagIds() {
+    if (_tomlCache == null) {
+      return [];
+    }
+
+    return _tomlCache!['highlight_tag_ids'].cast<int>();
+  }
 }
 
 class UpdateInfo {

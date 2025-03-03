@@ -24,6 +24,7 @@ import 'package:dan_xi/model/forum/report.dart';
 import 'package:dan_xi/page/forum/hole_detail.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/forum/human_duration.dart';
@@ -81,6 +82,9 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
       color: useAccessibilityColoring
           ? Theme.of(context).textTheme.bodyLarge!.color
           : element.color,
+      highlighted: AnnouncementRepository.getInstance()
+          .getHighlightedTagIds()
+          .contains(element.tag_id),
     ));
   }
   return Wrap(
