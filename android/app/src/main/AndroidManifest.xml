@@ -3,9 +3,6 @@
 
     <!-- Access to the Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Set quick actions -->
-    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
-    <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
     <!-- Keep the screen on when showing QR code -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- Write images, ics files -->
