@@ -158,7 +158,8 @@ class WebvpnProxy {
       Dio dio, IndependentCookieJar jar, PersonInfo? info) async {
     Response<dynamic>? res = await dio.get(WEBVPN_ID_REQUEST_URL,
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    if (res.statusCode == 302) {
+    if (DioUtils.getRedirectLocation(res) != null) {
+      // if we are redirected to UIS, we need to login to UIS first
       await DioUtils.processRedirect(dio, res);
       res = await UISLoginTool.loginUIS(dio, WEBVPN_UIS_LOGIN_URL, jar, info);
       if (res == null) {
