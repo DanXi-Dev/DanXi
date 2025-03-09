@@ -156,6 +156,7 @@ class WebvpnProxy {
         // Temporary cookie jar
         IndependentCookieJar workJar = IndependentCookieJar();
         newDio.interceptors.add(CookieManager(workJar));
+        newDio.interceptors.add(DioLogInterceptor());
 
         loginSession = _authenticateWebVPN(newDio, workJar, _personInfo);
         await loginSession;
