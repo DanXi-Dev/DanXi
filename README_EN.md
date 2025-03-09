@@ -63,9 +63,9 @@ mount it.
 
 ```shell
 $ flutter --version
-Flutter 3.29.0 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 35c388afb5 (5 days ago) • 2025-02-10 12:48:41 -0800
-Engine • revision f73bfc4522
+Flutter 3.29.1 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 09de023485 (9 days ago) • 2025-02-28 13:44:05 -0800
+Engine • revision 871f65ac1b
 Tools • Dart 3.7.0 • DevTools 2.42.2
 ```
 
