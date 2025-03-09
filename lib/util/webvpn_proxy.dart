@@ -91,7 +91,26 @@ class WebvpnProxy {
       return true;
     }
 
-    if (response.realUri.toString().startsWith(WEBVPN_LOGIN_URL)) {
+    /// Get the absolute final URL of the response (after all redirects).
+    ///
+    /// [response.realUri] is not always the final URL, because it may be a relative URL (i.e., /login).
+    String getAbsoluteFinalURL(Response<dynamic> response) {
+      final realUri = response.realUri;
+      if (realUri.isAbsolute) return realUri.toString();
+
+      // find the real origin in the reverse order
+      for (final redirect in response.redirects.reversed) {
+        if (redirect.location.isAbsolute) {
+          return redirect.location.origin + realUri.toString();
+        }
+      }
+
+      return response.requestOptions.uri.origin + realUri.toString();
+    }
+
+    final finalUrl = getAbsoluteFinalURL(response);
+    debugPrint("Response URL: $finalUrl");
+    if (finalUrl.startsWith(WEBVPN_LOGIN_URL)) {
       return true;
     }
 
