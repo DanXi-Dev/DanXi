@@ -7,6 +7,7 @@ import 'package:dan_xi/repository/cookie/readonly_cookie_jar.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dio/dio.dart';
+import 'package:dio5_log/interceptor/diox_log_interceptor.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
