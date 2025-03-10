@@ -15,8 +15,8 @@ const RESOURCES = {"canvaskit/skwasm.js": "f2ad9363618c5f62e813740099a80e63",
 "canvaskit/chromium/canvaskit.wasm": "64a386c87532ae52ae041d18a32a3635",
 "canvaskit/chromium/canvaskit.js": "ba4a8ae1a65ff3ad81c6818fd47e348b",
 "canvaskit/chromium/canvaskit.js.symbols": "5a23598a2a8efd18ec3b60de5d28af8f",
-"index.html": "e4430a86fd953a8b8030893579a96cc4",
-"/": "e4430a86fd953a8b8030893579a96cc4",
+"index.html": "8b57a2cb2dfd7892b02f7a5caa13eee7",
+"/": "8b57a2cb2dfd7892b02f7a5caa13eee7",
 "assets/NOTICES": "3256ff87632e1e4cd6f0b6c561aba053",
 "assets/assets/graphics/JingYiJun.jpg": "4a7784470ae0db3d576d0ae676d3b6e1",
 "assets/assets/graphics/hasbai.jpeg": "f1fdc1d1cd82fc94d94a5b1fce513932",
@@ -94,10 +94,10 @@ const RESOURCES = {"canvaskit/skwasm.js": "f2ad9363618c5f62e813740099a80e63",
 "assets/AssetManifest.json": "db88196cd21249b4d0ffbf4ac406229b",
 "version.json": "e31afb07aabd4f4d840c38e41f998bc6",
 "flutter.js": "76f08d47ff9f5715220992f993002504",
-"main.dart.js": "2d43d64c11a3cca5203bc5924007525c",
+"main.dart.js": "40307618ee08fbd847cd63dd37f11a08",
 "favicon.webp": "5d8a19c576a1ba2a24af3b99f340237d",
 "manifest.json": "012d91b9edf492757ddf24dd1b15d03e",
-"flutter_bootstrap.js": "d7a26769d310223564d9a2983e3c75e0"};
+"flutter_bootstrap.js": "01fe7875cf807b8f358b5f40322733c9"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",
