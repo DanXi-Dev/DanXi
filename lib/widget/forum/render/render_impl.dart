@@ -257,7 +257,7 @@ class MarkdownFloorMentionSupport extends MarkdownElementBuilder {
     } else {
       return OTFloorMentionWidget(
         future: ForumRepository.getInstance()
-            .loadSpecificFloor(int.parse(element.textContent)),
+            .loadFloorById(int.parse(element.textContent)),
         hasBackgroundImage: hasBackgroundImage,
       );
     }
@@ -283,7 +283,7 @@ class MarkdownHoleMentionSupport extends MarkdownElementBuilder {
     } else {
       return OTFloorMentionWidget(
         future: ForumRepository.getInstance()
-            .loadSpecificHole(int.parse(element.textContent))
+            .loadHoleById(int.parse(element.textContent))
             .then((value) => value?.floors?.first_floor),
         hasBackgroundImage: hasBackgroundImage,
       );

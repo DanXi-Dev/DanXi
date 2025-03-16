@@ -369,7 +369,7 @@ class ForumRepository extends BaseRepositoryWithDio {
   }
 
   // NEVER USED
-  Future<OTHole?> loadSpecificHole(int holeId) async {
+  Future<OTHole?> loadHoleById(int holeId) async {
     final options = RequestOptions(
         path: "$_BASE_URL/holes/$holeId", method: "GET", headers: _tokenHeader);
     final Response<Map<String, dynamic>> response =
@@ -378,7 +378,26 @@ class ForumRepository extends BaseRepositoryWithDio {
     return hole;
   }
 
-  Future<OTFloor?> loadSpecificFloor(int floorId) async {
+  Future<List<OTHole>?> loadHolesById(Iterable<int> holeIds) async {
+    // We can only do this without a new upstream API
+    List<OTHole> result = [];
+    for (var holeId in holeIds) {
+      try {
+        OTHole? hole = await loadHoleById(holeId);
+        if (hole == null) {
+          throw NotNullableError("Hole shouldn't be null");
+        }
+        result.add(hole);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    assert(result.length == holeIds.length);
+    return result;
+  }
+
+  Future<OTFloor?> loadFloorById(int floorId) async {
     final result = _floorCache[floorId];
     if (result != null) {
       return result;
