@@ -37,6 +37,7 @@ import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/watermark.dart';
 import 'package:dan_xi/widget/forum/forum_widgets.dart';
@@ -146,6 +147,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               startFloor: _listViewController.length()),
       MyReplies() => await ForumRepository.getInstance()
           .loadUserFloors(startFloor: _listViewController.length()),
+      ViewHistory() => (await ForumRepository.getInstance().loadHolesById(
+                  SettingsProvider.getInstance()
+                      .viewHistory
+                      .skip(_listViewController.length())) ??
+              [])
+          .map((hole) => hole.floors!.first_floor!)
+          .toList(),
       PunishmentHistory() => await loadPunishmentHistory(page),
     };
 
@@ -328,6 +336,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       OTHole hole = widget.arguments!['post'];
       _renderModel = Normal(hole);
 
+      // Record view history
+      SettingsProvider.getInstance().viewHistory = [
+        hole.hole_id!,
+        // Limit the number of view history, and avoid duplicate entries
+        ...SettingsProvider.getInstance()
+            .viewHistory
+            .filter((id) => id != hole.hole_id!)
+            .take(SettingsProvider.MAX_VIEW_HISTORY - 1)
+      ];
+
       // Update hole view count
       if (hole.hole_id != null) {
         unawaited(
@@ -339,6 +357,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       _renderModel = PunishmentHistory();
     } else if (widget.arguments?['myReplies'] == true) {
       _renderModel = MyReplies();
+    } else if (widget.arguments?['viewHistory'] == true) {
+      _renderModel = ViewHistory();
     }
 
     shouldScrollToEnd = widget.arguments?['scroll_to_end'] == true;
@@ -446,6 +466,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             Normal(hole: var hole) => Text("#${hole.hole_id}"),
             Search() => Text(S.of(context).search_result),
             MyReplies() => Text(S.of(context).list_my_replies),
+            ViewHistory() => Text(S.of(context).list_view_history),
             PunishmentHistory() => Text(S.of(context).list_my_punishments),
           },
         ),
@@ -554,7 +575,21 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   ? const Icon(Icons.more_vert)
                   : const Icon(CupertinoIcons.ellipsis),
             ),
-          ]
+          ],
+          if (_renderModel case ViewHistory())
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: Icon(Icons.delete),
+              onPressed: () async {
+                if (await Noticing.showConfirmationDialog(
+                        context, S.of(context).are_you_sure,
+                        isConfirmDestructive: true) ==
+                    true) {
+                  SettingsProvider.getInstance().viewHistory = [];
+                  refreshListView();
+                }
+              },
+            )
         ],
       ),
       body: Builder(
@@ -948,7 +983,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   context, S.of(context).request_success);
               ForumRepository.getInstance().invalidateFloorCache(e.floor_id!);
               final newFloor = await ForumRepository.getInstance()
-                  .loadSpecificFloor(e.floor_id!);
+                  .loadFloorById(e.floor_id!);
               _listViewController.replaceDatumWith(e, newFloor!);
             }
             // await refreshListView();
@@ -973,7 +1008,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                     context, S.of(context).request_success);
                 ForumRepository.getInstance().invalidateFloorCache(e.floor_id!);
                 final newFloor = await ForumRepository.getInstance()
-                    .loadSpecificFloor(e.floor_id!);
+                    .loadFloorById(e.floor_id!);
                 _listViewController.replaceDatumWith(e, newFloor!);
               } catch (e, st) {
                 Noticing.showErrorDialog(context, e, trace: st);
@@ -1199,6 +1234,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
         MyReplies() => (await ForumRepository.getInstance().loadUserFloors(
             startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE)),
+        ViewHistory() => (await ForumRepository.getInstance().loadHolesById(
+                    SettingsProvider.getInstance()
+                        .viewHistory
+                        .skip(_listViewController.length())) ??
+                [])
+            .map((hole) => hole.floors!.first_floor!)
+            .toList(),
         PunishmentHistory() =>
           (await ForumRepository.getInstance().getPunishmentHistory())
               ?.map((e) => e.floor!)
@@ -1393,5 +1435,7 @@ class Search extends RenderModel {
 }
 
 class MyReplies extends RenderModel {}
+
+class ViewHistory extends RenderModel {}
 
 class PunishmentHistory extends RenderModel {}

@@ -252,7 +252,7 @@ Future<void> goToPIDResultPage(BuildContext context, int pid) async {
       showProgressDialog(loadingText: S.of(context).loading, context: context);
   try {
     final OTHole? post =
-        await ForumRepository.getInstance().loadSpecificHole(pid);
+        await ForumRepository.getInstance().loadHoleById(pid);
     smartNavigatorPush(context, "/bbs/postDetail", arguments: {
       "post": post!,
     });
@@ -274,7 +274,7 @@ Future<void> goToFloorIdResultPage(BuildContext context, int floorId) async {
       showProgressDialog(loadingText: S.of(context).loading, context: context);
   try {
     final floor =
-        (await ForumRepository.getInstance().loadSpecificFloor(floorId))!;
+        (await ForumRepository.getInstance().loadFloorById(floorId))!;
     OTFloorMentionWidget.showFloorDetail(context, floor);
   } catch (error, st) {
     if (error is DioException &&

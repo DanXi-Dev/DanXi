@@ -848,6 +848,13 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                 ),
                 ListTile(
                   leading: nil,
+                  title: Text(S.of(context).list_view_history),
+                  onTap: () => smartNavigatorPush(context, '/bbs/postDetail',
+                      arguments: {'viewHistory': true},
+                      forcePushOnMainNavigator: true),
+                ),
+                ListTile(
+                  leading: nil,
                   title: Text(S.of(context).list_my_punishments),
                   onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
                       arguments: {"punishmentHistory": true}),

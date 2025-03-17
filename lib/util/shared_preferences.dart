@@ -131,6 +131,9 @@ class XSharedPreferences {
   Future<bool> setStringList(String dataKey, List<String>? dataValue) =>
       setString(dataKey, jsonEncode(dataValue));
 
+  Future<bool> setIntList(String dataKey, List<int>? dataValue) =>
+      setString(dataKey, jsonEncode(dataValue));
+
   String? getString(String key) => _preferences.getString(key);
 
   int? getInt(String key) => _preferences.getInt(key);
@@ -138,6 +141,11 @@ class XSharedPreferences {
   double? getDouble(String key) => _preferences.getDouble(key);
 
   bool? getBool(String key) => _preferences.getBoolean(key);
+
+  List<int>? getIntList(String key) {
+    String? value = getString(key);
+    return value == null ? null : jsonDecode(value).cast<int>();
+  }
 
   List<String>? getStringList(String key) {
     String? value = getString(key);
