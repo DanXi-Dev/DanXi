@@ -1,5 +1,5 @@
 /*
- *     Copyright (C) 2021  DanXi-Dev
+ *     Copyright (C) 2025  DanXi-Dev
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,64 +17,79 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart' as sp;
 import 'package:dan_xi/repository/fdu/ecard_repository.dart';
-import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:dan_xi/widget/forum/tag_selector/selector.dart';
 import 'package:dan_xi/widget/forum/tag_selector/tag.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-/// A list page showing user's campus card spending history.
-///
-/// Arguments:
-/// [CardInfo] cardInfo: user's card info.
-class CardDetailPage extends StatefulWidget {
-  final Map<String, dynamic>? arguments;
+part 'card_detail.g.dart';
 
-  @override
-  CardDetailPageState createState() => CardDetailPageState();
-
-  const CardDetailPage({super.key, this.arguments});
-}
-
-class CardDetailPageState extends State<CardDetailPage> {
-  CardInfo? _cardInfo;
-  List<Tag>? _tags;
-  late List<int> _tagDays;
-  bool _selectable = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _cardInfo = widget.arguments!['cardInfo'];
-    _tagDays = [7, 15, 30];
+@riverpod
+Future<List<CardRecord>> cardRecord(Ref ref, int logDays,
+    {List<CardRecord>? cache}) async {
+  if (logDays == 0 && cache != null) {
+    return cache;
   }
 
+  return await CardRepository.getInstance()
+      .loadCardRecord(sp.StateProvider.personInfo.value, logDays);
+}
+
+class CardDetailPageArguments {
+  final CardInfo cardInfo;
+
+  CardDetailPageArguments(this.cardInfo);
+}
+
+class CardDetailPage extends HookConsumerWidget {
+  final _tagDays = [0, 7, 15, 30];
+  final CardDetailPageArguments arguments;
+
+  CardDetailPage({super.key, required this.arguments});
+
   @override
-  Widget build(BuildContext context) {
-    _tags ??= [
-      Tag(
-          S.current.last_7_days,
-          PlatformX.isMaterial(context)
-              ? Icons.timelapse
-              : CupertinoIcons.clock_fill),
-      Tag(
-          S.current.last_15_days,
-          PlatformX.isMaterial(context)
-              ? Icons.timelapse
-              : CupertinoIcons.clock_fill),
-      Tag(
-          S.current.last_30_days,
-          PlatformX.isMaterial(context)
-              ? Icons.timelapse
-              : CupertinoIcons.clock_fill),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tags = [
+      Tag(S.current.last_7_days, Icons.timelapse),
+      Tag(S.current.last_15_days, Icons.timelapse),
+      Tag(S.current.last_30_days, Icons.timelapse),
     ];
+    final dayId = useState<int>(-1);
+    final cardRecord = ref.watch(cardRecordProvider(_tagDays[dayId.value + 1],
+        cache: arguments.cardInfo.records));
+
+    Widget buildRecordWidget() {
+      return switch (cardRecord) {
+        AsyncData(:final value) => Expanded(
+            child: MediaQuery.removePadding(
+                context: context,
+                removeTop: true,
+                child: WithScrollbar(
+                  controller: PrimaryScrollController.of(context),
+                  child: ListView(
+                    controller: PrimaryScrollController.of(context),
+                    children: _getListWidgets(value),
+                  ),
+                ))),
+        AsyncError(:final error, :final stackTrace) =>
+          ErrorPageWidget.buildWidget(context, error,
+              stackTrace: stackTrace,
+              onTap: () =>
+                  ref.refresh(cardRecordProvider(_tagDays[dayId.value + 1]))),
+        _ => Center(child: PlatformCircularProgressIndicator()),
+      };
+    }
+
     return PlatformScaffold(
       iosContentBottomPadding: true,
       iosContentPadding: true,
@@ -89,60 +104,28 @@ class CardDetailPageState extends State<CardDetailPage> {
             fillRandomColor: false,
             fixedColor: Theme.of(context).colorScheme.secondary,
             fontSize: 16,
-            enabled: _selectable,
+            enabled: !cardRecord.isLoading,
             singleChoice: true,
-            defaultChoice: -1,
-            onChoice: (Tag tag, list) async {
-              int index = _tags!.indexOf(tag);
-              if (index >= 0) {
-                // Make the tags not clickable when data's being retrieved
-                setState(() {
-                  tag.checkedIcon = PlatformX.isMaterial(context)
-                      ? Icons.pending
-                      : CupertinoIcons.hourglass;
-                  _selectable = false;
-                });
-                _cardInfo!.records = await CardRepository.getInstance()
-                    .loadCardRecord(
-                        StateProvider.personInfo.value, _tagDays[index]);
-                setState(() {
-                  tag.checkedIcon = PlatformX.isMaterial(context)
-                      ? Icons.check
-                      : CupertinoIcons.checkmark;
-                  _selectable = true;
-                });
-              }
+            defaultChoice: dayId.value,
+            onChoice: (Tag tag, list) {
+              dayId.value = tags.indexOf(tag);
             },
-            tagList: _tags),
-        Expanded(
-            child: MediaQuery.removePadding(
-                context: context,
-                removeTop: true,
-                child: WithScrollbar(
-                  controller: PrimaryScrollController.of(context),
-                  child: ListView(
-                    controller: PrimaryScrollController.of(context),
-                    children: _getListWidgets(),
-                  ),
-                ))),
+            tagList: tags),
+        buildRecordWidget(),
       ]),
     );
   }
 
-  List<Widget> _getListWidgets() {
+  List<Widget> _getListWidgets(List<CardRecord> records) {
     List<Widget> widgets = [];
-    if (_cardInfo!.records != null) {
-      for (var element in _cardInfo!.records!) {
-        widgets.add(ListTile(
-          // leading: PlatformX.isMaterial(context)
-          //     ? Icon(Icons.monetization_on)
-          //     : Icon(CupertinoIcons.money_dollar_circle_fill),
-          title: Text(element.location),
-          trailing: Text(Constant.yuanSymbol(element.payment)),
-          subtitle:
-              Text(DateFormat("yyyy-MM-dd HH:mm:ss").format(element.time)),
-        ));
-      }
+    for (var element in records) {
+      widgets.add(ListTile(
+        // leading: Icon(Icons.monetization_on)
+        title: Text(element.location),
+        trailing: Text((element.type.contains("充值") ? "+" : "-") +
+            Constant.yuanSymbol(element.payment)),
+        subtitle: Text(DateFormat("yyyy-MM-dd HH:mm:ss").format(element.time)),
+      ));
     }
 
     return widgets;
