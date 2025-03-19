@@ -34,3 +34,5 @@ analyzer:
   exclude: [ build/**, lib/generated/** ]
   language:
     strict-raw-types: true
+  plugins:
+    - custom_lint
