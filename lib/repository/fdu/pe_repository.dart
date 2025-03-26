@@ -34,10 +34,10 @@ class FudanPERepository extends BaseRepositoryWithDio {
 
   factory FudanPERepository.getInstance() => _instance;
 
-  Future<List<dynamic>?> loadExerciseRecords(PersonInfo? info) =>
+  Future<List<ExerciseObjects>?> loadExerciseRecords(PersonInfo? info) =>
       Retrier.runAsyncWithRetry(() => _loadExerciseRecords(info));
 
-  Future<List<dynamic>?> _loadExerciseRecords(PersonInfo? info) async {
+  Future<List<ExerciseObjects>?> _loadExerciseRecords(PersonInfo? info) async {
     // PE system request a token from UIS to log in.
     String token = "";
     await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, info)
@@ -48,7 +48,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
       }
       return null;
     });
-    final List<dynamic> items = [];
+    final List<ExerciseObjects> items = [];
     final Response<String> r = await dio.get("$_INFO_URL?token=$token");
     final BeautifulSoup soup = BeautifulSoup(r.data!);
     final Iterable<dom.Element> tableLines = soup
@@ -92,36 +92,35 @@ class FudanPERepository extends BaseRepositoryWithDio {
       "fdtyjw.fudan.edu.cn"; // uses a separate host here, since we are excepting an error response from server
 }
 
-class ExerciseItem {
+sealed class ExerciseObjects {}
+
+class ExerciseItem implements ExerciseObjects {
   final String title;
   final int? times;
-  final String type;
 
-  ExerciseItem(this.title, this.times, this.type);
+  ExerciseItem(this.title, this.times);
 
   static List<ExerciseItem> fromHtml(dom.Element html) {
     List<ExerciseItem> list = [];
     List<dom.Element> elements = html.getElementsByTagName("td");
     for (int i = 0; i < elements.length; i += 2) {
       list.add(ExerciseItem(elements[i].text.trim().replaceFirst("：", ""),
-          int.tryParse(elements[i + 1].text.trim()), "Item"));
+          int.tryParse(elements[i + 1].text.trim())));
     }
     return list;
   }
 }
 
-class ExerciseRecord {
+class ExerciseRecord implements ExerciseObjects {
   final String title;
   final String result;
   final String singleScore;
   final String comment;
-  final String type;
 
-  ExerciseRecord(
-      this.title, this.result, this.singleScore, this.comment, this.type);
+  ExerciseRecord(this.title, this.result, this.singleScore, this.comment);
 
   static ExerciseRecord fromHtml(
       String title, String result, String singleScore, String comment) {
-    return ExerciseRecord(title, result, singleScore, comment, "Record");
+    return ExerciseRecord(title, result, singleScore, comment);
   }
 }

@@ -9,6 +9,7 @@
 .history
 .svn/
 .gradle/
+android/app/.cxx/
 
 # IntelliJ related
 *.iml

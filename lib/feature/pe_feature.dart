@@ -29,7 +29,7 @@ import 'package:flutter/material.dart';
 
 class PEFeature extends Feature {
   PersonInfo? _info;
-  List<dynamic>? _exercises;
+  List<ExerciseObjects>? _exercises;
 
   /// Status of the request.
   ConnectionStatus _status = ConnectionStatus.NONE;
@@ -75,45 +75,49 @@ class PEFeature extends Feature {
           // 1 Morning, 2 Must-do, 3 Select-do
           List<int> exerciseCategory = [0, 0, 0];
           for (var element in _exercises!) {
-            if (element.type == "Item") {
-              switch (element.title) {
-                case '早操':
-                  exerciseCategory[0] += (element as ExerciseItem).times!;
-                  break;
-                case '课外活动':
-                  exerciseCategory[2] += (element as ExerciseItem).times!;
-                  break;
-                case '晚锻炼':
-                  exerciseCategory[2] += (element as ExerciseItem).times!;
-                  break;
-                case '夜跑':
-                  exerciseCategory[1] += (element as ExerciseItem).times!;
-                  break;
-                case '仰卧起坐':
-                  exerciseCategory[1] += (element as ExerciseItem).times!;
-                  break;
-                case '引体向上':
-                  exerciseCategory[1] += (element as ExerciseItem).times!;
-                  break;
-                case '中长跑':
-                  exerciseCategory[1] += (element as ExerciseItem).times!;
-                  break;
-                case '立定跳远':
-                  exerciseCategory[1] += (element as ExerciseItem).times!;
-                  break;
-                case '周末上午':
-                  exerciseCategory[2] += (element as ExerciseItem).times!;
-                  break;
-                case '加章1':
-                  exerciseCategory[0] += (element as ExerciseItem).times!;
-                  break;
-                case '加章2':
-                  exerciseCategory[1] += (element as ExerciseItem).times!;
-                  break;
-                case '加章3':
-                  exerciseCategory[2] += (element as ExerciseItem).times!;
-                  break;
-              }
+            switch (element) {
+              case ExerciseItem():
+                switch (element.title) {
+                  case '早操':
+                    exerciseCategory[0] += element.times!;
+                    break;
+                  case '课外活动':
+                    exerciseCategory[2] += element.times!;
+                    break;
+                  case '晚锻炼':
+                    exerciseCategory[2] += element.times!;
+                    break;
+                  case '夜跑':
+                    exerciseCategory[1] += element.times!;
+                    break;
+                  case '仰卧起坐':
+                    exerciseCategory[1] += element.times!;
+                    break;
+                  case '引体向上':
+                    exerciseCategory[1] += element.times!;
+                    break;
+                  case '中长跑':
+                    exerciseCategory[1] += element.times!;
+                    break;
+                  case '立定跳远':
+                    exerciseCategory[1] += element.times!;
+                    break;
+                  case '周末上午':
+                    exerciseCategory[2] += element.times!;
+                    break;
+                  case '加章1':
+                    exerciseCategory[0] += element.times!;
+                    break;
+                  case '加章2':
+                    exerciseCategory[1] += element.times!;
+                    break;
+                  case '加章3':
+                    exerciseCategory[2] += element.times!;
+                    break;
+                }
+                break;
+              case ExerciseRecord():
+                break;
             }
           }
           return "早锻: ${exerciseCategory[0]} 必锻: ${exerciseCategory[1]} 选锻: ${exerciseCategory[2]}";
@@ -147,9 +151,9 @@ class PEFeature extends Feature {
     if (_exercises != null && _exercises!.isNotEmpty) {
       String body = "";
       for (var element in _exercises!) {
-        if (element.type == "Item")
+        if (element is ExerciseItem) {
           body += "\n${element.title}: ${element.times}";
-        else if (element.type == "Record") {
+        } else if (element is ExerciseRecord) {
           body += "\n${element.title}  ${element.result}";
           if (element.singleScore != null) {
             body += "  ${element.singleScore}  ${element.comment}";
