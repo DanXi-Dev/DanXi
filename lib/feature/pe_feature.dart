@@ -29,7 +29,7 @@ import 'package:flutter/material.dart';
 
 class PEFeature extends Feature {
   PersonInfo? _info;
-  List<ExerciseObjects>? _exercises;
+  List<ExerciseObject>? _exercises;
 
   /// Status of the request.
   ConnectionStatus _status = ConnectionStatus.NONE;

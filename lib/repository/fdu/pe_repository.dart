@@ -34,10 +34,10 @@ class FudanPERepository extends BaseRepositoryWithDio {
 
   factory FudanPERepository.getInstance() => _instance;
 
-  Future<List<ExerciseObjects>?> loadExerciseRecords(PersonInfo? info) =>
+  Future<List<ExerciseObject>?> loadExerciseRecords(PersonInfo? info) =>
       Retrier.runAsyncWithRetry(() => _loadExerciseRecords(info));
 
-  Future<List<ExerciseObjects>?> _loadExerciseRecords(PersonInfo? info) async {
+  Future<List<ExerciseObject>?> _loadExerciseRecords(PersonInfo? info) async {
     // PE system request a token from UIS to log in.
     String token = "";
     await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, info)
@@ -48,7 +48,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
       }
       return null;
     });
-    final List<ExerciseObjects> items = [];
+    final List<ExerciseObject> items = [];
     final Response<String> r = await dio.get("$_INFO_URL?token=$token");
     final BeautifulSoup soup = BeautifulSoup(r.data!);
     final Iterable<dom.Element> tableLines = soup
@@ -92,9 +92,9 @@ class FudanPERepository extends BaseRepositoryWithDio {
       "fdtyjw.fudan.edu.cn"; // uses a separate host here, since we are excepting an error response from server
 }
 
-sealed class ExerciseObjects {}
+sealed class ExerciseObject {}
 
-class ExerciseItem implements ExerciseObjects {
+class ExerciseItem implements ExerciseObject {
   final String title;
   final int? times;
 
@@ -111,7 +111,7 @@ class ExerciseItem implements ExerciseObjects {
   }
 }
 
-class ExerciseRecord implements ExerciseObjects {
+class ExerciseRecord implements ExerciseObject {
   final String title;
   final String result;
   final String singleScore;
