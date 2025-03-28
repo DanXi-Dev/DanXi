@@ -29,7 +29,7 @@ import 'package:flutter/material.dart';
 
 class PEFeature extends Feature {
   PersonInfo? _info;
-  List<ExerciseObject>? _exercises;
+  List<ExerciseItem>? _exercises;
 
   /// Status of the request.
   ConnectionStatus _status = ConnectionStatus.NONE;
@@ -75,48 +75,42 @@ class PEFeature extends Feature {
           // 1 Morning, 2 Must-do, 3 Select-do
           List<int> exerciseCategory = [0, 0, 0];
           for (var element in _exercises!) {
-            switch (element) {
-              case ExerciseItem():
-                switch (element.title) {
-                  case '早操':
-                    exerciseCategory[0] += element.times!;
-                    break;
-                  case '课外活动':
-                    exerciseCategory[2] += element.times!;
-                    break;
-                  case '晚锻炼':
-                    exerciseCategory[2] += element.times!;
-                    break;
-                  case '夜跑':
-                    exerciseCategory[1] += element.times!;
-                    break;
-                  case '仰卧起坐':
-                    exerciseCategory[1] += element.times!;
-                    break;
-                  case '引体向上':
-                    exerciseCategory[1] += element.times!;
-                    break;
-                  case '中长跑':
-                    exerciseCategory[1] += element.times!;
-                    break;
-                  case '立定跳远':
-                    exerciseCategory[1] += element.times!;
-                    break;
-                  case '周末上午':
-                    exerciseCategory[2] += element.times!;
-                    break;
-                  case '加章1':
-                    exerciseCategory[0] += element.times!;
-                    break;
-                  case '加章2':
-                    exerciseCategory[1] += element.times!;
-                    break;
-                  case '加章3':
-                    exerciseCategory[2] += element.times!;
-                    break;
-                }
+            switch (element.title) {
+              case '早操':
+                exerciseCategory[0] += element.times!;
                 break;
-              case ExerciseRecord():
+              case '课外活动':
+                exerciseCategory[2] += element.times!;
+                break;
+              case '晚锻炼':
+                exerciseCategory[2] += element.times!;
+                break;
+              case '夜跑':
+                exerciseCategory[1] += element.times!;
+                break;
+              case '仰卧起坐':
+                exerciseCategory[1] += element.times!;
+                break;
+              case '引体向上':
+                exerciseCategory[1] += element.times!;
+                break;
+              case '中长跑':
+                exerciseCategory[1] += element.times!;
+                break;
+              case '立定跳远':
+                exerciseCategory[1] += element.times!;
+                break;
+              case '周末上午':
+                exerciseCategory[2] += element.times!;
+                break;
+              case '加章1':
+                exerciseCategory[0] += element.times!;
+                break;
+              case '加章2':
+                exerciseCategory[1] += element.times!;
+                break;
+              case '加章3':
+                exerciseCategory[2] += element.times!;
                 break;
             }
           }
@@ -151,14 +145,7 @@ class PEFeature extends Feature {
     if (_exercises != null && _exercises!.isNotEmpty) {
       String body = "";
       for (var element in _exercises!) {
-        if (element is ExerciseItem) {
-          body += "\n${element.title}: ${element.times}";
-        } else if (element is ExerciseRecord) {
-          body += "\n${element.title}  ${element.result}";
-          if (element.singleScore != null) {
-            body += "  ${element.singleScore}  ${element.comment}";
-          }
-        }
+        body += "\n${element.title}: ${element.times}";
       }
       Noticing.showModalNotice(context!,
           message: body, title: S.of(context!).pe_exercises);

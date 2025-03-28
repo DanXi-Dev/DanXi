@@ -34,10 +34,10 @@ class FudanPERepository extends BaseRepositoryWithDio {
 
   factory FudanPERepository.getInstance() => _instance;
 
-  Future<List<ExerciseObject>?> loadExerciseRecords(PersonInfo? info) =>
+  Future<List<ExerciseItem>?> loadExerciseRecords(PersonInfo? info) =>
       Retrier.runAsyncWithRetry(() => _loadExerciseRecords(info));
 
-  Future<List<ExerciseObject>?> _loadExerciseRecords(PersonInfo? info) async {
+  Future<List<ExerciseItem>?> _loadExerciseRecords(PersonInfo? info) async {
     // PE system request a token from UIS to log in.
     String token = "";
     await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, info)
@@ -48,7 +48,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
       }
       return null;
     });
-    final List<ExerciseObject> items = [];
+    final List<ExerciseItem> items = [];
     final Response<String> r = await dio.get("$_INFO_URL?token=$token");
     final BeautifulSoup soup = BeautifulSoup(r.data!);
     final Iterable<dom.Element> tableLines = soup
@@ -56,33 +56,10 @@ class FudanPERepository extends BaseRepositoryWithDio {
             "#pAll > table > tbody > tr:nth-child(6) > td > table > tbody > tr")
         .map((e) => e.element!);
 
-    final Iterable<dom.Element> peScoreLines = soup
-        .findAll(
-            "#pAll > table > tbody > tr:nth-child(26) > td > table > tbody > tr > td")
-        .map((e) => e.element!);
-
-    if (tableLines.isEmpty) {
-      throw "Unable to get the data";
-    }
+    if (tableLines.isEmpty) throw "Unable to get the data";
 
     for (var line in tableLines) {
       items.addAll(ExerciseItem.fromHtml(line));
-    }
-    int i = 0;
-    List<String> peInfo = [];
-    for (var line in peScoreLines) {
-      i++;
-      if (i == 1) continue;
-      if (i == 6) {
-        i = 0;
-        continue;
-      }
-      peInfo.add(line.text);
-      if (i == 5) {
-        items.add(ExerciseRecord.fromHtml(
-            peInfo[0], peInfo[1], peInfo[2], peInfo[3]));
-        peInfo.clear();
-      }
     }
     return items;
   }
@@ -92,9 +69,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
       "fdtyjw.fudan.edu.cn"; // uses a separate host here, since we are excepting an error response from server
 }
 
-sealed class ExerciseObject {}
-
-class ExerciseItem implements ExerciseObject {
+class ExerciseItem {
   final String title;
   final int? times;
 
@@ -108,19 +83,5 @@ class ExerciseItem implements ExerciseObject {
           int.tryParse(elements[i + 1].text.trim())));
     }
     return list;
-  }
-}
-
-class ExerciseRecord implements ExerciseObject {
-  final String title;
-  final String result;
-  final String singleScore;
-  final String comment;
-
-  ExerciseRecord(this.title, this.result, this.singleScore, this.comment);
-
-  static ExerciseRecord fromHtml(
-      String title, String result, String singleScore, String comment) {
-    return ExerciseRecord(title, result, singleScore, comment);
   }
 }
