@@ -127,13 +127,7 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
 
   @override
   Widget build(BuildContext context) {
-    // The check `if (!_isInTab)` was removed.
-    // Original Problem: Subpages pushed via Navigator.push (SettingsSubpage)
-    // couldn't find PageWithTab as an ancestor, resulting in _isInTab = false.
-    // This skipped creating the PlatformScaffold/PlatformAppBar for them.
-    // Fix: Always build the PlatformScaffold and PlatformAppBar, assuming all
-    // PlatformSubpage instances should have their own scaffold and app bar,
-    // regardless of whether they are in a tab view or pushed independently.
+    if (!_isInTab) return buildPage(context);
 
     // Build action buttons.
     Widget? leadingButton;

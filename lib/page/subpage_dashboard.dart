@@ -73,7 +73,7 @@ class HomeSubpage extends PlatformSubpage<HomeSubpage> {
         S.of(cxt).settings,
         Icon(Icons.settings_outlined),
             () => Navigator.of(cxt).push(
-            MaterialPageRoute(builder: (context) => const SettingsSubpage())
+                MaterialPageRoute(builder: (context) => const SettingsPage())
         )
     ),
   ];
