@@ -18,6 +18,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/page/danke/course_group_detail.dart';
@@ -58,6 +59,7 @@ import 'package:dan_xi/util/screen_proxy.dart';
 import 'package:dan_xi/widget/libraries/dynamic_theme.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:device_identity/device_identity.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -68,8 +70,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:material_color_generator/material_color_generator.dart';
 import 'package:provider/provider.dart';
 import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
-
-import 'common/constant.dart';
 
 /// The main entry of the whole app.
 /// Do some initial work here.
@@ -225,68 +225,108 @@ class DanxiApp extends StatelessWidget {
       // [DynamicThemeController] enables the app to change between dark/light
       // theme without restart on iOS.
       builder: (BuildContext context) {
-        MaterialColor primarySwatch =
-            context.select<SettingsProvider, MaterialColor>((value) =>
-                generateMaterialColor(color: Color(value.primarySwatch)));
-        return DynamicThemeController(
-          lightTheme: Constant.lightTheme(
-              PlatformX.isCupertino(context), primarySwatch),
-          darkTheme:
-              Constant.darkTheme(PlatformX.isCupertino(context), primarySwatch),
-          child: Material(
-            child: PlatformApp(
-              // Remember? We have just defined this scroll behavior class above
-              // to enable scrolling with mouse & stylus.
-              scrollBehavior: TouchMouseScrollBehavior(),
-              debugShowCheckedModeBanner: false,
-              // Fix cupertino UI text color issue by override text color
-              cupertino: (context, __) => CupertinoAppData(
-                  theme: CupertinoThemeData(
-                      brightness: context
-                          .select<SettingsProvider, ThemeType>(
-                              (s) => s.themeType)
-                          .getBrightness(),
-                      textTheme: CupertinoTextThemeData(
-                          textStyle: TextStyle(
-                              color: PlatformX.getTheme(context, primarySwatch)
-                                  .textTheme
-                                  .bodyLarge!
-                                  .color)))),
-              material: (context, __) => MaterialAppData(
-                  theme: PlatformX.getTheme(context, primarySwatch)),
-              // Configure i18n delegates.
-              localizationsDelegates: const [
-                // [S] is a generated class that contains all the strings in the
-                // app for l10n.
-                S.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate
-              ],
-              locale: LanguageManager.toLocale(
-                  context.watch<SettingsProvider>().language),
-              supportedLocales: S.delegate.supportedLocales,
-              onUnknownRoute: (settings) => throw AssertionError(
-                  "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code."),
-              home: ThemedSystemOverlay(
-                child: PlatformMasterDetailApp(
-                  // Configure the page route behaviour of the whole app.
-                  onGenerateRoute: (settings) {
-                    final Function? pageContentBuilder =
+        return DynamicColorBuilder(
+          builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+            // Use context.watch to listen for setting changes
+            final settings = context.watch<SettingsProvider>();
+
+            MaterialColor manualPrimarySwatch = generateMaterialColor(
+                color: Color(settings.primarySwatch));
+
+            // Determine if dynamic colors should be used
+            bool useSystemPalette = PlatformX.isAndroid && settings.followSystemPalette;
+
+            ThemeData lightThemeConfig;
+            ThemeData darkThemeConfig;
+            bool isPlatformCupertino = PlatformX.isCupertino(context);
+
+            // Get base themes for copying non-color properties if needed
+            // Pass a default color like Colors.blue, it won't be used if dynamic is active
+            ThemeData baseLightTheme = Constant.lightTheme(isPlatformCupertino, manualPrimarySwatch);
+            ThemeData baseDarkTheme = Constant.darkTheme(isPlatformCupertino, manualPrimarySwatch);
+
+            if (useSystemPalette && lightDynamic != null && darkDynamic != null) {
+              // Build themes directly using the dynamic ColorScheme
+              lightThemeConfig = ThemeData(
+                colorScheme: lightDynamic,
+                useMaterial3: baseLightTheme.useMaterial3,
+                cardTheme: baseLightTheme.cardTheme,
+                dividerTheme: baseLightTheme.dividerTheme,
+              );
+              darkThemeConfig = ThemeData(
+                colorScheme: darkDynamic,
+                brightness: Brightness.dark,
+                useMaterial3: baseDarkTheme.useMaterial3,
+                cardTheme: baseDarkTheme.cardTheme,
+                dividerTheme: baseDarkTheme.dividerTheme,
+              );
+            } else {
+              // Use the original logic based on manual primarySwatch
+              lightThemeConfig = baseLightTheme;
+              darkThemeConfig = baseDarkTheme;
+            }
+
+            return DynamicThemeController(
+              lightTheme: lightThemeConfig,
+              darkTheme: darkThemeConfig,
+              child: Material(
+                child: PlatformApp(
+                  // Remember? We have just defined this scroll behavior class above
+                  // to enable scrolling with mouse & stylus.
+                  scrollBehavior: TouchMouseScrollBehavior(),
+                  debugShowCheckedModeBanner: false,
+                  // Fix cupertino UI text color issue by override text color
+                  cupertino: (context, __) => CupertinoAppData(
+                      theme: CupertinoThemeData(
+                          brightness: context
+                              .select<SettingsProvider, ThemeType>( //
+                                  (s) => s.themeType)
+                              .getBrightness(),
+                          textTheme: CupertinoTextThemeData(
+                              textStyle: TextStyle(
+                                  color: (Theme.of(context).brightness == Brightness.dark // Use current theme brightness
+                                      ? Colors.white
+                                      : Colors.black)
+                              )))),
+                  material: (context, __) => MaterialAppData(
+                    // Pass the ThemeData determined by DynamicThemeController
+                    theme: Theme.of(context),
+                  ),
+                  // Configure i18n delegates.
+                  localizationsDelegates: const [
+                    // [S] is a generated class that contains all the strings in the
+                    // app for l10n.
+                    S.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate
+                  ],
+                  locale: LanguageManager.toLocale(
+                      context.watch<SettingsProvider>().language),
+                  supportedLocales: S.delegate.supportedLocales,
+                  onUnknownRoute: (settings) => throw AssertionError(
+                      "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code."),
+                  home: ThemedSystemOverlay(
+                    child: PlatformMasterDetailApp(
+                      // Configure the page route behaviour of the whole app.
+                      onGenerateRoute: (settings) {
+                        final Function? pageContentBuilder =
                         DanxiApp.routes[settings.name!];
-                    if (pageContentBuilder != null) {
-                      return platformPageRoute(
-                          context: context,
-                          builder: (context) => pageContentBuilder(context,
-                              arguments: settings.arguments));
-                    }
-                    return null;
-                  },
-                  navigatorKey: navigatorKey,
+                        if (pageContentBuilder != null) {
+                          return platformPageRoute(
+                              context: context,
+                              builder: (context) => pageContentBuilder(context,
+                                  arguments: settings.arguments));
+                        }
+                        return null;
+                      },
+                      navigatorKey: navigatorKey,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );

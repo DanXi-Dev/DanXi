@@ -87,6 +87,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_TIMETABLE_LAST_UPDATED = "timetable_last_updated";
   static const String KEY_USE_WEBVPN = "use_webvpn";
   static const String KEY_VIEW_HISTORY = "view_history";
+  static const String KEY_FOLLOW_SYSTEM_PALETTE = "follow_system_palette";
 
   static const int MAX_VIEW_HISTORY = 250;
 
@@ -657,16 +658,24 @@ class SettingsProvider with ChangeNotifier {
 
   /// Primary color used by the app.
   int get primarySwatch {
+    if (preferences == null) {
+      return Colors.blue.value;
+    }
+
     if (preferences!.containsKey(KEY_PRIMARY_SWATCH_V2)) {
       int? color = preferences!.getInt(KEY_PRIMARY_SWATCH_V2);
-      return Color(color!).value;
+      if (color != null) {
+        return Color(color).value;
+      } else {
+      }
+    } else {
     }
     return Colors.blue.value;
   }
 
   /// Set primary swatch by color name defined in [Constant.TAG_COLOR_LIST].
   void setPrimarySwatch(int value) {
-    preferences!.setInt(KEY_PRIMARY_SWATCH_V2, Color(value).value);
+    preferences!.setInt(KEY_PRIMARY_SWATCH_V2, value);
     notifyListeners();
   }
 
@@ -787,6 +796,18 @@ class SettingsProvider with ChangeNotifier {
 
   set viewHistory(List<int> value) {
     preferences!.setIntList(KEY_VIEW_HISTORY, value);
+    notifyListeners();
+  }
+
+  bool get followSystemPalette {
+    if (preferences!.containsKey(KEY_FOLLOW_SYSTEM_PALETTE)) {
+      return preferences!.getBool(KEY_FOLLOW_SYSTEM_PALETTE)!;
+    }
+    return false; // Default to false if not set
+  }
+
+  set followSystemPalette(bool value) {
+    preferences!.setBool(KEY_FOLLOW_SYSTEM_PALETTE, value);
     notifyListeners();
   }
 }

@@ -428,6 +428,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                                           onPressed: () =>
                                               Navigator.of(context).pop()))),
                         ),
+
                         Selector<SettingsProvider, bool>(
                           selector: (_, model) =>
                               model.useAccessibilityColoring,
@@ -446,30 +447,58 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                             },
                           ),
                         ),
-                        if (PlatformX.isMaterial(context))
-                          ListTile(
-                            title: Text(S.of(context).theme_color),
-                            subtitle:
-                                Text(S.of(context).theme_color_description),
-                            leading: const Icon(Icons.color_lens),
-                            onTap: () async {
-                              MaterialColor? result =
-                                  await showPlatformDialog<MaterialColor?>(
-                                context: context,
-                                builder: (_) => SwatchPickerDialog(
-                                  initialSelectedColor: context
-                                      .read<SettingsProvider>()
-                                      .primarySwatch,
-                                ),
-                              );
-                              if (result != null && mounted) {
-                                context
-                                    .read<SettingsProvider>()
-                                    .setPrimarySwatch(result.value);
-                                FlutterApp.restartApp(context);
+
+                        Builder(
+                            builder: (context) {
+                              // Watch the followSystemPalette setting
+                              bool isFollowingSystemPalette = PlatformX.isAndroid && context.watch<SettingsProvider>().followSystemPalette;
+
+                              // Conditionally build the ListTile for theme color
+                              if (PlatformX.isMaterial(context)) {
+                                return ListTile(
+                                  title: Text(S.of(context).theme_color),
+                                  subtitle: Text(
+                                      S.of(context).theme_color_description),
+                                  leading: const Icon(Icons.color_lens),
+                                  // Disable if following system palette
+                                  enabled: !isFollowingSystemPalette,
+                                  onTap: isFollowingSystemPalette
+                                      ? null // Set onTap to null when disabled
+                                      : () async {
+                                    int initialColor = context.read<SettingsProvider>().primarySwatch;
+
+                                    MaterialColor? result =
+                                    await showPlatformDialog<MaterialColor?>(
+                                      context: context,
+                                      builder: (_) => SwatchPickerDialog(
+                                        initialSelectedColor: initialColor,
+                                      ),
+                                    );
+
+                                    if (result != null && mounted) {
+                                      context
+                                          .read<SettingsProvider>()
+                                          .setPrimarySwatch(result.value);
+                                    } else {}
+                                  },
+                                );
+                              } else {
+                                return const SizedBox.shrink();
                               }
+                            }
+                        ),
+
+                        if (PlatformX.isAndroid)
+                          SwitchListTile.adaptive(
+                            title: Text(S.of(context).follow_system_palette),
+                            subtitle: Text(S.of(context).follow_system_palette_description),
+                            secondary: const Icon(Icons.palette_outlined),
+                            value: SettingsProvider.getInstance().followSystemPalette,
+                            onChanged: (bool value) {
+                              SettingsProvider.getInstance().followSystemPalette = value;
                             },
                           ),
+
                         ListTile(
                           title: Text(S.of(context).theme),
                           subtitle: Text(context
