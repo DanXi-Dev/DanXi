@@ -548,5 +548,7 @@
   "use_webvpn_description": "When enabled, certain functions could be accessed directly without Fudan LAN (restart required)",
   "show_this_person": "Filter by this user",
   "select_all": "Select All",
-  "share_hole_title": "Select the floors to share"
+  "share_hole_title": "Select the floors to share",
+  "follow_system_palette": "Follow system color palette",
+  "follow_system_palette_description": "Use Android's Material You dynamic colors based on your wallpaper"
 }

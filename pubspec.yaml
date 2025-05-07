@@ -115,6 +115,7 @@ dependencies:
   ffi: any
   toml: ^0.16.0
   pub_semver: ^2.1.4
+  dynamic_color: ^1.6.8
 
 dependency_overrides:
   linkify:
