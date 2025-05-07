@@ -50,6 +50,7 @@ import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/language_manager.dart';
 import 'package:dan_xi/provider/notification_provider.dart';
+import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/util/lazy_future.dart';
@@ -150,6 +151,7 @@ class DanxiApp extends StatelessWidget {
     '/placeholder': (context, {arguments}) => ColoredBox(
         color: Theme.of(context).scaffoldBackgroundColor.withAlpha(254)),
     '/home': (context, {arguments}) => const HomePage(),
+    '/settings': (context, {arguments}) => const SettingsPage(),
     '/diagnose': (context, {arguments}) =>
         DiagnosticConsole(arguments: arguments),
     '/bbs/reports': (context, {arguments}) =>
@@ -225,40 +227,33 @@ class DanxiApp extends StatelessWidget {
       // [DynamicThemeController] enables the app to change between dark/light
       // theme without restart on iOS.
       builder: (BuildContext context) {
+        MaterialColor manualPrimarySwatch =
+          context.select<SettingsProvider, MaterialColor>((settings) =>
+              generateMaterialColor(color: Color(settings.primarySwatch)));
+
+        final bool followSystemPalette = context.select<SettingsProvider, bool>(
+            (settings) => settings.followSystemPalette
+        );
+        bool isPlatformCupertino = PlatformX.isCupertino(context);
+
         return DynamicColorBuilder(
           builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-            // Use context.watch to listen for setting changes
-            final settings = context.watch<SettingsProvider>();
-
-            MaterialColor manualPrimarySwatch = generateMaterialColor(
-                color: Color(settings.primarySwatch));
-
             // Determine if dynamic colors should be used
-            bool useSystemPalette = PlatformX.isAndroid && settings.followSystemPalette;
+            bool useSystemPalette = PlatformX.isAndroid && followSystemPalette;
 
             ThemeData lightThemeConfig;
             ThemeData darkThemeConfig;
-            bool isPlatformCupertino = PlatformX.isCupertino(context);
 
-            // Get base themes for copying non-color properties if needed
-            // Pass a default color like Colors.blue, it won't be used if dynamic is active
             ThemeData baseLightTheme = Constant.lightTheme(isPlatformCupertino, manualPrimarySwatch);
             ThemeData baseDarkTheme = Constant.darkTheme(isPlatformCupertino, manualPrimarySwatch);
 
             if (useSystemPalette && lightDynamic != null && darkDynamic != null) {
               // Build themes directly using the dynamic ColorScheme
-              lightThemeConfig = ThemeData(
+              lightThemeConfig = baseLightTheme.copyWith(
                 colorScheme: lightDynamic,
-                useMaterial3: baseLightTheme.useMaterial3,
-                cardTheme: baseLightTheme.cardTheme,
-                dividerTheme: baseLightTheme.dividerTheme,
               );
-              darkThemeConfig = ThemeData(
+              darkThemeConfig = baseDarkTheme.copyWith(
                 colorScheme: darkDynamic,
-                brightness: Brightness.dark,
-                useMaterial3: baseDarkTheme.useMaterial3,
-                cardTheme: baseDarkTheme.cardTheme,
-                dividerTheme: baseDarkTheme.dividerTheme,
               );
             } else {
               // Use the original logic based on manual primarySwatch

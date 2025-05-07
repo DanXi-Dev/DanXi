@@ -40,7 +40,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:dan_xi/page/subpage_settings.dart';
 
 class HomeSubpage extends PlatformSubpage<HomeSubpage> {
   @override
@@ -72,9 +71,7 @@ class HomeSubpage extends PlatformSubpage<HomeSubpage> {
     AppBarButtonItem(
         S.of(cxt).settings,
         Icon(Icons.settings_outlined),
-            () => Navigator.of(cxt).push(
-                MaterialPageRoute(builder: (context) => const SettingsPage())
-        )
+            () => smartNavigatorPush(cxt, '/settings')
     ),
   ];
 }
