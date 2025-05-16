@@ -124,7 +124,7 @@ class LoginDialogState extends State<LoginDialog> {
           try {
             newInfo.name = await CardRepository.getInstance().getName(newInfo);
             if (newInfo.name?.isEmpty ?? true) {
-              throw WeakPasswordException();
+              throw Exception("Unable to get user name");
             }
             await newInfo.saveToSharedPreferences(widget.sharedPreferences!);
             widget.personInfo.value = newInfo;
@@ -201,6 +201,7 @@ class LoginDialogState extends State<LoginDialog> {
         context,
         error,
         stackTrace: stack,
+        buttonText: "", // hide the button
         errorMessageTextStyle: const TextStyle(fontSize: 12, color: Colors.red),
       );
       refreshSelf();
