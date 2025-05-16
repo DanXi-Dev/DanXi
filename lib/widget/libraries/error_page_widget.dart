@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -32,6 +33,7 @@ class ErrorPageWidget extends StatelessWidget {
   final dynamic error;
   final StackTrace? trace;
   final VoidCallback? onTap;
+  final TextStyle? errorMessageTextStyle;
 
   const ErrorPageWidget(
       {super.key,
@@ -40,7 +42,8 @@ class ErrorPageWidget extends StatelessWidget {
       required this.errorMessage,
       this.onTap,
       this.error,
-      this.trace});
+      this.trace,
+      this.errorMessageTextStyle});
 
   /// Try to parse error information from [error].
   static String generateUserFriendlyDescription(S locale, dynamic error,
@@ -82,7 +85,7 @@ class ErrorPageWidget extends StatelessWidget {
           break;
       }
     } else if (error is NotLoginError) {
-      errorType = locale.require_login;
+      errorType = error.errorMessage;
     } else if (error is FormatException) {
       errorType = locale.format_exception;
     } else if (error is ArgumentError) {
@@ -90,12 +93,26 @@ class ErrorPageWidget extends StatelessWidget {
           error.message.contains("must return a value of the future's type")) {
         errorType = locale.no_data_error;
       }
+    } else if (error is CredentialsInvalidException) {
+      errorType = locale.credentials_invalid;
+    } else if (error is CaptchaNeededException) {
+      errorType = locale.captcha_needed;
+    } else if (error is NetworkMaintenanceException) {
+      errorType = locale.under_maintenance;
+    } else if (error is WeakPasswordException) {
+      errorType = locale.weak_password;
     }
     return errorType;
   }
 
+  /// Build a new [ErrorPageWidget] with the given [error] and optional [stackTrace].
+  ///
+  /// If [buttonText] is not provided, it defaults to the localized "Retry" text. Or, if [buttonText] == "", the button will not be shown.
   factory ErrorPageWidget.buildWidget(BuildContext context, dynamic error,
-      {StackTrace? stackTrace, String? buttonText, VoidCallback? onTap}) {
+      {StackTrace? stackTrace,
+      String? buttonText,
+      VoidCallback? onTap,
+      TextStyle? errorMessageTextStyle}) {
     buttonText ??= S.of(context).retry;
     return ErrorPageWidget(
         buttonText: buttonText,
@@ -103,7 +120,8 @@ class ErrorPageWidget extends StatelessWidget {
             stackTrace: stackTrace),
         error: error,
         trace: stackTrace,
-        onTap: onTap);
+        onTap: onTap,
+        errorMessageTextStyle: errorMessageTextStyle);
   }
 
   static String generateErrorDetails(dynamic error, StackTrace? trace) {
@@ -124,12 +142,14 @@ class ErrorPageWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[icon!, const SizedBox(height: 8)],
-            Text(errorMessage),
-            const SizedBox(height: 8),
-            PlatformElevatedButton(
-              onPressed: onTap,
-              child: Text(buttonText),
-            ),
+            Text(errorMessage, style: errorMessageTextStyle),
+            if (buttonText != "") ...[
+              const SizedBox(height: 8),
+              PlatformElevatedButton(
+                onPressed: onTap,
+                child: Text(buttonText),
+              ),
+            ],
             if (error != null) ...[
               const SizedBox(height: 8),
               PlatformTextButton(

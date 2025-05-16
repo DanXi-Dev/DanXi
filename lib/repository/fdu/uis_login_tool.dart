@@ -147,7 +147,7 @@ class UISLoginTool {
     } else if (response.data.toString().contains(UNDER_MAINTENANCE)) {
       throw NetworkMaintenanceException();
     } else if (response.data.toString().contains(WEAK_PASSWORD)) {
-      throw GeneralLoginFailedException();
+      throw WeakPasswordException();
     }
 
     jar.cloneFrom(workJar);
@@ -161,4 +161,4 @@ class CredentialsInvalidException implements Exception {}
 
 class NetworkMaintenanceException implements Exception {}
 
-class GeneralLoginFailedException implements Exception {}
+class WeakPasswordException implements Exception {}
