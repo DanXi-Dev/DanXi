@@ -24,15 +24,17 @@ class Retrier {
   ///
   /// Note: 2022/1/18 Must specify [retryTimes], or won't retry.
   static E runWithRetry<E>(E Function() function, {int retryTimes = 0}) {
-    Exception? error;
+    dynamic error;
+    StackTrace? stack;
     for (int i = 0; i <= retryTimes; i++) {
       try {
         return function();
-      } catch (e) {
-        error = e as Exception;
+      } catch (e, st) {
+        error = e;
+        stack = st;
       }
     }
-    throw error!;
+    Error.throwWithStackTrace(error, stack!);
   }
 
   /// Try to run [function] for [retryTimes] times asynchronously.
@@ -42,12 +44,12 @@ class Retrier {
   static Future<E> runAsyncWithRetry<E>(Future<E> Function() function,
       {int retryTimes = 0}) async {
     late Function errorCatcher;
-    errorCatcher = (e) async {
+    errorCatcher = (e, stack) async {
       if (retryTimes > 0) {
         retryTimes--;
         return await function().catchError(errorCatcher);
       } else {
-        throw e;
+        Error.throwWithStackTrace(e, stack);
       }
     };
     return await function().catchError(errorCatcher);
@@ -67,14 +69,14 @@ class Retrier {
     late Function errorCatcher;
     errorCatcher = (e, stack) async {
       if (isFatalError != null && isFatalError(e)) {
-        throw e;
+        Error.throwWithStackTrace(e, stack);
       }
       if (retryTimes > 0) {
         retryTimes--;
         await tryFix(e).catchError((error, stackTrace) {});
         return await function().catchError(errorCatcher);
       } else {
-        throw e;
+        Error.throwWithStackTrace(e, stack);
       }
     };
     return await function().catchError(errorCatcher);
