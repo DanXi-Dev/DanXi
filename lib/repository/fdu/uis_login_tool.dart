@@ -87,6 +87,12 @@ class UISLoginTool {
       },
       retryTimes: retryTimes,
       isFatalError: isFatalError,
+      // If there is an explicit reason for UIS login failure, we should not retry anymore.
+      isFatalRetryError: (e) =>
+          e is CredentialsInvalidException ||
+          e is CaptchaNeededException ||
+          e is NetworkMaintenanceException ||
+          e is WeakPasswordException,
     );
   }
 

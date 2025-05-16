@@ -81,6 +81,12 @@ class FudanEhallRepository extends BaseRepositoryWithDio {
         () async => await _getStudentInfo(info),
         (_) async => await loginEhall(info),
         retryTimes: 3,
+        // If there is an explicit reason for UIS login failure, we should not retry anymore.
+        isFatalRetryError: (e) =>
+            e is CredentialsInvalidException ||
+            e is CaptchaNeededException ||
+            e is NetworkMaintenanceException ||
+            e is WeakPasswordException,
       );
 
   Future<StudentInfo> _getStudentInfo(PersonInfo info) async {
