@@ -247,8 +247,9 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     if (PlatformX.isIOS) {
       OpenFile.open(outputFile.absolute.path, type: converter.mimeType);
     } else if (PlatformX.isAndroid) {
-      Share.shareXFiles(
-          [XFile(outputFile.absolute.path, mimeType: converter.mimeType!)]);
+      SharePlus.instance.share(ShareParams(files: [
+        XFile(outputFile.absolute.path, mimeType: converter.mimeType)
+      ]));
     } else if (mounted) {
       Noticing.showNotice(context, outputFile.absolute.path);
     }

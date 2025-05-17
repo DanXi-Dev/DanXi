@@ -62,3 +62,6 @@ ios/fastlane/Matchfile
 # FVM Version Cache
 .fvm/
 .fvmrc
+
+# Android NDK build intermediate files
+android/app/.cxx
