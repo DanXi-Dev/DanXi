@@ -24,15 +24,17 @@ class Retrier {
   ///
   /// Note: 2022/1/18 Must specify [retryTimes], or won't retry.
   static E runWithRetry<E>(E Function() function, {int retryTimes = 0}) {
-    Exception? error;
+    dynamic error;
+    StackTrace? stack;
     for (int i = 0; i <= retryTimes; i++) {
       try {
         return function();
-      } catch (e) {
-        error = e as Exception;
+      } catch (e, st) {
+        error = e;
+        stack = st;
       }
     }
-    throw error!;
+    Error.throwWithStackTrace(error, stack!);
   }
 
   /// Try to run [function] for [retryTimes] times asynchronously.
@@ -42,12 +44,12 @@ class Retrier {
   static Future<E> runAsyncWithRetry<E>(Future<E> Function() function,
       {int retryTimes = 0}) async {
     late Function errorCatcher;
-    errorCatcher = (e) async {
+    errorCatcher = (e, stack) async {
       if (retryTimes > 0) {
         retryTimes--;
         return await function().catchError(errorCatcher);
       } else {
-        throw e;
+        Error.throwWithStackTrace(e, stack);
       }
     };
     return await function().catchError(errorCatcher);
@@ -56,25 +58,32 @@ class Retrier {
   /// Try to run [function] for [retryTimes] times asynchronously.
   /// If [function] throws an error, run [tryFix] to fix the problem. Then run the function again.
   /// If [isFatalError] is provided, check if the error is fatal. If it is, stop retrying and throw the error immediately.
-  /// Notes: Any errors thrown by [tryFix] will be ignored.
+  /// If [isFatalRetryError] is provided, check if the error is fatal for retry. If it is, stop retrying and throw the error immediately.
+  ///     Otherwise, any error thrown by [tryFix] will be ignored.
   ///
   /// Return the results of [function] if it executes successfully. Otherwise, throw an error that [function] threw.
   ///
   /// Note: 2022/1/18 Must specify [retryTimes], or will only retry once.
   static Future<E> tryAsyncWithFix<E>(
       Future<E> Function() function, Future<void> Function(dynamic) tryFix,
-      {int retryTimes = 1, bool Function(dynamic error)? isFatalError}) async {
+      {int retryTimes = 1, bool Function(dynamic error)? isFatalError, bool Function(dynamic error)? isFatalRetryError}) async {
     late Function errorCatcher;
     errorCatcher = (e, stack) async {
       if (isFatalError != null && isFatalError(e)) {
-        throw e;
+        Error.throwWithStackTrace(e, stack);
       }
       if (retryTimes > 0) {
         retryTimes--;
-        await tryFix(e).catchError((error, stackTrace) {});
+        try {
+          await tryFix(e);
+        } catch (e) {
+          if (isFatalRetryError != null && isFatalRetryError(e)) {
+            Error.throwWithStackTrace(e, stack);
+          }
+        }
         return await function().catchError(errorCatcher);
       } else {
-        throw e;
+        Error.throwWithStackTrace(e, stack);
       }
     };
     return await function().catchError(errorCatcher);
