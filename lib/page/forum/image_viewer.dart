@@ -135,19 +135,19 @@ class ImageViewerPageState extends State<ImageViewerPage> {
   Future<void> shareImage(BuildContext context) async {
     File image = await DefaultCacheManagerWithWebvpn()
         .getSingleFile(_imageList[showIndex].hdUrl);
-    if (!mounted) return;
+    if (!context.mounted) return;
 
     if (PlatformX.isMobile) {
       final box = context.findRenderObject() as RenderBox?;
-      Share.shareXFiles(
-        [
+      SharePlus.instance.share(ShareParams(
+        files: [
           XFile(image.absolute.path,
               mimeType:
                   ImageViewerPage.getMineType(_imageList[showIndex].hdUrl))
         ],
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
-      );
-    } else if (context.mounted) {
+      ));
+    } else {
       Noticing.showNotice(context, image.absolute.path);
     }
   }

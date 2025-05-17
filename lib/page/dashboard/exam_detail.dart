@@ -117,8 +117,8 @@ class ExamListState extends State<ExamList> {
     if (PlatformX.isIOS) {
       OpenFile.open(outputFile.absolute.path, type: "text/calendar");
     } else if (PlatformX.isAndroid) {
-      Share.shareXFiles(
-          [XFile(outputFile.absolute.path, mimeType: "text/calendar")]);
+      SharePlus.instance.share(ShareParams(
+          files: [XFile(outputFile.absolute.path, mimeType: "text/calendar")]));
     } else if (mounted) {
       Noticing.showNotice(context, outputFile.absolute.path);
     }
