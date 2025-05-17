@@ -87,14 +87,14 @@ class CardRepository extends BaseRepositoryWithDio {
   ///
   /// If [logDays] > 0, it will return records of recent [logDays] days;
   /// If [logDays] = 0, it will return the latest records;
-  /// If [logDays] < 0, it will return null.
-  Future<List<CardRecord>?> loadCardRecord(
+  /// If [logDays] < 0, it will return empty list.
+  Future<List<CardRecord>> loadCardRecord(
           PersonInfo? info, int logDays) async =>
       UISLoginTool.tryAsyncWithAuth(
           dio, _LOGIN_URL, cookieJar!, info, () => _loadCardRecord(logDays));
 
-  Future<List<CardRecord>?> _loadCardRecord(int logDays) async {
-    if (logDays < 0) return null;
+  Future<List<CardRecord>> _loadCardRecord(int logDays) async {
+    if (logDays < 0) return [];
     // Get csrf id.
     Response<String> consumeCsrfPageResponse =
         await dio.get(_CONSUME_DETAIL_CSRF_URL);

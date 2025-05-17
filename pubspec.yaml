@@ -115,6 +115,9 @@ dependencies:
   ffi: any
   toml: ^0.16.0
   pub_semver: ^2.1.4
+  hooks_riverpod: ^2.6.1
+  flutter_hooks:
+  riverpod_annotation: ^2.6.1
 
 dependency_overrides:
   linkify:
@@ -129,6 +132,9 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
   intl_utils: ^2.8.7
+  custom_lint:
+  riverpod_generator: ^2.6.3
+  riverpod_lint: ^2.6.3
   # below used in build.dart
   archive: ^4.0.4
   git: ^2.2.1

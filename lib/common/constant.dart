@@ -607,7 +607,6 @@ extension CampusEx on Campus? {
         return ['Z2'];
       case Campus.NONE:
       case null:
-      default:
         return ['?'];
     }
   }
