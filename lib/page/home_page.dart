@@ -29,7 +29,6 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_danke.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
-import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -143,7 +142,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       DankeSubPage(key: dankePageKey),
       if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
         TimetableSubPage(key: timetablePageKey),
-      const SettingsSubpage(),
     ];
   }
 
@@ -706,12 +704,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         : const Icon(CupertinoIcons.calendar),
                     label: S.of(context).timetable,
                   ),
-                BottomNavigationBarItem(
-                  icon: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.settings)
-                      : const Icon(CupertinoIcons.gear_alt),
-                  label: S.of(context).settings,
-                ),
+                // BottomNavigationBarItem(
+                //   icon: PlatformX.isMaterial(context)
+                //       ? const Icon(Icons.settings)
+                //       : const Icon(CupertinoIcons.gear_alt),
+                //   label: S.of(context).settings,
+                // ),
               ],
               currentIndex: pageIndex,
               itemChanged: (index) {

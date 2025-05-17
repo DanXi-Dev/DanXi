@@ -530,5 +530,7 @@
   "use_webvpn_description": "有効時、一部の機能はFudan LANなしで、直接に連接するのができます (再起動が必要)",
   "show_this_person": "この人だけ",
   "select_all": "全選択",
-  "share_hole_title": "分け合う階層を選択する"
+  "share_hole_title": "分け合う階層を選択する",
+  "follow_system_palette": "システムカラーパレットに従う",
+  "follow_system_palette_description": "壁紙に基づくAndroid Material Youの動的カラーを使用する"
 }
