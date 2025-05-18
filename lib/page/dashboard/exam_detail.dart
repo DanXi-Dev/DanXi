@@ -97,10 +97,12 @@ class ExamListState extends State<ExamList> {
             status: IEventStatus.CONFIRMED,
             description:
                 "${element.testCategory} ${element.type}\n${element.note}",
+            // toUtc: https://github.com/DanXi-Dev/DanXi/issues/522
             start:
-                DateTime.parse('${element.date} ${element.time.split('~')[0]}'),
-            end:
-                DateTime.parse('${element.date} ${element.time.split('~')[1]}'),
+                DateTime.parse('${element.date} ${element.time.split('~')[0]}')
+                    .toUtc(),
+            end: DateTime.parse('${element.date} ${element.time.split('~')[1]}')
+                .toUtc(),
           ));
         } catch (ignored) {
           Noticing.showNotice(
