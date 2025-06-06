@@ -32,7 +32,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   static const String EXAM_TABLE_URL =
       'https://jwfw.fudan.edu.cn/eams/stdExamTable!examTable.action';
 
-  static String kExamScoreUrl(semesterId) =>
+  static String kExamScoreUrl(String? semesterId) =>
       'https://jwfw.fudan.edu.cn/eams/teach/grade/course/person!search.action?semesterId=$semesterId';
 
   static const String GPA_URL =
@@ -55,6 +55,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     "Connection": "keep-alive",
   };
 
+  /// Error patterns from EduService.
+  static const String SEMESTER_NO_EXAM = "当前学期未设置排考批次";
+  static const String TOO_FAST = "请不要过快点击";
+
   @override
   String get linkHost => "fudan.edu.cn";
 
@@ -64,7 +68,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   factory EduServiceRepository.getInstance() => _instance;
 
-  Future<List<Exam>?> loadExamListRemotely(PersonInfo? info,
+  Future<List<Exam>> loadExamListRemotely(PersonInfo? info,
           {String? semesterId}) =>
       UISLoginTool.tryAsyncWithAuth(dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info,
           () => _loadExamList(semesterId: semesterId));
@@ -75,7 +79,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
               orElse: () => Cookie("semester.id", ""))
           .value;
 
-  Future<List<Exam>?> _loadExamList({String? semesterId}) async {
+  Future<List<Exam>> _loadExamList({String? semesterId}) async {
     String? oldSemesterId = await semesterIdFromCookie;
     // Set the semester id
     if (semesterId != null) {
@@ -90,6 +94,11 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       cookieJar?.saveFromResponse(
           Uri.parse(HOST), [Cookie("semester.id", oldSemesterId)]);
     }
+    if (r.data!.contains(SEMESTER_NO_EXAM)) {
+      throw SemesterNoExamException();
+    } else if (r.data!.contains(TOO_FAST)) {
+      throw ClickTooFastException();
+    }
     final BeautifulSoup soup = BeautifulSoup(r.data!);
     final dom.Element tableBody = soup.find("tbody")!.element!;
     return tableBody
@@ -98,15 +107,20 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         .toList();
   }
 
-  Future<List<ExamScore>?> loadExamScoreRemotely(PersonInfo? info,
+  Future<List<ExamScore>> loadExamScoreRemotely(PersonInfo? info,
           {String? semesterId}) =>
       UISLoginTool.tryAsyncWithAuth(dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info,
           () => _loadExamScore(semesterId));
 
-  Future<List<ExamScore>?> _loadExamScore([String? semesterId]) async {
+  Future<List<ExamScore>> _loadExamScore([String? semesterId]) async {
     final Response<String> r = await dio.get(
         kExamScoreUrl(semesterId ?? await semesterIdFromCookie),
         options: Options(headers: Map.of(_JWFW_HEADER)));
+    if (r.data!.contains(SEMESTER_NO_EXAM)) {
+      throw SemesterNoExamException();
+    } else if (r.data!.contains(TOO_FAST)) {
+      throw ClickTooFastException();
+    }
     final BeautifulSoup soup = BeautifulSoup(r.data!);
     final dom.Element tableBody = soup.find("tbody")!.element!;
     return tableBody
@@ -115,11 +129,11 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         .toList();
   }
 
-  Future<List<GPAListItem>?> loadGPARemotely(PersonInfo? info) =>
+  Future<List<GPAListItem>> loadGPARemotely(PersonInfo? info) =>
       UISLoginTool.tryAsyncWithAuth(
           dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info, () => _loadGPA());
 
-  Future<List<GPAListItem>?> _loadGPA() async {
+  Future<List<GPAListItem>> _loadGPA() async {
     final Response<String> r =
         await dio.get(GPA_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
     final BeautifulSoup soup = BeautifulSoup(r.data!);
@@ -133,12 +147,12 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   /// Load the semesters id & name, etc.
   ///
   /// Returns an unpacked list of [SemesterInfo].
-  Future<List<SemesterInfo>?> loadSemesters(PersonInfo? info) =>
+  Future<List<SemesterInfo>> loadSemesters(PersonInfo? info) =>
       UISLoginTool.tryAsyncWithAuth(
           dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info, () => _loadSemesters(),
           retryTimes: 2);
 
-  Future<List<SemesterInfo>?> _loadSemesters() async {
+  Future<List<SemesterInfo>> _loadSemesters() async {
     await dio.get(EXAM_TABLE_URL,
         options: Options(headers: Map.of(_JWFW_HEADER)));
     final Response<String> semesterResponse = await dio.post(SEMESTER_DATA_URL,
@@ -299,3 +313,6 @@ class GPAListItem {
         elements[4].text);
   }
 }
+
+class SemesterNoExamException implements Exception {}
+class ClickTooFastException implements Exception {}
