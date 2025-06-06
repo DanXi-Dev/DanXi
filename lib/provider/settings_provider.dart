@@ -86,6 +86,9 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_PROXY = "proxy";
   static const String KEY_TIMETABLE_LAST_UPDATED = "timetable_last_updated";
   static const String KEY_USE_WEBVPN = "use_webvpn";
+  static const String KEY_VIEW_HISTORY = "view_history";
+
+  static const int MAX_VIEW_HISTORY = 250;
 
   SettingsProvider._();
 
@@ -772,6 +775,18 @@ class SettingsProvider with ChangeNotifier {
 
   set useWebvpn(bool value) {
     preferences!.setBool(KEY_USE_WEBVPN, value);
+    notifyListeners();
+  }
+
+  List<int> get viewHistory {
+    if (preferences!.containsKey(KEY_VIEW_HISTORY)) {
+      return preferences!.getIntList(KEY_VIEW_HISTORY)!;
+    }
+    return [];
+  }
+
+  set viewHistory(List<int> value) {
+    preferences!.setIntList(KEY_VIEW_HISTORY, value);
     notifyListeners();
   }
 }

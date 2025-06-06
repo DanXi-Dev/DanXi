@@ -28,6 +28,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:dio/dio.dart';
@@ -82,7 +83,7 @@ class LoginDialog extends StatefulWidget {
 class LoginDialogState extends State<LoginDialog> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
-  String _errorText = "";
+  Widget _errorWidget = SizedBox.shrink();
   static const DEFAULT_USERGROUP = UserGroup.FUDAN_UNDERGRADUATE_STUDENT;
   UserGroup _group = DEFAULT_USERGROUP;
 
@@ -123,7 +124,7 @@ class LoginDialogState extends State<LoginDialog> {
           try {
             newInfo.name = await CardRepository.getInstance().getName(newInfo);
             if (newInfo.name?.isEmpty ?? true) {
-              throw GeneralLoginFailedException();
+              throw Exception("Unable to get user name");
             }
             await newInfo.saveToSharedPreferences(widget.sharedPreferences!);
             widget.personInfo.value = newInfo;
@@ -190,19 +191,19 @@ class LoginDialogState extends State<LoginDialog> {
   }
 
   void _executeLogin() {
-    _tryLogin(_nameController.text, _pwdController.text).catchError((error) {
+    _tryLogin(_nameController.text, _pwdController.text)
+        .catchError((error, stack) {
       if (error is CredentialsInvalidException) {
         _pwdController.text = "";
-        _errorText = S.of(context).credentials_invalid;
-      } else if (error is CaptchaNeededException) {
-        _errorText = S.of(context).captcha_needed;
-      } else if (error is NetworkMaintenanceException) {
-        _errorText = S.of(context).under_maintenance;
-      } else if (error is GeneralLoginFailedException) {
-        _errorText = S.of(context).weak_password;
-      } else {
-        _errorText = S.of(context).connection_failed;
       }
+      if (!mounted) return;
+      _errorWidget = ErrorPageWidget.buildWidget(
+        context,
+        error,
+        stackTrace: stack,
+        buttonText: "", // hide the button
+        errorMessageTextStyle: const TextStyle(fontSize: 12, color: Colors.red),
+      );
       refreshSelf();
     });
   }
@@ -253,11 +254,7 @@ class LoginDialogState extends State<LoginDialog> {
                 ),
               ],
 
-              Text(
-                _errorText,
-                textAlign: TextAlign.start,
-                style: const TextStyle(fontSize: 12, color: Colors.red),
-              ),
+              _errorWidget,
               TextField(
                 controller: _nameController,
                 enabled: _group != UserGroup.VISITOR,

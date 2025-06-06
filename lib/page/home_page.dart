@@ -384,7 +384,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     try {
       if (element == 'hole') {
         final OTHole hole =
-            (await ForumRepository.getInstance().loadSpecificHole(postId))!;
+            (await ForumRepository.getInstance().loadHoleById(postId))!;
         if (mounted) {
           smartNavigatorPush(context, "/bbs/postDetail", arguments: {
             "post": hole,
@@ -392,9 +392,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }
       } else if (element == 'floor') {
         final floor =
-            (await ForumRepository.getInstance().loadSpecificFloor(postId))!;
+            (await ForumRepository.getInstance().loadFloorById(postId))!;
         final OTHole hole = (await ForumRepository.getInstance()
-            .loadSpecificHole(floor.hole_id!))!;
+            .loadHoleById(floor.hole_id!))!;
         if (mounted) {
           smartNavigatorPush(context, "/bbs/postDetail", arguments: {
             "post": hole,

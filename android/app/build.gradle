@@ -19,9 +19,9 @@ gradle.taskGraph.whenReady {
     }
 }
 android {
-    compileSdkVersion 35
+    compileSdkVersion 36
 
-    ndkVersion "28.0.13004108"
+    ndkVersion "29.0.13113456"
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -32,7 +32,7 @@ android {
         applicationId "io.github.danxi_dev.dan_xi"
         namespace "io.github.danxi_dev.dan_xi"
         minSdk 23
-        targetSdk 35
+        targetSdk 36
         versionCode flutter.versionCode
         versionName flutter.versionName
     }

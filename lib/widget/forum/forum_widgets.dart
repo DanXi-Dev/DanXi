@@ -562,9 +562,9 @@ class OTMentionPreviewWidgetState extends State<OTMentionPreviewWidget> {
     if (isShowingPreview) {
       return OTFloorMentionWidget(
         future: widget.type == OTMentionType.FLOOR
-            ? ForumRepository.getInstance().loadSpecificFloor(widget.id)
+            ? ForumRepository.getInstance().loadFloorById(widget.id)
             : ForumRepository.getInstance()
-                .loadSpecificHole(widget.id)
+                .loadHoleById(widget.id)
                 .then((value) => value?.floors?.first_floor),
         hasBackgroundImage: widget.hasBackgroundImage,
         showBottomBar: widget.showBottomBar,
@@ -604,7 +604,7 @@ class OTFloorMentionWidget extends StatelessWidget {
         loadingText: S.of(context).loading, context: context);
     try {
       OTHole? hole =
-          await ForumRepository.getInstance().loadSpecificHole(floor.hole_id!);
+          await ForumRepository.getInstance().loadHoleById(floor.hole_id!);
       if (context.mounted) {
         smartNavigatorPush(context, "/bbs/postDetail",
             arguments: {"post": hole, "locate": floor});

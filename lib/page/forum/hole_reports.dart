@@ -245,7 +245,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                   loadingText: S.of(context).loading, context: context);
               try {
                 final OTHole? post = await ForumRepository.getInstance()
-                    .loadSpecificHole(e.hole_id!);
+                    .loadHoleById(e.hole_id!);
                 if (!mounted) return;
                 smartNavigatorPush(context, "/bbs/postDetail",
                     arguments: {"post": post!, "locate": e.floor});
@@ -452,9 +452,9 @@ class AuditListState extends State<AuditList> {
                     loadingText: S.of(context).loading, context: context);
                 try {
                   final OTHole? post = await ForumRepository.getInstance()
-                      .loadSpecificHole(e.hole_id);
+                      .loadHoleById(e.hole_id);
                   final OTFloor? floor = await ForumRepository.getInstance()
-                      .loadSpecificFloor(e.id);
+                      .loadFloorById(e.id);
                   if (!mounted) return;
                   smartNavigatorPush(context, "/bbs/postDetail",
                       arguments: {"post": post!, "locate": floor!});

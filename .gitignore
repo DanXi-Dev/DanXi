@@ -65,3 +65,6 @@ ios/fastlane/Matchfile
 
 # Flutter DevTools
 devtools_options.yaml
+
+# Android NDK build intermediate files
+android/app/.cxx
