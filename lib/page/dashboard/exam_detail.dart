@@ -299,7 +299,7 @@ class ExamList extends HookConsumerWidget {
           AsyncData() => Text(
               S.of(context).your_gpa_subtitle(
                   userGPA?.rank ?? "N/A", userGPA?.credits ?? "N/A"),
-              style: TextStyle(color: Theme.of(context).hintColor)),
+              style: TextStyle(color: Colors.white)),
           AsyncError() => nil,
           _ => Text(S.of(context).loading),
         },
