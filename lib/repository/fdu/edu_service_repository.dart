@@ -71,7 +71,9 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   Future<List<Exam>> loadExamListRemotely(PersonInfo? info,
           {String? semesterId}) =>
       UISLoginTool.tryAsyncWithAuth(dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info,
-          () => _loadExamList(semesterId: semesterId));
+          () => _loadExamList(semesterId: semesterId),
+          isFatalError: (e) =>
+              e is SemesterNoExamException || e is ClickTooFastException);
 
   Future<String?> get semesterIdFromCookie async =>
       (await cookieJar!.loadForRequest(Uri.parse(HOST)))
@@ -100,7 +102,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       throw ClickTooFastException();
     }
     final BeautifulSoup soup = BeautifulSoup(r.data!);
-    final dom.Element tableBody = soup.find("tbody")!.element!;
+    final tableExists = soup.find("thead", class_: "gridhead") != null;
+    final tableBodyElement = soup.find("tbody");
+    if (tableExists && tableBodyElement == null) return [];
+    final dom.Element tableBody = tableBodyElement!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => Exam.fromHtml(e))
@@ -110,7 +115,9 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   Future<List<ExamScore>> loadExamScoreRemotely(PersonInfo? info,
           {String? semesterId}) =>
       UISLoginTool.tryAsyncWithAuth(dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info,
-          () => _loadExamScore(semesterId));
+          () => _loadExamScore(semesterId),
+          isFatalError: (e) =>
+              e is SemesterNoExamException || e is ClickTooFastException);
 
   Future<List<ExamScore>> _loadExamScore([String? semesterId]) async {
     final Response<String> r = await dio.get(
@@ -122,7 +129,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       throw ClickTooFastException();
     }
     final BeautifulSoup soup = BeautifulSoup(r.data!);
-    final dom.Element tableBody = soup.find("tbody")!.element!;
+    final tableExists = soup.find("thead", class_: "gridhead") != null;
+    final tableBodyElement = soup.find("tbody");
+    if (tableExists && tableBodyElement == null) return [];
+    final dom.Element tableBody = tableBodyElement!.element!;
     return tableBody
         .getElementsByTagName("tr")
         .map((e) => ExamScore.fromEduServiceHtml(e))
@@ -315,4 +325,5 @@ class GPAListItem {
 }
 
 class SemesterNoExamException implements Exception {}
+
 class ClickTooFastException implements Exception {}
