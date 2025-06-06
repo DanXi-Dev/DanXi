@@ -450,14 +450,22 @@ class ForumRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<OTFloor>?> loadSearchResults(String? searchString,
-      {int? startFloor, int length = Constant.POST_COUNT_PER_PAGE}) async {
+      {int? startFloor,
+      bool accurate = false,
+      int length = Constant.POST_COUNT_PER_PAGE,
+      (DateTime? start, DateTime? end) dateRange = (null, null)}) async {
     final options = RequestOptions(
-        path: "$_BASE_URL/floors",
+        path: "$_BASE_URL/floors/search",
         method: "GET",
         queryParameters: {
-          "start_floor": startFloor,
-          "s": searchString,
-          "length": length,
+          "offset": startFloor,
+          "search": searchString,
+          "size": length,
+          "accurate": accurate,
+          if (dateRange.$1 != null)
+            "start_time": (dateRange.$1!.millisecondsSinceEpoch / 1000).toInt(),
+          if (dateRange.$2 != null)
+            "end_time": (dateRange.$2!.millisecondsSinceEpoch / 1000).toInt(),
         },
         headers: _tokenHeader);
     final Response<List<dynamic>> response =
