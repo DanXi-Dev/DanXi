@@ -18,77 +18,79 @@
 import 'dart:io';
 
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart' as sp;
 import 'package:dan_xi/repository/fdu/data_center_repository.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
-import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
-import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ical/serializer.dart';
 import 'package:nil/nil.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:share_plus/share_plus.dart';
+
+part 'exam_detail.g.dart';
+
+@riverpod
+Future<List<GPAListItem>> gpa(Ref ref) async {
+  return await EduServiceRepository.getInstance()
+      .loadGPARemotely(sp.StateProvider.personInfo.value);
+}
+
+@riverpod
+Future<List<SemesterInfo>> semester(Ref ref) async {
+  return await EduServiceRepository.getInstance()
+      .loadSemesters(sp.StateProvider.personInfo.value);
+}
+
+@riverpod
+Future<List<Exam>> exam(Ref ref, String semesterId) async {
+  return await EduServiceRepository.getInstance().loadExamListRemotely(
+      sp.StateProvider.personInfo.value,
+      semesterId: semesterId);
+}
+
+@riverpod
+Future<List<ExamScore>> examScore(Ref ref, String semesterId) async {
+  return await EduServiceRepository.getInstance().loadExamScoreRemotely(
+      sp.StateProvider.personInfo.value,
+      semesterId: semesterId);
+}
+
+@riverpod
+Future<List<ExamScore>> examScoreFromDataCenter(Ref ref) async {
+  return await DataCenterRepository.getInstance()
+      .loadAllExamScore(sp.StateProvider.personInfo.value);
+}
 
 /// A list page showing user's GPA scores and exam information.
 /// It will try to fetch [SemesterInfo] first.
 /// If successful, it will fetch exams in this term. In case that there is no exam, it shows the score of this term.
 /// If failed, it will try to fetch the list of score in all terms from DataCenter.
-class ExamList extends StatefulWidget {
+class ExamList extends HookConsumerWidget {
   final Map<String, dynamic>? arguments;
 
-  @override
-  ExamListState createState() => ExamListState();
-
   const ExamList({super.key, this.arguments});
-}
 
-class ExamListState extends State<ExamList> {
-  List<Exam> _examData = [];
-  PersonInfo? _info;
-  Future<List<GPAListItem>?>? _gpaListFuture;
-  List<GPAListItem>? _gpa;
-
-  Future<List<SemesterInfo>?>? _semesterFuture;
-  List<SemesterInfo>? _unpackedSemester;
-  List<ExamScore>? _cachedScoreData;
-  int? _showingSemester;
-
-  set semester(int? newSemester) {
-    _cachedScoreData = null;
-    _showingSemester = newSemester;
-  }
-
-  int? get semester => _showingSemester;
-
-  @override
-  void initState() {
-    super.initState();
-    _info = StateProvider.personInfo.value;
-    _gpaListFuture = LazyFuture.pack(
-        EduServiceRepository.getInstance().loadGPARemotely(_info));
-    _semesterFuture = LazyFuture.pack(
-        EduServiceRepository.getInstance().loadSemesters(_info));
-  }
-
-  void _exportICal() async {
-    if (_examData.isEmpty) {
+  void _exportICal(BuildContext context, List<Exam> examList) async {
+    if (examList.isEmpty) {
       Noticing.showNotice(context, S.of(context).exam_unavailable,
           title: S.of(context).fatal_error);
       return;
     }
     ICalendar cal = ICalendar(company: 'DanXi', lang: "CN");
-    for (var element in _examData) {
+    for (var element in examList) {
       if (element.date.trim().isNotEmpty && element.time.trim().isNotEmpty) {
         try {
           cal.addElement(IEvent(
@@ -121,13 +123,17 @@ class ExamListState extends State<ExamList> {
     } else if (PlatformX.isAndroid) {
       SharePlus.instance.share(ShareParams(
           files: [XFile(outputFile.absolute.path, mimeType: "text/calendar")]));
-    } else if (mounted) {
+    } else if (context.mounted) {
       Noticing.showNotice(context, outputFile.absolute.path);
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final semesters = ref.watch(semesterProvider);
+    final currentSemesterIndex = useState<int?>(null);
+    final currentExamRef = useState<List<Exam>?>(null);
+
     return PlatformScaffold(
         iosContentBottomPadding: false,
         iosContentPadding: false,
@@ -139,69 +145,109 @@ class ExamListState extends State<ExamList> {
               icon: Icon(PlatformX.isMaterial(context)
                   ? Icons.share
                   : CupertinoIcons.square_arrow_up),
-              onPressed: _exportICal,
+              onPressed: currentExamRef.value != null
+                  ? () => _exportICal(context, currentExamRef.value!)
+                  : null,
             ),
           ],
         ),
         body: SafeArea(
-            child: FutureWidget<List<SemesterInfo>?>(
-                future: _semesterFuture,
-                successBuilder: (BuildContext context,
-                    AsyncSnapshot<List<SemesterInfo>?> snapshot) {
-                  _unpackedSemester = snapshot.data;
-                  semester ??= _unpackedSemester!.length - 5;
-                  return _loadExamGradeHybridView();
-                },
-                loadingBuilder:
-                    Center(child: PlatformCircularProgressIndicator()),
-                // @w568w (2022-1-27): replacing following lines with `errorBuilder: _loadGradeViewFromDataCenter`
-                // leads to a 100% execution of _loadGradeViewFromDataCenter.
-                // I don't know why.
-                errorBuilder: (BuildContext context,
-                    AsyncSnapshot<List<SemesterInfo>?> snapshot) {
-                  return _loadGradeViewFromDataCenter();
-                })));
+          child: switch (semesters) {
+            AsyncData(:final value) => _loadExamGradeHybridView(
+                context, ref, value, currentSemesterIndex,
+                currentExamRef: currentExamRef),
+            AsyncError() => _loadGradeViewFromDataCenter(context, ref),
+            _ => Center(child: PlatformCircularProgressIndicator()),
+          },
+        ));
   }
 
-  Future<void> loadExamAndScore() async {
-    _examData.clear();
-    _cachedScoreData = null;
-    _examData = (await EduServiceRepository.getInstance().loadExamListRemotely(
-        _info,
-        semesterId: _unpackedSemester![semester!].semesterId))!;
-    _cachedScoreData = await EduServiceRepository.getInstance()
-        .loadExamScoreRemotely(_info,
-            semesterId: _unpackedSemester![semester!].semesterId);
-  }
+  Widget _loadExamGradeHybridView(BuildContext context, WidgetRef ref,
+      List<SemesterInfo> semesters, ValueNotifier<int?> currentSemesterIndex,
+      {ValueNotifier<List<Exam>?>? currentExamRef}) {
+    final currentSemesterIndexValue =
+        currentSemesterIndex.value ?? semesters.length - 3;
+    final currentSemester = semesters[currentSemesterIndexValue];
 
-  Widget _loadExamGradeHybridView() {
-    Widget body = FutureWidget<void>(
-        nullable: true,
-        future: LazyFuture.pack(loadExamAndScore()),
-        successBuilder: (_, snapShot) => _examData.isEmpty
-            ? _loadGradeView(needReloadScoreData: false)
-            : ListView(children: _getListWidgetsHybrid()),
-        loadingBuilder: Center(
-          child: PlatformCircularProgressIndicator(),
-        ),
-        errorBuilder: () => _loadGradeView());
+    final currentExamProvider = examProvider(currentSemester.semesterId!);
+    final currentScoreProvider = examScoreProvider(currentSemester.semesterId!);
+    final exams = ref.watch(currentExamProvider);
+    final scores = ref.watch(currentScoreProvider);
+
+    void reloadData() {
+      ref.invalidate(currentExamProvider);
+      ref.invalidate(currentScoreProvider);
+    }
+
+    Widget body;
+    List<Exam>? examList;
+    switch ((exams, scores)) {
+      case (AsyncData(value: final exams), AsyncData(value: final scores)):
+        examList = exams;
+        body = exams.isEmpty
+            ? _buildGradeLayout(context, ref, scores)
+            : ListView(
+                children: _getListWidgetsHybrid(context, ref, exams, scores));
+      case (AsyncError(:final error), AsyncLoading())
+          when error is SemesterNoExamException:
+        // There is no exam in this semester, but never mind, we are still loading scores
+        body = Center(child: PlatformCircularProgressIndicator());
+      case (AsyncError(:final error), AsyncData(value: final scores))
+          when error is SemesterNoExamException:
+        // There is no exam in this semester, but we indeed have exam!
+        body = _buildGradeLayout(context, ref, scores);
+      case (
+            AsyncError(error: final examError),
+            AsyncError(error: final scoreError)
+          )
+          when examError is SemesterNoExamException && scoreError is RangeError:
+        // There is no exam in this semester, but we indeed have exam (although zero).
+        body = Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Center(
+              child: Text(S.of(context).no_data),
+            ));
+      case (AsyncError(:final error, :final stackTrace), _):
+        body = ErrorPageWidget.buildWidget(
+          context,
+          error,
+          stackTrace: stackTrace,
+          onTap: reloadData,
+        );
+      case (_, AsyncError(:final error, :final stackTrace)):
+        if (error is RangeError) {
+          body = Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Center(
+                child: Text(S.of(context).no_data),
+              ));
+        } else {
+          body = ErrorPageWidget.buildWidget(context, error,
+              stackTrace: stackTrace, onTap: reloadData);
+        }
+      default:
+        body = Center(child: PlatformCircularProgressIndicator());
+    }
+    currentExamRef?.value = examList;
+
     final List<Widget> mainWidgets = [
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           PlatformIconButton(
             icon: const Icon(Icons.chevron_left),
-            onPressed: semester! > 0
-                ? () => setState(() => semester = semester! - 1)
+            onPressed: currentSemesterIndexValue > 0
+                ? () =>
+                    currentSemesterIndex.value = currentSemesterIndexValue - 1
                 : null,
           ),
           Text(S.of(context).semester(
-              _unpackedSemester![semester!].schoolYear ?? "?",
-              _unpackedSemester![semester!].name ?? "?")),
+              currentSemester.schoolYear ?? "?", currentSemester.name ?? "?")),
           PlatformIconButton(
             icon: const Icon(Icons.chevron_right),
-            onPressed: semester! < _unpackedSemester!.length - 1
-                ? () => setState(() => semester = semester! + 1)
+            onPressed: currentSemesterIndexValue < semesters.length - 1
+                ? () =>
+                    currentSemesterIndex.value = currentSemesterIndexValue + 1
                 : null,
           )
         ],
@@ -211,68 +257,101 @@ class ExamListState extends State<ExamList> {
     return Column(children: mainWidgets);
   }
 
-  Widget _loadGradeView({bool needReloadScoreData = true}) =>
-      FutureWidget<List<ExamScore>?>(
-          future: needReloadScoreData
-              ? EduServiceRepository.getInstance().loadExamScoreRemotely(_info,
-                  semesterId: _unpackedSemester![semester!].semesterId)
-              : Future.value(_cachedScoreData),
-          successBuilder: (_, snapShot) => _buildGradeLayout(snapShot),
-          loadingBuilder: Center(child: PlatformCircularProgressIndicator()),
-          errorBuilder:
-              (BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) {
-            if (snapshot.error is RangeError) {
-              return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: Center(
-                    child: Text(S.of(context).no_data),
-                  ));
-            }
-            return _loadGradeViewFromDataCenter();
-          });
+  Widget _loadGradeViewFromDataCenter(BuildContext context, WidgetRef ref) {
+    final scores = ref.watch(examScoreFromDataCenterProvider);
+    switch (scores) {
+      case AsyncData(value: final data):
+        return _buildGradeLayout(context, ref, data, isFallback: true);
+      case AsyncError(:final error, :final stackTrace):
+        return ErrorPageWidget(
+          errorMessage:
+              '${S.of(context).failed}\n${S.of(context).need_campus_network}\n\nError:\n${ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error)}',
+          error: error,
+          trace: stackTrace,
+          onTap: () => ref.invalidate(examScoreFromDataCenterProvider),
+          buttonText: S.of(context).retry,
+        );
+      default:
+        return Center(child: PlatformCircularProgressIndicator());
+    }
+  }
 
-  Widget _buildGradeLayout(AsyncSnapshot<List<ExamScore>?> snapshot,
+  Widget _buildGradeLayout(
+          BuildContext context, WidgetRef ref, List<ExamScore> examScores,
           {bool isFallback = false}) =>
       WithScrollbar(
           controller: PrimaryScrollController.of(context),
           child: ListView(
               primary: true,
-              children: _getListWidgetsGrade(snapshot.data!,
+              children: _getListWidgetsGrade(context, ref, examScores,
                   isFallback: isFallback)));
 
-  Widget _loadGradeViewFromDataCenter() {
-    return GestureDetector(
-        child: FutureWidget<List<ExamScore>?>(
-            future: DataCenterRepository.getInstance().loadAllExamScore(_info),
-            successBuilder: (_, snapShot) =>
-                _buildGradeLayout(snapShot, isFallback: true),
-            loadingBuilder: Center(
-              child: PlatformCircularProgressIndicator(),
+  Widget _buildGPACard(BuildContext context, WidgetRef ref) {
+    final gpa = ref.watch(gpaProvider);
+    GPAListItem? userGPA;
+    if (gpa case AsyncData(value: final gpaList)) {
+      try {
+        userGPA = gpaList.firstWhere(
+            (element) => element.id == sp.StateProvider.personInfo.value!.id);
+      } catch (_) {
+        // If we cannot find such an element, we will just return null.
+      }
+    }
+    return Card(
+      color: PlatformX.backgroundAccentColor(context),
+      child: ListTile(
+        visualDensity: VisualDensity.comfortable,
+        title: Text(
+          S.of(context).your_gpa,
+          style: const TextStyle(color: Colors.white),
+        ),
+        trailing: switch (gpa) {
+          AsyncData() => Text(
+              userGPA?.gpa ?? "N/A",
+              textScaler: TextScaler.linear(1.25),
+              style: const TextStyle(color: Colors.white),
             ),
-            errorBuilder: _buildErrorPage));
+          AsyncError() => nil,
+          _ => PlatformCircularProgressIndicator(),
+        },
+        subtitle: switch (gpa) {
+          AsyncData() => Text(
+              S.of(context).your_gpa_subtitle(
+                  userGPA?.rank ?? "N/A", userGPA?.credits ?? "N/A"),
+              style: TextStyle(color: Colors.white)),
+          AsyncError() => nil,
+          _ => Text(S.of(context).loading),
+        },
+        onTap: () {
+          if (gpa case AsyncData(value: final gpaList)) {
+            smartNavigatorPush(context, "/exam/gpa",
+                arguments: {"gpalist": gpaList});
+          }
+        },
+      ),
+    );
   }
 
-  Widget _buildErrorPage(
-          BuildContext context, AsyncSnapshot<List<ExamScore>?> snapshot) =>
-      ErrorPageWidget(
-        errorMessage:
-            '${S.of(context).failed}\n${S.of(context).need_campus_network}\n\nError:\n${ErrorPageWidget.generateUserFriendlyDescription(S.of(context), snapshot.error)}',
-        error: snapshot.error,
-        trace: snapshot.stackTrace,
-        onTap: () => setState(() {
-          _semesterFuture = LazyFuture.pack(
-              EduServiceRepository.getInstance().loadSemesters(_info));
-        }),
-        buttonText: S.of(context).retry,
-      );
-
-  List<Widget> _getListWidgetsGrade(List<ExamScore> scores,
+  List<Widget> _getListWidgetsGrade(
+      BuildContext context, WidgetRef ref, List<ExamScore> scores,
       {bool isFallback = false}) {
+    Widget buildLimitedCard() => Card(
+        color: Theme.of(context).colorScheme.error,
+        child: ListTile(
+          visualDensity: VisualDensity.comfortable,
+          title: Text(
+            S.of(context).limited_mode_title,
+            style: const TextStyle(color: Colors.white),
+          ),
+          subtitle: Text(S.of(context).limited_mode_description,
+              style: const TextStyle(color: Colors.white)),
+        ));
+
     List<Widget> widgets = [];
     if (isFallback) {
-      widgets.add(_buildLimitedCard());
+      widgets.add(buildLimitedCard());
     } else {
-      widgets.add(_buildGPACard());
+      widgets.add(_buildGPACard(context, ref));
     }
     for (var value in scores) {
       widgets.add(_buildCardGrade(value, context));
@@ -280,222 +359,6 @@ class ExamListState extends State<ExamList> {
     return widgets;
   }
 
-  Widget _buildLimitedCard() => Card(
-      color: Theme.of(context).colorScheme.error,
-      child: ListTile(
-        visualDensity: VisualDensity.comfortable,
-        title: Text(
-          S.of(context).limited_mode_title,
-          style: const TextStyle(color: Colors.white),
-        ),
-        subtitle: Text(S.of(context).limited_mode_description,
-            style: const TextStyle(color: Colors.white)),
-      ));
-
-  Widget _buildGPACard() => Card(
-        color: PlatformX.backgroundAccentColor(context),
-        child: ListTile(
-          visualDensity: VisualDensity.comfortable,
-          title: Text(
-            S.of(context).your_gpa,
-            style: const TextStyle(color: Colors.white),
-          ),
-          trailing: FutureWidget<List<GPAListItem>?>(
-            future: _gpaListFuture,
-            successBuilder: (BuildContext context,
-                AsyncSnapshot<List<GPAListItem>?> snapShot) {
-              _gpa = snapShot.data;
-              return Text(
-                snapShot.data!
-                    .firstWhere((element) => element.id == _info!.id)
-                    .gpa,
-                textScaler: TextScaler.linear(1.25),
-                style: const TextStyle(color: Colors.white),
-              );
-            },
-            errorBuilder: (BuildContext context,
-                AsyncSnapshot<List<GPAListItem>?> snapShot) {
-              return nil;
-            },
-            loadingBuilder: (_, __) => PlatformCircularProgressIndicator(),
-          ),
-          subtitle: FutureWidget<List<GPAListItem>?>(
-            future: _gpaListFuture,
-            successBuilder: (BuildContext context,
-                AsyncSnapshot<List<GPAListItem>?> snapShot) {
-              GPAListItem myGPA = snapShot.data!
-                  .firstWhere((element) => element.id == _info!.id);
-              return Text(
-                  S.of(context).your_gpa_subtitle(myGPA.rank, myGPA.credits),
-                  style: TextStyle(color: ThemeData.dark().hintColor));
-            },
-            errorBuilder: (BuildContext context,
-                AsyncSnapshot<List<GPAListItem>?> snapShot) {
-              return Text(S.of(context).failed);
-            },
-            loadingBuilder: (_, __) => Text(S.of(context).loading),
-          ),
-          onTap: () {
-            if (_gpa != null && _gpa!.isNotEmpty) {
-              smartNavigatorPush(context, "/exam/gpa",
-                  arguments: {"gpalist": _gpa});
-            }
-          },
-        ),
-      );
-
-  List<Widget> _getListWidgetsHybrid() {
-    List<Widget> widgets = [_buildGPACard()];
-    List<Widget> secondaryWidgets = [
-      _buildDividerWithText(S.of(context).other_types_exam,
-          Theme.of(context).textTheme.bodyLarge!.color)
-    ]; //These widgets are displayed after the ones above
-    if (_examData.isEmpty) return widgets;
-    for (var value in _examData) {
-      if (value.testCategory.trim() == "论文" ||
-          value.testCategory.trim() == "其他" ||
-          value.type != "期末考试") {
-        secondaryWidgets.add(_buildCardHybrid(value, context));
-      } else {
-        widgets.add(_buildCardHybrid(value, context));
-      }
-    }
-
-    // Some courses do not require an exam but also have given their scores.
-    // Append these courses to the bottom of the list.
-    _cachedScoreData?.forEach((element) {
-      if (_examData.every((exam) => exam.id != element.id)) {
-        secondaryWidgets.add(_buildCardGrade(element, context));
-      }
-    });
-    return widgets + secondaryWidgets;
-  }
-
-  Widget _buildDividerWithText(String text, Color? color) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Row(children: <Widget>[
-        Expanded(child: Divider(color: color)),
-        Text(" $text ", style: TextStyle(color: color)),
-        Expanded(child: Divider(color: color)),
-      ]));
-
-  Widget _buildGradeContainer(String level, String? score) => Container(
-      height: 36,
-      width: 36,
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.white,
-          width: 1,
-        ),
-      ),
-      child: Column(children: [
-        Center(
-          child: Text(
-            level,
-          ),
-        ),
-        Center(
-          child: Text(score!, textScaler: TextScaler.linear(0.6)),
-        ),
-      ]));
-
-  // Grade card with exam data
-  Widget _buildCardHybrid(Exam value, BuildContext context) => Card(
-        child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                    child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "${value.testCategory} ${value.type}",
-                      textScaler: TextScaler.linear(0.8),
-                      style: TextStyle(color: Theme.of(context).hintColor),
-                    ),
-                    Text(
-                      value.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    if (value.date.trim() != "" ||
-                        value.location.trim() != "" ||
-                        value.time.trim() != "")
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          if (value.date != "" || value.time != "") ...[
-                            Text("${value.date} ${value.time}",
-                                textScaler: TextScaler.linear(0.8)),
-                            const SizedBox(
-                              width: 8,
-                            ),
-                          ] else
-                            ...[],
-                          Text("${value.location} ",
-                              textScaler: TextScaler.linear(0.8)),
-                        ],
-                      ),
-                    if (value.note.trim() != "")
-                      Text(
-                        value.note,
-                        textScaler: TextScaler.linear(0.8),
-                        style: TextStyle(color: Theme.of(context).hintColor),
-                      ),
-                  ],
-                )),
-                if (!value.type.contains("补") && !value.type.contains("缓")) ...[
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: FutureWidget<List<ExamScore>?>(
-                      // Using our cached data here
-                      future: _cachedScoreData == null
-                          ? EduServiceRepository.getInstance()
-                              .loadExamScoreRemotely(_info,
-                                  semesterId:
-                                      _unpackedSemester![semester!].semesterId)
-                          : Future.value(_cachedScoreData),
-                      loadingBuilder: PlatformCircularProgressIndicator(),
-                      errorBuilder: nil,
-                      successBuilder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          _cachedScoreData = snapshot.data;
-                          try {
-                            return Row(
-                              children: [
-                                const SizedBox(
-                                  width: 8,
-                                ),
-                                _buildGradeContainer(
-                                    _cachedScoreData!
-                                        .firstWhere(
-                                            (element) => element.id == value.id)
-                                        .level,
-                                    _cachedScoreData!
-                                        .firstWhere(
-                                            (element) => element.id == value.id)
-                                        .score)
-                              ],
-                            );
-                            // If we cannot find such an element, we will build an empty SizedBox.
-                          } catch (_) {}
-                        }
-                        return nil;
-                      },
-                    ),
-                  )
-                ] else ...[
-                  Expanded(
-                      child: Text(S.of(context).failed_exam_no_grade,
-                          softWrap: true, textAlign: TextAlign.right))
-                ]
-              ],
-            )),
-      );
-
-  // Grade card without exam data
   Widget _buildCardGrade(ExamScore value, BuildContext context) => Card(
         child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -527,4 +390,134 @@ class ExamListState extends State<ExamList> {
               ],
             )),
       );
+
+  Widget _buildCardHybrid(
+      BuildContext context, Exam value, List<ExamScore> scores) {
+    ExamScore? score;
+    try {
+      score = scores.firstWhere((element) => element.id == value.id);
+    } catch (_) {
+      // If we cannot find such an element, we will just return null.
+    }
+    return Card(
+      child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                  child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "${value.testCategory} ${value.type}",
+                    textScaler: TextScaler.linear(0.8),
+                    style: TextStyle(color: Theme.of(context).hintColor),
+                  ),
+                  Text(
+                    value.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  if (value.date.trim() != "" ||
+                      value.location.trim() != "" ||
+                      value.time.trim() != "")
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        if (value.date != "" || value.time != "") ...[
+                          Text("${value.date} ${value.time}",
+                              textScaler: TextScaler.linear(0.8)),
+                          const SizedBox(width: 8),
+                        ] else
+                          ...[],
+                        Text("${value.location} ",
+                            textScaler: TextScaler.linear(0.8)),
+                      ],
+                    ),
+                  if (value.note.trim() != "")
+                    Text(
+                      value.note,
+                      textScaler: TextScaler.linear(0.8),
+                      style: TextStyle(color: Theme.of(context).hintColor),
+                    ),
+                ],
+              )),
+              if (!value.type.contains("补") && !value.type.contains("缓")) ...[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: score != null
+                      ? Row(
+                          children: [
+                            const SizedBox(width: 8),
+                            _buildGradeContainer(score.level, score.score)
+                          ],
+                        )
+                      : nil,
+                )
+              ] else ...[
+                Expanded(
+                    child: Text(S.of(context).failed_exam_no_grade,
+                        softWrap: true, textAlign: TextAlign.right))
+              ]
+            ],
+          )),
+    );
+  }
+
+  Widget _buildGradeContainer(String level, String? score) => Container(
+      height: 36,
+      width: 36,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.white,
+          width: 1,
+        ),
+      ),
+      child: Column(children: [
+        Center(
+          child: Text(
+            level,
+          ),
+        ),
+        Center(
+          child: Text(score!, textScaler: TextScaler.linear(0.6)),
+        ),
+      ]));
+
+  List<Widget> _getListWidgetsHybrid(BuildContext context, WidgetRef ref,
+      List<Exam> exams, List<ExamScore> scores) {
+    Widget buildDividerWithText(String text, Color? color) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Row(children: <Widget>[
+          Expanded(child: Divider(color: color)),
+          Text(" $text ", style: TextStyle(color: color)),
+          Expanded(child: Divider(color: color)),
+        ]));
+
+    List<Widget> widgets = [_buildGPACard(context, ref)];
+    List<Widget> secondaryWidgets = [
+      buildDividerWithText(S.of(context).other_types_exam,
+          Theme.of(context).textTheme.bodyLarge!.color)
+    ]; //These widgets are displayed after the ones above
+    if (exams.isEmpty) return widgets;
+    for (var value in exams) {
+      if (value.testCategory.trim() == "论文" ||
+          value.testCategory.trim() == "其他" ||
+          value.type != "期末考试") {
+        secondaryWidgets.add(_buildCardHybrid(context, value, scores));
+      } else {
+        widgets.add(_buildCardHybrid(context, value, scores));
+      }
+    }
+
+    // Some courses do not require an exam but also have given their scores.
+    // Append these courses to the bottom of the list.
+    for (var element in scores) {
+      if (exams.every((exam) => exam.id != element.id)) {
+        secondaryWidgets.add(_buildCardGrade(element, context));
+      }
+    }
+    return widgets + secondaryWidgets;
+  }
 }
