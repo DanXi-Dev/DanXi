@@ -348,8 +348,8 @@ class LoginDialogState extends State<LoginDialog> {
     );
   }
 
-  _showSwitchGroupModal() {
-    return showPlatformModalSheet(
+  Future<void> _showSwitchGroupModal() async {
+    await showPlatformModalSheet(
         context: context,
         builder: (context) => PlatformContextMenu(
             actions: _buildLoginAsList(context),
