@@ -141,10 +141,10 @@ class _OTSearchPageState extends State<OTSearchPage> {
     return start.isBefore(end) || start.isAtSameMomentAs(end);
   }
 
+  static final DateFormat formatter = DateFormat('yyyy-MM-dd');
+
   @override
   Widget build(BuildContext context) {
-    DateFormat formatter = DateFormat('yyyy-MM-dd');
-    return PlatformScaffold(
       iosContentPadding: false,
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
