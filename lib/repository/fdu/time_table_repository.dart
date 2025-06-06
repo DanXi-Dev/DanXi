@@ -25,6 +25,7 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/io/cache.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
+import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -130,6 +131,13 @@ class TimeTableRepository extends BaseRepositoryWithDio {
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
     }
+  }
+
+  // Check if the timetable has been fetched before.
+  bool hasCache() {
+    XSharedPreferences preferences =
+        SettingsProvider.getInstance().preferences!;
+    return preferences.containsKey(KEY_TIMETABLE_CACHE) && SettingsProvider.getInstance().timetableLastUpdated != null;
   }
 
   @override

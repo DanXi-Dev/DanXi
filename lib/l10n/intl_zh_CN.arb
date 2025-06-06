@@ -542,5 +542,6 @@
   "use_webvpn_description": "启动该项后，允许在非校园网环境下直接访问茶楼、评教等功能（需要重启应用）",
   "show_this_person": "只看此人",
   "select_all": "全选",
-  "share_hole_title": "选择要分享的楼层"
+  "share_hole_title": "选择要分享的楼层",
+  "next_course_setup": "请先到课表页面完成相关设置，然后刷新"
 }
