@@ -188,6 +188,25 @@ class ExamList extends HookConsumerWidget {
             ? _buildGradeLayout(context, ref, scores)
             : ListView(
                 children: _getListWidgetsHybrid(context, ref, exams, scores));
+      case (AsyncError(:final error), AsyncLoading())
+          when error is SemesterNoExamException:
+        // There is no exam in this semester, but never mind, we are still loading scores
+        body = Center(child: PlatformCircularProgressIndicator());
+      case (AsyncError(:final error), AsyncData(value: final scores))
+          when error is SemesterNoExamException:
+        // There is no exam in this semester, but we indeed have exam!
+        body = _buildGradeLayout(context, ref, scores);
+      case (
+            AsyncError(error: final examError),
+            AsyncError(error: final scoreError)
+          )
+          when examError is SemesterNoExamException && scoreError is RangeError:
+        // There is no exam in this semester, but we indeed have exam (although zero).
+        body = Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Center(
+              child: Text(S.of(context).no_data),
+            ));
       case (AsyncError(:final error, :final stackTrace), _):
         body = ErrorPageWidget.buildWidget(
           context,
