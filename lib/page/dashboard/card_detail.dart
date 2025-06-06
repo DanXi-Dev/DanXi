@@ -65,8 +65,9 @@ class CardDetailPage extends HookConsumerWidget {
       Tag(S.current.last_30_days, Icons.timelapse),
     ];
     final dayId = useState<int>(-1);
-    final cardRecord = ref.watch(cardRecordProvider(_tagDays[dayId.value + 1],
-        cache: arguments.cardInfo.records));
+    final currentCardRecordProvider = cardRecordProvider(_tagDays[dayId.value + 1],
+        cache: arguments.cardInfo.records);
+    final cardRecord = ref.watch(currentCardRecordProvider);
 
     Widget buildRecordWidget() {
       return switch (cardRecord) {
@@ -85,7 +86,7 @@ class CardDetailPage extends HookConsumerWidget {
           ErrorPageWidget.buildWidget(context, error,
               stackTrace: stackTrace,
               onTap: () =>
-                  ref.refresh(cardRecordProvider(_tagDays[dayId.value + 1]))),
+                  ref.refresh(currentCardRecordProvider)),
         _ => Center(child: PlatformCircularProgressIndicator()),
       };
     }
