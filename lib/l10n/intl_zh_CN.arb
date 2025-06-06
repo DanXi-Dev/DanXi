@@ -388,6 +388,7 @@
   "search_by_pid_tip": "跳转到帖子「{pid}」",
   "search_by_tag_tip": "查看本分区含 Tag「{tag}」的帖子",
   "search_by_text_tip": "搜索正文含「{searchKeyword}」的帖子",
+  "search_by_text_accurate_tip": "精确搜索正文含「{searchKeyword}」的帖子",
   "search_hint": "搜索 或 #PID",
   "search_result": "搜索结果",
   "seats": "座位数：{seats}",
@@ -543,5 +544,11 @@
   "show_this_person": "只看此人",
   "select_all": "全选",
   "share_hole_title": "选择要分享的楼层",
-  "next_course_setup": "请先到课表页面完成相关设置，然后刷新"
+  "next_course_setup": "请先到课表页面完成相关设置，然后刷新",
+  "date_range_select": "选择日期范围",
+  "select_date_range_invalid_range": "开始日期必须早于结束日期",
+  "select_date_range_from": "从",
+  "select_date_range_to": "到",
+  "select_date_range_far_past": "遥远的过去",
+  "select_date_range_now": "现在"
 }

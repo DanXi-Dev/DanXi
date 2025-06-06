@@ -394,6 +394,7 @@
   "search_by_pid_tip": "Go to the post {pid}",
   "search_by_tag_tip": "See posts with tag \"{tag}\" in this division",
   "search_by_text_tip": "Search \"{searchKeyword}\" in content",
+  "search_by_text_accurate_tip": "Exactly search \"{searchKeyword}\" in content",
   "search_hint": "Search or #PID",
   "search_result": "Search Result",
   "seats": "{seats} seats",
@@ -549,5 +550,11 @@
   "show_this_person": "Filter by this user",
   "select_all": "Select All",
   "share_hole_title": "Select the floors to share",
-  "next_course_setup": "Require setup in Agenda. Then refresh."
+  "next_course_setup": "Require setup in Agenda. Then refresh.",
+  "date_range_select": "Select date range",
+  "select_date_range_invalid_range": "Start date must be before end date",
+  "select_date_range_from": "From",
+  "select_date_range_to": "To",
+  "select_date_range_far_past": "Far Past",
+  "select_date_range_now": "Now"
 }

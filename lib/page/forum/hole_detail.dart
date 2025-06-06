@@ -142,9 +142,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     final results = switch (_renderModel) {
       Normal(hole: var hole) => await ForumRepository.getInstance()
           .loadFloors(hole, startFloor: page * Constant.POST_COUNT_PER_PAGE),
-      Search(keyword: var searchKeyword) => await ForumRepository.getInstance()
-          .loadSearchResults(searchKeyword,
-              startFloor: _listViewController.length()),
+      Search(keyword: var searchKeyword, :final dateRange, :final accurate) =>
+        await ForumRepository.getInstance().loadSearchResults(searchKeyword,
+            startFloor: _listViewController.length(),
+            dateRange: dateRange,
+            accurate: accurate),
       MyReplies() => await ForumRepository.getInstance()
           .loadUserFloors(startFloor: _listViewController.length()),
       ViewHistory() => (await ForumRepository.getInstance().loadHolesById(
@@ -352,7 +354,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             ForumRepository.getInstance().updateHoleViewCount(hole.hole_id!));
       }
     } else if (widget.arguments!.containsKey('searchKeyword')) {
-      _renderModel = Search(widget.arguments!['searchKeyword']);
+      _renderModel = Search(
+          widget.arguments!['searchKeyword'],
+          widget.arguments!['searchDateRange'],
+          widget.arguments!['searchAccurate']);
     } else if (widget.arguments?['punishmentHistory'] == true) {
       _renderModel = PunishmentHistory();
     } else if (widget.arguments?['myReplies'] == true) {
@@ -1229,9 +1234,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         Normal(hole: var hole) => await ForumRepository.getInstance()
             .loadFloors(hole,
                 startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
-        Search(keyword: var searchKeyword) =>
+        Search(keyword: var searchKeyword, :final dateRange, :final accurate) =>
           await ForumRepository.getInstance().loadSearchResults(searchKeyword,
-              startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
+              startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE,
+              dateRange: dateRange,
+              accurate: accurate),
         MyReplies() => (await ForumRepository.getInstance().loadUserFloors(
             startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE)),
         ViewHistory() => (await ForumRepository.getInstance().loadHolesById(
@@ -1430,8 +1437,10 @@ class Normal extends RenderModel {
 
 class Search extends RenderModel {
   String keyword;
+  (DateTime? start, DateTime? end) dateRange;
+  bool accurate;
 
-  Search(this.keyword);
+  Search(this.keyword, this.dateRange, this.accurate);
 }
 
 class MyReplies extends RenderModel {}
