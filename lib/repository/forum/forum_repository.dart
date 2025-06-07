@@ -808,6 +808,20 @@ class ForumRepository extends BaseRepositoryWithDio {
     return response.data?.map((e) => OTPunishment.fromJson(e)).toList();
   }
 
+  /// Get user silence status by floor ID
+  /// Returns a map where keys are division IDs and values are silence end times
+  Future<Map<String, String>?> adminGetUserSilenceByFloorId(int floorId) async {
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors/$floorId/user_silence",
+        method: "GET",
+        headers: _tokenHeader);
+    final Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
+
+    // Convert to Map<String, String> format
+    return response.data?.map((key, value) => MapEntry(key.toString(), value.toString()));
+  }
+
   /// Admin API below
   Future<List<OTReport>?> adminGetReports(int startReport,
       [int length = 10]) async {
@@ -1115,3 +1129,4 @@ class PushNotificationRegData {
 
   PushNotificationRegData(this.deviceId, this.token, this.type);
 }
+

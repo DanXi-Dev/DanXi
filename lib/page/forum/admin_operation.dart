@@ -1,6 +1,7 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/forum/floor.dart';
 import 'package:dan_xi/model/forum/history.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
@@ -44,6 +45,26 @@ Future<List<String>> punishmentHistory(Ref ref, int floorId) async {
 @riverpod
 Future<List<OTHistory>> modifyHistory(Ref ref, int floorId) async {
   return (await ForumRepository.getInstance().getHistory(floorId))!;
+}
+
+@riverpod
+Future<List<(String, DateTime)>> userPunishmentStatus(
+    Ref ref, int floorId) async {
+  final divisions = ForumProvider.getInstance().divisionCache;
+
+  final mapResult = (await ForumRepository.getInstance()
+      .adminGetUserSilenceByFloorId(floorId))!;
+  final result = <(String, DateTime)>[];
+  for (final entry in mapResult.entries) {
+    try {
+      final division =
+          divisions.firstWhere((d) => d.division_id.toString() == entry.key);
+      result.add((division.name!, DateTime.parse(entry.value)));
+    } catch (_) {
+      result.add((entry.key, DateTime.parse(entry.value)));
+    }
+  }
+  return result;
 }
 
 Future<bool> showAdminOperation(BuildContext context, OTFloor floor) async {
@@ -113,6 +134,8 @@ class AdminOperationPage extends HookConsumerWidget {
         ref.watch(punishmentHistoryProvider(floor.floor_id!));
     final modifyHistoryAsync =
         ref.watch(modifyHistoryProvider(floor.floor_id!));
+    final userPunishmentStatusAsync =
+        ref.watch(userPunishmentStatusProvider(floor.floor_id!));
 
     return PlatformScaffold(
       iosContentBottomPadding: false,
@@ -240,7 +263,17 @@ class AdminOperationPage extends HookConsumerWidget {
                       text: "违规记录",
                       onRetry: () => ref.invalidate(
                           punishmentHistoryProvider(floor.floor_id!)),
-                    )
+                    ),
+                    _buildFoldedList(
+                      context: context,
+                      asyncValue: userPunishmentStatusAsync,
+                      itemBuilder: (e) => Card(
+                          child: ListTile(
+                              title: Text("分区: ${e.$1}，封禁时间至: ${e.$2}"))),
+                      text: "当前封禁状态",
+                      onRetry: () => ref.invalidate(
+                          punishmentHistoryProvider(floor.floor_id!)),
+                    ),
                   ])))),
     );
   }
@@ -302,7 +335,7 @@ class AdminOperationPage extends HookConsumerWidget {
           ),
           children: [...value.map(itemBuilder)],
         ),
-      AsyncError(:final error, :final stackTrace) => ListTile(
+      AsyncError(:final error) => ListTile(
           leading: Icon(
             PlatformIcons(context).error,
             color: Theme.of(context).colorScheme.error,
