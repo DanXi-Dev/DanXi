@@ -179,6 +179,13 @@ class OTHoleWidget extends StatelessWidget {
                                   label: S.of(context).hole_hidden,
                                 ),
                               ],
+                              if (postElement.isForceDeleted) ...[
+                                const SizedBox(width: 4),
+                                LeadingChip(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  label: S.of(context).hole_force_deleted,
+                                ),
+                              ],
                               if (postElement.locked == true) ...[
                                 const SizedBox(width: 4),
                                 LeadingChip(
@@ -447,6 +454,16 @@ class OTFloorWidget extends StatelessWidget {
                         LeadingChip(
                           color: Colors.red,
                           label: S.of(context).hole_hidden,
+                        ),
+                      ],
+                      // Ditto.
+                      if (parentHole?.isForceDeleted == true &&
+                          floor.floor_id ==
+                              parentHole?.floors?.first_floor?.floor_id) ...[
+                        const SizedBox(width: 4),
+                        LeadingChip(
+                          color: Colors.red,
+                          label: S.of(context).hole_force_deleted,
                         ),
                       ],
                       // Show locked tag if the hole is locked and this is the first floor
