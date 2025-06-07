@@ -35,7 +35,6 @@ import 'package:dan_xi/util/io/cache_manager_with_webvpn.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-// import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/win32/auto_start.dart'
     if (dart.library.html) 'package:dan_xi/util/win32/auto_start_stub.dart';
@@ -294,7 +293,6 @@ class _SettingsPageState extends State<SettingsPage> {
     List<Widget> list = [];
     onTapListener(Language language) {
       SettingsProvider.getInstance().language = language;
-      // setState(() {});
     }
 
     for (var value in Constant.LANGUAGE_VALUES) {
@@ -311,7 +309,6 @@ class _SettingsPageState extends State<SettingsPage> {
     List<Widget> list = [];
     onTapListener(ThemeType theme) {
       SettingsProvider.getInstance().themeType = theme;
-      // setState(() {});
     }
 
     for (var value in ThemeType.values) {
@@ -447,7 +444,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                   SettingsProvider.getInstance()
                                       .useAccessibilityColoring = value;
                                   forumPageKey.currentState?.setState(() {});
-                                  // setState(() {});
                                 },
                               ),
                             ),
@@ -483,7 +479,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                             context
                                                 .read<SettingsProvider>()
                                                 .setPrimarySwatch(result.value);
-                                                // setState(() {});
                                           } else {}
                                         },
                                 );
@@ -501,7 +496,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                 value: SettingsProvider.getInstance().followSystemPalette,
                                 onChanged: (bool value) {
                                   SettingsProvider.getInstance().followSystemPalette = value;
-                                      // setState(() {});
                                 },
                               ),
 
@@ -799,7 +793,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   onTap: () async {
                     await smartNavigatorPush(context, '/bbs/tags/blocklist');
                     forumPageKey.currentState?.setState(() {});
-                    // setState(() {});
                   },
                 ),
                 ListTile(
@@ -822,7 +815,6 @@ class _SettingsPageState extends State<SettingsPage> {
                       SettingsProvider.getInstance().backgroundImagePath =
                           imagePath;
                       forumPageKey.currentState?.setState(() {});
-                      // setState(() {});
                     } else {
                       if (await Noticing.showConfirmationDialog(context,
                               S.of(context).background_image_already_set,
@@ -838,7 +830,6 @@ class _SettingsPageState extends State<SettingsPage> {
                         SettingsProvider.getInstance().backgroundImagePath =
                             null;
                         forumPageKey.currentState?.setState(() {});
-                        // setState(() {});
                       }
                     }
                   },
@@ -941,10 +932,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       }
                       forumPageKey.currentState?.listViewController
                           .notifyUpdate();
-                          // setState(() {});
                     } finally {
                       progressDialog.dismiss(showAnim: false);
-                      // setState(() {});
                     }
                   }
                 },

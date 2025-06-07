@@ -658,12 +658,16 @@ class SettingsProvider with ChangeNotifier {
 
   /// Primary color used by the app.
   int get primarySwatch {
-    return preferences!.getInt(KEY_PRIMARY_SWATCH_V2) ?? Colors.blue.value;
+    if (preferences!.containsKey(KEY_PRIMARY_SWATCH_V2)) {
+      int? color = preferences!.getInt(KEY_PRIMARY_SWATCH_V2);
+      return Color(color!).value;
+    }
+    return Colors.blue.value;
   }
 
   /// Set primary swatch by color name defined in [Constant.TAG_COLOR_LIST].
   void setPrimarySwatch(int value) {
-    preferences!.setInt(KEY_PRIMARY_SWATCH_V2, value);
+    preferences!.setInt(KEY_PRIMARY_SWATCH_V2, Color(value).value);
     notifyListeners();
   }
 

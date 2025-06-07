@@ -274,7 +274,7 @@ class DanxiApp extends StatelessWidget {
                   cupertino: (context, __) => CupertinoAppData(
                       theme: CupertinoThemeData(
                           brightness: context
-                              .select<SettingsProvider, ThemeType>( //
+                              .select<SettingsProvider, ThemeType>(
                                   (s) => s.themeType)
                               .getBrightness(),
                           textTheme: CupertinoTextThemeData(

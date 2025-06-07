@@ -17,7 +17,6 @@
 
 import 'dart:io';
 
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:device_identity/device_identity.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -26,7 +25,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/src/platform.dart' as platform_impl;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:platform_device_id/platform_device_id.dart';
-import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 /// A universal implementation of [Platform] in dart:io and [kIsWeb] in dart:core.
@@ -75,23 +73,6 @@ class PlatformX {
     }
 
     return deviceId ?? const Uuid().v4();
-  }
-
-  static ThemeData getTheme(BuildContext context,
-      [MaterialColor? primarySwatch, bool? watchChanges]) {
-    primarySwatch ??= Colors.blue;
-    watchChanges ??= true;
-
-    var isDarkMode = watchChanges
-        ? context
-                .select<SettingsProvider, ThemeType>(
-                    (settings) => settings.themeType)
-                .getBrightness() ==
-            Brightness.dark
-        : PlatformX.isDarkMode;
-    return isDarkMode
-        ? Constant.darkTheme(PlatformX.isCupertino(context), primarySwatch)
-        : Constant.lightTheme(PlatformX.isCupertino(context), primarySwatch);
   }
 
   static Color? backgroundColor(BuildContext context) {
