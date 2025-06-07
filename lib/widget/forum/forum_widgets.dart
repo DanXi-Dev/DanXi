@@ -365,12 +365,11 @@ class OTFloorWidget extends StatelessWidget {
       });
     }
 
-    bool isPinned() {
-      return context.read<ForumProvider>().divisionCache.any((division) =>
-          division.pinned?.any(
-              (pinnedHole) => pinnedHole.hole_id == parentHole?.hole_id) ==
-          true);
-    }
+    final isPinned = context.read<ForumProvider>().divisionCache.any(
+        (division) =>
+            division.pinned?.any(
+                (pinnedHole) => pinnedHole.hole_id == parentHole?.hole_id) ==
+            true);
 
     final nameColor = floor.anonyname?.hashColor() ?? Colors.red;
 
@@ -461,7 +460,7 @@ class OTFloorWidget extends StatelessWidget {
                         ),
                       ],
                       // Show pinned tag if this hole is in the pinned list and this is the first floor
-                      if (isPinned() &&
+                      if (isPinned &&
                           floor.floor_id ==
                               parentHole?.floors?.first_floor?.floor_id) ...[
                         const SizedBox(width: 4),
@@ -836,6 +835,7 @@ class OTFloorWidgetBottomBar extends StatelessWidget {
 class OTFloorToolBar extends StatefulWidget {
   final OTFloor floor;
   final int? index;
+
   // The callback when modify or delete is invoked
   final Function()? onClickMore;
 
