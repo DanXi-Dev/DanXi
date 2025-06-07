@@ -136,7 +136,7 @@ class AdminOperationPage extends HookConsumerWidget {
         useState<FileImage?>(SettingsProvider.getInstance().backgroundImage);
     final reasonController = useTextEditingController();
     final punishUser = useState<bool>(false);
-    final deletePost = useState<PostOperation>(PostOperation.delete);
+    final postOp = useState<PostOperation>(PostOperation.delete);
     final punishmentDays = useState<int>(0);
 
     final punishmentHistoryAsync =
@@ -161,7 +161,7 @@ class AdminOperationPage extends HookConsumerWidget {
             onPressed: () async => _sendDocument(
               context: context,
               floor: floor,
-              postOp: deletePost.value,
+              postOp: postOp.value,
               punishUser: punishUser.value,
               punishmentDays: punishmentDays.value,
               reasonText: reasonController.text,
@@ -206,6 +206,7 @@ class AdminOperationPage extends HookConsumerWidget {
                       maxLines: 1,
                       expands: false,
                       autofocus: true,
+                      enabled: postOp.value != PostOperation.force_delete,
                       textAlignVertical: TextAlignVertical.top,
                       controller: reasonController,
                     ),
@@ -215,7 +216,7 @@ class AdminOperationPage extends HookConsumerWidget {
                       ListTile(
                         title: const Text("帖子操作"),
                         leading: const Icon(CupertinoIcons.hand_draw),
-                        subtitle: Text(deletePost.value.description),
+                        subtitle: Text(postOp.value.description),
                         onTap: () => showPlatformModalSheet(
                             context: context,
                             builder: (BuildContext context) =>
@@ -225,7 +226,7 @@ class AdminOperationPage extends HookConsumerWidget {
                                               menuContext: context,
                                               child: Text(e.description),
                                               onPressed: () {
-                                                deletePost.value = e;
+                                                postOp.value = e;
                                               },
                                             ))
                                         .toList(),
@@ -404,8 +405,8 @@ class SpinBoxTile extends StatelessWidget {
 }
 
 enum PostOperation {
-  delete(description: "删除"),
-  fold(description: "折叠"),
+  delete(description: "删除楼层"),
+  fold(description: "折叠楼层"),
   force_delete(description: "完全删除整个帖子，在收藏订阅中不可见（!!!）");
 
   final String description;
