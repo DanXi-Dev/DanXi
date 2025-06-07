@@ -444,13 +444,13 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     );
   }
 
-  goToPrev() {
+  void goToPrev() {
     setState(() {
       _showingTime!.week--;
     });
   }
 
-  goToNext() {
+  void goToNext() {
     setState(() {
       _showingTime!.week++;
     });

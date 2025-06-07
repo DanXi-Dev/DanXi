@@ -334,7 +334,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
         child: RefreshIndicator(
             edgeOffset: MediaQuery.of(context).padding.top,
             color: Theme.of(context).colorScheme.secondary,
-            backgroundColor: Theme.of(context).dialogBackgroundColor,
+            backgroundColor: DialogTheme.of(context).backgroundColor,
             onRefresh: () async {
               HapticFeedback.mediumImpact();
               refreshSelf();
@@ -913,7 +913,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
 
   static const String CLEAN_MODE_EXAMPLE = '`差不多得了😅，自己不会去看看吗😇`';
 
-  _showCleanModeGuideDialog() => showPlatformDialog(
+  Future _showCleanModeGuideDialog() => showPlatformDialog(
       context: context,
       builder: (context) => AlertDialog(
             title: Text(S.of(context).forum_clean_mode),

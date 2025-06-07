@@ -224,7 +224,7 @@ class TagContainerState extends State<TagContainer> {
     }
   }
 
-  fixedColorApplier(Color? fixedColor) {
+  void fixedColorApplier(Color? fixedColor) {
     // for (int i = 0; i <= tagList.length - 1; i++) {
     //   tagList[i].tagColor = fixedColor;
     // }

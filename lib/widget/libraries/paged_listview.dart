@@ -315,7 +315,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
     );
   }
 
-  _getListItemAt(int index, AsyncSnapshot<List<T>?>? snapshot) {
+  Widget _getListItemAt(int index, AsyncSnapshot<List<T>?>? snapshot) {
     if (_hasHeadWidget) {
       if (index == 0) {
         return _headBuilderWithKey(context);
@@ -363,7 +363,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   ///
   /// Warn: if [useInitialData] is true, the initial data will be used for next loading,
   /// let alone the current [pageIndex]!
-  Future<List<T>?> _setFuture({useInitialData = true}) {
+  Future<List<T>?> _setFuture({bool useInitialData = true}) {
     if (widget.allDataReceiver == null) {
       _shouldLoad = true;
       _isRefreshing = _isEnded = false;
@@ -385,7 +385,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   }
 
   // [queueDataClear] indicates where to replace the data when load completed (aka queued), or to cleat it immediately
-  void initialize({useInitialData = true, queueDataClear = false}) {
+  void initialize({bool useInitialData = true, bool queueDataClear = false}) {
     _hasHeadWidget = widget.headBuilder != null;
     if (queueDataClear) {
       _dataClearQueued = true;
@@ -427,7 +427,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   ///
   /// Note: [_futureData] will be discarded after called. Call [notifyUpdate] to rebuild it and go back
   /// to normal mode.
-  replaceAllDataWith(List<T> data) {
+  void replaceAllDataWith(List<T> data) {
     setState(() {
       // @w568w (2022-1-25): NEVER USE A REFERENCE-ONLY COPY OF LIST.
       // `_data = data;` makes me struggle with a weird bug
@@ -447,13 +447,13 @@ class PagedListViewState<T> extends State<PagedListView<T>>
     });
   }
 
-  replaceDataInRangeWith(Iterable<T> data, int start) {
+  void replaceDataInRangeWith(Iterable<T> data, int start) {
     setState(() {
       _data.setAll(start, data);
     });
   }
 
-  replaceDatumWith(T data, int index) {
+  void replaceDatumWith(T data, int index) {
     setState(() {
       _data[index] = data;
     });
@@ -544,13 +544,13 @@ class PagedListViewController<T> implements ListProvider<T> {
   PagedListViewController();
 
   @protected
-  setListener(PagedListViewState<T> state) {
+  void setListener(PagedListViewState<T> state) {
     _state = state;
   }
 
   bool get isEnded => _state.isEnded;
 
-  Future<void> notifyUpdate({useInitialData = true, queueDataClear = true}) =>
+  Future<void> notifyUpdate({bool useInitialData = true, bool queueDataClear = true}) =>
       _state.notifyUpdate(useInitialData, queueDataClear);
 
   /// Returns whether the scroll was successful or not
@@ -594,15 +594,15 @@ class PagedListViewController<T> implements ListProvider<T> {
     _state.replaceAllDataWith(data);
   }
 
-  replaceDataInRangeWith(Iterable<T> data, int start) {
+  void replaceDataInRangeWith(Iterable<T> data, int start) {
     _state.replaceDataInRangeWith(data, start);
   }
 
-  replaceDatumWith(T oldData, T newData) {
+  void replaceDatumWith(T oldData, T newData) {
     _state.replaceDatumWith(newData, _state._data.indexOf(oldData));
   }
 
-  replaceInitialData(Iterable<T> data) {
+  void replaceInitialData(Iterable<T> data) {
     try {
       _state.replaceDataInRangeWith(data, 0);
     } catch (_) {

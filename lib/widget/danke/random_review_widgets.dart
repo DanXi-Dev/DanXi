@@ -39,7 +39,7 @@ class RandomReviewWidgets extends StatelessWidget {
         child: _buildCard(context));
   }
 
-  _buildCard(BuildContext context) {
+  Card _buildCard(BuildContext context) {
     // style of the card
     final TextStyle infoStyle =
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);

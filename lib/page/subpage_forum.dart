@@ -652,7 +652,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
         edgeOffset: MediaQuery.of(context).padding.top,
         key: indicatorKey,
         color: Theme.of(context).colorScheme.secondary,
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
+        backgroundColor: DialogTheme.of(context).backgroundColor,
         onRefresh: () async {
           HapticFeedback.mediumImpact();
           // Refresh the list...

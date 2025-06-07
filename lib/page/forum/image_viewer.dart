@@ -48,7 +48,7 @@ import 'package:share_plus/share_plus.dart';
 ///
 /// [Object] hero_tag: a hero object used to show animation between page transition.
 ///
-/// [List<ImageUrlInfo>] image_list: a list of images to be shown. If set, <preview_url,hd_url> should be in the list.
+/// [List<ImageUrlInfo>] image_list: a list of images to be shown. If set, (preview_url, hd_url) should be in the list.
 ///
 /// [ImageLoadCallback] loader: a method to load more image on the next page.
 ///
@@ -178,13 +178,13 @@ class ImageViewerPageState extends State<ImageViewerPage> {
         await Gal.putImage(tempFileWithExtName.absolute.path);
         result = true;
       } catch (_) {}
-      if (!mounted) return;
+      if (!context.mounted) return;
       if (result) {
         Noticing.showNotice(context, S.of(context).image_save_success);
       } else {
         Noticing.showNotice(context, S.of(context).image_save_failed);
       }
-    } else if (mounted) {
+    } else if (context.mounted) {
       Noticing.showNotice(context, image.absolute.path);
     }
   }

@@ -134,7 +134,7 @@ class CourseReviewEditorText with ChangeNotifier {
     return val >= min && val <= max;
   }
 
-  CourseReviewEditorText.newInstance({withContent = '', withTitle = ''}) {
+  CourseReviewEditorText.newInstance({String withContent = '', String withTitle = ''}) {
     _content = withContent;
     _title = withTitle;
   }

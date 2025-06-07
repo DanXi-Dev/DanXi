@@ -174,7 +174,7 @@ class IndependentCookieJar implements CookieJar {
     _deepClone(otherJar.hostCookies, hostCookies);
   }
 
-  static _deepClone(
+  static void _deepClone(
       Map<String?, Map<String, Map<String, SerializableCookie>>> from,
       Map<String?, Map<String, Map<String, SerializableCookie>>> to) {
     to.clear();

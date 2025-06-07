@@ -279,10 +279,6 @@ class SettingsProvider with ChangeNotifier {
   Future<void> init() async =>
       preferences = await XSharedPreferences.getInstance();
 
-  @Deprecated(
-      "SettingsProvider do not need a BuildContext any more. Use SettingsProvider.getInstance() instead")
-  factory SettingsProvider.of(_) => SettingsProvider.getInstance();
-
   bool get useAccessibilityColoring {
     if (preferences!.containsKey(KEY_ACCESSIBILITY_COLORING)) {
       return preferences!.getBool(KEY_ACCESSIBILITY_COLORING)!;

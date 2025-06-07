@@ -35,7 +35,7 @@ import 'package:flutter/widgets.dart';
 abstract class Feature {
   /// Request [FeatureContainer] to update the widget status since they're changed.
   @nonVirtual
-  notifyUpdate() => container.doUpdate();
+  void notifyUpdate() => container.doUpdate();
 
   bool get clickable => false;
 

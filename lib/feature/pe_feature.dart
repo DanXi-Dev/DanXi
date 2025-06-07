@@ -155,9 +155,7 @@ class PEFeature extends Feature {
           body += "\n${element.title}: ${element.times}";
         } else if (element is ExerciseRecord) {
           body += "\n${element.title}  ${element.result}";
-          if (element.singleScore != null) {
-            body += "  ${element.singleScore}  ${element.comment}";
-          }
+          body += "  ${element.singleScore}  ${element.comment}";
         }
       }
       Noticing.showModalNotice(context!,

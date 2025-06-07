@@ -56,7 +56,7 @@ class LoginDialog extends StatefulWidget {
 
   static bool get dialogShown => _isShown;
 
-  static showLoginDialog(BuildContext context, XSharedPreferences? preferences,
+  static Future<void> showLoginDialog(BuildContext context, XSharedPreferences? preferences,
       ValueNotifier<PersonInfo?> personInfo, bool dismissible) async {
     if (_isShown) return;
     _isShown = true;
@@ -360,7 +360,7 @@ class LoginDialogState extends State<LoginDialog> {
   }
 
   /// Change the login group and rebuild the dialog.
-  _switchLoginGroup(UserGroup e) {
+  void _switchLoginGroup(UserGroup e) {
     if (e == UserGroup.VISITOR) {
       _nameController.text = _pwdController.text = "[ Forum Only ]";
     } else {

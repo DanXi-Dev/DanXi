@@ -30,7 +30,7 @@ class TopController extends StatelessWidget {
   const TopController(
       {super.key, this.controller, this.onDoubleTap, this.child});
 
-  static scrollToTop(ScrollController? controller) =>
+  static Future<void>? scrollToTop(ScrollController? controller) =>
       controller?.animateTo(-controller.initialScrollOffset,
           duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
 
