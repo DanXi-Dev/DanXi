@@ -23,6 +23,7 @@ import 'package:dan_xi/model/forum/message.dart';
 import 'package:dan_xi/model/forum/report.dart';
 import 'package:dan_xi/page/forum/hole_detail.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
@@ -364,6 +365,13 @@ class OTFloorWidget extends StatelessWidget {
       });
     }
 
+    bool isPinned() {
+      return context.read<ForumProvider>().divisionCache.any((division) =>
+          division.pinned?.any(
+              (pinnedHole) => pinnedHole.hole_id == parentHole?.hole_id) ==
+          true);
+    }
+
     final nameColor = floor.anonyname?.hashColor() ?? Colors.red;
 
     Linkify? foldedWidget;
@@ -440,6 +448,26 @@ class OTFloorWidget extends StatelessWidget {
                         LeadingChip(
                           color: Colors.red,
                           label: S.of(context).hole_hidden,
+                        ),
+                      ],
+                      // Show locked tag if the hole is locked and this is the first floor
+                      if (parentHole?.locked == true &&
+                          floor.floor_id ==
+                              parentHole?.floors?.first_floor?.floor_id) ...[
+                        const SizedBox(width: 4),
+                        LeadingChip(
+                          color: Theme.of(context).colorScheme.primary,
+                          label: S.of(context).hole_locked,
+                        ),
+                      ],
+                      // Show pinned tag if this hole is in the pinned list and this is the first floor
+                      if (isPinned() &&
+                          floor.floor_id ==
+                              parentHole?.floors?.first_floor?.floor_id) ...[
+                        const SizedBox(width: 4),
+                        LeadingChip(
+                          color: Theme.of(context).colorScheme.primary,
+                          label: S.of(context).pinned,
                         ),
                       ],
                     ],
