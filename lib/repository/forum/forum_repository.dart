@@ -819,7 +819,8 @@ class ForumRepository extends BaseRepositoryWithDio {
         await WebvpnProxy.requestWithProxy(dio, options);
 
     // Convert to Map<String, String> format
-    return response.data?.map((key, value) => MapEntry(key.toString(), value.toString()));
+    return response.data
+        ?.map((key, value) => MapEntry(key.toString(), value.toString()));
   }
 
   /// Admin API below
@@ -870,6 +871,14 @@ class ForumRepository extends BaseRepositoryWithDio {
           if (deleteReason?.isNotEmpty == true)
             "delete_reason": deleteReason ?? ""
         },
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
+  }
+
+  Future<int?> adminForceDeleteHole(int holeId) async {
+    final options = RequestOptions(
+        path: "$_BASE_URL/holes/$holeId/_force",
+        method: "DELETE",
         headers: _tokenHeader);
     return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
@@ -1129,4 +1138,3 @@ class PushNotificationRegData {
 
   PushNotificationRegData(this.deviceId, this.token, this.type);
 }
-

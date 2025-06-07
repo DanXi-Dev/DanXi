@@ -23,14 +23,16 @@ part 'admin_operation.g.dart';
 
 class AdminOperationInfo {
   int floorId;
-  bool isDelete;
+  int? holeId;
+  PostOperation op;
   bool doPenalty;
   int penaltyDays;
   String reason;
 
   AdminOperationInfo(
       {required this.floorId,
-      required this.isDelete,
+      required this.op,
+      required this.holeId,
       required this.doPenalty,
       required this.penaltyDays,
       required this.reason});
@@ -76,13 +78,20 @@ Future<bool> showAdminOperation(BuildContext context, OTFloor floor) async {
   try {
     final operation = result! as AdminOperationInfo;
     int? response;
-    if (operation.isDelete) {
-      response = await ForumRepository.getInstance().adminDeleteFloor(
-          operation.floorId, operation.reason.isEmpty ? "" : operation.reason);
-    } else {
-      response = await ForumRepository.getInstance().adminFoldFloor(
-          operation.reason.isEmpty ? [] : [operation.reason],
-          operation.floorId);
+    switch (operation.op) {
+      case PostOperation.force_delete:
+        response = await ForumRepository.getInstance()
+            .adminForceDeleteHole(operation.holeId!);
+        break;
+      case PostOperation.delete:
+        response = await ForumRepository.getInstance()
+            .adminDeleteFloor(operation.floorId, operation.reason);
+        break;
+      case PostOperation.fold:
+        response = await ForumRepository.getInstance().adminFoldFloor(
+            operation.reason.isEmpty ? [] : [operation.reason],
+            operation.floorId);
+        break;
     }
 
     if (response == null || response >= 300) {
@@ -127,7 +136,7 @@ class AdminOperationPage extends HookConsumerWidget {
         useState<FileImage?>(SettingsProvider.getInstance().backgroundImage);
     final reasonController = useTextEditingController();
     final punishUser = useState<bool>(false);
-    final deletePost = useState<bool>(true);
+    final postOp = useState<PostOperation>(PostOperation.delete);
     final punishmentDays = useState<int>(0);
 
     final punishmentHistoryAsync =
@@ -152,7 +161,7 @@ class AdminOperationPage extends HookConsumerWidget {
             onPressed: () async => _sendDocument(
               context: context,
               floor: floor,
-              deletePost: deletePost.value,
+              postOp: postOp.value,
               punishUser: punishUser.value,
               punishmentDays: punishmentDays.value,
               reasonText: reasonController.text,
@@ -197,6 +206,7 @@ class AdminOperationPage extends HookConsumerWidget {
                       maxLines: 1,
                       expands: false,
                       autofocus: true,
+                      enabled: postOp.value != PostOperation.force_delete,
                       textAlignVertical: TextAlignVertical.top,
                       controller: reasonController,
                     ),
@@ -206,25 +216,20 @@ class AdminOperationPage extends HookConsumerWidget {
                       ListTile(
                         title: const Text("帖子操作"),
                         leading: const Icon(CupertinoIcons.hand_draw),
-                        subtitle: Text(deletePost.value ? "删除" : "折叠"),
+                        subtitle: Text(postOp.value.description),
                         onTap: () => showPlatformModalSheet(
                             context: context,
                             builder: (BuildContext context) =>
                                 PlatformContextMenu(
-                                    actions: [
-                                      PlatformContextMenuItem(
-                                        menuContext: context,
-                                        child: const Text("删除"),
-                                        onPressed: () =>
-                                            deletePost.value = true,
-                                      ),
-                                      PlatformContextMenuItem(
-                                        menuContext: context,
-                                        child: const Text("折叠"),
-                                        onPressed: () =>
-                                            deletePost.value = false,
-                                      )
-                                    ],
+                                    actions: PostOperation.values
+                                        .map((e) => PlatformContextMenuItem(
+                                              menuContext: context,
+                                              child: Text(e.description),
+                                              onPressed: () {
+                                                postOp.value = e;
+                                              },
+                                            ))
+                                        .toList(),
                                     cancelButton: CupertinoActionSheetAction(
                                         child: Text(S.of(context).cancel),
                                         onPressed: () =>
@@ -281,13 +286,13 @@ class AdminOperationPage extends HookConsumerWidget {
   Future<void> _sendDocument({
     required BuildContext context,
     required OTFloor floor,
-    required bool deletePost,
+    required PostOperation postOp,
     required bool punishUser,
     required int punishmentDays,
     required String reasonText,
   }) async {
     String confirmationText =
-        "您将要${deletePost ? '删除' : '折叠'}帖子 #${floor.floor_id}, ";
+        "您将要 ${postOp.description} 帖子 #${floor.floor_id}, ";
     if (punishUser) {
       confirmationText += "\n并处以 $punishmentDays 天的封禁, ";
     }
@@ -304,7 +309,8 @@ class AdminOperationPage extends HookConsumerWidget {
         doPenalty: punishUser,
         floorId: floor.floor_id!,
         penaltyDays: punishmentDays,
-        isDelete: deletePost,
+        op: postOp,
+        holeId: floor.hole_id,
         reason: reasonText);
 
     if (!context.mounted) return;
@@ -396,4 +402,14 @@ class SpinBoxTile extends StatelessWidget {
           )),
     );
   }
+}
+
+enum PostOperation {
+  delete(description: "删除楼层"),
+  fold(description: "折叠楼层"),
+  force_delete(description: "完全删除整个帖子，在收藏订阅中不可见（!!!）");
+
+  final String description;
+
+  const PostOperation({required this.description});
 }

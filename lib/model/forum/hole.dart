@@ -29,6 +29,7 @@ class OTHole {
   int? division_id;
   String? time_updated;
   String? time_created;
+  String? time_deleted;
   List<OTTag>? tags;
   int? view;
   int? reply;
@@ -45,18 +46,23 @@ class OTHole {
       (other is OTHole) && hole_id == other.hole_id;
 
   OTHole(this.hole_id, this.division_id, this.time_created, this.time_updated,
-      this.tags, this.view, this.reply, this.floors);
+      this.time_deleted, this.tags, this.view, this.reply, this.floors);
 
   /// Generate an empty BBSPost for special sakes.
-  factory OTHole.dummy() => OTHole(-1, -1, "", "", [], -1, -1, null);
+  factory OTHole.dummy() => OTHole(-1, -1, "", "", "", [], -1, -1, null);
 
   @override
   String toString() {
-    return 'OTHole{id: $hole_id, division_id: $division_id, time_updated: $time_updated, time_created: $time_created, tags: $tags, view: $view, reply: $reply, floors: $floors, hidden: $hidden, locked: $locked}';
+    return 'OTHole{id: $hole_id, division_id: $division_id, time_updated: $time_updated, time_created: $time_created, time_deleted: $time_deleted, tags: $tags, view: $view, reply: $reply, floors: $floors, hidden: $hidden, locked: $locked}';
   }
 
   bool get is_folded =>
       tags?.any((element) => element.name?.startsWith("*") ?? false) ?? false;
+
+  bool get isForceDeleted =>
+      time_deleted != null &&
+      time_deleted!.isNotEmpty &&
+      DateTime.tryParse(time_deleted!) != null;
 
   static final DUMMY_POST = OTHole.dummy();
 

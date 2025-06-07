@@ -550,5 +550,6 @@
   "select_date_range_from": "从",
   "select_date_range_to": "到",
   "select_date_range_far_past": "遥远的过去",
-  "select_date_range_now": "现在"
+  "select_date_range_now": "现在",
+  "hole_force_deleted": "已删除"
 }
