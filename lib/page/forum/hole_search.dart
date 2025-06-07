@@ -145,6 +145,7 @@ class _OTSearchPageState extends State<OTSearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    return PlatformScaffold(
       iosContentPadding: false,
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
