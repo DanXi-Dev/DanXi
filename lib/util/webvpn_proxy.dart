@@ -135,7 +135,7 @@ class WebvpnProxy {
     personInfo.addListener(_prevListener!);
   }
 
-  static Future<void> loginWebvpn(Dio dio) async {
+  static Future<void> loginWebvpn() async {
     if (!isLoggedIn) {
       // Another concurrent task is running
       if (loginSession != null) {
@@ -305,7 +305,7 @@ class WebvpnProxy {
     }
 
     // Try logging in first, will return immediately if we've already logged in
-    await loginWebvpn(dio);
+    await loginWebvpn();
 
     // First attempt
     try {
@@ -324,7 +324,7 @@ class WebvpnProxy {
 
     // Re-login
     isLoggedIn = false;
-    await loginWebvpn(dio);
+    await loginWebvpn();
 
     // Second attempt
     try {
