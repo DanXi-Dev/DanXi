@@ -240,26 +240,24 @@ class DanxiApp extends StatelessWidget {
           builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
             // Determine if dynamic colors should be used
             bool useSystemPalette = PlatformX.isAndroid && followSystemPalette;
-
+            
             ThemeData lightThemeConfig;
             ThemeData darkThemeConfig;
-
-            ThemeData baseLightTheme = Constant.lightTheme(isPlatformCupertino, manualPrimarySwatch);
-            ThemeData baseDarkTheme = Constant.darkTheme(isPlatformCupertino, manualPrimarySwatch);
+            
+            MaterialColor lightThemeSwatch;
+            MaterialColor darkThemeSwatch;
 
             if (useSystemPalette && lightDynamic != null && darkDynamic != null) {
-              // Build themes directly using the dynamic ColorScheme
-              lightThemeConfig = baseLightTheme.copyWith(
-                colorScheme: lightDynamic,
-              );
-              darkThemeConfig = baseDarkTheme.copyWith(
-                colorScheme: darkDynamic,
-              );
+
+              lightThemeSwatch = generateMaterialColor(color: lightDynamic.primary);
+              darkThemeSwatch = generateMaterialColor(color: darkDynamic.primary);
             } else {
-              // Use the original logic based on manual primarySwatch
-              lightThemeConfig = baseLightTheme;
-              darkThemeConfig = baseDarkTheme;
+              lightThemeSwatch = manualPrimarySwatch;
+              darkThemeSwatch = manualPrimarySwatch;
             }
+
+            lightThemeConfig = Constant.lightTheme(isPlatformCupertino, lightThemeSwatch);
+            darkThemeConfig = Constant.darkTheme(isPlatformCupertino, darkThemeSwatch);
 
             return DynamicThemeController(
               lightTheme: lightThemeConfig,

@@ -74,10 +74,10 @@ class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  State<SettingsPage> createState() => SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class SettingsPageState extends State<SettingsPage> {
   /// All open-source license for the app.
   static const List<LicenseItem> _LICENSE_ITEMS = [
     LicenseItem("asn1lib", LICENSE_BSD, "https://github.com/wstrange/asn1lib"),
@@ -495,7 +495,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 secondary: const Icon(Icons.palette_outlined),
                                 value: SettingsProvider.getInstance().followSystemPalette,
                                 onChanged: (bool value) {
-                                  SettingsProvider.getInstance().followSystemPalette = value;
+                                  context.read<SettingsProvider>().followSystemPalette = value;
                                 },
                               ),
 
@@ -773,7 +773,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                             S.of(context).recommended_tags) ==
                                     true) {
                               SettingsProvider.getInstance()
-                                      .isTagSuggestionEnabled = value;
+                                  .isTagSuggestionEnabled = value;
                             }
                           }),
                       selector: (_, model) => model.isTagSuggestionEnabled),
