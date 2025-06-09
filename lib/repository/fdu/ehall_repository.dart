@@ -22,7 +22,6 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/retrier.dart';
-import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dio/dio.dart';
 
 class FudanEhallRepository extends BaseRepositoryWithDio {
@@ -41,30 +40,15 @@ class FudanEhallRepository extends BaseRepositoryWithDio {
 
   factory FudanEhallRepository.getInstance() => _instance;
 
-  /// fixme: This method is essentially the same as the one in [WebvpnProxy._authenticateWebVPN].
-  ///
-  /// We should consider refactoring this to avoid code duplication.
-  Future<void> _authenticateEhall(PersonInfo info) async {
-    Response<dynamic>? res = await dio.get(_ID_REQUEST_URL,
-        options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    if (DioUtils.getRedirectLocation(res) != null) {
-      // if we are redirected to UIS, we need to login to UIS first
-      await DioUtils.processRedirect(dio, res);
-      res = await UISLoginTool.loginUIS(dio, _UIS_LOGIN_URL, cookieJar!, info);
-      if (res == null) throw Exception("UIS login failed");
-    }
-    final ticket = WebvpnProxy.retrieveTicket(res);
-
-    Map<String, dynamic> queryParams = {
-      'redirect': 'https://ehall.fudan.edu.cn',
-      'ticket': ticket,
-    };
-
-    final response = await dio.get(_LOGIN_URL,
-        queryParameters: queryParams,
-        options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    await DioUtils.processRedirect(dio, response);
-  }
+  Future<void> _authenticateEhall(PersonInfo info) =>
+      UISLoginTool.authenticateWithTicket(
+          dio,
+          cookieJar!,
+          info,
+          _ID_REQUEST_URL,
+          _UIS_LOGIN_URL,
+          _LOGIN_URL,
+          {'redirect': 'https://ehall.fudan.edu.cn'});
 
   Future<void> loginEhall(PersonInfo info) async {
     if (loginSession != null) {

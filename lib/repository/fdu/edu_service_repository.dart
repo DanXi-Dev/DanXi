@@ -233,6 +233,22 @@ class SemesterInfo {
   factory SemesterInfo.fromJson(Map<String, dynamic> json) {
     return SemesterInfo(json['id'], json['schoolYear'], json['name']);
   }
+
+  static String seasonToName(String name) {
+    switch (name) {
+      case "AUTUMN":
+        return "1";
+      case "SPRING":
+        return "2";
+      default:
+        return "?"; // FIXME: currently JWGL only has AUTUMN and SPRING semesters. SUMMER & WINTER are not supported.
+    }
+  }
+
+  factory SemesterInfo.fromCourseTableJson(Map<String, dynamic> json) {
+    return SemesterInfo(json['id'].toString(), json['schoolYear'],
+        seasonToName(json['season']));
+  }
 }
 
 class Exam {

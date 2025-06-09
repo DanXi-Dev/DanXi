@@ -135,7 +135,7 @@ class WebvpnProxy {
     personInfo.addListener(_prevListener!);
   }
 
-  static Future<void> loginWebvpn(Dio dio) async {
+  static Future<void> loginWebvpn() async {
     if (!isLoggedIn) {
       // Another concurrent task is running
       if (loginSession != null) {
@@ -176,41 +176,9 @@ class WebvpnProxy {
   }
 
   static Future<void> _authenticateWebVPN(
-      Dio dio, IndependentCookieJar jar, PersonInfo? info) async {
-    Response<dynamic>? res = await dio.get(WEBVPN_ID_REQUEST_URL,
-        options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    if (DioUtils.getRedirectLocation(res) != null) {
-      // if we are redirected to UIS, we need to login to UIS first
-      await DioUtils.processRedirect(dio, res);
-      res = await UISLoginTool.loginUIS(dio, WEBVPN_UIS_LOGIN_URL, jar, info);
-      if (res == null) {
-        throw WebvpnRequestException("Failed to login to UIS");
-      }
-    }
-    final ticket = retrieveTicket(res);
-
-    Map<String, dynamic> queryParams = {
-      'cas_login': 'true',
-      'ticket': ticket,
-    };
-
-    final response = await dio.get(WEBVPN_LOGIN_URL,
-        queryParameters: queryParams,
-        options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    await DioUtils.processRedirect(dio, response);
-  }
-
-  static String? retrieveTicket(Response<dynamic> response) {
-    // Check if the URL host matches the expected value
-    if (response.realUri.host != "id.fudan.edu.cn") {
-      return null;
-    }
-
-    BeautifulSoup soup = BeautifulSoup(response.data!);
-
-    final element = soup.find('', selector: '#ticket');
-    return element?.attributes['value'];
-  }
+          Dio dio, IndependentCookieJar jar, PersonInfo? info) =>
+      UISLoginTool.authenticateWithTicket(dio, jar, info, WEBVPN_ID_REQUEST_URL,
+          WEBVPN_UIS_LOGIN_URL, WEBVPN_LOGIN_URL, {'cas_login': 'true'});
 
   /// Check if we are able to connect to the service directly (without WebVPN).
   /// This method uses a low-timeout dio to reduce wait time.
@@ -305,7 +273,7 @@ class WebvpnProxy {
     }
 
     // Try logging in first, will return immediately if we've already logged in
-    await loginWebvpn(dio);
+    await loginWebvpn();
 
     // First attempt
     try {
@@ -324,7 +292,7 @@ class WebvpnProxy {
 
     // Re-login
     isLoggedIn = false;
-    await loginWebvpn(dio);
+    await loginWebvpn();
 
     // Second attempt
     try {
