@@ -182,31 +182,38 @@ class ExamList extends HookConsumerWidget {
     Widget body;
     List<Exam>? examList;
     switch ((exams, scores)) {
+      // Both exams and scores are available
       case (AsyncData(value: final exams), AsyncData(value: final scores)):
         examList = exams;
         body = exams.isEmpty
             ? _buildGradeLayout(context, ref, scores)
             : ListView(
                 children: _getListWidgetsHybrid(context, ref, exams, scores));
+      // There are some exams in this semester, but no score has been published
+      case (AsyncData(value: final exams), AsyncError(error: final scoreError))
+          when scoreError is RangeError:
+        body = ListView(
+            children: _getListWidgetsHybrid(context, ref, exams, []));
+      // There is no exam in this semester, but never mind, we are still loading scores
       case (AsyncError(:final error), AsyncLoading())
           when error is SemesterNoExamException:
-        // There is no exam in this semester, but never mind, we are still loading scores
         body = Center(child: PlatformCircularProgressIndicator());
+      // There is no exam in this semester, but we indeed have scores!
       case (AsyncError(:final error), AsyncData(value: final scores))
           when error is SemesterNoExamException:
-        // There is no exam in this semester, but we indeed have exam!
         body = _buildGradeLayout(context, ref, scores);
+      // There is no exam in this semester, and no scores have been published
       case (
             AsyncError(error: final examError),
             AsyncError(error: final scoreError)
           )
           when examError is SemesterNoExamException && scoreError is RangeError:
-        // There is no exam in this semester, but we indeed have exam (although zero).
         body = Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Center(
               child: Text(S.of(context).no_data),
             ));
+      // Other cases, such as loading or error
       case (AsyncError(:final error, :final stackTrace), _):
         body = ErrorPageWidget.buildWidget(
           context,
