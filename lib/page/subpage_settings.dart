@@ -323,6 +323,7 @@ class SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool supportsDynamicColor = context.watch<SettingsProvider>().supportsDynamicColor;
     // Load preference fields
     return PlatformScaffold(
       appBar: PlatformAppBar(
@@ -488,7 +489,7 @@ class SettingsPageState extends State<SettingsPage> {
                             }
                         ),
 
-                            if (PlatformX.isAndroid)
+                            if (supportsDynamicColor)
                               SwitchListTile.adaptive(
                                 title: Text(S.of(context).follow_system_palette),
                                 subtitle: Text(S.of(context).follow_system_palette_description),

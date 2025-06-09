@@ -85,6 +85,18 @@ class PlatformX {
         : Theme.of(context).colorScheme.secondary;
   }
 
+  static Future<bool> supportsDynamicColor() async {
+    if (!isAndroid) return false;
+    
+    try {
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      return androidInfo.version.sdkInt >= 31;
+    } catch (e) {
+      return false;
+    }
+  }
+
   static const illegalCharWindows = [r'/', r':', r'@'];
 
   static String get fileSystemSlash => isWindows ? "\\" : "/";

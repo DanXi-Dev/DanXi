@@ -31,6 +31,7 @@ import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/forum/hole_editor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 
 /// A class to manage [SharedPreferences] Settings
@@ -41,6 +42,9 @@ import 'package:flutter/material.dart';
 class SettingsProvider with ChangeNotifier {
   XSharedPreferences? preferences;
   static final _instance = SettingsProvider._();
+
+  bool supportsDynamicColor = false;
+
   static const String KEY_PREFERRED_CAMPUS = "campus";
 
   //static const String KEY_AUTOTICK_LAST_CANCEL_DATE =
@@ -277,8 +281,10 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> init() async =>
-      preferences = await XSharedPreferences.getInstance();
+  Future<void> init() async {
+    preferences = await XSharedPreferences.getInstance();
+    supportsDynamicColor = await PlatformX.supportsDynamicColor();
+  }
 
   bool get useAccessibilityColoring {
     if (preferences!.containsKey(KEY_ACCESSIBILITY_COLORING)) {
