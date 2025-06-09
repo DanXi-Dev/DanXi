@@ -283,7 +283,8 @@ class ScheduleViewState extends State<ScheduleView> {
           const SizedBox(
             height: 4,
           ),
-          AutoSizeText(course.roomName!, minFontSize: 10, style: textStyle),
+          AutoSizeText(course.roomName ?? "",
+              minFontSize: 10, style: textStyle),
         ],
       ),
     );
