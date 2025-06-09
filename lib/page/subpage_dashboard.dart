@@ -62,12 +62,18 @@ class HomeSubpage extends PlatformSubpage<HomeSubpage> {
 
   @override
   Create<List<AppBarButtonItem>> get trailing => (cxt) => [
-        AppBarButtonItem(
-            S.of(cxt).dashboard_layout,
-            Text(S.of(cxt).edit, textScaler: TextScaler.linear(1.2)),
+    AppBarButtonItem(
+        S.of(cxt).dashboard_layout,
+        Icon(Icons.create_outlined),
             () => smartNavigatorPush(cxt, '/dashboard/reorder').then(
-                (value) => RefreshHomepageEvent(onlyRefreshOrder: true).fire()))
-      ];
+                (value) => RefreshHomepageEvent(onlyRefreshOrder: true).fire())),
+
+    AppBarButtonItem(
+        S.of(cxt).settings,
+        Icon(Icons.settings_outlined),
+            () => smartNavigatorPush(cxt, '/settings')
+    ),
+  ];
 }
 
 class RefreshHomepageEvent {
@@ -208,7 +214,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
         child: RefreshIndicator(
             edgeOffset: MediaQuery.of(context).padding.top,
             color: Theme.of(context).colorScheme.secondary,
-            backgroundColor: Theme.of(context).dialogBackgroundColor,
+            backgroundColor: DialogTheme.of(context).backgroundColor,
             onRefresh: () async {
               HapticFeedback.mediumImpact();
               LimitedQueuedInterceptor.getInstance().dropAllRequest();

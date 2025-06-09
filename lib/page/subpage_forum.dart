@@ -418,8 +418,11 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           if (lastElement != null) {
             time = DateTime.parse(lastElement.time_updated!);
           }
+
+          final requestDivisionId =
+              _tagFilter == null ? getDivisionId(context) : null;
           return ForumRepository.getInstance().loadHoles(
-              time, getDivisionId(context),
+              time, requestDivisionId,
               tag: _tagFilter,
               sortOrder: context.read<SettingsProvider>().forumSortOrder);
         }).call(page);
@@ -650,7 +653,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
         edgeOffset: MediaQuery.of(context).padding.top,
         key: indicatorKey,
         color: Theme.of(context).colorScheme.secondary,
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
+        backgroundColor: DialogTheme.of(context).backgroundColor,
         onRefresh: () async {
           HapticFeedback.mediumImpact();
           // Refresh the list...

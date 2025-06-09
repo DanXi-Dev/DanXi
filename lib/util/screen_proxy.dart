@@ -26,21 +26,21 @@ class ScreenProxy {
 
   static Future<double?> get brightness async {
     if (PlatformX.isMobile) {
-      return await ScreenBrightness().current;
+      return await ScreenBrightness().application;
     } else {
       return 0;
     }
   }
 
-  static setBrightness(double brightness) async {
+  static Future<void> setBrightness(double brightness) async {
     if (PlatformX.isMobile) {
-      await ScreenBrightness().setScreenBrightness(brightness);
+      await ScreenBrightness().setApplicationScreenBrightness(brightness);
     }
   }
 
-  static resetBrightness() async {
+  static Future<void> resetBrightness() async {
     if (PlatformX.isMobile) {
-      await ScreenBrightness().resetScreenBrightness();
+      await ScreenBrightness().resetApplicationScreenBrightness();
     }
   }
 }

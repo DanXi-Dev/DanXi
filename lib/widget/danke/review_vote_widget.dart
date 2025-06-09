@@ -35,10 +35,10 @@ class ReviewVoteWidget extends StatefulWidget {
 
   @override
   // pass reviewTotalVote to _ReviewVoteWidgetState
-  _ReviewVoteWidgetState createState() => _ReviewVoteWidgetState();
+  ReviewVoteWidgetState createState() => ReviewVoteWidgetState();
 }
 
-class _ReviewVoteWidgetState extends State<ReviewVoteWidget> {
+class ReviewVoteWidgetState extends State<ReviewVoteWidget> {
   // HydrogenC: Why is this field called remark on the server?
   late int _reviewVote;
 

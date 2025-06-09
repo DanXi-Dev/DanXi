@@ -19,6 +19,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -32,6 +33,7 @@ import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/repository/fdu/postgraduate_timetable_repository.dart';
 import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
+import 'package:dan_xi/util/io/cache_manager_with_webvpn.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -39,6 +41,7 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/retrier.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/util/timetable_converter_impl.dart';
+import 'package:dan_xi/widget/dialogs/manually_add_course_dialog.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
@@ -54,8 +57,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
-
-import '../widget/dialogs/manually_add_course_dialog.dart';
 
 /// Keys to locate buttons in the interactive tutorial.
 GlobalKey keyButton = GlobalKey();
@@ -184,7 +185,14 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Image.network(imageUrl),
+                        CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            cacheManager: DefaultCacheManagerWithWebvpn(),
+                            // Ensure shape is the same as the loading indicator
+                            fit: BoxFit.contain,
+                            progressIndicatorBuilder:
+                                (context, url, progress) =>
+                                    PlatformCircularProgressIndicator()),
                         TextField(controller: controller)
                       ],
                     ),
@@ -239,8 +247,9 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     if (PlatformX.isIOS) {
       OpenFile.open(outputFile.absolute.path, type: converter.mimeType);
     } else if (PlatformX.isAndroid) {
-      Share.shareXFiles(
-          [XFile(outputFile.absolute.path, mimeType: converter.mimeType!)]);
+      SharePlus.instance.share(ShareParams(files: [
+        XFile(outputFile.absolute.path, mimeType: converter.mimeType)
+      ]));
     } else if (mounted) {
       Noticing.showNotice(context, outputFile.absolute.path);
     }
@@ -435,13 +444,13 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     );
   }
 
-  goToPrev() {
+  void goToPrev() {
     setState(() {
       _showingTime!.week--;
     });
   }
 
-  goToNext() {
+  void goToNext() {
     setState(() {
       _showingTime!.week++;
     });
@@ -524,7 +533,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       key: indicatorKey,
       edgeOffset: MediaQuery.of(context).padding.top,
       color: Theme.of(context).colorScheme.secondary,
-      backgroundColor: Theme.of(context).dialogBackgroundColor,
+      backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
       onRefresh: () async {
         forceLoadFromRemote = true;
         HapticFeedback.mediumImpact();
@@ -588,7 +597,7 @@ class SemesterSelectionButton extends StatefulWidget {
 }
 
 class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
-  List<SemesterInfo>? _semesterInfo;
+  TimeTableSemesterInfo? _semesterInfo;
   SemesterInfo? _selectionInfo;
   late Future<void> _future;
 
@@ -599,17 +608,16 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
   }
 
   Future<void> loadSemesterInfo() async {
-    _semesterInfo = await EduServiceRepository.getInstance()
-        .loadSemesters(StateProvider.personInfo.value);
-    // Reverse the order to make the newest item at top
-    _semesterInfo = _semesterInfo?.reversed.toList();
+    _semesterInfo = await TimeTableRepository.getInstance()
+        .loadSemestersForTimeTable(StateProvider.personInfo.value!);
     String? chosenSemester = SettingsProvider.getInstance().timetableSemester;
     if (chosenSemester == null || chosenSemester.isEmpty) {
-      chosenSemester = await TimeTableRepository.getInstance()
-          .getDefaultSemesterId(StateProvider.personInfo.value);
+      chosenSemester = _semesterInfo!.defaultSemesterId;
     }
-    _selectionInfo = _semesterInfo!
+    _selectionInfo = _semesterInfo!.semesters
         .firstWhere((element) => element.semesterId == chosenSemester!);
+    SettingsProvider.getInstance().semesterStartDates =
+        _semesterInfo!.startDates;
   }
 
   @override
@@ -628,7 +636,7 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
                 cancelButton: CupertinoActionSheetAction(
                     child: Text(S.of(menuContext).cancel),
                     onPressed: () => Navigator.of(menuContext).pop()),
-                actions: _semesterInfo!
+                actions: _semesterInfo!.semesters
                     .map((e) => PlatformContextMenuItem(
                         menuContext: menuContext,
                         onPressed: () {

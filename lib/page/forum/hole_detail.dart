@@ -37,6 +37,8 @@ import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/watermark.dart';
 import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:dan_xi/widget/forum/ottag_selector.dart';
@@ -140,41 +142,193 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     final results = switch (_renderModel) {
       Normal(hole: var hole) => await ForumRepository.getInstance()
           .loadFloors(hole, startFloor: page * Constant.POST_COUNT_PER_PAGE),
-      Search(keyword: var searchKeyword) => await ForumRepository.getInstance()
-          .loadSearchResults(searchKeyword,
-              startFloor: _listViewController.length()),
+      Search(keyword: var searchKeyword, :final dateRange, :final accurate) =>
+        await ForumRepository.getInstance().loadSearchResults(searchKeyword,
+            startFloor: _listViewController.length(),
+            dateRange: dateRange,
+            accurate: accurate),
       MyReplies() => await ForumRepository.getInstance()
           .loadUserFloors(startFloor: _listViewController.length()),
+      ViewHistory() => (await ForumRepository.getInstance().loadHolesById(
+                  SettingsProvider.getInstance()
+                      .viewHistory
+                      .skip(_listViewController.length())) ??
+              [])
+          .map((hole) => hole.floors!.first_floor!)
+          .toList(),
       PunishmentHistory() => await loadPunishmentHistory(page),
     };
 
     return results;
   }
 
-  // construct the uri of the floor and copy it to clipboard
-  Future<bool> _shareFloorAsUri(int? floorId) async {
-    // String uri = 'https://www.fduhole.com/floor/$floorId';
-    String uri = '##$floorId';
+  /// Build the text form of a floor for sharing.
+  String _renderFloorAsText(OTFloor floor, int index) {
+    StringBuffer shareText = StringBuffer();
+    String postTime = DateFormat("yyyy/MM/dd HH:mm")
+        .format(DateTime.tryParse(floor.time_created!)!.toLocal());
+    shareText.writeln("${floor.anonyname} 于 $postTime");
+    shareText.writeln("${index}F (##${floor.floor_id})");
+    shareText.write(renderText(
+        floor.filteredContent ?? "",
+        S.of(context).image_tag,
+        S.of(context).formula,
+        S.of(context).sticker_tag,
+        removeMentions: false));
+    return shareText.toString();
+  }
+
+  Future<bool> _shareFloorAsText(OTFloor floor, int index) async {
     try {
-      if (floorId == null) return false;
-      await FlutterClipboard.copy(uri);
+      await FlutterClipboard.copy(_renderFloorAsText(floor, index));
     } catch (e) {
       return false;
     }
     return true;
   }
 
-  // construct the uri of the hole and copy it to clipboard
-  Future<bool> _shareHoleAsUri(int? holeId) async {
-    // String uri = 'https://www.fduhole.com/hole/$holeId';
-    String uri = '#$holeId';
+  Future<bool> _shareHoleAsText() async {
+    // load the whole post
+    ProgressFuture dialog = showProgressDialog(
+        loadingText: S.of(context).loading, context: context);
+    List<OTFloor> allFloors;
     try {
-      if (holeId == null) return false;
-      await FlutterClipboard.copy(uri);
+      allFloors = await _loadAllContent();
+    } catch (error, st) {
+      if (mounted) Noticing.showErrorDialog(context, error, trace: st);
+      return false;
+    } finally {
+      dialog.dismiss(showAnim: false);
+    }
+
+    if (!mounted) return false;
+    final List<int> selectedFloors = [];
+    final result = await showPlatformModalSheet<List<int>>(
+        context: context,
+        builder: (_) {
+          return StatefulBuilder(builder: (context, setState) {
+            return ConstrainedBox(
+              constraints: BoxConstraints(
+                  maxHeight: ViewportUtils.getViewportHeight(context) * 0.85),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text(
+                      S.of(context).share_hole_title,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      primary: false,
+                      shrinkWrap: true,
+                      itemCount: allFloors.length,
+                      itemBuilder: (context, index) {
+                        final floor = allFloors[index];
+                        return Stack(
+                          children: [
+                            OTFloorWidget(
+                              hasBackgroundImage: false,
+                              floor: floor,
+                              isInMention: true,
+                              showToolBars: false,
+                              showBottomBar: true,
+                              parentHole: (_renderModel as Normal).hole,
+                              onTap: () {
+                                setState(() {
+                                  if (selectedFloors.contains(index)) {
+                                    selectedFloors.remove(index);
+                                  } else {
+                                    selectedFloors.add(index);
+                                  }
+                                });
+                              },
+                            ),
+                            if (selectedFloors.contains(index)) ...[
+                              Positioned.fill(
+                                child: IgnorePointer(
+                                  child: Container(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary
+                                        .withValues(alpha: 0.5),
+                                  ),
+                                ),
+                              ),
+                              Positioned.fill(
+                                child: IgnorePointer(
+                                  child: Center(
+                                    child: Icon(
+                                      PlatformX.isMaterial(context)
+                                          ? Icons.check_circle
+                                          : CupertinoIcons
+                                              .check_mark_circled_solid,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ]
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                  SafeArea(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        TextButton(
+                          child: Text(S.of(context).select_all),
+                          onPressed: () {
+                            setState(() {
+                              // if all floors are selected, clear the selection.
+                              // Otherwise, select all floors.
+                              bool hasSelectedAll =
+                                  selectedFloors.length == allFloors.length;
+                              selectedFloors.clear();
+                              if (!hasSelectedAll) {
+                                selectedFloors.addAll(List.generate(
+                                    allFloors.length, (index) => index));
+                              }
+                            });
+                          },
+                        ),
+                        TextButton(
+                          onPressed: selectedFloors.isNotEmpty
+                              ? () => Navigator.of(context).pop(selectedFloors)
+                              : null,
+                          child: Text(S.of(context).confirm),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          });
+        });
+    if (result == null || !mounted) return false;
+
+    // build share text
+    StringBuffer shareText = StringBuffer();
+    result.forEachIndexed((index, floorIndex) {
+      shareText.write(_renderFloorAsText(allFloors[floorIndex], floorIndex));
+      if (index != result.length - 1) {
+        shareText.writeln();
+        shareText.writeln();
+      }
+    });
+    try {
+      await FlutterClipboard.copy(shareText.toString());
+      return true;
     } catch (e) {
       return false;
     }
-    return true;
   }
 
   @override
@@ -184,17 +338,32 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       OTHole hole = widget.arguments!['post'];
       _renderModel = Normal(hole);
 
+      // Record view history
+      SettingsProvider.getInstance().viewHistory = [
+        hole.hole_id!,
+        // Limit the number of view history, and avoid duplicate entries
+        ...SettingsProvider.getInstance()
+            .viewHistory
+            .filter((id) => id != hole.hole_id!)
+            .take(SettingsProvider.MAX_VIEW_HISTORY - 1)
+      ];
+
       // Update hole view count
       if (hole.hole_id != null) {
         unawaited(
             ForumRepository.getInstance().updateHoleViewCount(hole.hole_id!));
       }
     } else if (widget.arguments!.containsKey('searchKeyword')) {
-      _renderModel = Search(widget.arguments!['searchKeyword']);
+      _renderModel = Search(
+          widget.arguments!['searchKeyword'],
+          widget.arguments!['searchDateRange'],
+          widget.arguments!['searchAccurate']);
     } else if (widget.arguments?['punishmentHistory'] == true) {
       _renderModel = PunishmentHistory();
     } else if (widget.arguments?['myReplies'] == true) {
       _renderModel = MyReplies();
+    } else if (widget.arguments?['viewHistory'] == true) {
+      _renderModel = ViewHistory();
     }
 
     shouldScrollToEnd = widget.arguments?['scroll_to_end'] == true;
@@ -302,6 +471,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             Normal(hole: var hole) => Text("#${hole.hole_id}"),
             Search() => Text(S.of(context).search_result),
             MyReplies() => Text(S.of(context).list_my_replies),
+            ViewHistory() => Text(S.of(context).list_view_history),
             PunishmentHistory() => Text(S.of(context).list_my_punishments),
           },
         ),
@@ -329,7 +499,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               options: [
                 PopupMenuOption(
                     label: S.of(context).scroll_to_end,
-                    onTap: _onTapScrollToEnd),
+                    onTap: (_) {
+                      setState(() {
+                        shouldScrollToEnd = true;
+                      });
+                    }),
                 PopupMenuOption(
                     label: selectedPerson == hole.floors?.first_floor?.anonyname
                         ? S.of(context).show_all_replies
@@ -361,7 +535,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 PopupMenuOption(
                   label: S.of(context).share_hole,
                   onTap: (_) async {
-                    if (await _shareHoleAsUri(hole.hole_id)) {
+                    if (await _shareHoleAsText()) {
                       if (context.mounted) {
                         Noticing.showMaterialNotice(
                             context, S.of(context).shareHoleSuccess);
@@ -406,7 +580,21 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   ? const Icon(Icons.more_vert)
                   : const Icon(CupertinoIcons.ellipsis),
             ),
-          ]
+          ],
+          if (_renderModel case ViewHistory())
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: Icon(Icons.delete),
+              onPressed: () async {
+                if (await Noticing.showConfirmationDialog(
+                        context, S.of(context).are_you_sure,
+                        isConfirmDestructive: true) ==
+                    true) {
+                  SettingsProvider.getInstance().viewHistory = [];
+                  refreshListView();
+                }
+              },
+            )
         ],
       ),
       body: Builder(
@@ -421,7 +609,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             Normal() => RefreshIndicator(
                 edgeOffset: MediaQuery.of(context).padding.top,
                 color: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).dialogBackgroundColor,
+                backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
                 onRefresh: () async {
                   HapticFeedback.mediumImpact();
 
@@ -446,9 +634,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     ).withWatermarkRegion();
   }
 
-  // Load all floors, in case we have to scroll to end or to a specific floor
-  Future<void> _loadAllContent() async {
-    // If we haven't loaded before, we need to load all floors.
+  // Load all floors, in case we have to scroll to end or to a specific floor.
+  Future<List<OTFloor>> _loadAllContent() async {
     final allFloors = await ForumRepository.getInstance()
         .loadFloors((_renderModel as Normal).hole, startFloor: 0, length: 0);
 
@@ -458,21 +645,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
     _listViewController.replaceAllDataWith(allFloors);
     _allDataLoaded = true;
-  }
 
-  Future<void> _onTapScrollToEnd(_) async {
-    ProgressFuture dialog = showProgressDialog(
-        loadingText: S.of(context).loading, context: context);
-    try {
-      // The scrolling is actually performed in the post-build binding
-      setState(() {
-        shouldScrollToEnd = true;
-      });
-    } catch (error, st) {
-      Noticing.showErrorDialog(context, error, trace: st);
-    } finally {
-      dialog.dismiss(showAnim: false);
-    }
+    return allFloors;
   }
 
   Widget _buildFavoredActionButton() {
@@ -565,7 +739,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   List<OTTag> deepCopyTagList(List<OTTag> list) =>
       list.map((e) => OTTag.fromJson(jsonDecode(jsonEncode(e)))).toList();
 
-  List<Widget> _buildContextMenu(BuildContext menuContext, OTFloor e) {
+  List<Widget> _buildContextMenu(
+      BuildContext menuContext, OTFloor e, int index) {
     List<Widget> buildAdminMenu(BuildContext menuContext, OTFloor e) {
       return [
         PlatformContextMenuItem(
@@ -813,7 +988,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   context, S.of(context).request_success);
               ForumRepository.getInstance().invalidateFloorCache(e.floor_id!);
               final newFloor = await ForumRepository.getInstance()
-                  .loadSpecificFloor(e.floor_id!);
+                  .loadFloorById(e.floor_id!);
               _listViewController.replaceDatumWith(e, newFloor!);
             }
             // await refreshListView();
@@ -838,7 +1013,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                     context, S.of(context).request_success);
                 ForumRepository.getInstance().invalidateFloorCache(e.floor_id!);
                 final newFloor = await ForumRepository.getInstance()
-                    .loadSpecificFloor(e.floor_id!);
+                    .loadFloorById(e.floor_id!);
                 _listViewController.replaceDatumWith(e, newFloor!);
               } catch (e, st) {
                 Noticing.showErrorDialog(context, e, trace: st);
@@ -891,7 +1066,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       PlatformContextMenuItem(
         menuContext: menuContext,
         onPressed: () async {
-          if (await _shareFloorAsUri(e.floor_id)) {
+          if (await _shareFloorAsText(e, index)) {
             if (mounted) {
               Noticing.showMaterialNotice(
                   context, S.of(context).shareFloorSuccess);
@@ -1059,11 +1234,20 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         Normal(hole: var hole) => await ForumRepository.getInstance()
             .loadFloors(hole,
                 startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
-        Search(keyword: var searchKeyword) =>
+        Search(keyword: var searchKeyword, :final dateRange, :final accurate) =>
           await ForumRepository.getInstance().loadSearchResults(searchKeyword,
-              startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
+              startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE,
+              dateRange: dateRange,
+              accurate: accurate),
         MyReplies() => (await ForumRepository.getInstance().loadUserFloors(
             startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE)),
+        ViewHistory() => (await ForumRepository.getInstance().loadHolesById(
+                    SettingsProvider.getInstance()
+                        .viewHistory
+                        .skip(_listViewController.length())) ??
+                [])
+            .map((hole) => hole.floors!.first_floor!)
+            .toList(),
         PunishmentHistory() =>
           (await ForumRepository.getInstance().getPunishmentHistory())
               ?.map((e) => e.floor!)
@@ -1097,7 +1281,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             builder: (BuildContext context) => PlatformContextMenu(
                 actions: _multiSelectMode
                     ? _buildMultiSelectContextMenu(context)
-                    : _buildContextMenu(context, floor),
+                    : _buildContextMenu(context, floor, index),
                 cancelButton: CupertinoActionSheetAction(
                   child: Text(S.of(context).cancel),
                   onPressed: () => Navigator.of(context).pop(),
@@ -1253,10 +1437,14 @@ class Normal extends RenderModel {
 
 class Search extends RenderModel {
   String keyword;
+  (DateTime? start, DateTime? end) dateRange;
+  bool accurate;
 
-  Search(this.keyword);
+  Search(this.keyword, this.dateRange, this.accurate);
 }
 
 class MyReplies extends RenderModel {}
+
+class ViewHistory extends RenderModel {}
 
 class PunishmentHistory extends RenderModel {}

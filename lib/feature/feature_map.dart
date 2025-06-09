@@ -40,7 +40,7 @@ class FeatureMap {
   /// Register all features with [registerFeature].
   ///
   /// Should be invoked only once at startup.
-  static registerAllFeatures() {
+  static void registerAllFeatures() {
     registerFeature(
         "bus_feature", () => BusFeature(), (cxt) => S.of(cxt).bus_query);
     registerFeature(

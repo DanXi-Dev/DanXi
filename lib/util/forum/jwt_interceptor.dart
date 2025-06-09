@@ -41,7 +41,7 @@ class JWTInterceptor extends QueuedInterceptor {
     _dio.interceptors.add(CookieManager(WebvpnProxy.webvpnCookieJar));
   }
 
-  static _rewriteRequestOptionsWithToken(
+  static RequestOptions _rewriteRequestOptionsWithToken(
       RequestOptions options, JWToken token) {
     Map<String, dynamic> newHeader =
         options.headers.map((key, value) => MapEntry(key, value));

@@ -40,6 +40,8 @@ class UISLoginTool {
   static const String WEAK_PASSWORD = "弱密码提示";
   static const String UNDER_MAINTENANCE = "网络维护中 | Under Maintenance";
 
+  static const String ID_HOST = "id.fudan.edu.cn";
+
   /// RWLocks to prevent multiple login requests happening at the same time.
   static final Map<IndependentCookieJar, ReadWriteMutex> _lockMap = {};
 
@@ -87,6 +89,12 @@ class UISLoginTool {
       },
       retryTimes: retryTimes,
       isFatalError: isFatalError,
+      // If there is an explicit reason for UIS login failure, we should not retry anymore.
+      isFatalRetryError: (e) =>
+          e is CredentialsInvalidException ||
+          e is CaptchaNeededException ||
+          e is NetworkMaintenanceException ||
+          e is WeakPasswordException,
     );
   }
 
@@ -147,11 +155,61 @@ class UISLoginTool {
     } else if (response.data.toString().contains(UNDER_MAINTENANCE)) {
       throw NetworkMaintenanceException();
     } else if (response.data.toString().contains(WEAK_PASSWORD)) {
-      throw GeneralLoginFailedException();
+      throw WeakPasswordException();
     }
 
     jar.cloneFrom(workJar);
     return response;
+  }
+
+  static Future<String?> getAuthenticateTicket(
+      Dio dio,
+      IndependentCookieJar jar,
+      PersonInfo? info,
+      String requestURL,
+      String uisLoginURL) async {
+    Response<dynamic>? res = await dio.get(requestURL,
+        options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
+    if (DioUtils.getRedirectLocation(res) != null) {
+      // if we are redirected to UIS, we need to login to UIS first
+      await DioUtils.processRedirect(dio, res);
+      res = await UISLoginTool.loginUIS(dio, uisLoginURL, jar, info);
+      if (res == null) {
+        throw AuthenticationFailedException();
+      }
+    }
+    return _retrieveTicket(res);
+  }
+
+  static Future<void> authenticateWithTicket(
+      Dio dio,
+      IndependentCookieJar jar,
+      PersonInfo? info,
+      String requestURL,
+      String uisLoginURL,
+      String loginURL,
+      Map<String, dynamic> queryParams) async {
+    final ticket =
+        await getAuthenticateTicket(dio, jar, info, requestURL, uisLoginURL);
+
+    queryParams['ticket'] = ticket;
+
+    final response = await dio.get(loginURL,
+        queryParameters: queryParams,
+        options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
+    await DioUtils.processRedirect(dio, response);
+  }
+
+  static String? _retrieveTicket(Response<dynamic> response) {
+    // Check if the URL host matches the expected value
+    if (response.realUri.host != ID_HOST) {
+      return null;
+    }
+
+    BeautifulSoup soup = BeautifulSoup(response.data!);
+
+    final element = soup.find('', selector: '#ticket');
+    return element?.attributes['value'];
   }
 }
 
@@ -161,4 +219,6 @@ class CredentialsInvalidException implements Exception {}
 
 class NetworkMaintenanceException implements Exception {}
 
-class GeneralLoginFailedException implements Exception {}
+class WeakPasswordException implements Exception {}
+
+class AuthenticationFailedException implements Exception {}

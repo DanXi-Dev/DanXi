@@ -22,7 +22,6 @@ import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/forum/user.dart';
 import 'package:dan_xi/page/home_page.dart';
-import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
@@ -36,7 +35,6 @@ import 'package:dan_xi/util/io/cache_manager_with_webvpn.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/win32/auto_start.dart'
     if (dart.library.html) 'package:dan_xi/util/win32/auto_start_stub.dart';
@@ -71,17 +69,14 @@ Future<void> updateOTUserProfile(BuildContext context) async {
   }
 }
 
-class SettingsSubpage extends PlatformSubpage<SettingsSubpage> {
-  @override
-  SettingsSubpageState createState() => SettingsSubpageState();
-
-  const SettingsSubpage({super.key});
+class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
 
   @override
-  Create<Widget> get title => (cxt) => Text(S.of(cxt).settings);
+  State<SettingsPage> createState() => SettingsPageState();
 }
 
-class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
+class SettingsPageState extends State<SettingsPage> {
   /// All open-source license for the app.
   static const List<LicenseItem> _LICENSE_ITEMS = [
     LicenseItem("asn1lib", LICENSE_BSD, "https://github.com/wstrange/asn1lib"),
@@ -258,7 +253,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
     onTapListener(Campus campus) {
       SettingsProvider.getInstance().campus = campus;
       dashboardPageKey.currentState?.triggerRebuildFeatures();
-      refreshSelf();
+      setState(() {});
     }
 
     for (var value in Constant.CAMPUS_VALUES) {
@@ -278,7 +273,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
           value.internalString();
       updateOTUserProfile(context);
       forumPageKey.currentState?.setState(() {});
-      refreshSelf();
+      setState(() {});
     }
 
     for (var value in FoldBehavior.values) {
@@ -326,316 +321,359 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
   }
 
   @override
-  Widget buildPage(BuildContext context) {
+  Widget build(BuildContext context) {
+    final bool supportsDynamicColor = context.read<SettingsProvider>().supportsDynamicColor;
     // Load preference fields
-    return WithScrollbar(
-        controller: PrimaryScrollController.of(context),
-        child: RefreshIndicator(
-            edgeOffset: MediaQuery.of(context).padding.top,
-            color: Theme.of(context).colorScheme.secondary,
-            backgroundColor: Theme.of(context).dialogBackgroundColor,
-            onRefresh: () async {
-              HapticFeedback.mediumImpact();
-              refreshSelf();
-            },
-            child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  //Account Selection
-                  Card(
-                    child: Column(children: [
-                      ListTile(
-                        title: Text(S.of(context).account),
-                        leading: PlatformX.isMaterial(context)
-                            ? const Icon(Icons.account_circle)
-                            : const Icon(CupertinoIcons.person_circle),
-                        subtitle: Text(
-                            "${StateProvider.personInfo.value!.name} (${StateProvider.personInfo.value!.id})"),
-                        onTap: () {
-                          showPlatformDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (BuildContext context) =>
-                                PlatformAlertDialog(
-                              title: Text(
-                                  S.of(context).logout_question_prompt_title),
-                              content:
-                                  Text(S.of(context).logout_question_prompt),
-                              actions: [
-                                PlatformDialogAction(
-                                  child: Text(S.of(context).cancel),
-                                  onPressed: () => Navigator.of(context).pop(),
-                                ),
-                                PlatformDialogAction(
-                                    child: Text(
-                                      S.of(context).i_see,
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .error),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      _deleteAllDataAndExit();
-                                    })
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-
-                      // Campus
-                      ListTile(
-                        title: Text(S.of(context).default_campus),
-                        leading: PlatformX.isMaterial(context)
-                            ? const Icon(Icons.location_on)
-                            : const Icon(CupertinoIcons.location_fill),
-                        subtitle: Text(SettingsProvider.getInstance()
-                            .campus
-                            .displayTitle(context)),
-                        onTap: () => showPlatformModalSheet(
-                            context: context,
-                            builder: (BuildContext context) =>
-                                PlatformContextMenu(
-                                    actions: _buildCampusAreaList(context),
-                                    cancelButton: CupertinoActionSheetAction(
-                                        child: Text(S.of(context).cancel),
-                                        onPressed: () =>
-                                            Navigator.of(context).pop()))),
-                      ),
-                    ]),
-                  ),
-                  // Accessibility
-                  Card(
-                    child: Column(
-                      children: [
-                        ListTile(
-                          title: Text(S.of(context).default_language),
-                          leading: PlatformX.isMaterial(context)
-                              ? const Icon(Icons.language)
-                              : const Icon(CupertinoIcons.globe),
-                          subtitle: Text(SettingsProvider.getInstance()
-                              .language
-                              .displayTitle(context)),
-                          onTap: () => showPlatformModalSheet(
-                              context: context,
-                              builder: (BuildContext context) =>
-                                  PlatformContextMenu(
-                                      actions: _buildLanguageList(context),
-                                      cancelButton: CupertinoActionSheetAction(
-                                          child: Text(S.of(context).cancel),
-                                          onPressed: () =>
-                                              Navigator.of(context).pop()))),
-                        ),
-                        Selector<SettingsProvider, bool>(
-                          selector: (_, model) =>
-                              model.useAccessibilityColoring,
-                          builder: (_, bool value, __) =>
-                              SwitchListTile.adaptive(
-                            title: Text(S.of(context).accessibility_coloring),
-                            subtitle: Text(
-                                S.of(context).high_contrast_color_description),
-                            secondary:
-                                const Icon(Icons.accessibility_new_rounded),
-                            value: value,
-                            onChanged: (bool value) {
-                              SettingsProvider.getInstance()
-                                  .useAccessibilityColoring = value;
-                              forumPageKey.currentState?.setState(() {});
-                            },
-                          ),
-                        ),
-                        if (PlatformX.isMaterial(context))
+    return PlatformScaffold(
+      appBar: PlatformAppBar(
+        title: Text(S.of(context).settings),
+      ),
+      body: SafeArea(
+        child: WithScrollbar(
+            controller: PrimaryScrollController.of(context),
+            child: RefreshIndicator(
+                edgeOffset: MediaQuery.of(context).padding.top,
+                color: Theme.of(context).colorScheme.secondary,
+                backgroundColor: DialogTheme.of(context).backgroundColor,
+                onRefresh: () async {
+                  HapticFeedback.mediumImpact();
+                  setState(() {});
+                },
+                child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      //Account Selection
+                      Card(
+                        child: Column(children: [
                           ListTile(
-                            title: Text(S.of(context).theme_color),
-                            subtitle:
-                                Text(S.of(context).theme_color_description),
-                            leading: const Icon(Icons.color_lens),
-                            onTap: () async {
-                              MaterialColor? result =
-                                  await showPlatformDialog<MaterialColor?>(
+                            title: Text(S.of(context).account),
+                            leading: PlatformX.isMaterial(context)
+                                ? const Icon(Icons.account_circle)
+                                : const Icon(CupertinoIcons.person_circle),
+                            subtitle: Text(
+                                "${StateProvider.personInfo.value!.name} (${StateProvider.personInfo.value!.id})"),
+                            onTap: () {
+                              showPlatformDialog(
                                 context: context,
-                                builder: (_) => SwatchPickerDialog(
-                                  initialSelectedColor: context
-                                      .read<SettingsProvider>()
-                                      .primarySwatch,
+                                barrierDismissible: false,
+                                builder: (BuildContext context) =>
+                                    PlatformAlertDialog(
+                                  title: Text(
+                                      S.of(context).logout_question_prompt_title),
+                                  content:
+                                      Text(S.of(context).logout_question_prompt),
+                                  actions: [
+                                    PlatformDialogAction(
+                                      child: Text(S.of(context).cancel),
+                                      onPressed: () => Navigator.of(context).pop(),
+                                    ),
+                                    PlatformDialogAction(
+                                        child: Text(
+                                          S.of(context).i_see,
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .error),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                          _deleteAllDataAndExit();
+                                        })
+                                  ],
                                 ),
                               );
-                              if (result != null && mounted) {
-                                context
-                                    .read<SettingsProvider>()
-                                    .setPrimarySwatch(result.value);
-                                FlutterApp.restartApp(context);
-                              }
                             },
                           ),
-                        ListTile(
-                          title: Text(S.of(context).theme),
-                          subtitle: Text(context
-                                  .select<SettingsProvider, ThemeType>(
-                                      (s) => s.themeType)
-                                  .displayTitle(context) ??
-                              "null"),
-                          leading: const Icon(Icons.brightness_4),
-                          onTap: () => showPlatformModalSheet(
-                              context: context,
-                              builder: (BuildContext context) =>
-                                  PlatformContextMenu(
-                                      actions: _buildThemeList(context),
-                                      cancelButton: CupertinoActionSheetAction(
-                                          child: Text(S.of(context).cancel),
-                                          onPressed: () =>
-                                              Navigator.of(context).pop()))),
-                        ),
-                        ListTile(
-                          title: Text(S.of(context).proxy_setting),
-                          subtitle: Text(
-                              context.select<SettingsProvider, String?>(
-                                      (s) => s.proxy) ??
-                                  S.of(context).proxy_setting_unset),
-                          leading: const Icon(Icons.network_ping),
-                          onTap: () async {
-                            String? addr = await Noticing.showInputDialog(
-                                context,
-                                S.of(context).proxy_setting_input_title,
-                                initialText:
-                                    context.read<SettingsProvider>().proxy,
-                                hintText:
-                                    S.of(context).proxy_setting_input_hint);
-                            if (!context.mounted || addr == null) {
-                              return; // return if cancelled
-                            }
-                            if (addr.isEmpty) addr = null;
-                            context.read<SettingsProvider>().proxy = addr;
-                            await Noticing.showNotice(context,
-                                S.of(context).proxy_setting_set_successfully);
-                          },
-                          enabled: !PlatformX.isWeb,
-                        ),
-                        if (context.select<SettingsProvider, bool>(
-                            (value) => value.hiddenNotifications.isNotEmpty))
-                          ListTile(
-                            title:
-                                Text(S.of(context).show_hidden_notifications),
-                            subtitle: Text(S
-                                .of(context)
-                                .show_hidden_notifications_description),
-                            leading: const Icon(Icons.notifications_off),
-                            onTap: () => context
-                                .read<SettingsProvider>()
-                                .hiddenNotifications = [],
-                          ),
-                        SwitchListTile.adaptive(
-                            title: Text(S.of(context).use_webvpn_title),
-                            secondary: const Icon(Icons.network_cell),
-                            subtitle:
-                                Text(S.of(context).use_webvpn_description),
-                            value: context.select<SettingsProvider, bool>(
-                                (s) => s.useWebvpn),
-                            onChanged: (bool value) async {
-                              context.read<SettingsProvider>().useWebvpn =
-                                  value;
-                            })
-                      ],
-                    ),
-                  ),
-                  if (PlatformX.isWindows)
-                    Card(
-                      child: SwitchListTile.adaptive(
-                          title: Text(S.of(context).windows_auto_start_title),
-                          secondary: const Icon(Icons.settings_power),
-                          subtitle: Text(
-                              S.of(context).windows_auto_start_description),
-                          value: WindowsAutoStart.autoStart,
-                          onChanged: (bool value) async {
-                            WindowsAutoStart.autoStart = value;
-                            await Noticing.showNotice(
-                                context,
-                                S
-                                    .of(context)
-                                    .windows_auto_start_wait_dialog_message,
-                                title: S
-                                    .of(context)
-                                    .windows_auto_start_wait_dialog_title,
-                                useSnackBar: false);
-                            refreshSelf();
-                          }),
-                    ),
 
-                  // FDUHOLE
-                  _buildForumSettingsCard(context),
-                  if (SettingsProvider.getInstance().debugMode)
-                    //Theme Selection
-                    Card(
-                      child: ListTile(
-                        title: Text(S.of(context).theme),
-                        leading: PlatformX.isMaterial(context)
-                            ? const Icon(Icons.color_lens)
-                            : const Icon(CupertinoIcons.color_filter),
-                        subtitle: Text(PlatformX.isMaterial(context)
-                            ? S.of(context).material
-                            : S.of(context).cupertino),
-                        onTap: () => PlatformX.isMaterial(context)
-                            ? PlatformProvider.of(context)!
-                                .changeToCupertinoPlatform()
-                            : PlatformProvider.of(context)!
-                                .changeToMaterialPlatform(),
+                          // Campus
+                          ListTile(
+                            title: Text(S.of(context).default_campus),
+                            leading: PlatformX.isMaterial(context)
+                                ? const Icon(Icons.location_on)
+                                : const Icon(CupertinoIcons.location_fill),
+                            subtitle: Text(SettingsProvider.getInstance()
+                                .campus
+                                .displayTitle(context)),
+                            onTap: () => showPlatformModalSheet(
+                                context: context,
+                                builder: (BuildContext sheetContext) =>
+                                    PlatformContextMenu(
+                                        actions: _buildCampusAreaList(sheetContext),
+                                        cancelButton: CupertinoActionSheetAction(
+                                                child: Text(S.of(sheetContext).cancel),
+                                                onPressed: () =>
+                                                    Navigator.of(sheetContext).pop()))),
+                          ),
+                        ]),
                       ),
-                    ),
-                  if (SettingsProvider.getInstance().debugMode)
-                    Card(
-                        child: ListTile(
-                            title: const Text("Fancy Watermark"),
-                            leading: const Icon(Icons.numbers),
-                            subtitle: const Text(
-                                "[WARNING: DEBUG FEATURE] Visible watermark"),
-                            onTap: () {
-                              if (SettingsProvider.getInstance()
-                                  .visibleWatermarkMode) {
-                                SettingsProvider.getInstance()
-                                    .lightWatermarkColor = 0x2a000000;
-                                SettingsProvider.getInstance()
-                                    .darkWatermarkColor = 0x2a000000;
-                                SettingsProvider.getInstance()
-                                    .visibleWatermarkMode = false;
+                      // Accessibility
+                      Card(
+                        child: Column(
+                          children: [
+                            ListTile(
+                              title: Text(S.of(context).default_language),
+                              leading: PlatformX.isMaterial(context)
+                                  ? const Icon(Icons.language)
+                                  : const Icon(CupertinoIcons.globe),
+                              subtitle: Text(SettingsProvider.getInstance()
+                                  .language
+                                  .displayTitle(context)),
+                              onTap: () => showPlatformModalSheet(
+                                  context: context,
+                                  builder: (BuildContext sheetContext) =>
+                                      PlatformContextMenu(
+                                          actions: _buildLanguageList(sheetContext),
+                                          cancelButton: CupertinoActionSheetAction(
+                                                  child: Text(S.of(sheetContext).cancel),
+                                                  onPressed: () =>
+                                                      Navigator.of(sheetContext).pop()))),
+                            ),
+
+                            Selector<SettingsProvider, bool>(
+                              selector: (_, model) =>
+                                  model.useAccessibilityColoring,
+                              builder: (_, bool value, __) =>
+                                  SwitchListTile.adaptive(
+                                title: Text(S.of(context).accessibility_coloring),
+                                subtitle: Text(
+                                    S.of(context).high_contrast_color_description),
+                                secondary:
+                                    const Icon(Icons.accessibility_new_rounded),
+                                value: value,
+                                onChanged: (bool value) {
+                                  SettingsProvider.getInstance()
+                                      .useAccessibilityColoring = value;
+                                  forumPageKey.currentState?.setState(() {});
+                                },
+                              ),
+                            ),
+
+                            Builder(
+                              builder: (context) {
+                              // Watch the followSystemPalette setting
+                              bool isFollowingSystemPalette = PlatformX.isAndroid && context.read<SettingsProvider>().followSystemPalette;
+
+                              // Conditionally build the ListTile for theme color
+                              if (PlatformX.isMaterial(context)) {
+                                return ListTile(
+                                  title: Text(S.of(context).theme_color),
+                                  subtitle: Text(
+                                      S.of(context).theme_color_description),
+                                  leading: const Icon(Icons.color_lens),
+                                  // Disable if following system palette
+                                  enabled: !isFollowingSystemPalette,
+                                  onTap: isFollowingSystemPalette
+                                      ? null // Set onTap to null when disabled
+                                      : () async {
+                                          int initialColor = context.read<SettingsProvider>().primarySwatch;
+
+                                          MaterialColor? result =
+                                              await showPlatformDialog<MaterialColor?>(
+                                            context: context,
+                                            builder: (_) => SwatchPickerDialog(
+                                              initialSelectedColor: initialColor,
+                                            ),
+                                          );
+
+                                          if (result != null && mounted) {
+                                            context
+                                                .read<SettingsProvider>()
+                                                .setPrimarySwatch(result.value);
+                                          } else {}
+                                        },
+                                );
                               } else {
-                                SettingsProvider.getInstance()
-                                    .lightWatermarkColor = 0x01000000;
-                                SettingsProvider.getInstance()
-                                    .darkWatermarkColor = 0x01000000;
-                                SettingsProvider.getInstance()
-                                    .visibleWatermarkMode = true;
+                                return const SizedBox.shrink();
                               }
-                              FlutterApp.restartApp(context);
-                            })),
-                    // Sponsor Option
-                    // if (PlatformX.isMobile)
-                    //   Card(
-                    //     child: ListTile(
-                    //       isThreeLine:
-                    //           !SettingsProvider.getInstance().isAdEnabled,
-                    //       leading: Icon(
-                    //         PlatformIcons(context).heartSolid,
-                    //       ),
-                    //       title: Text(S.of(context).sponsor_us),
-                    //       subtitle: Text(
-                    //           SettingsProvider.getInstance().isAdEnabled
-                    //               ? S.of(context).sponsor_us_enabled
-                    //               : S.of(context).sponsor_us_disabled),
-                    //       onTap: () async {
-                    //         if (SettingsProvider.getInstance().isAdEnabled) {
-                    //           _toggleAdDisplay();
-                    //         } else {
-                    //           _toggleAdDisplay();
-                    //           await _showAdsThankDialog();
-                    //         }
-                    //       },
-                    //     ),
-                    //   ),
+                            }
+                        ),
+
+                            if (supportsDynamicColor)
+                              Selector<SettingsProvider, bool>(
+                                selector: (_, settings) => settings.followSystemPalette,
+                                builder: (context, followSystemPaletteValue, _) {
+                                  return SwitchListTile.adaptive(
+                                    title: Text(S.of(context).follow_system_palette),
+                                    subtitle: Text(S.of(context).follow_system_palette_description),
+                                    secondary: const Icon(Icons.palette_outlined),
+                                    value: followSystemPaletteValue,
+                                    onChanged: (bool value) {
+                                      context.read<SettingsProvider>().followSystemPalette = value;
+                                    },
+                                  );
+                                },
+                              ),
+
+                            ListTile(
+                              title: Text(S.of(context).theme),
+                              subtitle: Text(context
+                                      .select<SettingsProvider, ThemeType>(
+                                          (s) => s.themeType)
+                                      .displayTitle(context) ??
+                                  "null"),
+                              leading: const Icon(Icons.brightness_4),
+                              onTap: () => showPlatformModalSheet(
+                                  context: context,
+                                  builder: (BuildContext sheetContext) =>
+                                      PlatformContextMenu(
+                                          actions: _buildThemeList(sheetContext),
+                                          cancelButton: CupertinoActionSheetAction(
+                                                  child: Text(S.of(sheetContext).cancel),
+                                                  onPressed: () =>
+                                                  Navigator.of(sheetContext).pop()))),
+                            ),
+                            ListTile(
+                              title: Text(S.of(context).proxy_setting),
+                              subtitle: Text(
+                                  context.select<SettingsProvider, String?>(
+                                          (s) => s.proxy) ??
+                                      S.of(context).proxy_setting_unset),
+                              leading: const Icon(Icons.network_ping),
+                              onTap: () async {
+                                String? addr = await Noticing.showInputDialog(
+                                    context,
+                                    S.of(context).proxy_setting_input_title,
+                                    initialText:
+                                        context.read<SettingsProvider>().proxy,
+                                    hintText:
+                                        S.of(context).proxy_setting_input_hint);
+                                if (!context.mounted || addr == null) {
+                                  return; // return if cancelled
+                                }
+                                if (addr.isEmpty) addr = null;
+                                context.read<SettingsProvider>().proxy = addr;
+                                await Noticing.showNotice(context,
+                                    S.of(context).proxy_setting_set_successfully);
+                              },
+                              enabled: !PlatformX.isWeb,
+                            ),
+                            if (context.select<SettingsProvider, bool>(
+                                (value) => value.hiddenNotifications.isNotEmpty))
+                              ListTile(
+                                title:
+                                Text(S.of(context).show_hidden_notifications),
+                                subtitle: Text(S
+                                    .of(context)
+                                    .show_hidden_notifications_description),
+                                leading: const Icon(Icons.notifications_off),
+                                onTap: () => context
+                                        .read<SettingsProvider>()
+                                        .hiddenNotifications = [],
+                              ),
+                            SwitchListTile.adaptive(
+                                title: Text(S.of(context).use_webvpn_title),
+                                secondary: const Icon(Icons.network_cell),
+                                subtitle:
+                                    Text(S.of(context).use_webvpn_description),
+                                value: context.select<SettingsProvider, bool>(
+                                    (s) => s.useWebvpn),
+                                onChanged: (bool value) async {
+                                  context.read<SettingsProvider>().useWebvpn =
+                                      value;
+                                })
+                          ],
+                        ),
+                      ),
+                      if (PlatformX.isWindows)
+                        Card(
+                          child: SwitchListTile.adaptive(
+                              title: Text(S.of(context).windows_auto_start_title),
+                              secondary: const Icon(Icons.settings_power),
+                              subtitle: Text(
+                                  S.of(context).windows_auto_start_description),
+                              value: WindowsAutoStart.autoStart,
+                              onChanged: (bool value) async {
+                                WindowsAutoStart.autoStart = value;
+                                await Noticing.showNotice(
+                                    context,
+                                    S
+                                        .of(context)
+                                        .windows_auto_start_wait_dialog_message,
+                                    title: S
+                                        .of(context)
+                                        .windows_auto_start_wait_dialog_title,
+                                    useSnackBar: false);
+                                setState(() {});
+                              }),
+                        ),
+
+                      // FDUHOLE
+                      _buildForumSettingsCard(context),
+                      if (SettingsProvider.getInstance().debugMode)
+                        //Theme Selection
+                        Card(
+                          child: ListTile(
+                            title: Text(S.of(context).theme),
+                            leading: PlatformX.isMaterial(context)
+                                ? const Icon(Icons.color_lens)
+                                : const Icon(CupertinoIcons.color_filter),
+                            subtitle: Text(PlatformX.isMaterial(context)
+                                ? S.of(context).material
+                                : S.of(context).cupertino),
+                            onTap: () => PlatformX.isMaterial(context)
+                                ? PlatformProvider.of(context)!
+                                    .changeToCupertinoPlatform()
+                                : PlatformProvider.of(context)!
+                                    .changeToMaterialPlatform(),
+                          ),
+                        ),
+                      if (SettingsProvider.getInstance().debugMode)
+                        Card(
+                            child: ListTile(
+                                title: const Text("Fancy Watermark"),
+                                leading: const Icon(Icons.numbers),
+                                subtitle: const Text(
+                                    "[WARNING: DEBUG FEATURE] Visible watermark"),
+                                onTap: () {
+                                  if (SettingsProvider.getInstance()
+                                      .visibleWatermarkMode) {
+                                    SettingsProvider.getInstance()
+                                        .lightWatermarkColor = 0x2a000000;
+                                    SettingsProvider.getInstance()
+                                        .darkWatermarkColor = 0x2a000000;
+                                    SettingsProvider.getInstance()
+                                        .visibleWatermarkMode = false;
+                                  } else {
+                                    SettingsProvider.getInstance()
+                                        .lightWatermarkColor = 0x04000000;
+                                    SettingsProvider.getInstance()
+                                        .darkWatermarkColor = 0x0a000000;
+                                    SettingsProvider.getInstance()
+                                        .visibleWatermarkMode = true;
+                                  }
+                                  FlutterApp.restartApp(context);
+                                })),
+
+                  // Sponsor Option
+                  // if (PlatformX.isMobile)
+                  //   Card(
+                  //     child: ListTile(
+                  //       isThreeLine:
+                  //           !SettingsProvider.getInstance().isAdEnabled,
+                  //       leading: Icon(
+                  //         PlatformIcons(context).heartSolid,
+                  //       ),
+                  //       title: Text(S.of(context).sponsor_us),
+                  //       subtitle: Text(
+                  //           SettingsProvider.getInstance().isAdEnabled
+                  //               ? S.of(context).sponsor_us_enabled
+                  //               : S.of(context).sponsor_us_disabled),
+                  //       onTap: () async {
+                  //         if (SettingsProvider.getInstance().isAdEnabled) {
+                  //           _toggleAdDisplay();
+                  //         } else {
+                  //           _toggleAdDisplay();
+                  //           await _showAdsThankDialog();
+                  //         }
+                  //       },
+                  //     ),
+                  //   ),
 
                   // About
                   _buildAboutCard(context)
-                ])));
+                ]))),
+      ),
+    );
   }
 
   Widget _buildForumSettingsCard(BuildContext context) {
@@ -666,34 +704,34 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     onTap: () {
                       showPlatformModalSheet(
                           context: context,
-                          builder: (BuildContext context) =>
+                          builder: (BuildContext sheetContext) =>
                               PlatformContextMenu(
-                                actions: _buildFoldBehaviorList(context),
+                                actions: _buildFoldBehaviorList(sheetContext),
                                 cancelButton: CupertinoActionSheetAction(
-                                  child: Text(S.of(context).cancel),
-                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: Text(S.of(sheetContext).cancel),
+                                  onPressed: () => Navigator.of(sheetContext).pop(),
                                 ),
                               ));
                     },
                   ),
-                  errorBuilder: ListTile(
+                  errorBuilder: (context, error, stackTrace) => ListTile(
                     title: Text(S.of(context).forum_nsfw_behavior),
                     leading: PlatformX.isMaterial(context)
                         ? const Icon(Icons.hide_image)
                         : const Icon(CupertinoIcons.eye_slash),
                     subtitle: Text(S.of(context).fatal_error),
-                    onTap: () => refreshSelf(),
+                    onTap: () => setState(() {}),
                   ),
-                  loadingBuilder: ListTile(
+                  loadingBuilder: (context) => ListTile(
                     title: Text(S.of(context).forum_nsfw_behavior),
                     leading: PlatformX.isMaterial(context)
                         ? const Icon(Icons.hide_image)
                         : const Icon(CupertinoIcons.eye_slash),
                     subtitle: Text(S.of(context).loading),
-                    onTap: () => refreshSelf(),
+                    onTap: () => setState(() {}),
                   ),
                 ),
-                OTNotificationSettingsTile(onSettingsUpdate: refreshSelf),
+                OTNotificationSettingsTile(onSettingsUpdate: () => setState(() {})),
                 Selector<SettingsProvider, bool>(
                     builder: (_, bool value, __) => SwitchListTile.adaptive(
                           title: Text(S.of(context).forum_show_banner),
@@ -772,12 +810,13 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                       final ImagePickerProxy picker =
                           ImagePickerProxy.createPicker();
                       final String? image = await picker.pickImage();
-                      if (image == null) return;
+                      if (image == null || !mounted) return;
                       final String path =
                           (await getApplicationDocumentsDirectory()).path;
                       final File file = File(image);
                       final imagePath = '$path/background';
                       await file.copy(imagePath);
+                      if (!mounted) return;
                       SettingsProvider.getInstance().backgroundImagePath =
                           imagePath;
                       forumPageKey.currentState?.setState(() {});
@@ -792,6 +831,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                           await file.delete();
                           await FileImage(file).evict();
                         }
+                        if (!mounted) return;
                         SettingsProvider.getInstance().backgroundImagePath =
                             null;
                         forumPageKey.currentState?.setState(() {});
@@ -846,6 +886,13 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                 ),
                 ListTile(
                   leading: nil,
+                  title: Text(S.of(context).list_view_history),
+                  onTap: () => smartNavigatorPush(context, '/bbs/postDetail',
+                      arguments: {'viewHistory': true},
+                      forcePushOnMainNavigator: true),
+                ),
+                ListTile(
+                  leading: nil,
                   title: Text(S.of(context).list_my_punishments),
                   onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
                       arguments: {"punishmentHistory": true}),
@@ -873,13 +920,14 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                     } else {
                       await ForumRepository.getInstance().initializeRepo();
                       onLogout();
-                      refreshSelf();
+                      setState(() {});
                     }
                   } else if (await Noticing.showConfirmationDialog(
                           context, S.of(context).logout_forum,
                           title: S.of(context).logout,
                           isConfirmDestructive: true) ==
                       true) {
+                    if (!mounted) return;
                     ProgressFuture progressDialog = showProgressDialog(
                         loadingText: S.of(context).logout, context: context);
                     try {
@@ -904,16 +952,16 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
 
   static const String CLEAN_MODE_EXAMPLE = '`差不多得了😅，自己不会去看看吗😇`';
 
-  _showCleanModeGuideDialog() => showPlatformDialog(
+  Future _showCleanModeGuideDialog() => showPlatformDialog(
       context: context,
-      builder: (context) => AlertDialog(
-            title: Text(S.of(context).forum_clean_mode),
+      builder: (dialogContext) => AlertDialog(
+            title: Text(S.of(dialogContext).forum_clean_mode),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(S.of(context).forum_clean_mode_detail),
+                Text(S.of(dialogContext).forum_clean_mode_detail),
                 const SizedBox(height: 8),
-                Text(S.of(context).before_enabled),
+                Text(S.of(dialogContext).before_enabled),
                 const SizedBox(height: 4),
                 PostRenderWidget(
                   render: kMarkdownRender,
@@ -921,7 +969,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                   hasBackgroundImage: false,
                 ),
                 const SizedBox(height: 8),
-                Text(S.of(context).after_enabled),
+                Text(S.of(dialogContext).after_enabled),
                 const SizedBox(height: 4),
                 PostRenderWidget(
                   render: kMarkdownRender,
@@ -932,8 +980,8 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
             ),
             actions: [
               TextButton(
-                child: Text(S.of(context).i_see),
-                onPressed: () => Navigator.of(context).pop(),
+                child: Text(S.of(dialogContext).i_see),
+                onPressed: () => Navigator.of(dialogContext).pop(),
               )
             ],
           ));
@@ -1114,6 +1162,7 @@ class SettingsSubpageState extends PlatformSubpageState<SettingsSubpage> {
                             recipients: [S.of(context).feedback_email],
                             isHTML: false,
                           );
+                          if (!mounted) return;
                           await FlutterEmailSender.send(email);
                         }
                       },
@@ -1152,7 +1201,8 @@ class Developer {
 }
 
 class OTNotificationSettingsWidget extends StatefulWidget {
-  const OTNotificationSettingsWidget({super.key});
+  final VoidCallback onUpdate;
+  const OTNotificationSettingsWidget({super.key, required this.onUpdate});
 
   @override
   State<OTNotificationSettingsWidget> createState() =>
@@ -1181,16 +1231,22 @@ class _OTNotificationSettingsWidgetState
           title: Text(value.displayTitle(context) ?? "null"),
           value: getNotifyListNonNull().contains(value.internalString()),
           onChanged: (newValue) {
+            bool changed = false;
             if (newValue == true &&
                 !getNotifyListNonNull().contains(value.internalString())) {
               getNotifyListNonNull().add(value.internalString());
               updateOTUserProfile(context);
+              changed = true;
             } else if (newValue == false &&
                 getNotifyListNonNull().contains(value.internalString())) {
               getNotifyListNonNull().remove(value.internalString());
               updateOTUserProfile(context);
+              changed = true;
             }
-            refreshSelf();
+            if (changed) {
+              setState(() {});
+              widget.onUpdate();
+            }
           }));
     }
     return list;
@@ -1198,7 +1254,7 @@ class _OTNotificationSettingsWidgetState
 }
 
 class OTNotificationSettingsTile extends StatelessWidget {
-  final void Function() onSettingsUpdate;
+  final VoidCallback onSettingsUpdate;
 
   const OTNotificationSettingsTile({super.key, required this.onSettingsUpdate});
 

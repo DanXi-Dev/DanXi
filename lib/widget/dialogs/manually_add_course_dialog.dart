@@ -41,7 +41,6 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
     newCourse.teacherNames = courseTeacherNameController.text.split(" ");
     newCourse.availableWeeks = courseAvailableList;
     newCourse.roomName = courseRoomNameController.text;
-    newCourse.teacherIds = [""];
 
     return newCourse;
   }

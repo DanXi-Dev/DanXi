@@ -4,24 +4,6 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
-}
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
-
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
@@ -37,9 +19,9 @@ gradle.taskGraph.whenReady {
     }
 }
 android {
-    compileSdkVersion 35
+    compileSdkVersion 36
 
-    ndkVersion "28.0.12674087"
+    ndkVersion "29.0.13113456"
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -49,10 +31,10 @@ android {
     defaultConfig {
         applicationId "io.github.danxi_dev.dan_xi"
         namespace "io.github.danxi_dev.dan_xi"
-        minSdkVersion 23
-        targetSdkVersion 35
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        minSdk 23
+        targetSdk 36
+        versionCode flutter.versionCode
+        versionName flutter.versionName
     }
     signingConfigs {
         release {
@@ -64,9 +46,9 @@ android {
     }
     buildTypes {
         release {
-            // Signing with the debug keys for now, so `flutter run --release` works.
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             // Only used when building a released work.
             signingConfig signingConfigs.release
         }

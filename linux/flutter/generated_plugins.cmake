@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   desktop_window
+  dynamic_color
   file_selector_linux
   flutter_js
   flutter_secure_storage_linux

@@ -7,6 +7,7 @@ import 'package:dan_xi/repository/cookie/readonly_cookie_jar.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dio/dio.dart';
+import 'package:dio5_log/interceptor/diox_log_interceptor.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -52,7 +53,9 @@ class WebvpnProxy {
     "forum.fduhole.com":
         "https://webvpn.fudan.edu.cn/https/77726476706e69737468656265737421f6f853892a7e6e546b0086a09d1b203a46",
     "image.fduhole.com":
-        "https://webvpn.fudan.edu.cn/https/77726476706e69737468656265737421f9fa409b227e6e546b0086a09d1b203ab8"
+        "https://webvpn.fudan.edu.cn/https/77726476706e69737468656265737421f9fa409b227e6e546b0086a09d1b203ab8",
+    "yjsxk.fudan.edu.cn":
+        "https://webvpn.fudan.edu.cn/http/77726476706e69737468656265737421e9fd52842c7e6e457a0987e29d51367bba7b"
   };
 
   static PersonInfo? _personInfo;
@@ -79,21 +82,40 @@ class WebvpnProxy {
     }
   }
 
-  // Check if we have logged in to WebVPN, returns false if we haven't
-  static bool checkResponse(Response<dynamic> response) {
+  // Check if we should login to WebVPN. Return `true` if we should login now.
+  static bool isResponseRequiringLogin(Response<dynamic> response) {
     // When 302 is raised when the method is `POST`, it means that we haven't logged in
     if (response.requestOptions.method == "POST" &&
         response.statusCode == 302 &&
         response.headers['location'] != null &&
         response.headers['location']!.isNotEmpty) {
-      return false;
+      return true;
     }
 
-    if (response.realUri.toString().startsWith(WEBVPN_LOGIN_URL)) {
-      return false;
+    /// Get the absolute final URL of the response (after all redirects).
+    ///
+    /// [response.realUri] is not always the final URL, because it may be a relative URL (i.e., /login).
+    String getAbsoluteFinalURL(Response<dynamic> response) {
+      final realUri = response.realUri;
+      if (realUri.isAbsolute) return realUri.toString();
+
+      // find the real origin in the reverse order
+      for (final redirect in response.redirects.reversed) {
+        if (redirect.location.isAbsolute) {
+          return redirect.location.origin + realUri.toString();
+        }
+      }
+
+      return response.requestOptions.uri.origin + realUri.toString();
     }
 
-    return true;
+    final finalUrl = getAbsoluteFinalURL(response);
+    debugPrint("Response URL: $finalUrl");
+    if (finalUrl.startsWith(WEBVPN_LOGIN_URL)) {
+      return true;
+    }
+
+    return false;
   }
 
   /// Bind WebVPN proxy to a person info so that it updates automatically when [personInfo] changes.
@@ -113,7 +135,7 @@ class WebvpnProxy {
     personInfo.addListener(_prevListener!);
   }
 
-  static Future<void> loginWebvpn(Dio dio) async {
+  static Future<void> loginWebvpn() async {
     if (!isLoggedIn) {
       // Another concurrent task is running
       if (loginSession != null) {
@@ -135,6 +157,7 @@ class WebvpnProxy {
         // Temporary cookie jar
         IndependentCookieJar workJar = IndependentCookieJar();
         newDio.interceptors.add(CookieManager(workJar));
+        newDio.interceptors.add(DioLogInterceptor());
 
         loginSession = _authenticateWebVPN(newDio, workJar, _personInfo);
         await loginSession;
@@ -148,45 +171,14 @@ class WebvpnProxy {
       } finally {
         loginSession = null;
       }
-      // Any exception thrown won't be catched and will be propagated to widgets
+      // Any exception thrown won't be caught and will be propagated to widgets
     }
   }
 
   static Future<void> _authenticateWebVPN(
-      Dio dio, IndependentCookieJar jar, PersonInfo? info) async {
-    Response<dynamic>? res = await dio.get(WEBVPN_ID_REQUEST_URL,
-        options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    if (res.statusCode == 302) {
-      await DioUtils.processRedirect(dio, res);
-      res = await UISLoginTool.loginUIS(dio, WEBVPN_UIS_LOGIN_URL, jar, info);
-      if (res == null) {
-        throw WebvpnRequestException("Failed to login to UIS");
-      }
-    }
-    final ticket = _retrieveTicket(res);
-
-    Map<String, dynamic> queryParams = {
-      'cas_login': 'true',
-      'ticket': ticket,
-    };
-
-    final response = await dio.get(WEBVPN_LOGIN_URL,
-        queryParameters: queryParams,
-        options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    await DioUtils.processRedirect(dio, response);
-  }
-
-  static String? _retrieveTicket(Response<dynamic> response) {
-    // Check if the URL host matches the expected value
-    if (response.realUri.host != "id.fudan.edu.cn") {
-      return null;
-    }
-
-    BeautifulSoup soup = BeautifulSoup(response.data!);
-
-    final element = soup.find('', selector: '#ticket');
-    return element?.attributes['value'];
-  }
+          Dio dio, IndependentCookieJar jar, PersonInfo? info) =>
+      UISLoginTool.authenticateWithTicket(dio, jar, info, WEBVPN_ID_REQUEST_URL,
+          WEBVPN_UIS_LOGIN_URL, WEBVPN_LOGIN_URL, {'cas_login': 'true'});
 
   /// Check if we are able to connect to the service directly (without WebVPN).
   /// This method uses a low-timeout dio to reduce wait time.
@@ -281,22 +273,40 @@ class WebvpnProxy {
     }
 
     // Try logging in first, will return immediately if we've already logged in
-    await loginWebvpn(dio);
+    await loginWebvpn();
 
     // First attempt
-    Response<T> response = await dio.fetch<T>(options);
-    if (checkResponse(response)) {
-      return response;
+    try {
+      Response<T> response = await DioUtils.fetchWithJsonError(dio, options);
+      if (!isResponseRequiringLogin(response)) {
+        return response;
+      }
+    } on DioException catch (e) {
+      if (e.response == null) {
+        rethrow;
+      }
+      if (!isResponseRequiringLogin(e.response!)) {
+        rethrow;
+      }
     }
 
     // Re-login
     isLoggedIn = false;
-    await loginWebvpn(dio);
+    await loginWebvpn();
 
     // Second attempt
-    response = await dio.fetch<T>(options);
-    if (checkResponse(response)) {
-      return response;
+    try {
+      Response<T> response = await DioUtils.fetchWithJsonError(dio, options);
+      if (!isResponseRequiringLogin(response)) {
+        return response;
+      }
+    } on DioException catch (e) {
+      if (e.response == null) {
+        rethrow;
+      }
+      if (!isResponseRequiringLogin(e.response!)) {
+        rethrow;
+      }
     }
 
     // All attempts failed

@@ -13,7 +13,7 @@ subprojects {
         // override the android compileSdkVersion and namespace for each dependencies to compile with the latest Gradle
         if (project.plugins.hasPlugin("com.android.application") ||
                 project.plugins.hasPlugin("com.android.library")) {
-            project.android.compileSdkVersion = 35
+            project.android.compileSdkVersion = 36
 
             // override Java version to 23
             project.android.compileOptions.sourceCompatibility = JavaVersion.VERSION_23
@@ -36,11 +36,11 @@ subprojects {
     }
 }
 
-// override the kotlin language version for each dependencies to 2.1.0
+// override the kotlin language version for each dependencies to 2.1.21
 configurations.all {
     resolutionStrategy.eachDependency { details ->
         if (details.requested.group == 'org.jetbrains.kotlin' && details.requested.name == 'kotlin-gradle-plugin') {
-            details.useVersion '2.1.0'
+            details.useVersion '2.1.21'
         }
     }
 }

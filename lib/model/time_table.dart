@@ -118,16 +118,14 @@ class TimeTable {
 
   TimeTable();
 
-  /// Parse timetable from the HTML source codes of Fudan Undergraduate Edu Service.
+  /// Parse timetable from https://fdjwgl.fudan.edu.cn/student/for-std/course-table/semester/{sem_id}/print-data for Undergraduate.
   ///
   /// See:
   /// * [TimeTableRepository]
-  factory TimeTable.fromHtml(DateTime startTime, String tablePageSource) {
+  factory TimeTable.fromJWGLJson(DateTime startTime, dynamic courseJson) {
     TimeTable newTable = TimeTable()..startDate = startTime;
-    RegExp courseMatcher =
-        RegExp(r'\t*activity = new.*\n(\t*index =.*\n\t*table0.*\n)*');
-    for (Match matchedCourse in courseMatcher.allMatches(tablePageSource)) {
-      newTable.courses!.add(Course.fromHtmlPart(matchedCourse.group(0)!));
+    for (final activity in courseJson["studentTableVms"][0]["activities"]) {
+      newTable.courses!.add(Course.fromJWGLJson(activity));
     }
     return newTable;
   }
@@ -271,7 +269,6 @@ enum TableDisplayType {
 
 @JsonSerializable()
 class Course {
-  List<String>? teacherIds;
   List<String>? teacherNames;
   String? courseId;
   String? courseName;
@@ -292,39 +289,6 @@ class Course {
     return availableWeeks;
   }
 
-  static List<CourseTime> _parseSlotFromStrings(Iterable<RegExpMatch> times) {
-    List<CourseTime> courseTimes = [];
-    courseTimes.addAll(times.map((RegExpMatch e) {
-      List<String> daySlot = e.group(0)!.trim().split("*unitCount+");
-      return CourseTime(int.parse(daySlot[0]), int.parse(daySlot[1]));
-    }));
-    return courseTimes;
-  }
-
-  static _trimCourseName(String name) {
-    name = name.trim();
-    int idPos = name.lastIndexOf(RegExp(r'\(\w{3,4}\d{6}.?\.\d{2}h?\)'));
-    return idPos >= 0 ? name.replaceRange(idPos, name.length, "") : name;
-  }
-
-  factory Course.fromHtmlPart(String htmlPart) {
-    Course newCourse = Course();
-    RegExp infoMatcher = RegExp(r'(?<=TaskActivity\(").*(?="\))');
-    RegExp timeMatcher = RegExp(r'[0-9]+\*unitCount\+[0-9]+');
-    String info = infoMatcher.firstMatch(htmlPart)!.group(0)!;
-
-    List<String> infoVarList = info.split('","');
-    return newCourse
-      ..teacherIds = infoVarList[0].split(",")
-      ..teacherNames = infoVarList[1].split(",")
-      ..courseId = infoVarList[2]
-      ..courseName = _trimCourseName(infoVarList[3])
-      ..roomId = infoVarList[4]
-      ..roomName = infoVarList[5]
-      ..availableWeeks = _parseWeeksFromString(infoVarList[6])
-      ..times = _parseSlotFromStrings(timeMatcher.allMatches(htmlPart));
-  }
-
   factory Course.fromPGPart(dynamic PGPart) {
     Course newCourse = Course();
     return newCourse
@@ -335,6 +299,27 @@ class Course {
       ..availableWeeks = _parseWeeksFromString("0" + PGPart["ZCBH"])
       ..times = [CourseTime(PGPart["XQ"] - 1, PGPart["KSJCDM"] - 1)]
       ..teacherNames = [PGPart["JSXM"]];
+  }
+
+  factory Course.fromJWGLJson(dynamic activity) {
+    Course newCourse = Course();
+
+    List<CourseTime> courseTimes = [];
+    for (int slot = activity["startUnit"];
+        slot <= activity["endUnit"];
+        slot++) {
+      courseTimes.add(CourseTime(activity["weekday"] - 1, slot - 1));
+    }
+
+    return newCourse
+      ..teacherNames = List<String>.from(activity["teachers"])
+      ..courseId =
+          "${activity['lessonId']}(${activity['lessonCode']})"
+      ..courseName = activity["courseName"]
+      ..roomId = activity["room"]
+      ..roomName = activity['room']
+      ..availableWeeks = List<int>.from(activity["weekIndexes"])
+      ..times = courseTimes;
   }
 
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);

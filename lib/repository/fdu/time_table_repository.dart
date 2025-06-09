@@ -17,30 +17,33 @@
 
 import 'dart:convert';
 
-import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/util/io/cache.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
+import 'package:dan_xi/util/retrier.dart';
+import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dio/dio.dart';
-import 'package:html/dom.dart' as dom;
 
 class TimeTableRepository extends BaseRepositoryWithDio {
-  static const String LOGIN_URL =
-      'https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fjwfw.fudan.edu.cn%2Feams%2Flogin.action';
-  static const String EXAM_TABLE_LOGIN_URL =
-      'https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fjwfw.fudan.edu.cn%2Feams%2FstdExamTable%21examTable.action';
-  static const String ID_URL =
-      'https://jwfw.fudan.edu.cn/eams/courseTableForStd.action';
-  static const String TIME_TABLE_URL =
-      'https://jwfw.fudan.edu.cn/eams/courseTableForStd!courseTable.action';
-  static const String EXAM_TABLE_URL =
-      'https://jwfw.fudan.edu.cn/eams/stdExamTable!examTable.action';
-  static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
+  static const String TIMETABLE_REQUEST_URL =
+      'https://id.fudan.edu.cn/idp/authCenter/authenticate?service=https%3A%2F%2Ffdjwgl.fudan.edu.cn%2Fstudent%2Fsso%2Flogin%3FtargetUrl%3D%2Fstudent%2Ffor-std%2Fcourse-table';
+  static const String TIMETABLE_UIS_LOGIN_URL =
+      'https://uis.fudan.edu.cn/authserver/login?service=https://id.fudan.edu.cn/idp/thirdAuth/cas';
+  static const String TIMETABLE_SESSION_URL =
+      'https://fdjwgl.fudan.edu.cn/student/sso/login?targetUrl=/student/for-std/course-table&ticket=';
+  static const String TIMETABLE_DATA_URL =
+      'https://fdjwgl.fudan.edu.cn/student/for-std/course-table/semester/{sem_id}/print-data';
+  static const String TIMETABLE_URL =
+      'https://fdjwgl.fudan.edu.cn/student/for-std/course-table';
   static const String KEY_TIMETABLE_CACHE = "timetable";
+
+  static Future<void>? loginSession;
 
   TimeTableRepository._();
 
@@ -48,71 +51,170 @@ class TimeTableRepository extends BaseRepositoryWithDio {
 
   factory TimeTableRepository.getInstance() => _instance;
 
-  String? _getIds(String html) {
-    RegExp idMatcher = RegExp(r'(?<=ids",").+(?="\);)');
-    return idMatcher.firstMatch(html)!.group(0);
+  Future<void> _authenticateJWGL(PersonInfo info) async {
+    final ticket = await UISLoginTool.getAuthenticateTicket(
+        dio, cookieJar!, info, TIMETABLE_REQUEST_URL, TIMETABLE_UIS_LOGIN_URL);
+    Response<dynamic>? res = await dio.get(TIMETABLE_SESSION_URL + ticket!,
+        options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
+    await DioUtils.processRedirect(dio, res);
+  }
+
+  Future<void> loginJWGL(PersonInfo info) async {
+    if (loginSession != null) {
+      try {
+        await loginSession;
+      } on DioException {
+        loginSession = _authenticateJWGL(info);
+        await loginSession!;
+      }
+    } else {
+      loginSession = _authenticateJWGL(info);
+      await loginSession!;
+      loginSession = null;
+    }
+  }
+
+  Future<TimeTableSemesterInfo> loadSemestersForTimeTable(
+          PersonInfo info) async =>
+      Retrier.tryAsyncWithFix(
+        () async => await _loadSemestersForTimeTable(info),
+        (_) async => await loginJWGL(info),
+        retryTimes: 5,
+        // If there is an explicit reason for UIS login failure, we should not retry anymore.
+        isFatalRetryError: (e) =>
+            e is CredentialsInvalidException ||
+            e is CaptchaNeededException ||
+            e is NetworkMaintenanceException ||
+            e is WeakPasswordException,
+      );
+
+  // Load current semester id, start date from JWGL, and store start date in settings.
+  Future<CurrentSemesterInfo> _loadCurrentSemesterInfo(PersonInfo? info,
+      {String? semesterHtml}) async {
+    if (semesterHtml == null || semesterHtml.isEmpty) {
+      Response<dynamic>? res = await dio.get(TIMETABLE_URL,
+          options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
+      semesterHtml = res.data!;
+    }
+    final currentSemesterRegex = RegExp(r'var currentSemester = ([\s\S]*?);');
+    final currentSemesterMatch = currentSemesterRegex.firstMatch(semesterHtml!);
+    if (currentSemesterMatch == null || currentSemesterMatch.groupCount < 1) {
+      throw "Retrieval failed";
+    }
+    final String currentSemesterJsonText =
+        currentSemesterMatch.group(1)!.replaceAll('\'', '"');
+    final currentSemesterJson = jsonDecode(currentSemesterJsonText);
+    String defaultSemesterId = currentSemesterJson['id'].toString();
+    DateTime startDate = DateTime(
+        currentSemesterJson['startDate']["values"][0],
+        currentSemesterJson['startDate']["values"][1],
+        currentSemesterJson['startDate']["values"][2]);
+    // Start date at JWGL is Sunday, we need to add one day to make it Monday.
+    startDate = startDate.add(Duration(days: 1));
+    SettingsProvider.getInstance().thisSemesterStartDate =
+        startDate.toIso8601String();
+    return CurrentSemesterInfo(defaultSemesterId, startDate);
+  }
+
+  Future<TimeTableSemesterInfo> _loadSemestersForTimeTable(
+      PersonInfo? info) async {
+    Response<dynamic>? res = await dio.get(TIMETABLE_URL,
+        options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
+    final String semesterHtml = res.data!;
+    final semestersRegex =
+        RegExp(r'var semesters = JSON\.parse\(([\s\S]*?)\);');
+    final semestersMatch = semestersRegex.firstMatch(semesterHtml);
+    if (semestersMatch == null || semestersMatch.groupCount < 1) {
+      throw "Retrieval failed";
+    }
+    final String semestersJsonText =
+        semestersMatch.group(1)!.replaceAll('\'', '').replaceAll(r'\"', '"');
+    final semestersJson = jsonDecode(semestersJsonText);
+    List<SemesterInfo> sems = [];
+    List<TimeTableStartTimeItem> startDates = [];
+    for (var element in semestersJson) {
+      if (element is Map<String, dynamic> && element.isNotEmpty) {
+        var annualSemesters = SemesterInfo.fromCourseTableJson(element);
+        sems.add(annualSemesters);
+        DateTime? startDate = DateTime.tryParse(
+          element['startDate'] ?? '',
+        );
+        if (startDate != null) {
+          // Start date at JWGL is Sunday, we need to add one day to make it Monday.
+          startDate = startDate.add(Duration(days: 1));
+        }
+        startDates.add(TimeTableStartTimeItem(
+          element['id'].toString(),
+          startDate?.toIso8601String(),
+        ));
+      }
+    }
+    if (sems.isEmpty) throw "Retrieval failed";
+
+    String defaultSemesterId =
+        (await _loadCurrentSemesterInfo(info, semesterHtml: semesterHtml))
+            .semesterId!;
+
+    return TimeTableSemesterInfo(
+      sems,
+      defaultSemesterId,
+      TimeTableExtra(startDates),
+    );
   }
 
   Future<TimeTable?> loadTimeTableRemotely(PersonInfo? info,
           {DateTime? startTime}) =>
-      UISLoginTool.tryAsyncWithAuth(dio, LOGIN_URL, cookieJar!, info,
-          () => _loadTimeTableRemotely(startTime: startTime));
+      Retrier.tryAsyncWithFix(
+        () async => await _loadTimeTableRemotely(info, startTime: startTime),
+        (_) async => await loginJWGL(info!),
+        retryTimes: 3,
+        // If there is an explicit reason for UIS login failure, we should not retry anymore.
+        isFatalRetryError: (e) =>
+            e is CredentialsInvalidException ||
+            e is CaptchaNeededException ||
+            e is NetworkMaintenanceException ||
+            e is WeakPasswordException,
+      );
 
-  Future<String?> getDefaultSemesterId(PersonInfo? info) {
-    return UISLoginTool.tryAsyncWithAuth(dio, LOGIN_URL, cookieJar!, info,
-        () async {
-      await dio.get(ID_URL);
-      return (await cookieJar!.loadForRequest(Uri.parse(HOST)))
-          .firstWhere((element) => element.name == "semester.id")
-          .value;
-    });
-  }
-
-  Future<TimeTable?> _loadTimeTableRemotely({DateTime? startTime}) async {
-    Future<String?> getAppropriateSemesterId() async {
-      String? setValue = SettingsProvider.getInstance().timetableSemester;
-      if (setValue == null || setValue.isEmpty) {
-        return (await cookieJar!.loadForRequest(Uri.parse(HOST)))
-            .firstWhere((element) => element.name == "semester.id")
-            .value;
+  Future<TimeTable?> _loadTimeTableRemotely(PersonInfo? info,
+      {DateTime? startTime}) async {
+    Future<CurrentSemesterInfo> getAppropriateSemesterInfo(
+        PersonInfo? info) async {
+      String? semesterId = SettingsProvider.getInstance().timetableSemester;
+      String? startDate = SettingsProvider.getInstance().thisSemesterStartDate;
+      if (semesterId == null ||
+          semesterId.isEmpty ||
+          startDate == null ||
+          startDate.isEmpty) {
+        return await _loadCurrentSemesterInfo(info);
       } else {
-        return setValue;
+        return CurrentSemesterInfo(semesterId, DateTime.tryParse(startDate));
       }
     }
 
-    Response<String> idPage = await dio.get(ID_URL);
-    String? termId = _getIds(idPage.data!);
-    Response<String> tablePage = await dio.post(TIME_TABLE_URL,
-        data: {
-          "ignoreHead": "1",
-          "setting.kind": "std",
-          "startWeek": "1",
-          "ids": termId,
-          "semester.id": await getAppropriateSemesterId()
-        },
+    CurrentSemesterInfo semesterInfo = await getAppropriateSemesterInfo(info);
+    Response<dynamic>? res = await dio.get(
+        TIMETABLE_DATA_URL.replaceAll("{sem_id}", semesterInfo.semesterId!),
         options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    TimeTable timetable = TimeTable.fromHtml(
-        startTime ??
-            DateTime.tryParse(
-                SettingsProvider.getInstance().thisSemesterStartDate ?? "") ??
-            Constant.DEFAULT_SEMESTER_START_DATE,
-        tablePage.data!);
-    for (var course in timetable.courses!) {
-      for (var weekday in course.times!) {
-        if (weekday.weekDay == 6) {
-          for (int i = 0; i < course.availableWeeks!.length; i++) {
-            course.availableWeeks![i] = course.availableWeeks![i] - 1;
-          }
-          break;
-        }
-      }
-    }
+    TimeTable timetable = TimeTable.fromJWGLJson(
+        startTime ?? semesterInfo.startDate ?? TimeTable.defaultStartTime,
+        res.data!);
+    // TODO: do we still need this?
+    // for (var course in timetable.courses!) {
+    //   for (var weekday in course.times!) {
+    //     if (weekday.weekDay == 6) {
+    //       for (int i = 0; i < course.availableWeeks!.length; i++) {
+    //         course.availableWeeks![i] = course.availableWeeks![i] - 1;
+    //       }
+    //       break;
+    //     }
+    //   }
+    // }
     return timetable;
   }
 
   Future<TimeTable?> loadTimeTable(PersonInfo? info,
       {DateTime? startTime, bool forceLoadFromRemote = false}) async {
-    startTime ??= TimeTable.defaultStartTime;
     if (forceLoadFromRemote) {
       TimeTable? result = await Cache.getRemotely<TimeTable>(
           KEY_TIMETABLE_CACHE,
@@ -132,33 +234,30 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     }
   }
 
+  // Check if the timetable has been fetched before.
+  bool hasCache() {
+    XSharedPreferences preferences =
+        SettingsProvider.getInstance().preferences!;
+    return preferences.containsKey(KEY_TIMETABLE_CACHE) &&
+        SettingsProvider.getInstance().timetableLastUpdated != null;
+  }
+
   @override
-  String get linkHost => "fudan.edu.cn";
+  String get linkHost => "fdjwgl.fudan.edu.cn";
 }
 
-class Test {
-  final String id;
-  final String name;
-  final String type;
-  final String date;
-  final String time;
-  final String location;
-  final String testCategory;
-  final String note;
+class CurrentSemesterInfo {
+  String? semesterId;
+  DateTime? startDate;
 
-  Test(this.id, this.name, this.type, this.date, this.time, this.location,
-      this.testCategory, this.note);
+  CurrentSemesterInfo(this.semesterId, this.startDate);
+}
 
-  factory Test.fromHtml(dom.Element html) {
-    List<dom.Element> elements = html.getElementsByTagName("td");
-    return Test(
-        elements[0].text.trim(),
-        elements[2].text.trim(),
-        elements[3].text.trim(),
-        elements[4].text.trim(),
-        elements[5].text.trim(),
-        elements[6].text.trim(),
-        elements[7].text.trim(),
-        elements[8].text.trim());
-  }
+class TimeTableSemesterInfo {
+  List<SemesterInfo> semesters;
+  TimeTableExtra startDates;
+  String? defaultSemesterId;
+
+  TimeTableSemesterInfo(
+      this.semesters, this.defaultSemesterId, this.startDates);
 }

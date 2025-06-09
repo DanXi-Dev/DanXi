@@ -25,7 +25,7 @@ import 'package:dio/io.dart';
 /// Useful utils when processing network requests with dio.
 class DioUtils {
   // ignore: non_constant_identifier_names
-  static get NON_REDIRECT_OPTION_WITH_FORM_TYPE {
+  static Options get NON_REDIRECT_OPTION_WITH_FORM_TYPE {
     return Options(
         contentType: Headers.formUrlEncodedContentType,
         followRedirects: false,
@@ -35,7 +35,7 @@ class DioUtils {
   }
 
   // ignore: non_constant_identifier_names
-  static NON_REDIRECT_OPTION_WITH_FORM_TYPE_AND_HEADER(
+  static Options NON_REDIRECT_OPTION_WITH_FORM_TYPE_AND_HEADER(
           Map<String, dynamic> header) =>
       Options(
           headers: header,
@@ -44,6 +44,30 @@ class DioUtils {
           validateStatus: (status) {
             return status! < 400;
           });
+
+  /// Get the location to which the [response] is redirected.
+  ///
+  /// If the response is not a valid redirect response, return null.
+  ///
+  /// It doesn't check whether the "location" is empty, relative, etc.
+  /// You should do it yourself.
+  ///
+  /// ## Formality
+  /// This method is a bit different from the original one (see [HttpClientResponse.isRedirect] in `http_impl.dart`),
+  /// which considers the request HTTP method and excludes some invalid combinations (e.g., POST can only be redirected by 303).
+  /// But in practice, we don't need to (and cannot) be so strict. Some badly designed servers may return 302 for POST requests.
+  static String? getRedirectLocation(Response<dynamic> response) {
+    final statusCode = response.statusCode;
+    bool isRedirect = statusCode == HttpStatus.movedPermanently ||
+        statusCode == HttpStatus.permanentRedirect ||
+        statusCode == HttpStatus.found ||
+        statusCode == HttpStatus.seeOther ||
+        statusCode == HttpStatus.temporaryRedirect;
+    if (isRedirect) {
+      return response.headers['location']?[0];
+    }
+    return null;
+  }
 
   /// Process the redirect response manually and return the final response.
   ///
@@ -54,13 +78,11 @@ class DioUtils {
   static Future<Response<dynamic>> processRedirect(
       Dio dio, Response<dynamic> response) async {
     // Prevent the redirect being processed by HttpClient, with the 302 response caught manually.
-    if (response.statusCode == 302 &&
-        response.headers['location'] != null &&
-        response.headers['location']!.isNotEmpty) {
-      String location = response.headers['location']![0];
+    String? location = getRedirectLocation(response);
+    if (location != null) {
       if (location.isEmpty) return response;
       if (!Uri.parse(location).isAbsolute) {
-        location = '${response.requestOptions.uri.origin}/$location';
+        location = '${response.requestOptions.uri.origin}$location';
       }
       return processRedirect(dio,
           await dio.get(location, options: NON_REDIRECT_OPTION_WITH_FORM_TYPE));
@@ -103,5 +125,48 @@ class DioUtils {
     Dio dio = Dio(options);
     setProxy(dio, SettingsProvider.getInstance().proxy);
     return dio;
+  }
+
+  /// Fetch with the [options], but when T is JSON-like and the response is not,
+  /// throw a [DioException] WITH the response data.
+  /// (The original [fetch] will throw a [DioException] WITHOUT the response data when [FormatException] occurs.)
+  static Future<Response<T>> fetchWithJsonError<T>(
+      Dio dio, RequestOptions options) async {
+    if (T == dynamic ||
+        options.responseType == ResponseType.bytes ||
+        options.responseType == ResponseType.stream) {
+      // If T is dynamic, or the caller wants bytes or stream, just call the original fetch.
+      // Because we are going to parse the response data as [String] below!
+      return await dio.fetch(options) as Response<T>;
+    }
+
+    Response<String> response = await dio.fetch(options);
+    if (T == String) {
+      return response as Response<T>;
+    } else {
+      try {
+        dynamic transformedResponseData = await dio.transformer
+            .transformResponse(
+                options.copyWith(responseType: ResponseType.json),
+                ResponseBody.fromString(response.data!, response.statusCode!,
+                    headers: response.headers.map,
+                    statusMessage: response.statusMessage));
+        return Response<T>(
+          data: transformedResponseData,
+          requestOptions: response.requestOptions,
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
+          isRedirect: response.isRedirect,
+          redirects: response.redirects,
+          headers: response.headers,
+        );
+      } catch (e) {
+        throw DioException(
+          requestOptions: options,
+          response: response,
+          error: e,
+        );
+      }
+    }
   }
 }

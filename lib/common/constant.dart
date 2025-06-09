@@ -365,10 +365,9 @@ class Constant {
           trackColor: toggleableProperty,
         ),
         radioTheme: RadioThemeData(fillColor: toggleableProperty),
-        indicatorColor: const Color(0xFF007AFF),
         canvasColor: const Color.fromRGBO(242, 242, 247, 1),
         scaffoldBackgroundColor: const Color.fromRGBO(242, 242, 247, 1),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -379,15 +378,15 @@ class Constant {
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(foregroundColor: const Color(0xFF007AFF)),
         ),
+        tabBarTheme: TabBarThemeData(indicatorColor: const Color(0xFF007AFF)),
       );
     }
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(seedColor: color),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0.5,
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-        color: ThemeData.light().cardColor,
       ),
       dividerTheme: const DividerThemeData(thickness: 0.2),
     );
@@ -414,7 +413,6 @@ class Constant {
             secondary: const Color(0xFF007AFF),
             primary: const Color(0xFF007AFF),
             surface: Colors.black),
-        indicatorColor: const Color(0xFF007AFF),
         switchTheme: SwitchThemeData(
           thumbColor: toggleableProperty,
           trackColor: toggleableProperty,
@@ -422,7 +420,7 @@ class Constant {
         radioTheme: RadioThemeData(fillColor: toggleableProperty),
         scaffoldBackgroundColor: Colors.black,
         canvasColor: Colors.black,
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           margin: const EdgeInsets.fromLTRB(7, 8, 7, 8),
           color: const Color.fromRGBO(28, 28, 30, 1),
           //color: Color.fromRGBO(30, 30, 33, 0.8),
@@ -434,17 +432,18 @@ class Constant {
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(foregroundColor: const Color(0xFF007AFF)),
         ),
-        dialogBackgroundColor: const Color.fromRGBO(28, 28, 30, 1.0),
         textTheme: Typography.whiteCupertino,
+        dialogTheme: DialogThemeData(
+            backgroundColor: const Color.fromRGBO(28, 28, 30, 1.0)),
+        tabBarTheme: TabBarThemeData(indicatorColor: const Color(0xFF007AFF)),
       );
     }
     return ThemeData(
       useMaterial3: true,
       colorScheme:
           ColorScheme.fromSeed(seedColor: color, brightness: Brightness.dark),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-        color: ThemeData.dark().cardColor,
       ),
       dividerTheme: const DividerThemeData(thickness: 0.2),
     );
@@ -608,7 +607,6 @@ extension CampusEx on Campus? {
         return ['Z2'];
       case Campus.NONE:
       case null:
-      default:
         return ['?'];
     }
   }

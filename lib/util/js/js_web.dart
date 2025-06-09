@@ -15,9 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-@JS()
-library;
-
+// ignore: deprecated_member_use
 import 'package:js/js.dart';
 
 @JS('window.eval')

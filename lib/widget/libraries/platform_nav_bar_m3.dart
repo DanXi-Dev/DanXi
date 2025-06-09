@@ -19,41 +19,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class PlatformNavBarM3 extends PlatformNavBar {
-  @override
-  final Key? widgetKey;
-  @override
-  final Color? backgroundColor;
-
-  @override
-  final List<BottomNavigationBarItem>? items;
-  @override
-  final void Function(int)? itemChanged;
-  @override
-  final int? currentIndex;
-
-  @override
-  final PlatformBuilder<MaterialNavBarData>? material;
-  @override
-  final PlatformBuilder<CupertinoTabBarData>? cupertino;
-
-  PlatformNavBarM3({
+  const PlatformNavBarM3({
     super.key,
-    this.widgetKey,
-    this.backgroundColor,
-    this.items,
-    this.itemChanged,
-    this.currentIndex,
-    this.material,
-    this.cupertino,
-  }) : super(
-          widgetKey: widgetKey,
-          backgroundColor: backgroundColor,
-          items: items,
-          itemChanged: itemChanged,
-          currentIndex: currentIndex,
-          material: material,
-          cupertino: cupertino,
-        );
+    super.widgetKey,
+    super.backgroundColor,
+    super.items,
+    super.itemChanged,
+    super.currentIndex,
+    super.material,
+    super.cupertino,
+  });
 
   @override
   BottomAppBar createMaterialWidget(BuildContext context) {

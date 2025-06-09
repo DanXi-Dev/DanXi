@@ -36,6 +36,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class OTSearchPage extends StatefulWidget {
@@ -50,6 +51,7 @@ class OTSearchPage extends StatefulWidget {
 class _OTSearchPageState extends State<OTSearchPage> {
   final List<SearchSuggestionProvider> suggestionProviders = [
     searchByText,
+    searchByTextAccurate,
     searchByPid,
     searchByFloorId,
     searchByTag
@@ -57,6 +59,10 @@ class _OTSearchPageState extends State<OTSearchPage> {
 
   /// The text user inputs.
   final TextEditingController _searchFieldController = TextEditingController();
+
+  /// Date range.
+  DateTime? startDate, endDate;
+  bool enableDateRange = false;
 
   Widget _buildSearchHistory(BuildContext context) => Column(
         mainAxisSize: MainAxisSize.min,
@@ -112,10 +118,30 @@ class _OTSearchPageState extends State<OTSearchPage> {
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
                 children: suggestionProviders
-                    .map((e) => e.call(context, value.text))
+                    .map((e) =>
+                        e.call(context, value.text, (startDate, endDate)))
                     .toList(),
               ),
       );
+
+  Future<DateTime?> selectDate(
+      BuildContext context, DateTime? initialDate) async {
+    DateTime? selectedDate = await showPlatformDatePicker(
+      context: context,
+      initialDate: initialDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+      material: (_, __) => MaterialDatePickerData(barrierDismissible: false),
+    );
+    return selectedDate;
+  }
+
+  bool validateDate(DateTime? start, DateTime? end) {
+    if (start == null || end == null) return true;
+    return start.isBefore(end) || start.isAtSameMomentAs(end);
+  }
+
+  static final DateFormat formatter = DateFormat('yyyy-MM-dd');
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +151,88 @@ class _OTSearchPageState extends State<OTSearchPage> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PlatformAppBarX(
         title: Text(S.of(context).search),
-        trailingActions: const [],
+        trailingActions: [
+          PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon: Icon(
+                enableDateRange ? Icons.calendar_month : Icons.calendar_today),
+            onPressed: () async {
+              bool? enable = await showPlatformDialog<bool>(
+                  context: context,
+                  builder: (context) {
+                    return PlatformAlertDialog(
+                      title: Text(S.of(context).date_range_select),
+                      actions: [
+                        PlatformTextButton(
+                          material: (_, __) => MaterialTextButtonData(
+                              style: ButtonStyle(
+                                  foregroundColor:
+                                      WidgetStateProperty.all<Color>(
+                                          Colors.red))),
+                          child: Text(S.of(context).reset),
+                          onPressed: () {
+                            startDate = null;
+                            endDate = null;
+                            Navigator.pop(context, false);
+                          },
+                        ),
+                        PlatformTextButton(
+                          child: Text(S.of(context).confirm),
+                          onPressed: () {
+                            if (!validateDate(startDate, endDate)) {
+                              Noticing.showNotice(context, S.of(context).select_date_range_invalid_range,
+                                  useSnackBar: false);
+                              return;
+                            }
+                            Navigator.pop(context, true);
+                          },
+                        ),
+                      ],
+                      content: StatefulBuilder(
+                        builder: (context, setState) {
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(S.of(context).select_date_range_from),
+                              PlatformTextButton(
+                                child: Text(startDate == null
+                                    ? S.of(context).select_date_range_far_past
+                                    : formatter.format(startDate!)),
+                                onPressed: () async {
+                                  DateTime? selectedDate =
+                                      await selectDate(context, startDate);
+                                  setState(() {
+                                    startDate = selectedDate;
+                                  });
+                                },
+                              ),
+                              Text(S.of(context).select_date_range_to),
+                              PlatformTextButton(
+                                  child: Text(endDate == null
+                                      ? S.of(context).select_date_range_now
+                                      : formatter.format(endDate!)),
+                                  onPressed: () async {
+                                    DateTime? selectedDate =
+                                        await selectDate(context, endDate);
+                                    setState(() {
+                                      endDate = selectedDate;
+                                    });
+                                  }),
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                  });
+              if (enable != null) {
+                setState(() {
+                  enableDateRange =
+                      enable && (startDate != null || endDate != null);
+                });
+              }
+            },
+          )
+        ],
       ),
       body: SafeArea(
         bottom: false,
@@ -158,32 +265,47 @@ class _OTSearchPageState extends State<OTSearchPage> {
 final RegExp pidPattern = RegExp(r'#([0-9]+)');
 final RegExp floorPattern = RegExp(r'##([0-9]+)');
 
-final GlobalKey _globalKey = GlobalKey();
-
-Widget searchByText(BuildContext context, String searchKeyword) {
-  return Builder(
-      key: _globalKey,
-      builder: (context) {
-        return ListTile(
-          title: Text(S.of(context).search_by_text_tip(searchKeyword)),
-          leading: PlatformX.isMaterial(context)
-              ? const Icon(Icons.text_fields)
-              : const Icon(CupertinoIcons.search),
-          onTap: () async {
-            submit(context, searchKeyword);
-            bool isCareWordsDetected = await detectCareWords(searchKeyword);
-            if (context.mounted && isCareWordsDetected) {
-              await showPlatformDialog(
-                  context: context, builder: (_) => const CareDialog());
-            }
-            smartNavigatorPush(_globalKey.currentContext!, "/bbs/postDetail",
-                arguments: {"searchKeyword": searchKeyword});
-          },
-        );
-      });
+Widget searchByTextGeneral(
+  bool accurate,
+  BuildContext context,
+  String searchKeyword,
+  (DateTime? start, DateTime? end) dateRange,
+) {
+  return Builder(builder: (context) {
+    return ListTile(
+      title: Text(accurate
+          ? S.of(context).search_by_text_accurate_tip(searchKeyword)
+          : S.of(context).search_by_text_tip(searchKeyword)),
+      leading: PlatformX.isMaterial(context)
+          ? const Icon(Icons.text_fields)
+          : const Icon(CupertinoIcons.search),
+      onTap: () async {
+        submit(context, searchKeyword);
+        bool isCareWordsDetected = await detectCareWords(searchKeyword);
+        if (context.mounted && isCareWordsDetected) {
+          await showPlatformDialog(
+              context: context, builder: (_) => const CareDialog());
+        }
+        if (!context.mounted) return;
+        smartNavigatorPush(context, "/bbs/postDetail", arguments: {
+          "searchKeyword": searchKeyword,
+          "searchDateRange": dateRange,
+          "searchAccurate": accurate,
+        });
+      },
+    );
+  });
 }
 
-Widget searchByPid(BuildContext context, String searchKeyword) {
+SearchSuggestionProvider searchByText = (context, searchKeyword, dateRange) =>
+    searchByTextGeneral(false, context, searchKeyword, dateRange);
+
+SearchSuggestionProvider searchByTextAccurate =
+    (context, searchKeyword, dateRange) =>
+        searchByTextGeneral(true, context, searchKeyword, dateRange);
+
+Widget searchByPid(BuildContext context, String searchKeyword,
+    (DateTime? start, DateTime? end) dateRange) {
   final pidMatch = pidPattern.firstMatch(searchKeyword);
   if (pidMatch != null) {
     return ListTile(
@@ -201,7 +323,8 @@ Widget searchByPid(BuildContext context, String searchKeyword) {
   }
 }
 
-Widget searchByFloorId(BuildContext context, String searchKeyword) {
+Widget searchByFloorId(BuildContext context, String searchKeyword,
+    (DateTime? start, DateTime? end) dateRange) {
   final floorMatch = floorPattern.firstMatch(searchKeyword);
   if (floorMatch != null) {
     return ListTile(
@@ -219,7 +342,8 @@ Widget searchByFloorId(BuildContext context, String searchKeyword) {
   }
 }
 
-Widget searchByTag(BuildContext context, String searchKeyword) {
+Widget searchByTag(BuildContext context, String searchKeyword,
+    (DateTime? start, DateTime? end) dateRange) {
   return FutureWidget<List<OTTag>?>(
       future: LazyFuture.pack(ForumRepository.getInstance().loadTags()),
       successBuilder: (context, snapshot) {
@@ -251,8 +375,7 @@ Future<void> goToPIDResultPage(BuildContext context, int pid) async {
   ProgressFuture progressDialog =
       showProgressDialog(loadingText: S.of(context).loading, context: context);
   try {
-    final OTHole? post =
-        await ForumRepository.getInstance().loadSpecificHole(pid);
+    final OTHole? post = await ForumRepository.getInstance().loadHoleById(pid);
     smartNavigatorPush(context, "/bbs/postDetail", arguments: {
       "post": post!,
     });
@@ -273,8 +396,7 @@ Future<void> goToFloorIdResultPage(BuildContext context, int floorId) async {
   ProgressFuture progressDialog =
       showProgressDialog(loadingText: S.of(context).loading, context: context);
   try {
-    final floor =
-        (await ForumRepository.getInstance().loadSpecificFloor(floorId))!;
+    final floor = (await ForumRepository.getInstance().loadFloorById(floorId))!;
     OTFloorMentionWidget.showFloorDetail(context, floor);
   } catch (error, st) {
     if (error is DioException &&
@@ -301,5 +423,5 @@ void submit(BuildContext context, String value) {
   }
 }
 
-typedef SearchSuggestionProvider = Widget Function(
-    BuildContext context, String searchKeyword);
+typedef SearchSuggestionProvider = Widget Function(BuildContext context,
+    String searchKeyword, (DateTime? start, DateTime? end) dateRange);

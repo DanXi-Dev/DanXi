@@ -23,7 +23,9 @@ import 'package:dan_xi/model/forum/message.dart';
 import 'package:dan_xi/model/forum/report.dart';
 import 'package:dan_xi/page/forum/hole_detail.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/forum/human_duration.dart';
@@ -81,6 +83,9 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
       color: useAccessibilityColoring
           ? Theme.of(context).textTheme.bodyLarge!.color
           : element.color,
+      highlighted: AnnouncementRepository.getInstance()
+          .getHighlightedTagIds()
+          .contains(element.tag_id),
     ));
   }
   return Wrap(
@@ -172,6 +177,13 @@ class OTHoleWidget extends StatelessWidget {
                                 LeadingChip(
                                   color: Theme.of(context).colorScheme.primary,
                                   label: S.of(context).hole_hidden,
+                                ),
+                              ],
+                              if (postElement.isForceDeleted) ...[
+                                const SizedBox(width: 4),
+                                LeadingChip(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  label: S.of(context).hole_force_deleted,
                                 ),
                               ],
                               if (postElement.locked == true) ...[
@@ -306,6 +318,8 @@ class OTFloorWidget extends StatelessWidget {
   final bool isInMention;
   final bool hasBackgroundImage;
   final bool showToolBars;
+
+  final bool showBottomBar;
   final OTHole? parentHole;
   final int? index;
   final void Function()? onTap;
@@ -318,6 +332,9 @@ class OTFloorWidget extends StatelessWidget {
     required this.floor,
     this.isInMention = false,
     this.showToolBars = true,
+
+    /// If [null], the default value is [showToolBars].
+    bool? showBottomBar,
     this.index,
     this.onTap,
     this.onLongPress,
@@ -325,7 +342,7 @@ class OTFloorWidget extends StatelessWidget {
     required this.hasBackgroundImage,
     this.onTapImage,
     this.searchKeyWord,
-  });
+  }) : showBottomBar = showBottomBar ?? showToolBars;
 
   @override
   Widget build(BuildContext context) {
@@ -354,6 +371,12 @@ class OTFloorWidget extends StatelessWidget {
         'hero_tag': heroTag
       });
     }
+
+    final isPinned = context.read<ForumProvider>().divisionCache.any(
+        (division) =>
+            division.pinned?.any(
+                (pinnedHole) => pinnedHole.hole_id == parentHole?.hole_id) ==
+            true);
 
     final nameColor = floor.anonyname?.hashColor() ?? Colors.red;
 
@@ -433,6 +456,36 @@ class OTFloorWidget extends StatelessWidget {
                           label: S.of(context).hole_hidden,
                         ),
                       ],
+                      // Ditto.
+                      if (parentHole?.isForceDeleted == true &&
+                          floor.floor_id ==
+                              parentHole?.floors?.first_floor?.floor_id) ...[
+                        const SizedBox(width: 4),
+                        LeadingChip(
+                          color: Colors.red,
+                          label: S.of(context).hole_force_deleted,
+                        ),
+                      ],
+                      // Show locked tag if the hole is locked and this is the first floor
+                      if (parentHole?.locked == true &&
+                          floor.floor_id ==
+                              parentHole?.floors?.first_floor?.floor_id) ...[
+                        const SizedBox(width: 4),
+                        LeadingChip(
+                          color: Theme.of(context).colorScheme.primary,
+                          label: S.of(context).hole_locked,
+                        ),
+                      ],
+                      // Show pinned tag if this hole is in the pinned list and this is the first floor
+                      if (isPinned &&
+                          floor.floor_id ==
+                              parentHole?.floors?.first_floor?.floor_id) ...[
+                        const SizedBox(width: 4),
+                        LeadingChip(
+                          color: Theme.of(context).colorScheme.primary,
+                          label: S.of(context).pinned,
+                        ),
+                      ],
                     ],
                   ),
                   if (showToolBars && !floor.deleted!)
@@ -464,7 +517,7 @@ class OTFloorWidget extends StatelessWidget {
                         onLinkTap,
                         onTapImage ?? defaultOnImageTap,
                         hasBackgroundImage)),
-            if (showToolBars) ...[
+            if (showBottomBar) ...[
               const SizedBox(height: 5),
               OTFloorWidgetBottomBar(floor: floor, index: index),
             ]
@@ -553,9 +606,9 @@ class OTMentionPreviewWidgetState extends State<OTMentionPreviewWidget> {
     if (isShowingPreview) {
       return OTFloorMentionWidget(
         future: widget.type == OTMentionType.FLOOR
-            ? ForumRepository.getInstance().loadSpecificFloor(widget.id)
+            ? ForumRepository.getInstance().loadFloorById(widget.id)
             : ForumRepository.getInstance()
-                .loadSpecificHole(widget.id)
+                .loadHoleById(widget.id)
                 .then((value) => value?.floors?.first_floor),
         hasBackgroundImage: widget.hasBackgroundImage,
         showBottomBar: widget.showBottomBar,
@@ -595,7 +648,7 @@ class OTFloorMentionWidget extends StatelessWidget {
         loadingText: S.of(context).loading, context: context);
     try {
       OTHole? hole =
-          await ForumRepository.getInstance().loadSpecificHole(floor.hole_id!);
+          await ForumRepository.getInstance().loadHoleById(floor.hole_id!);
       if (context.mounted) {
         smartNavigatorPush(context, "/bbs/postDetail",
             arguments: {"post": hole, "locate": floor});
@@ -799,6 +852,7 @@ class OTFloorWidgetBottomBar extends StatelessWidget {
 class OTFloorToolBar extends StatefulWidget {
   final OTFloor floor;
   final int? index;
+
   // The callback when modify or delete is invoked
   final Function()? onClickMore;
 

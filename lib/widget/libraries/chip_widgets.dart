@@ -63,12 +63,44 @@ class LeadingChip extends ChipWidget {
 
 /// A rectangular chip to match the style of the swift version of the forum.
 class RectangularChip extends ChipWidget {
-  const RectangularChip({super.key, super.label, super.onTap, super.color});
+  /// Is the chip highlighted?
+  ///
+  /// If true, the chip will have a gradient background and [color] will be ignored.
+  final bool highlighted;
+
+  const RectangularChip({super.key, super.label, super.onTap, super.color, this.highlighted = false});
 
   @override
   Widget build(BuildContext context) {
     final effectiveColor = color ?? Theme.of(context).colorScheme.primary;
     final lightness = HSLColor.fromColor(effectiveColor).lightness;
+    BoxDecoration backgroundDecor;
+    Color textColor;
+    if (highlighted) {
+      backgroundDecor = BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.blue.withValues(alpha: 0.9),
+            Colors.purple.withValues(alpha: 0.9),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(2),
+      );
+      textColor = Colors.white;
+    } else {
+      backgroundDecor = BoxDecoration(
+        color: effectiveColor.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(2),
+      );
+      // Make text brighter under dark mode, and darker under light mode
+      textColor = PlatformX.isDarkMode
+          ? effectiveColor
+          .withLightness((lightness + 0.2).clamp(0, 1))
+          : effectiveColor
+          .withLightness((lightness - 0.2).clamp(0, 1));
+    }
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -77,22 +109,15 @@ class RectangularChip extends ChipWidget {
             onTap: onTap,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-              decoration: BoxDecoration(
-                color: effectiveColor.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
-              ),
+              decoration: backgroundDecor,
               child: Center(
                 child: Text(
                   label ?? "",
                   style: TextStyle(
                     fontSize: 12,
                     leadingDistribution: TextLeadingDistribution.even,
-                    // Make text brighter under dark mode, and darker under light mode
-                    color: PlatformX.isDarkMode
-                        ? effectiveColor
-                            .withLightness((lightness + 0.2).clamp(0, 1))
-                        : effectiveColor
-                            .withLightness((lightness - 0.2).clamp(0, 1)),
+
+                    color: textColor,
                   ),
                 ),
               ),

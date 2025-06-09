@@ -71,7 +71,7 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
 
   double _selectDate = 0;
 
-  _loadDefaultRoom() {
+  void _loadDefaultRoom() {
     _selectCampusIndex = SettingsProvider.getInstance().campus.index;
     _selectBuildingIndex =
         SettingsProvider.getInstance().lastECBuildingChoiceRepresentation;

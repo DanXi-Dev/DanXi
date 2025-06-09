@@ -17,7 +17,6 @@
 
 import 'dart:io';
 
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
@@ -25,7 +24,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/src/platform.dart' as platform_impl;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:platform_device_id/platform_device_id.dart';
-import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 /// A universal implementation of [Platform] in dart:io and [kIsWeb] in dart:core.
@@ -59,23 +57,6 @@ class PlatformX {
     return deviceId ?? const Uuid().v4();
   }
 
-  static ThemeData getTheme(BuildContext context,
-      [MaterialColor? primarySwatch, bool? watchChanges]) {
-    primarySwatch ??= Colors.blue;
-    watchChanges ??= true;
-
-    var isDarkMode = watchChanges
-        ? context
-                .select<SettingsProvider, ThemeType>(
-                    (settings) => settings.themeType)
-                .getBrightness() ==
-            Brightness.dark
-        : PlatformX.isDarkMode;
-    return isDarkMode
-        ? Constant.darkTheme(PlatformX.isCupertino(context), primarySwatch)
-        : Constant.lightTheme(PlatformX.isCupertino(context), primarySwatch);
-  }
-
   static Color? backgroundColor(BuildContext context) {
     return isMaterial(context) ? null : Theme.of(context).cardColor;
   }
@@ -84,6 +65,18 @@ class PlatformX {
     return isMaterial(context)
         ? Theme.of(context).primaryColor
         : Theme.of(context).colorScheme.secondary;
+  }
+
+  static Future<bool> supportsDynamicColor() async {
+    if (!isAndroid) return false;
+    
+    try {
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      return androidInfo.version.sdkInt >= 31;
+    } catch (e) {
+      return false;
+    }
   }
 
   static const illegalCharWindows = [r'/', r':', r'@'];

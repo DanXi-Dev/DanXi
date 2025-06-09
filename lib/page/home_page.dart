@@ -28,7 +28,6 @@ import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_danke.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
-import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/page/subpage_timetable.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
@@ -133,7 +132,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       DankeSubPage(key: dankePageKey),
       if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
         TimetableSubPage(key: timetablePageKey),
-      const SettingsSubpage(),
     ];
   }
 
@@ -147,7 +145,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   /// Deal with login issue described at [CaptchaNeededException].
-  _dealWithCaptchaNeededException() {
+  void _dealWithCaptchaNeededException() {
     // If we have shown a dialog, do not pop up another.
     if (_isErrorDialogShown) {
       return;
@@ -196,7 +194,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   /// Deal with login issue described at [CredentialsInvalidException].
-  _dealWithCredentialsInvalidException() async {
+  Future<void> _dealWithCredentialsInvalidException() async {
     if (!LoginDialog.dialogShown) {
       // In case that [_preferences] is still not initialized.
       PersonInfo.removeFromSharedPreferences(
@@ -206,7 +204,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   /// Deal with bmob error (e.g. unable to obtain data in [AnnouncementRepository]).
-  _dealWithBmobError() {
+  void _dealWithBmobError() {
     showPlatformDialog(
         context: context,
         builder: (BuildContext context) => PlatformAlertDialog(
@@ -373,7 +371,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     try {
       if (element == 'hole') {
         final OTHole hole =
-            (await ForumRepository.getInstance().loadSpecificHole(postId))!;
+            (await ForumRepository.getInstance().loadHoleById(postId))!;
         if (mounted) {
           smartNavigatorPush(context, "/bbs/postDetail", arguments: {
             "post": hole,
@@ -381,9 +379,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }
       } else if (element == 'floor') {
         final floor =
-            (await ForumRepository.getInstance().loadSpecificFloor(postId))!;
+            (await ForumRepository.getInstance().loadFloorById(postId))!;
         final OTHole hole = (await ForumRepository.getInstance()
-            .loadSpecificHole(floor.hole_id!))!;
+            .loadHoleById(floor.hole_id!))!;
         if (mounted) {
           smartNavigatorPush(context, "/bbs/postDetail", arguments: {
             "post": hole,
@@ -594,7 +592,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     screenListener?.watch();
   }
 
-  static showScreenshotWarning(BuildContext context) =>
+  static dynamic showScreenshotWarning(BuildContext context) =>
       Noticing.showNotice(context, S.of(context).screenshot_warning,
           title: S.of(context).screenshot_warning_title, useSnackBar: false);
 
@@ -698,12 +696,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         : const Icon(CupertinoIcons.calendar),
                     label: S.of(context).timetable,
                   ),
-                BottomNavigationBarItem(
-                  icon: PlatformX.isMaterial(context)
-                      ? const Icon(Icons.settings)
-                      : const Icon(CupertinoIcons.gear_alt),
-                  label: S.of(context).settings,
-                ),
+                // BottomNavigationBarItem(
+                //   icon: PlatformX.isMaterial(context)
+                //       ? const Icon(Icons.settings)
+                //       : const Icon(CupertinoIcons.gear_alt),
+                //   label: S.of(context).settings,
+                // ),
               ],
               currentIndex: pageIndex,
               itemChanged: (index) {

@@ -63,7 +63,7 @@ class BusFeature extends Feature {
     return (today == DateTime.sunday) || (today == DateTime.saturday);
   }
 
-  _loadBusList(PersonInfo? personInfo) async {
+  Future<void> _loadBusList(PersonInfo? personInfo) async {
     _status = ConnectionStatus.CONNECTING;
     _busList = await FudanBusRepository.getInstance()
         .loadBusList(personInfo, holiday: isHoliday!);

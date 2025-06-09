@@ -113,7 +113,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
   Widget _buildReportPage() => RefreshIndicator(
         edgeOffset: MediaQuery.of(context).padding.top,
         color: Theme.of(context).colorScheme.secondary,
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
+        backgroundColor: DialogTheme.of(context).backgroundColor,
         onRefresh: () async {
           HapticFeedback.mediumImpact();
           await _reportListViewController.notifyUpdate(
@@ -154,7 +154,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
           onPressed: () async {
             int? result = await ForumRepository.getInstance()
                 .adminSetReportDealt(e.report_id!);
-            if (result != null && result < 300 && mounted) {
+            if (result != null && result < 300 && pageContext.mounted) {
               Noticing.showModalNotice(pageContext,
                   message: S.of(pageContext).operation_successful);
               await _reportListViewController.notifyUpdate(
@@ -245,7 +245,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                   loadingText: S.of(context).loading, context: context);
               try {
                 final OTHole? post = await ForumRepository.getInstance()
-                    .loadSpecificHole(e.hole_id!);
+                    .loadHoleById(e.hole_id!);
                 if (!mounted) return;
                 smartNavigatorPush(context, "/bbs/postDetail",
                     arguments: {"post": post!, "locate": e.floor});
@@ -452,9 +452,9 @@ class AuditListState extends State<AuditList> {
                     loadingText: S.of(context).loading, context: context);
                 try {
                   final OTHole? post = await ForumRepository.getInstance()
-                      .loadSpecificHole(e.hole_id);
+                      .loadHoleById(e.hole_id);
                   final OTFloor? floor = await ForumRepository.getInstance()
-                      .loadSpecificFloor(e.id);
+                      .loadFloorById(e.id);
                   if (!mounted) return;
                   smartNavigatorPush(context, "/bbs/postDetail",
                       arguments: {"post": post!, "locate": floor!});
@@ -481,7 +481,7 @@ class AuditListState extends State<AuditList> {
     return RefreshIndicator(
       edgeOffset: MediaQuery.of(context).padding.top,
       color: Theme.of(context).colorScheme.secondary,
-      backgroundColor: Theme.of(context).dialogBackgroundColor,
+      backgroundColor: DialogTheme.of(context).backgroundColor,
       onRefresh: () async {
         HapticFeedback.mediumImpact();
         await _auditListViewController.notifyUpdate(

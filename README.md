@@ -63,10 +63,10 @@ dmg 硬盘映像，挂载拷贝即可。
 
 ```shell
 $ flutter --version
-Flutter 3.27.3 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision c519ee916e (3 days ago) • 2025-01-21 10:32:23 -0800
-Engine • revision e672b006cb
-Tools • Dart 3.6.1 • DevTools 2.40.2
+Flutter 3.32.2 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 8defaa71a7 (2 天前) • 2025-06-04 11:02:51 -0700
+Engine • revision 1091508939 (7 天前) • 2025-05-30 12:17:36 -0700
+Tools • Dart 3.8.1 • DevTools 2.45.1
 ```
 
 ## 编译说明
