@@ -328,7 +328,7 @@ class ForumRepository extends BaseRepositoryWithDio {
     return newDivision;
   }
 
-  Future<List<OTHole>?> loadHoles(DateTime startTime, int divisionId,
+  Future<List<OTHole>?> loadHoles(DateTime startTime, int? divisionId,
       {int length = Constant.POST_COUNT_PER_PAGE,
       String? tag,
       SortOrder? sortOrder}) async {
@@ -338,7 +338,7 @@ class ForumRepository extends BaseRepositoryWithDio {
         method: "GET",
         queryParameters: {
           "start_time": startTime.toUtc().toIso8601String(),
-          "division_id": divisionId,
+          "division_id": divisionId ?? 0, // 0 = don't filter by division
           "length": length,
           "tag": tag,
           "order": sortOrder.getInternalString()
@@ -450,14 +450,22 @@ class ForumRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<OTFloor>?> loadSearchResults(String? searchString,
-      {int? startFloor, int length = Constant.POST_COUNT_PER_PAGE}) async {
+      {int? startFloor,
+      bool accurate = false,
+      int length = Constant.POST_COUNT_PER_PAGE,
+      (DateTime? start, DateTime? end) dateRange = (null, null)}) async {
     final options = RequestOptions(
-        path: "$_BASE_URL/floors",
+        path: "$_BASE_URL/floors/search",
         method: "GET",
         queryParameters: {
-          "start_floor": startFloor,
-          "s": searchString,
-          "length": length,
+          "offset": startFloor,
+          "search": searchString,
+          "size": length,
+          "accurate": accurate,
+          if (dateRange.$1 != null)
+            "start_time": (dateRange.$1!.millisecondsSinceEpoch / 1000).toInt(),
+          if (dateRange.$2 != null)
+            "end_time": (dateRange.$2!.millisecondsSinceEpoch / 1000).toInt(),
         },
         headers: _tokenHeader);
     final Response<List<dynamic>> response =
@@ -800,6 +808,21 @@ class ForumRepository extends BaseRepositoryWithDio {
     return response.data?.map((e) => OTPunishment.fromJson(e)).toList();
   }
 
+  /// Get user silence status by floor ID
+  /// Returns a map where keys are division IDs and values are silence end times
+  Future<Map<String, String>?> adminGetUserSilenceByFloorId(int floorId) async {
+    final options = RequestOptions(
+        path: "$_BASE_URL/floors/$floorId/user_silence",
+        method: "GET",
+        headers: _tokenHeader);
+    final Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
+
+    // Convert to Map<String, String> format
+    return response.data
+        ?.map((key, value) => MapEntry(key.toString(), value.toString()));
+  }
+
   /// Admin API below
   Future<List<OTReport>?> adminGetReports(int startReport,
       [int length = 10]) async {
@@ -848,6 +871,14 @@ class ForumRepository extends BaseRepositoryWithDio {
           if (deleteReason?.isNotEmpty == true)
             "delete_reason": deleteReason ?? ""
         },
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
+  }
+
+  Future<int?> adminForceDeleteHole(int holeId) async {
+    final options = RequestOptions(
+        path: "$_BASE_URL/holes/$holeId/_force",
+        method: "DELETE",
         headers: _tokenHeader);
     return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }

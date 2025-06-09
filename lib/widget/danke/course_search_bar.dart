@@ -27,10 +27,10 @@ class CourseSearchBar extends StatefulWidget {
       {super.key, required this.onSearch, this.onFocusChanged});
 
   @override
-  _CourseSearchBarState createState() => _CourseSearchBarState();
+  CourseSearchBarState createState() => CourseSearchBarState();
 }
 
-class _CourseSearchBarState extends State<CourseSearchBar> {
+class CourseSearchBarState extends State<CourseSearchBar> {
   final TextEditingController _controller = TextEditingController();
 
   final FocusNode _focusNode = FocusNode();

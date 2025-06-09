@@ -394,6 +394,7 @@
   "search_by_pid_tip": "Go to the post {pid}",
   "search_by_tag_tip": "See posts with tag \"{tag}\" in this division",
   "search_by_text_tip": "Search \"{searchKeyword}\" in content",
+  "search_by_text_accurate_tip": "Exactly search \"{searchKeyword}\" in content",
   "search_hint": "Search or #PID",
   "search_result": "Search Result",
   "seats": "{seats} seats",

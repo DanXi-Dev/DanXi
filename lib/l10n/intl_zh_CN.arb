@@ -388,6 +388,7 @@
   "search_by_pid_tip": "跳转到帖子「{pid}」",
   "search_by_tag_tip": "查看本分区含 Tag「{tag}」的帖子",
   "search_by_text_tip": "搜索正文含「{searchKeyword}」的帖子",
+  "search_by_text_accurate_tip": "精确搜索正文含「{searchKeyword}」的帖子",
   "search_hint": "搜索 或 #PID",
   "search_result": "搜索结果",
   "seats": "座位数：{seats}",

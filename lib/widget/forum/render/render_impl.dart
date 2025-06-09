@@ -97,8 +97,8 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
         bool translucentCard,
         bool isPreviewWidget) {
       double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
-      final imageBuilder = (Uri uri, String? title, String? alt) {
-        String url = uri.toString();
+      final imageBuilder = (MarkdownImageConfig config) {
+        String url = config.uri.toString();
         // render stickers first
         if (url.startsWith("danxi_")) {
           // backward compatibility: <=1.4.3, danxi_ is used; after that, dx_ is used
@@ -106,7 +106,6 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
         }
         if (url.startsWith("dx_")) {
           var asset = getStickerAssetPath(url);
-          // print(asset);
           if (asset != null) {
             return Image.asset(
               asset,
@@ -148,7 +147,7 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
             MarkdownHoleMentionSupport.tag:
                 MarkdownHoleMentionSupport(translucentCard, isPreviewWidget),
           },
-          imageBuilder: imageBuilder);
+          sizedImageBuilder: imageBuilder);
     };
 
 final BaseRender kMarkdownRender = kMarkdownRenderFactory(kFontSize);

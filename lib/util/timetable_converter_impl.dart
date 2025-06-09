@@ -27,25 +27,22 @@ class ICSConverter extends TimetableConverter {
       Map<int, List<Event>> weekTable = table!.toWeekCourses(weekNum);
       for (int day = 0; day < 7; day++) {
         for (var event in weekTable[day]!) {
+          final startDate = table.startDate!.add(Duration(
+              days: 7 * (weekNum - 1) + day,
+              hours: TimeTable.kCourseSlotStartTime[event.time.slot].hour!,
+              minutes:
+                  TimeTable.kCourseSlotStartTime[event.time.slot].minute!));
+          final endDate = startDate
+              .add(const Duration(minutes: TimeTable.MINUTES_OF_COURSE));
           calendar.addElement(IEvent(
               status: IEventStatus.CONFIRMED,
               classification: IClass.PUBLIC,
               description: event.course.teacherNames!.join(","),
               location: event.course.roomName ?? "",
               summary: event.course.courseName ?? "",
-              start: table.startDate!.add(Duration(
-                  days: 7 * (weekNum - 1) + day,
-                  hours: TimeTable.kCourseSlotStartTime[event.time.slot].hour!,
-                  minutes:
-                      TimeTable.kCourseSlotStartTime[event.time.slot].minute!)),
-              end: table.startDate!
-                  .add(Duration(
-                      days: 7 * (weekNum - 1) + day,
-                      hours:
-                          TimeTable.kCourseSlotStartTime[event.time.slot].hour!,
-                      minutes: TimeTable
-                          .kCourseSlotStartTime[event.time.slot].minute!))
-                  .add(const Duration(minutes: TimeTable.MINUTES_OF_COURSE))));
+              // toUtc: https://github.com/DanXi-Dev/DanXi/issues/522
+              start: startDate.toUtc(),
+              end: endDate.toUtc()));
         }
       }
     }

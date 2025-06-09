@@ -333,54 +333,56 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
     return showPlatformModalSheet(
         context: context,
         builder: (BuildContext context) {
-          final Widget body = Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ListTile(
-                      leading: const Icon(Icons.emoji_emotions),
-                      title: Text(S.of(context).sticker)),
-                  // const Divider(),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: LayoutGrid(
-                          columnSizes: List.filled(stickerSheetColumns, 1.fr),
-                          rowSizes: List.filled(stickerSheetRows, auto),
-                          rowGap: 8,
-                          columnGap: 8,
-                          children: Stickers.values.map((e) {
-                            return Container(
-                              alignment: Alignment.center,
-                              child: InkWell(
-                                onTap: () {
-                                  var cursorPosition =
-                                      widget.controller.selection.base.offset;
-                                  cursorPosition = cursorPosition == -1
-                                      ? widget.controller.text.length
-                                      : cursorPosition;
-                                  widget.controller.text =
-                                      "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
-                                  Navigator.of(context).pop();
-                                },
-                                child: Image.asset(
-                                  getStickerAssetPath(e.name)!,
-                                  width: 60,
-                                  height: 60,
-                                  fit: BoxFit.contain,
+          final Widget body = SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                        leading: const Icon(Icons.emoji_emotions),
+                        title: Text(S.of(context).sticker)),
+                    // const Divider(),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: LayoutGrid(
+                            columnSizes: List.filled(stickerSheetColumns, 1.fr),
+                            rowSizes: List.filled(stickerSheetRows, auto),
+                            rowGap: 8,
+                            columnGap: 8,
+                            children: Stickers.values.map((e) {
+                              return Container(
+                                alignment: Alignment.center,
+                                child: InkWell(
+                                  onTap: () {
+                                    var cursorPosition =
+                                        widget.controller.selection.base.offset;
+                                    cursorPosition = cursorPosition == -1
+                                        ? widget.controller.text.length
+                                        : cursorPosition;
+                                    widget.controller.text =
+                                        "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Image.asset(
+                                    getStickerAssetPath(e.name)!,
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.contain,
+                                  ),
                                 ),
-                              ),
-                            );
-                          }).toList(),
+                              );
+                            }).toList(),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ]),
+                  ]),
+            ),
           );
           return PlatformX.isCupertino(context)
               ? ConstrainedBox(

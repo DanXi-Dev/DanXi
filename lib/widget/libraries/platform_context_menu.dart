@@ -22,13 +22,17 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 class PlatformContextMenu extends StatelessWidget {
   final Widget? cancelButton;
   final List<Widget> actions;
+  final bool useSafeArea;
 
   const PlatformContextMenu(
-      {super.key, this.cancelButton, required this.actions});
+      {super.key,
+      this.cancelButton,
+      required this.actions,
+      this.useSafeArea = true});
 
   @override
   Widget build(BuildContext context) {
-    return PlatformWidget(
+    Widget widget = PlatformWidget(
         cupertino: (_, __) => CupertinoActionSheet(
               actions: actions,
               cancelButton: cancelButton,
@@ -39,6 +43,7 @@ class PlatformContextMenu extends StatelessWidget {
                 children: actions,
               ),
             ));
+    return useSafeArea ? SafeArea(child: widget) : widget;
   }
 }
 

@@ -386,6 +386,7 @@
   "search_by_pid_tip": "「{pid}」ポストへ",
   "search_by_tag_tip": "このスペースのタグ「{tag}」のポストを見る",
   "search_by_text_tip": "本文中に「{searchKeyword}」を含むポストを検索する",
+  "search_by_text_accurate_tip": "本文中に「{searchKeyword}」を含むポストを精密検索する",
   "search_hint": "検索内容・#PID",
   "search_result": "検索結果",
   "seats": "座席数:{seats}",

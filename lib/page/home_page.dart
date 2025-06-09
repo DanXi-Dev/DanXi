@@ -156,7 +156,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   /// Deal with login issue described at [CaptchaNeededException].
-  _dealWithCaptchaNeededException() {
+  void _dealWithCaptchaNeededException() {
     // If we have shown a dialog, do not pop up another.
     if (_isErrorDialogShown) {
       return;
@@ -205,7 +205,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   /// Deal with login issue described at [CredentialsInvalidException].
-  _dealWithCredentialsInvalidException() async {
+  Future<void> _dealWithCredentialsInvalidException() async {
     if (!LoginDialog.dialogShown) {
       // In case that [_preferences] is still not initialized.
       PersonInfo.removeFromSharedPreferences(
@@ -215,7 +215,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   /// Deal with bmob error (e.g. unable to obtain data in [AnnouncementRepository]).
-  _dealWithBmobError() {
+  void _dealWithBmobError() {
     showPlatformDialog(
         context: context,
         builder: (BuildContext context) => PlatformAlertDialog(
@@ -600,7 +600,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     screenListener?.watch();
   }
 
-  static showScreenshotWarning(BuildContext context) =>
+  static dynamic showScreenshotWarning(BuildContext context) =>
       Noticing.showNotice(context, S.of(context).screenshot_warning,
           title: S.of(context).screenshot_warning_title, useSnackBar: false);
 

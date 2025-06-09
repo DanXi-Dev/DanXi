@@ -27,7 +27,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 /// Simple helper class to show a notice,
 /// like [SnackBar] on Material or a [CupertinoAlertDialog] on Cupertino.
 class Noticing {
-  static showMaterialNotice(BuildContext context, String message,
+  static void showMaterialNotice(BuildContext context, String message,
       {String? confirmText,
       String? title,
       bool useSnackBar = true,
@@ -40,7 +40,7 @@ class Noticing {
         useSnackBar: useSnackBar);
   }
 
-  static showNotice(BuildContext context, String message,
+  static Future<void> showNotice(BuildContext context, String message,
       {String? confirmText,
       String? title,
       bool useSnackBar = true,
@@ -98,7 +98,7 @@ class Noticing {
     }
   }
 
-  static showErrorDialog(BuildContext context, dynamic error,
+  static Future<T?> showErrorDialog<T>(BuildContext context, dynamic error,
       {StackTrace? trace,
       String? title,
       bool useSnackBar = false,
@@ -108,7 +108,7 @@ class Noticing {
     final message = ErrorPageWidget.generateUserFriendlyDescription(
         S.of(context), error,
         stackTrace: trace);
-    return await showPlatformDialog(
+    return await showPlatformDialog<T>(
         context: context,
         builder: (BuildContext context) => PlatformAlertDialog(
               title: title == null ? null : Text(title),
@@ -239,7 +239,7 @@ class Noticing {
             ));
   }
 
-  static showModalNotice(BuildContext context,
+  static Future<void> showModalNotice(BuildContext context,
       {String title = "", String message = "", bool selectable = false}) async {
     if (!title.endsWith('\n') && !message.startsWith('\n')) title += '\n';
     Widget content = Padding(

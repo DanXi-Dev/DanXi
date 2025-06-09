@@ -23,6 +23,7 @@ import 'package:dan_xi/model/forum/message.dart';
 import 'package:dan_xi/model/forum/report.dart';
 import 'package:dan_xi/page/forum/hole_detail.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
+import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
@@ -176,6 +177,13 @@ class OTHoleWidget extends StatelessWidget {
                                 LeadingChip(
                                   color: Theme.of(context).colorScheme.primary,
                                   label: S.of(context).hole_hidden,
+                                ),
+                              ],
+                              if (postElement.isForceDeleted) ...[
+                                const SizedBox(width: 4),
+                                LeadingChip(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  label: S.of(context).hole_force_deleted,
                                 ),
                               ],
                               if (postElement.locked == true) ...[
@@ -364,6 +372,12 @@ class OTFloorWidget extends StatelessWidget {
       });
     }
 
+    final isPinned = context.read<ForumProvider>().divisionCache.any(
+        (division) =>
+            division.pinned?.any(
+                (pinnedHole) => pinnedHole.hole_id == parentHole?.hole_id) ==
+            true);
+
     final nameColor = floor.anonyname?.hashColor() ?? Colors.red;
 
     Linkify? foldedWidget;
@@ -440,6 +454,36 @@ class OTFloorWidget extends StatelessWidget {
                         LeadingChip(
                           color: Colors.red,
                           label: S.of(context).hole_hidden,
+                        ),
+                      ],
+                      // Ditto.
+                      if (parentHole?.isForceDeleted == true &&
+                          floor.floor_id ==
+                              parentHole?.floors?.first_floor?.floor_id) ...[
+                        const SizedBox(width: 4),
+                        LeadingChip(
+                          color: Colors.red,
+                          label: S.of(context).hole_force_deleted,
+                        ),
+                      ],
+                      // Show locked tag if the hole is locked and this is the first floor
+                      if (parentHole?.locked == true &&
+                          floor.floor_id ==
+                              parentHole?.floors?.first_floor?.floor_id) ...[
+                        const SizedBox(width: 4),
+                        LeadingChip(
+                          color: Theme.of(context).colorScheme.primary,
+                          label: S.of(context).hole_locked,
+                        ),
+                      ],
+                      // Show pinned tag if this hole is in the pinned list and this is the first floor
+                      if (isPinned &&
+                          floor.floor_id ==
+                              parentHole?.floors?.first_floor?.floor_id) ...[
+                        const SizedBox(width: 4),
+                        LeadingChip(
+                          color: Theme.of(context).colorScheme.primary,
+                          label: S.of(context).pinned,
                         ),
                       ],
                     ],
@@ -808,6 +852,7 @@ class OTFloorWidgetBottomBar extends StatelessWidget {
 class OTFloorToolBar extends StatefulWidget {
   final OTFloor floor;
   final int? index;
+
   // The callback when modify or delete is invoked
   final Function()? onClickMore;
 

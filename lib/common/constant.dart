@@ -365,7 +365,6 @@ class Constant {
           trackColor: toggleableProperty,
         ),
         radioTheme: RadioThemeData(fillColor: toggleableProperty),
-        indicatorColor: const Color(0xFF007AFF),
         canvasColor: const Color.fromRGBO(242, 242, 247, 1),
         scaffoldBackgroundColor: const Color.fromRGBO(242, 242, 247, 1),
         cardTheme: CardThemeData(
@@ -379,6 +378,7 @@ class Constant {
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(foregroundColor: const Color(0xFF007AFF)),
         ),
+        tabBarTheme: TabBarThemeData(indicatorColor: const Color(0xFF007AFF)),
       );
     }
     return ThemeData(
@@ -413,7 +413,6 @@ class Constant {
             secondary: const Color(0xFF007AFF),
             primary: const Color(0xFF007AFF),
             surface: Colors.black),
-        indicatorColor: const Color(0xFF007AFF),
         switchTheme: SwitchThemeData(
           thumbColor: toggleableProperty,
           trackColor: toggleableProperty,
@@ -433,7 +432,10 @@ class Constant {
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(foregroundColor: const Color(0xFF007AFF)),
         ),
-        textTheme: Typography.whiteCupertino, dialogTheme: DialogThemeData(backgroundColor: const Color.fromRGBO(28, 28, 30, 1.0)),
+        textTheme: Typography.whiteCupertino,
+        dialogTheme: DialogThemeData(
+            backgroundColor: const Color.fromRGBO(28, 28, 30, 1.0)),
+        tabBarTheme: TabBarThemeData(indicatorColor: const Color(0xFF007AFF)),
       );
     }
     return ThemeData(
@@ -605,7 +607,6 @@ extension CampusEx on Campus? {
         return ['Z2'];
       case Campus.NONE:
       case null:
-      default:
         return ['?'];
     }
   }

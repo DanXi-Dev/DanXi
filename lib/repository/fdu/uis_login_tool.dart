@@ -87,6 +87,12 @@ class UISLoginTool {
       },
       retryTimes: retryTimes,
       isFatalError: isFatalError,
+      // If there is an explicit reason for UIS login failure, we should not retry anymore.
+      isFatalRetryError: (e) =>
+          e is CredentialsInvalidException ||
+          e is CaptchaNeededException ||
+          e is NetworkMaintenanceException ||
+          e is WeakPasswordException,
     );
   }
 
@@ -147,7 +153,7 @@ class UISLoginTool {
     } else if (response.data.toString().contains(UNDER_MAINTENANCE)) {
       throw NetworkMaintenanceException();
     } else if (response.data.toString().contains(WEAK_PASSWORD)) {
-      throw GeneralLoginFailedException();
+      throw WeakPasswordException();
     }
 
     jar.cloneFrom(workJar);
@@ -161,4 +167,4 @@ class CredentialsInvalidException implements Exception {}
 
 class NetworkMaintenanceException implements Exception {}
 
-class GeneralLoginFailedException implements Exception {}
+class WeakPasswordException implements Exception {}

@@ -113,7 +113,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
   Widget _buildReportPage() => RefreshIndicator(
         edgeOffset: MediaQuery.of(context).padding.top,
         color: Theme.of(context).colorScheme.secondary,
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
+        backgroundColor: DialogTheme.of(context).backgroundColor,
         onRefresh: () async {
           HapticFeedback.mediumImpact();
           await _reportListViewController.notifyUpdate(
@@ -154,7 +154,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
           onPressed: () async {
             int? result = await ForumRepository.getInstance()
                 .adminSetReportDealt(e.report_id!);
-            if (result != null && result < 300 && mounted) {
+            if (result != null && result < 300 && pageContext.mounted) {
               Noticing.showModalNotice(pageContext,
                   message: S.of(pageContext).operation_successful);
               await _reportListViewController.notifyUpdate(
@@ -481,7 +481,7 @@ class AuditListState extends State<AuditList> {
     return RefreshIndicator(
       edgeOffset: MediaQuery.of(context).padding.top,
       color: Theme.of(context).colorScheme.secondary,
-      backgroundColor: Theme.of(context).dialogBackgroundColor,
+      backgroundColor: DialogTheme.of(context).backgroundColor,
       onRefresh: () async {
         HapticFeedback.mediumImpact();
         await _auditListViewController.notifyUpdate(

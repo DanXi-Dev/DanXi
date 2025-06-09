@@ -34,7 +34,7 @@ class SportsReserveRepository extends BaseRepositoryWithDio {
   static const String STADIUM_LIST_NUMBER_URL =
       "https://elife.fudan.edu.cn/public/front/search.htm?1=1&id=2c9c486e4f821a19014f82381feb0001&orderBack=null&fieldID=&dicID=&dicSql=&pageBean.pageNo=1&pageBean.pageSize=10";
 
-  static sStadiumDetailUrl(String? contentId, DateTime queryDate) =>
+  static String sStadiumDetailUrl(String? contentId, DateTime queryDate) =>
       "https://elife.fudan.edu.cn/public/front/getResource2.htm?contentId=$contentId&ordersId=&"
       "currentDate=${DateFormat('yyyy-MM-dd').format(queryDate)}";
 

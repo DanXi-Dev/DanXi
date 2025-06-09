@@ -947,7 +947,7 @@ class SettingsPageState extends State<SettingsPage> {
 
   static const String CLEAN_MODE_EXAMPLE = '`差不多得了😅，自己不会去看看吗😇`';
 
-  _showCleanModeGuideDialog() => showPlatformDialog(
+  Future _showCleanModeGuideDialog() => showPlatformDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
             title: Text(S.of(dialogContext).forum_clean_mode),

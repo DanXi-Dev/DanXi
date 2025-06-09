@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/time_table.dart';
@@ -34,17 +33,26 @@ class NextCourseFeature extends Feature {
   bool get loadOnTap => false;
 
   LiveCourseModel? _data;
-  ConnectionStatus _status = ConnectionStatus.NONE;
+  CourseFeatureStatus _status = CourseFeatureStatus.NONE;
 
   Future<void> _loadCourse() async {
-    _status = ConnectionStatus.CONNECTING;
+    _status = CourseFeatureStatus.CONNECTING;
+    if (!TimeTableRepository.getInstance().hasCache()) {
+      // No cache indicates the user has never accessed timetable page.
+      // In this scenario, because the semester start date requires manual configuration,
+      // the course schedule should NOT be automatically fetched (the default start date is often incorrect!).
+      // Instead, the user should be prompted to visit timetable page.
+      _status = CourseFeatureStatus.SETUP_REQUIRED;
+      notifyUpdate();
+      return;
+    }
     TimeTable? timetable = await Retrier.runAsyncWithRetry(() async {
       await Future.delayed(const Duration(milliseconds: 500));
       return await TimeTableRepository.getInstance()
           .loadTimeTable(StateProvider.personInfo.value);
     });
     _data = getNextCourse(timetable!);
-    _status = ConnectionStatus.DONE;
+    _status = CourseFeatureStatus.DONE;
     notifyUpdate();
   }
 
@@ -79,9 +87,9 @@ class NextCourseFeature extends Feature {
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
-    if (_status == ConnectionStatus.NONE) {
+    if (_status == CourseFeatureStatus.NONE) {
       _loadCourse().catchError((error) {
-        _status = ConnectionStatus.FAILED;
+        _status = CourseFeatureStatus.FAILED;
         notifyUpdate();
       });
     }
@@ -93,10 +101,10 @@ class NextCourseFeature extends Feature {
   @override
   Widget? get customSubtitle {
     switch (_status) {
-      case ConnectionStatus.NONE:
-      case ConnectionStatus.CONNECTING:
+      case CourseFeatureStatus.NONE:
+      case CourseFeatureStatus.CONNECTING:
         return Text(S.of(context!).loading);
-      case ConnectionStatus.DONE:
+      case CourseFeatureStatus.DONE:
         if (_data != null) {
           if (_data!.nextCourse?.course.courseName != null) {
             return Text(S.of(context!).next_course_is(
@@ -107,14 +115,15 @@ class NextCourseFeature extends Feature {
         } else {
           return null;
         }
-      case ConnectionStatus.FAILED:
-      case ConnectionStatus.FATAL_ERROR:
+      case CourseFeatureStatus.FAILED:
         return Text(S.of(context!).failed);
+      case CourseFeatureStatus.SETUP_REQUIRED:
+        return Text(S.of(context!).next_course_setup);
     }
   }
 
   void refreshData() {
-    _status = ConnectionStatus.NONE;
+    _status = CourseFeatureStatus.NONE;
     notifyUpdate();
   }
 
@@ -158,3 +167,5 @@ class LiveCourseModel {
 
   LiveCourseModel(this.nowCourse, this.nextCourse, this.courseLeft);
 }
+
+enum CourseFeatureStatus { NONE, CONNECTING, DONE, FAILED, SETUP_REQUIRED }
