@@ -597,7 +597,7 @@ class SemesterSelectionButton extends StatefulWidget {
 }
 
 class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
-  List<SemesterInfo>? _semesterInfo;
+  TimeTableSemesterInfo? _semesterInfo;
   SemesterInfo? _selectionInfo;
   late Future<void> _future;
 
@@ -608,17 +608,16 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
   }
 
   Future<void> loadSemesterInfo() async {
-    _semesterInfo = await EduServiceRepository.getInstance()
-        .loadSemesters(StateProvider.personInfo.value);
-    // Reverse the order to make the newest item at top
-    _semesterInfo = _semesterInfo?.reversed.toList();
+    _semesterInfo = await TimeTableRepository.getInstance()
+        .loadSemestersForTimeTable(StateProvider.personInfo.value!);
     String? chosenSemester = SettingsProvider.getInstance().timetableSemester;
     if (chosenSemester == null || chosenSemester.isEmpty) {
-      chosenSemester = await TimeTableRepository.getInstance()
-          .getDefaultSemesterId(StateProvider.personInfo.value);
+      chosenSemester = _semesterInfo!.defaultSemesterId;
     }
-    _selectionInfo = _semesterInfo!
+    _selectionInfo = _semesterInfo!.semesters
         .firstWhere((element) => element.semesterId == chosenSemester!);
+    SettingsProvider.getInstance().semesterStartDates =
+        _semesterInfo!.startDates;
   }
 
   @override
@@ -637,7 +636,7 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
                 cancelButton: CupertinoActionSheetAction(
                     child: Text(S.of(menuContext).cancel),
                     onPressed: () => Navigator.of(menuContext).pop()),
-                actions: _semesterInfo!
+                actions: _semesterInfo!.semesters
                     .map((e) => PlatformContextMenuItem(
                         menuContext: menuContext,
                         onPressed: () {
