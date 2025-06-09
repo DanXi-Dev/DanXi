@@ -550,5 +550,13 @@
   "select_all": "Select All",
   "share_hole_title": "Select the floors to share",
   "follow_system_palette": "Follow system color palette",
-  "follow_system_palette_description": "Use Android's Material You dynamic colors based on your wallpaper"
+  "follow_system_palette_description": "Use Android's Material You dynamic colors based on your wallpaper",
+  "next_course_setup": "Require setup in Agenda. Then refresh.",
+  "date_range_select": "Select date range",
+  "select_date_range_invalid_range": "Start date must be before end date",
+  "select_date_range_from": "From",
+  "select_date_range_to": "To",
+  "select_date_range_far_past": "Far Past",
+  "select_date_range_now": "Now",
+  "hole_force_deleted": "Deleted"
 }

@@ -544,5 +544,13 @@
   "select_all": "全选",
   "share_hole_title": "选择要分享的楼层",
   "follow_system_palette": "跟随系统色彩",
-  "follow_system_palette_description": "使用基于壁纸的Android Material You动态颜色"
+  "follow_system_palette_description": "使用基于壁纸的Android Material You动态颜色",
+  "next_course_setup": "请先到课表页面完成相关设置，然后刷新",
+  "date_range_select": "选择日期范围",
+  "select_date_range_invalid_range": "开始日期必须早于结束日期",
+  "select_date_range_from": "从",
+  "select_date_range_to": "到",
+  "select_date_range_far_past": "遥远的过去",
+  "select_date_range_now": "现在",
+  "hole_force_deleted": "已删除"
 }

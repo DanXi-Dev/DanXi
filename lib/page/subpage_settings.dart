@@ -334,7 +334,7 @@ class SettingsPageState extends State<SettingsPage> {
             child: RefreshIndicator(
                 edgeOffset: MediaQuery.of(context).padding.top,
                 color: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).dialogBackgroundColor,
+                backgroundColor: DialogTheme.of(context).backgroundColor,
                 onRefresh: () async {
                   HapticFeedback.mediumImpact();
                   setState(() {});

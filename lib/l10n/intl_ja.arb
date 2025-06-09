@@ -532,5 +532,13 @@
   "select_all": "全選択",
   "share_hole_title": "分け合う階層を選択する",
   "follow_system_palette": "システムカラーパレットに従う",
-  "follow_system_palette_description": "壁紙に基づくAndroid Material Youの動的カラーを使用する"
+  "follow_system_palette_description": "壁紙に基づくAndroid Material Youの動的カラーを使用する",
+  "next_course_setup": "スケジュールで設定後、更新",
+  "date_range_select": "日付範囲を選択",
+  "select_date_range_invalid_range": "開始日は終了日より前である必要があります",
+  "select_date_range_from": "開始：",
+  "select_date_range_to": "終了：",
+  "select_date_range_far_past": "遠い過去",
+  "select_date_range_now": "現在",
+  "hole_force_deleted": "削除され"
 }

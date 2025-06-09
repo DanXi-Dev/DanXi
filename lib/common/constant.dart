@@ -368,7 +368,7 @@ class Constant {
         indicatorColor: const Color(0xFF007AFF),
         canvasColor: const Color.fromRGBO(242, 242, 247, 1),
         scaffoldBackgroundColor: const Color.fromRGBO(242, 242, 247, 1),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -384,7 +384,7 @@ class Constant {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(seedColor: color),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0.5,
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
       ),
@@ -421,7 +421,7 @@ class Constant {
         radioTheme: RadioThemeData(fillColor: toggleableProperty),
         scaffoldBackgroundColor: Colors.black,
         canvasColor: Colors.black,
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           margin: const EdgeInsets.fromLTRB(7, 8, 7, 8),
           color: const Color.fromRGBO(28, 28, 30, 1),
           //color: Color.fromRGBO(30, 30, 33, 0.8),
@@ -440,7 +440,7 @@ class Constant {
       useMaterial3: true,
       colorScheme:
           ColorScheme.fromSeed(seedColor: color, brightness: Brightness.dark),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
       ),
       dividerTheme: const DividerThemeData(thickness: 0.2),
