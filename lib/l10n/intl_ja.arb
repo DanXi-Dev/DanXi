@@ -532,6 +532,8 @@
   "show_this_person": "この人だけ",
   "select_all": "全選択",
   "share_hole_title": "分け合う階層を選択する",
+  "follow_system_palette": "システムカラーパレットに従う",
+  "follow_system_palette_description": "壁紙に基づくAndroid Material Youの動的カラーを使用する",
   "next_course_setup": "スケジュールで設定後、更新",
   "date_range_select": "日付範囲を選択",
   "select_date_range_invalid_range": "開始日は終了日より前である必要があります",

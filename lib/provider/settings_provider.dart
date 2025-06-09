@@ -31,6 +31,7 @@ import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/page/forum/hole_editor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
 
 /// A class to manage [SharedPreferences] Settings
@@ -41,6 +42,9 @@ import 'package:flutter/material.dart';
 class SettingsProvider with ChangeNotifier {
   XSharedPreferences? preferences;
   static final _instance = SettingsProvider._();
+
+  bool supportsDynamicColor = false;
+
   static const String KEY_PREFERRED_CAMPUS = "campus";
 
   //static const String KEY_AUTOTICK_LAST_CANCEL_DATE =
@@ -87,6 +91,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_TIMETABLE_LAST_UPDATED = "timetable_last_updated";
   static const String KEY_USE_WEBVPN = "use_webvpn";
   static const String KEY_VIEW_HISTORY = "view_history";
+  static const String KEY_FOLLOW_SYSTEM_PALETTE = "follow_system_palette";
 
   static const int MAX_VIEW_HISTORY = 250;
 
@@ -276,8 +281,10 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> init() async =>
-      preferences = await XSharedPreferences.getInstance();
+  Future<void> init() async {
+    preferences = await XSharedPreferences.getInstance();
+    supportsDynamicColor = await PlatformX.supportsDynamicColor();
+  }
 
   bool get useAccessibilityColoring {
     if (preferences!.containsKey(KEY_ACCESSIBILITY_COLORING)) {
@@ -783,6 +790,18 @@ class SettingsProvider with ChangeNotifier {
 
   set viewHistory(List<int> value) {
     preferences!.setIntList(KEY_VIEW_HISTORY, value);
+    notifyListeners();
+  }
+
+  bool get followSystemPalette {
+    if (preferences!.containsKey(KEY_FOLLOW_SYSTEM_PALETTE)) {
+      return preferences!.getBool(KEY_FOLLOW_SYSTEM_PALETTE)!;
+    }
+    return false; // Default to false if not set
+  }
+
+  set followSystemPalette(bool value) {
+    preferences!.setBool(KEY_FOLLOW_SYSTEM_PALETTE, value);
     notifyListeners();
   }
 }

@@ -16,7 +16,6 @@
  */
 
 import 'package:dan_xi/feature/base_feature.dart';
-import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -92,7 +91,7 @@ class FeatureCardItemState extends State<FeatureCardItem>
               widget.feature.customSubtitle ??
                   Text(
                     summary.join("\n"),
-                    style: PlatformX.getTheme(context)
+                    style: Theme.of(context)
                         .textTheme
                         .displayLarge!
                         .copyWith(fontSize: 12),
