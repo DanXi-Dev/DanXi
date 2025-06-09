@@ -1,0 +1,1 @@
+修复了一些最近报告的严重影响使用的 bug，以及一些新功能和变更。更新日志请看 https://github.com/DanXi-Dev/DanXi/releases。

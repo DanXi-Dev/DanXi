@@ -1,0 +1,1 @@
+This release addresses several critical usage bugs that were recently reported, along with some new features and changes. You can find the complete changelog at https://github.com/DanXi-Dev/DanXi/releases.
