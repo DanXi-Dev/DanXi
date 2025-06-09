@@ -323,7 +323,7 @@ class SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool supportsDynamicColor = context.watch<SettingsProvider>().supportsDynamicColor;
+    final bool supportsDynamicColor = context.read<SettingsProvider>().supportsDynamicColor;
     // Load preference fields
     return PlatformScaffold(
       appBar: PlatformAppBar(
@@ -452,7 +452,7 @@ class SettingsPageState extends State<SettingsPage> {
                             Builder(
                               builder: (context) {
                               // Watch the followSystemPalette setting
-                              bool isFollowingSystemPalette = PlatformX.isAndroid && context.watch<SettingsProvider>().followSystemPalette;
+                              bool isFollowingSystemPalette = PlatformX.isAndroid && context.read<SettingsProvider>().followSystemPalette;
 
                               // Conditionally build the ListTile for theme color
                               if (PlatformX.isMaterial(context)) {
@@ -490,13 +490,18 @@ class SettingsPageState extends State<SettingsPage> {
                         ),
 
                             if (supportsDynamicColor)
-                              SwitchListTile.adaptive(
-                                title: Text(S.of(context).follow_system_palette),
-                                subtitle: Text(S.of(context).follow_system_palette_description),
-                                secondary: const Icon(Icons.palette_outlined),
-                                value: SettingsProvider.getInstance().followSystemPalette,
-                                onChanged: (bool value) {
-                                  context.read<SettingsProvider>().followSystemPalette = value;
+                              Selector<SettingsProvider, bool>(
+                                selector: (_, settings) => settings.followSystemPalette,
+                                builder: (context, followSystemPaletteValue, _) {
+                                  return SwitchListTile.adaptive(
+                                    title: Text(S.of(context).follow_system_palette),
+                                    subtitle: Text(S.of(context).follow_system_palette_description),
+                                    secondary: const Icon(Icons.palette_outlined),
+                                    value: followSystemPaletteValue,
+                                    onChanged: (bool value) {
+                                      context.read<SettingsProvider>().followSystemPalette = value;
+                                    },
+                                  );
                                 },
                               ),
 
