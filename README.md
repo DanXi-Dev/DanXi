@@ -50,6 +50,28 @@
 Apple Intel 用户请打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版
 dmg 硬盘映像，挂载拷贝即可。
 
+## Linux
+
+### Arch Linux
+
+从 [AUR](https://aur.archlinux.org/danxi-git.git) 或 [archlinuxcn](https://github.com/archlinuxcn/repo/tree/master/archlinuxcn/danxi-git) 安装。
+
+#### AUR
+
+```shell
+[yay/paru] -S danxi-git
+```
+
+#### archlinuxcn
+
+```shell
+sudo pacman -S danxi-git
+```
+
+### 其他 Linux 发行版
+
+打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版 zip 压缩包，解压运行即可。
+
 # 构建
 
 ## 我们当前使用的 Flutter 编译版本
