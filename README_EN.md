@@ -57,6 +57,29 @@ Download from [App Store](https://apps.apple.com/us/app/旦夕/id1568629997)
 Go to [release page](https://github.com/DanXi-Dev/DanXi/releases), just download the dmg file and
 mount it.
 
+## Linux
+
+### Arch Linux
+
+You can install it from [AUR](https://aur.archlinux.org/danxi-git.git) or [archlinuxcn](https://github.com/archlinuxcn/repo/tree/master/archlinuxcn/danxi-git).
+
+#### AUR
+
+```shell
+[yay/paru] -S danxi-git
+```
+
+#### archlinuxcn
+
+```shell
+sudo pacman -S danxi-git
+```
+
+### Other Linux distributions
+
+Go to [release page](https://github.com/DanXi-Dev/DanXi/releases), just download the zip file and
+unzip it.
+
 # Compile
 
 ## Flutter version that we're using
