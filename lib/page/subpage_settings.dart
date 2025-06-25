@@ -1101,7 +1101,7 @@ class SettingsPageState extends State<SettingsPage> {
                       //Version
                       Align(
                         alignment: Alignment.centerRight,
-                        child: Text(
+                        child: SelectableText(
                           '${S.of(context).version} ${FlutterApp.versionName} build ${Pubspec.version.build.single} #${const String.fromEnvironment("GIT_HASH", defaultValue: "?")}',
                           textScaler: const TextScaler.linear(0.7),
                           style: const TextStyle(fontWeight: FontWeight.bold),
