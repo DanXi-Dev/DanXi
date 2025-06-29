@@ -18,6 +18,7 @@
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:flutter/material.dart';
 
 /// A simple implementation of [FeatureContainerState] to show the feature as a [ListTile].
@@ -69,7 +70,10 @@ class FeatureListItemState extends State<FeatureListItem>
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: widget.feature.customSubtitle ?? Text(summary.join("\n")),
-        onTap: widget.feature.clickable ? widget.feature.onTap : null,
+        onTap: widget.feature.clickable ? () {
+          HapticFeedbackUtil.light();
+          widget.feature.onTap?.call();
+        } : null,
       );
       widget.feature.onEvent(FeatureEvent.CREATE);
       return tile;
@@ -87,9 +91,11 @@ class FeatureListItemState extends State<FeatureListItem>
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(S.of(context).tap_to_view),
-        onTap: () => setState(() {
+        onTap: () { 
+          HapticFeedbackUtil.light();
+          setState(() {
           loadWidget = true;
-        }),
+        });}
       );
     }
   }
