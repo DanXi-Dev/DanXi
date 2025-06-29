@@ -19,6 +19,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/util/scroller_fix/mirror_scroll_controller.dart';
 import 'package:dan_xi/util/stream_listener.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -144,7 +145,10 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
               MaterialIconButtonData(tooltip: leadingItems.first.caption),
           padding: EdgeInsets.zero,
           icon: leadingItems.first.widget,
-          onPressed: leadingItems.first.onPressed,
+          onPressed: () {
+            HapticFeedbackUtil.light();
+            leadingItems.first.onPressed?.call();
+            },
         );
       }
     }
@@ -156,7 +160,10 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
             material: (_, __) => MaterialIconButtonData(tooltip: e.caption),
             padding: EdgeInsets.zero,
             icon: e.widget,
-            onPressed: e.onPressed);
+            onPressed: () {
+              HapticFeedbackUtil.light();
+              e.onPressed?.call();
+              });
       }).toList();
     }
 

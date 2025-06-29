@@ -541,5 +541,7 @@
   "select_date_range_to": "終了：",
   "select_date_range_far_past": "遠い過去",
   "select_date_range_now": "現在",
-  "hole_force_deleted": "削除され"
+  "hole_force_deleted": "削除され",
+  "haptic_feedback": "触覚フィードバック",
+  "haptic_feedback_description": "操作時に振動フィードバックを提供"
 }

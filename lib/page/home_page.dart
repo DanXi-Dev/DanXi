@@ -45,6 +45,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/util/webvpn_proxy.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/widget/dialogs/login_dialog.dart';
 import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
 import 'package:dan_xi/widget/forum/post_render.dart';
@@ -643,11 +644,14 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             child: ListTile(
               leading: Icon(PlatformIcons(context).accountCircle),
               title: Text(S.of(context).login),
-              onTap: () => LoginDialog.showLoginDialog(
+              onTap: () { 
+                HapticFeedbackUtil.light();
+                LoginDialog.showLoginDialog(
                   context,
                   SettingsProvider.getInstance().preferences,
                   StateProvider.personInfo,
-                  false),
+                  false);
+                  },
             ),
           )
         ]),
@@ -720,6 +724,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   return;
                 }
                 if (index != pageIndex) {
+                  HapticFeedbackUtil.medium();
                   // Dispatch [SubpageViewState] events.
                   _subpage[pageIndex]
                       .onViewStateChanged(context, SubpageViewState.INVISIBLE);
