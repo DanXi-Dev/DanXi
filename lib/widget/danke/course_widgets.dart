@@ -175,6 +175,22 @@ class FilterTagWidget extends StatelessWidget {
       );
 }
 
+class BadgeWidget extends StatelessWidget {
+  final Color? color;
+  final String? text;
+  final void Function()? onTap;
+
+  const BadgeWidget({super.key, this.color, this.text, this.onTap});
+
+  @override
+  Widget build(BuildContext context) => RectangularChip(
+        onTap: onTap,
+        label: text,
+        color: color,
+        highlighted: true,
+      );
+}
+
 class FilterTag<T> {
   FilterTag(this.displayName, this.filter);
 
