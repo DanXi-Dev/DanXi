@@ -58,7 +58,7 @@ void registerFeature(String key, Feature Function() featureFactoryFunc,
 }
 
 /// Check whether the [group] can use [feature].
-bool checkFeature(Feature feature, UserGroup group) =>
+bool checkFeature(Feature feature, UserGroup? group) =>
     _group.opt(feature.runtimeType.toString(), []).contains(group);
 
 /// Check whether [info] is in the [groups].
