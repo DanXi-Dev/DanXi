@@ -156,18 +156,18 @@ class ReviewHeader extends StatelessWidget {
           ),
           Expanded(
               child: GestureDetector(
-            onTap: () {},
-            child: Wrap(
-                // todo this is the badge list of the user
-                alignment: WrapAlignment.start,
-                spacing: 3,
-                runSpacing: 2,
-                children: List.generate(
-                    reviewExtra?.achievements?.length ?? 0,
-                    (index) => BadgeWidget(
-                        text: reviewExtra!.achievements?[index].name,
-                        onTap: () {}))),
-          )),
+                  onTap: () {},
+                  child: Wrap(
+                      alignment: WrapAlignment.start,
+                      spacing: 3,
+                      runSpacing: 2,
+                      children: reviewExtra?.achievements
+                              ?.map((badge) => BadgeWidget(
+                                    text: badge.name,
+                                    onTap: () {},
+                                  ))
+                              .toList() ??
+                          const <Widget>[]))),
         ],
       ),
       Padding(
