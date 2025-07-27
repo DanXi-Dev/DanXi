@@ -35,6 +35,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/watermark.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/widget/forum/render/base_render.dart';
 import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
@@ -238,8 +239,11 @@ class OTHoleWidget extends StatelessWidget {
                       ]),
                     ]),
               ]),
-              onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
-                  arguments: {"post": postElement})),
+              onTap: () { 
+                HapticFeedbackUtil.light();
+                smartNavigatorPush(context, "/bbs/postDetail",
+                  arguments: {"post": postElement});
+                  }),
         ],
       ),
     );
@@ -527,7 +531,10 @@ class OTFloorWidget extends StatelessWidget {
     );
 
     final card = GestureDetector(
-      onLongPress: onLongPress,
+      onLongPress: () {
+        HapticFeedbackUtil.medium();
+        onLongPress?.call();
+        },
       child: Card(
         color: isInMention && PlatformX.isCupertino(context)
             ? Theme.of(context).dividerColor.withValues(alpha: 0.05)
@@ -887,6 +894,7 @@ class OTFloorToolBarState extends State<OTFloorToolBar> {
         OTFloorWidgetBottomBarButton(
           text: "${floor.like}",
           onTap: () async {
+            HapticFeedbackUtil.light();
             try {
               floor.liked ??= false;
               setState(() {
@@ -911,6 +919,7 @@ class OTFloorToolBarState extends State<OTFloorToolBar> {
         OTFloorWidgetBottomBarButton(
           text: "${floor.dislike}",
           onTap: () async {
+            HapticFeedbackUtil.light();
             try {
               floor.disliked ??= false;
               setState(() {

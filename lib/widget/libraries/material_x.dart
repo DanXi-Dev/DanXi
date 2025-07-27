@@ -16,6 +16,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
 
 class ExpansionTileX extends StatefulWidget {
   /// Creates a single-line [ListTile] with an expansion arrow icon that expands or collapses
@@ -226,6 +227,7 @@ class _ExpansionTileXState extends State<ExpansionTileX>
   }
 
   void _handleTap() {
+    HapticFeedbackUtil.light();
     setState(() {
       _isExpanded = !_isExpanded;
       if (_isExpanded) {
