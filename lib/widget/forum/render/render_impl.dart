@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/stickers.dart';
@@ -106,14 +107,34 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
           url = url.replaceFirst("danxi_", "dx_");
         }
         if (url.startsWith("dx_")) {
-          var asset = getStickerAssetPath(url);
-          if (asset != null) {
-            return Image.asset(
-              asset,
-              width: 50,
-              height: 50,
-            );
-          }
+          return FutureBuilder<String?>(
+            future: getStickerPath(url),
+            builder: (context, snapshot) {
+              if (snapshot.hasData && snapshot.data != null) {
+                final path = snapshot.data!;
+                if (path.startsWith('assets/')) {
+                  return Image.asset(
+                    path,
+                    width: 50,
+                    height: 50,
+                  );
+                } else {
+                  return Image.file(
+                    File(path),
+                    width: 50,
+                    height: 50,
+                  );
+                }
+              }
+              return const SizedBox(
+                width: 50,
+                height: 50,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            },
+          );
         }
 
         return Center(

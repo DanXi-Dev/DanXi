@@ -15,6 +15,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
+import 'package:dan_xi/repository/app/announcement_repository.dart';
+
 enum Stickers {
   dx_angry,
   dx_call,
@@ -50,4 +53,19 @@ String? getStickerAssetPath(String stickerName) {
   } catch (error) {
     return null;
   }
+}
+
+Future<String?> getStickerPath(String stickerName) async {
+  final localAssetPath = getStickerAssetPath(stickerName);
+  if (localAssetPath != null) {
+    return localAssetPath;
+  }
+  
+  final repository = AnnouncementRepository.getInstance();
+  final cloudPath = await repository.getStickerFilePath(stickerName);
+  if (cloudPath != null && File(cloudPath).existsSync()) {
+    return cloudPath;
+  }
+  
+  return null;
 }
