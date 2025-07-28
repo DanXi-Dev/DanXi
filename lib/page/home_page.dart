@@ -34,6 +34,7 @@ import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
+import 'package:dan_xi/repository/app/sticker_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/test/test.dart';
@@ -243,6 +244,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _loadUserAgent().catchError((ignored) {});
       _loadStartDate().catchError((ignored) {});
       _loadCelebration().catchError((ignored, st) {});
+      _loadStickers().catchError((ignored) {});
     }, onError: (e) {
       _dealWithBmobError();
     });
@@ -843,5 +845,13 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> _loadCelebration() async {
     SettingsProvider.getInstance().celebrationWords =
         AnnouncementRepository.getInstance().getCelebrations() ?? [];
+  }
+
+  Future<void> _loadStickers() async {
+    try {
+      await StickerRepository.getInstance().checkAndUpdateStickers();
+    } catch (e) {
+      // Silently ignore sticker loading errors to not disrupt the app
+    }
   }
 }

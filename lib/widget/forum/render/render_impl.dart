@@ -106,12 +106,27 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
           url = url.replaceFirst("danxi_", "dx_");
         }
         if (url.startsWith("dx_")) {
+          // Try local asset first
           var asset = getStickerAssetPath(url);
           if (asset != null) {
             return Image.asset(
               asset,
               width: 50,
               height: 50,
+            );
+          }
+          
+          // Try remote sticker
+          var remoteSticker = getRemoteSticker(url);
+          if (remoteSticker != null) {
+            return Image.network(
+              remoteSticker.imageUrl,
+              width: 50,
+              height: 50,
+              errorBuilder: (context, error, stackTrace) {
+                // Fallback to placeholder or nothing
+                return const SizedBox(width: 50, height: 50);
+              },
             );
           }
         }

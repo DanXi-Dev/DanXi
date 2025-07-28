@@ -15,6 +15,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/model/sticker/remote_sticker.dart';
+import 'package:dan_xi/repository/app/sticker_repository.dart';
+
 enum Stickers {
   dx_angry,
   dx_call,
@@ -42,6 +45,7 @@ enum Stickers {
   dx_like;
 }
 
+/// Get local asset path for a sticker
 String? getStickerAssetPath(String stickerName) {
   try {
     Stickers sticker =
@@ -49,5 +53,74 @@ String? getStickerAssetPath(String stickerName) {
     return "assets/graphics/stickers/${sticker.name}.webp";
   } catch (error) {
     return null;
+  }
+}
+
+/// Get remote sticker information
+RemoteSticker? getRemoteSticker(String stickerName) {
+  return StickerRepository.getInstance().getRemoteSticker(stickerName);
+}
+
+/// Check if a sticker is available (either local or remote)
+bool isStickerAvailable(String stickerName) {
+  return getStickerAssetPath(stickerName) != null || 
+         getRemoteSticker(stickerName) != null;
+}
+
+/// Get all available stickers (both local and remote)
+List<StickerInfo> getAllAvailableStickers() {
+  final List<StickerInfo> allStickers = [];
+  
+  // Add local stickers
+  for (final sticker in Stickers.values) {
+    allStickers.add(StickerInfo(
+      name: sticker.name,
+      displayName: sticker.name.replaceAll('_', ' ').toUpperCase(),
+      isLocal: true,
+      assetPath: getStickerAssetPath(sticker.name),
+    ));
+  }
+  
+  // Add remote stickers
+  final remoteStickers = StickerRepository.getInstance().getAllRemoteStickers();
+  for (final remoteSticker in remoteStickers) {
+    // Skip if already exists as local sticker
+    if (Stickers.values.any((s) => s.name == remoteSticker.name)) {
+      continue;
+    }
+    
+    allStickers.add(StickerInfo(
+      name: remoteSticker.name,
+      displayName: remoteSticker.displayName,
+      isLocal: false,
+      imageUrl: remoteSticker.imageUrl,
+      category: remoteSticker.category,
+    ));
+  }
+  
+  return allStickers;
+}
+
+/// Information about a sticker (local or remote)
+class StickerInfo {
+  final String name;
+  final String displayName;
+  final bool isLocal;
+  final String? assetPath;
+  final String? imageUrl;
+  final String? category;
+  
+  const StickerInfo({
+    required this.name,
+    required this.displayName,
+    required this.isLocal,
+    this.assetPath,
+    this.imageUrl,
+    this.category,
+  });
+  
+  @override
+  String toString() {
+    return 'StickerInfo{name: $name, displayName: $displayName, isLocal: $isLocal}';
   }
 }

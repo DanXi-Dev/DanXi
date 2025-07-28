@@ -358,8 +358,8 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
 
   Future<T?> _buildStickersSheet<T>(BuildContext context) {
     int stickerSheetColumns = 5;
-    int stickerSheetRows =
-        (Stickers.values.length / stickerSheetColumns).ceil();
+    final allStickers = getAllAvailableStickers();
+    int stickerSheetRows = (allStickers.length / stickerSheetColumns).ceil();
 
     return showPlatformModalSheet(
         context: context,
@@ -385,7 +385,7 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                             rowSizes: List.filled(stickerSheetRows, auto),
                             rowGap: 8,
                             columnGap: 8,
-                            children: Stickers.values.map((e) {
+                            children: allStickers.map((stickerInfo) {
                               return Container(
                                 alignment: Alignment.center,
                                 child: InkWell(
@@ -396,15 +396,30 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                                         ? widget.controller.text.length
                                         : cursorPosition;
                                     widget.controller.text =
-                                        "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
+                                        "${widget.controller.text.substring(0, cursorPosition)}![](${stickerInfo.name})${widget.controller.text.substring(cursorPosition)}";
                                     Navigator.of(context).pop();
                                   },
-                                  child: Image.asset(
-                                    getStickerAssetPath(e.name)!,
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.contain,
-                                  ),
+                                  child: stickerInfo.isLocal
+                                      ? Image.asset(
+                                          stickerInfo.assetPath!,
+                                          width: 60,
+                                          height: 60,
+                                          fit: BoxFit.contain,
+                                        )
+                                      : Image.network(
+                                          stickerInfo.imageUrl!,
+                                          width: 60,
+                                          height: 60,
+                                          fit: BoxFit.contain,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Container(
+                                              width: 60,
+                                              height: 60,
+                                              color: Colors.grey[300],
+                                              child: const Icon(Icons.broken_image),
+                                            );
+                                          },
+                                        ),
                                 ),
                               );
                             }).toList(),
