@@ -325,6 +325,37 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
   final GlobalKey<OTTagSelectorState> _tagSelectorKey =
       GlobalKey<OTTagSelectorState>();
 
+  void _deleteImageFromText(String? imageUrl) async {
+    if (imageUrl == null) return;
+
+    final shouldDelete = await Noticing.showConfirmationDialog(
+      context,
+      S.of(context).confirm_delete_image,
+      title: S.of(context).delete_image,
+      confirmText: S.of(context).delete,
+      isConfirmDestructive: true,
+    );
+
+    if (shouldDelete != true) return;
+
+    final text = widget.controller.text;
+    final escapedImageUrl = RegExp.escape(imageUrl);
+    final patterns = [
+      r'!\[.*?\]\(' + escapedImageUrl + r'\)',
+      r'!\[\]\(' + escapedImageUrl + r'\)',
+    ];
+
+    String newText = text;
+    for (final pattern in patterns) {
+      final regex = RegExp(pattern);
+      newText = newText.replaceAll(regex, '');
+    }
+
+    if (newText != text) {
+      widget.controller.text = newText;
+    }
+  }
+
   Future<T?> _buildStickersSheet<T>(BuildContext context) {
     int stickerSheetColumns = 5;
     int stickerSheetRows =
@@ -559,8 +590,9 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
               padding: const EdgeInsets.only(top: 4.0),
               child: ValueListenableBuilder<TextEditingValue>(
                 builder: (context, value, child) => smartRender(
-                    context, value.text, null, null, false,
-                    preview: true),
+                    context, value.text, false,
+                    preview: true,
+                    onLongPressImage: (url) => _deleteImageFromText(url)),
                 valueListenable: widget.controller,
               ),
             ),
