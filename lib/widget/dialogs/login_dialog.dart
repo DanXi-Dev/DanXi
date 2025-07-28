@@ -39,6 +39,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:provider/provider.dart';
 
 const kCompatibleUserGroup = [
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
@@ -102,7 +103,7 @@ class LoginDialogState extends State<LoginDialog> {
         await newInfo.saveToSharedPreferences(widget.sharedPreferences!);
         widget.personInfo.value = newInfo;
         // disable WebVPN by default in VISITOR mode
-        SettingsProvider.getInstance().useWebvpn = false;
+        context.read<SettingsProvider>().useWebvpn = false;
         progressDialog.dismiss(showAnim: false);
         Navigator.of(context).pop();
         showFAQ();
