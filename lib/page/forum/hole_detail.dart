@@ -1430,19 +1430,21 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 StatelessWidget smartRender(
     BuildContext context,
     String content,
+    bool translucentCard,
+    {bool preview = false,
     LinkTapCallback? onTapLink,
     ImageTapCallback? onTapImage,
-    bool translucentCard,
-    {bool preview = false}) {
+    ImageLongPressCallback? onLongPressImage}) {
   return PostRenderWidget(
     render: SettingsProvider.getInstance().isMarkdownRenderingEnabled
         ? kMarkdownRender
         : kPlainRender,
     content: preprocessContentForDisplay(content),
-    onTapImage: onTapImage,
-    onTapLink: onTapLink,
     hasBackgroundImage: translucentCard,
     isPreviewWidget: preview,
+    onTapImage: onTapImage,
+    onTapLink: onTapLink,
+    onLongPressImage: onLongPressImage,
   );
 }
 

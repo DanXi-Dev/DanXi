@@ -89,7 +89,7 @@ class CourseReviewWidget extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                   child: smartRender(
-                      context, review.content!, null, null, translucent),
+                      context, review.content!, translucent),
                 ),
                 const Divider(),
                 Padding(
