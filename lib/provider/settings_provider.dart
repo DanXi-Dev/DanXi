@@ -92,6 +92,8 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_USE_WEBVPN = "use_webvpn";
   static const String KEY_VIEW_HISTORY = "view_history";
   static const String KEY_FOLLOW_SYSTEM_PALETTE = "follow_system_palette";
+  static const String KEY_HIDDEN_MY_POSTS = "hidden_my_posts";
+  static const String KEY_HIDDEN_MY_REPLIES = "hidden_my_replies";
 
   static const int MAX_VIEW_HISTORY = 250;
 
@@ -802,6 +804,30 @@ class SettingsProvider with ChangeNotifier {
 
   set followSystemPalette(bool value) {
     preferences!.setBool(KEY_FOLLOW_SYSTEM_PALETTE, value);
+    notifyListeners();
+  }
+
+  List<int> get hiddenMyPosts {
+    if (preferences!.containsKey(KEY_HIDDEN_MY_POSTS)) {
+      return preferences!.getIntList(KEY_HIDDEN_MY_POSTS)!;
+    }
+    return [];
+  }
+
+  set hiddenMyPosts(List<int> value) {
+    preferences!.setIntList(KEY_HIDDEN_MY_POSTS, value);
+    notifyListeners();
+  }
+
+  List<int> get hiddenMyReplies {
+    if (preferences!.containsKey(KEY_HIDDEN_MY_REPLIES)) {
+      return preferences!.getIntList(KEY_HIDDEN_MY_REPLIES)!;
+    }
+    return [];
+  }
+
+  set hiddenMyReplies(List<int> value) {
+    preferences!.setIntList(KEY_HIDDEN_MY_REPLIES, value);
     notifyListeners();
   }
 }

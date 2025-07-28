@@ -541,5 +541,9 @@
   "select_date_range_to": "終了：",
   "select_date_range_far_past": "遠い過去",
   "select_date_range_now": "現在",
-  "hole_force_deleted": "削除され"
+  "hole_force_deleted": "削除され",
+  "hide_post_success": "成功に隠された。再表示するには、設定で回复して",
+  "hide_post_confirm": "隠しますか？左上隅のボタンで隠されたものを再表示にするのは可能です",
+  "restore_hidden_confirm": "隠していたものを全部復元しますか？",
+  "clear_history_confirm": "ローカルの閲覧履歴を削除しますか？この過程は不可逆です"
 }
