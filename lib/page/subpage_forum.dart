@@ -461,7 +461,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   }
 
   /// Refresh the whole list.
-  Future<void> refreshList() async {
+  Future<void> refreshList({bool queueDataClear = true}) async {
     try {
       if (_postsType == PostsType.FAVORED_DISCUSSION) {
         await ForumRepository.getInstance().getFavoriteHoleId();
@@ -476,7 +476,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
         await _delegate?.triggerRefresh();
       } else {
         await listViewController.notifyUpdate(
-            useInitialData: true, queueDataClear: true);
+            useInitialData: true, queueDataClear: queueDataClear);
       }
     }
   }
@@ -637,7 +637,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
                           isConfirmDestructive: false) ==
                       true) {
                     SettingsProvider.getInstance().hiddenMyPosts = [];
-                    refreshList();
+                    refreshList(queueDataClear: false);
                   }
                 },
               )

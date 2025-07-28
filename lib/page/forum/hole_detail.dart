@@ -613,7 +613,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                         isConfirmDestructive: true) ==
                     true) {
                   SettingsProvider.getInstance().viewHistory = [];
-                  refreshListView();
+                  refreshListView(queueDataClear: false);
                 }
               },
             ),
