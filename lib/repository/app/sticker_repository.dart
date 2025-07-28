@@ -56,12 +56,20 @@ class StickerRepository extends BaseRepositoryWithDio {
         await _cachePackage(newPackage);
         await prefs.setString(_CACHED_VERSION_KEY, newPackage.version);
         _cachedPackage = newPackage;
+        
+        // Pre-cache images in the background
+        precacheImages();
+        
         return true; // Updated
       }
       
       // Load from cache if not already loaded
       if (_cachedPackage == null) {
         await _loadCachedPackage();
+        // Pre-cache images if we loaded from cache
+        if (_cachedPackage != null) {
+          precacheImages();
+        }
       }
       
       return false; // No update needed
@@ -110,16 +118,16 @@ class StickerRepository extends BaseRepositoryWithDio {
     }
   }
   
-  /// Pre-cache all sticker images
+  /// Pre-cache all sticker images for better performance
   Future<void> precacheImages() async {
     if (_cachedPackage == null) return;
     
+    // Cache images in the background without blocking
     for (final sticker in _cachedPackage!.stickers) {
-      try {
-        await DefaultCacheManager().getSingleFile(sticker.imageUrl);
-      } catch (e) {
-        // Ignore individual failures
-      }
+      // Don't wait for each image, just start the download
+      DefaultCacheManager().getSingleFile(sticker.imageUrl).catchError((e) {
+        // Ignore individual failures silently
+      });
     }
   }
   

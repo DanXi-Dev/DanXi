@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/stickers.dart';
@@ -119,14 +120,20 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
           // Try remote sticker
           var remoteSticker = getRemoteSticker(url);
           if (remoteSticker != null) {
-            return Image.network(
-              remoteSticker.imageUrl,
+            return CachedNetworkImage(
+              imageUrl: remoteSticker.imageUrl,
               width: 50,
               height: 50,
-              errorBuilder: (context, error, stackTrace) {
-                // Fallback to placeholder or nothing
-                return const SizedBox(width: 50, height: 50);
-              },
+              placeholder: (context, url) => const SizedBox(
+                width: 50,
+                height: 50,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              errorWidget: (context, url, error) => const SizedBox(
+                width: 50,
+                height: 50,
+                child: Icon(Icons.broken_image),
+              ),
             );
           }
         }

@@ -43,6 +43,7 @@ import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:dan_xi/widget/libraries/scale_transform.dart';
 import 'package:dan_xi/widget/forum/ottag_selector.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -406,12 +407,18 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                                           height: 60,
                                           fit: BoxFit.contain,
                                         )
-                                      : Image.network(
-                                          stickerInfo.imageUrl!,
+                                      : CachedNetworkImage(
+                                          imageUrl: stickerInfo.imageUrl!,
                                           width: 60,
                                           height: 60,
                                           fit: BoxFit.contain,
-                                          errorBuilder: (context, error, stackTrace) {
+                                          placeholder: (context, url) => Container(
+                                            width: 60,
+                                            height: 60,
+                                            color: Colors.grey[300],
+                                            child: const Center(child: CircularProgressIndicator()),
+                                          ),
+                                          errorWidget: (context, url, error) {
                                             return Container(
                                               width: 60,
                                               height: 60,
