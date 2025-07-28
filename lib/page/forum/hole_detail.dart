@@ -147,8 +147,12 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             startFloor: _listViewController.length(),
             dateRange: dateRange,
             accurate: accurate),
-      MyReplies() => await ForumRepository.getInstance()
-          .loadUserFloors(startFloor: _listViewController.length()),
+      MyReplies() => (await ForumRepository.getInstance()
+              .loadUserFloors(startFloor: _listViewController.length()))
+          // Filter manually hidden floors
+          .filter((element) => !SettingsProvider.getInstance()
+              .hiddenMyReplies
+              .contains(element.floor_id)),
       ViewHistory() => (await ForumRepository.getInstance().loadHolesById(
                   SettingsProvider.getInstance()
                       .viewHistory
@@ -373,9 +377,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   /// Refresh the list view.
-  Future<void> refreshListView({bool scrollToEnd = false}) async {
+  Future<void> refreshListView({bool scrollToEnd = false, bool queueDataClear = true}) async {
     _allDataLoaded = false;
-    await _listViewController.notifyUpdate(queueDataClear: true);
+    await _listViewController.notifyUpdate(queueDataClear: queueDataClear);
 
     if (scrollToEnd) {
       setState(() {
@@ -457,6 +461,24 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               ),
             ),
         _ => null,
+      },
+      onDismissItem: switch (_renderModel) {
+        MyReplies() => (context, index, item) {
+            SettingsProvider.getInstance().hiddenMyReplies = [
+              item.floor_id!,
+              ...SettingsProvider.getInstance().hiddenMyReplies
+            ];
+            Noticing.showMaterialNotice(
+                context, S.of(context).hide_post_success);
+          },
+        _ => null
+      },
+      onConfirmDismissItem: switch (_renderModel) {
+        MyReplies() => (context, index, item) =>
+            Noticing.showConfirmationDialog(
+                context, S.of(context).hide_post_confirm,
+                isConfirmDestructive: true),
+        _ => null
       },
     );
 
@@ -587,11 +609,26 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               icon: Icon(Icons.delete),
               onPressed: () async {
                 if (await Noticing.showConfirmationDialog(
-                        context, S.of(context).are_you_sure,
+                        context, S.of(context).clear_history_confirm,
                         isConfirmDestructive: true) ==
                     true) {
                   SettingsProvider.getInstance().viewHistory = [];
-                  refreshListView();
+                  refreshListView(queueDataClear: false);
+                }
+              },
+            ),
+          if (_renderModel case MyReplies())
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: Icon(Icons.restore_page),
+              onPressed: () async {
+                if (await Noticing.showConfirmationDialog(
+                        context, S.of(context).restore_hidden_confirm,
+                        isConfirmDestructive: false) ==
+                    true) {
+                  SettingsProvider.getInstance().hiddenMyReplies = [];
+                  // Set `queueDataClear` to false to instantly clear the [ListView]
+                  refreshListView(queueDataClear: false);
                 }
               },
             )

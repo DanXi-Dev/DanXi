@@ -559,5 +559,9 @@
   "select_date_range_to": "To",
   "select_date_range_far_past": "Far Past",
   "select_date_range_now": "Now",
-  "hole_force_deleted": "Deleted"
+  "hole_force_deleted": "Deleted",
+  "hide_post_success": "Successfully hidden item",
+  "hide_post_confirm": "Are you sure to hide the item? you may restore hidden items through the button on the top-right corner. ",
+  "restore_hidden_confirm": "Are you sure to restore all hidden items? ",
+  "clear_history_confirm": "Are you sure to clear local view history? this cannot be reverted. "
 }
