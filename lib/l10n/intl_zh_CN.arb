@@ -559,5 +559,7 @@
   "hide_post_success": "已成功隐藏该条目",
   "hide_post_confirm": "是否隐藏该条目？隐藏后仍可通过右上角恢复按钮恢复。",
   "restore_hidden_confirm": "是否复原所有隐藏条目？",
-  "clear_history_confirm": "是否清除本地浏览记录？清除后无法恢复。"
+  "clear_history_confirm": "是否清除本地浏览记录？清除后无法恢复。",
+  "ban_reporter": "封禁举报者",
+  "mark_as_dealt": "标记为已处理"
 }

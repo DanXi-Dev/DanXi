@@ -1008,6 +1008,14 @@ class ForumRepository extends BaseRepositoryWithDio {
     return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
+  Future<int?> adminBanReporter(int reportId) async {
+    final options = RequestOptions(
+        path: "$_BASE_URL/reports/ban/$reportId",
+        method: "POST",
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
+  }
+
   Future<List<String>?> adminGetPunishmentHistory(int floorId) async {
     final options = RequestOptions(
         path: "$_BASE_URL/floors/$floorId/punishment",

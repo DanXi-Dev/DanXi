@@ -150,15 +150,41 @@ class BBSReportDetailState extends State<BBSReportDetail> {
       [
         PlatformContextMenuItem(
           menuContext: menuContext,
-          child: const Text("Mark as dealt"),
+          child: Text(S.of(pageContext).mark_as_dealt),
           onPressed: () async {
-            int? result = await ForumRepository.getInstance()
-                .adminSetReportDealt(e.report_id!);
-            if (result != null && result < 300 && pageContext.mounted) {
-              Noticing.showModalNotice(pageContext,
-                  message: S.of(pageContext).operation_successful);
-              await _reportListViewController.notifyUpdate(
-                  useInitialData: false, queueDataClear: false);
+            try {
+              int? result = await ForumRepository.getInstance()
+                  .adminSetReportDealt(e.report_id!);
+              if (result != null && result < 300 && pageContext.mounted) {
+                Noticing.showModalNotice(pageContext,
+                    message: S.of(pageContext).operation_successful);
+                await _reportListViewController.notifyUpdate(
+                    useInitialData: false, queueDataClear: false);
+              }
+            } catch (error, st) {
+              if (pageContext.mounted) {
+                Noticing.showErrorDialog(pageContext, error, trace: st);
+              }
+            }
+          },
+        ),
+        PlatformContextMenuItem(
+          menuContext: menuContext,
+          child: Text(S.of(pageContext).ban_reporter),
+          onPressed: () async {
+            try {
+              int? result = await ForumRepository.getInstance()
+                  .adminBanReporter(e.report_id!);
+              if (result != null && result < 300 && pageContext.mounted) {
+                Noticing.showModalNotice(pageContext,
+                    message: S.of(pageContext).operation_successful);
+                await _reportListViewController.notifyUpdate(
+                    useInitialData: false, queueDataClear: false);
+              }
+            } catch (error, st) {
+              if (pageContext.mounted) {
+                Noticing.showErrorDialog(pageContext, error, trace: st);
+              }
             }
           },
         )
@@ -225,7 +251,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                       color: Theme.of(context).hintColor, fontSize: 12),
                 ),
                 GestureDetector(
-                  child: Text("Mark as dealt",
+                  child: Text(S.of(context).mark_as_dealt,
                       style: TextStyle(
                           color: Theme.of(context).hintColor, fontSize: 12)),
                   onTap: () async {
