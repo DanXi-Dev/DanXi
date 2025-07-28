@@ -80,7 +80,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "455e3752f74cebea578233c3cc6033b7
 "assets/packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html": "16911fcc170c8af1c5457940bd0bf055",
 "version.json": "765670aadbb82516d3fc9d87335ae78c",
 "manifest.json": "012d91b9edf492757ddf24dd1b15d03e",
-"flutter_bootstrap.js": "25115d6c079e38227f486d9c7ebf2f85",
+"flutter_bootstrap.js": "7eccd95e28c9aaa9cfbf39e693f76938",
 "canvaskit/skwasm.wasm": "39dd80367a4e71582d234948adc521c0",
 "canvaskit/canvaskit.wasm": "7a3f4ae7d65fc1de6a6e7ddd3224bc93",
 "canvaskit/skwasm.js.symbols": "e72c79950c8a8483d826a7f0560573a1",
@@ -91,10 +91,10 @@ const RESOURCES = {"assets/AssetManifest.bin": "455e3752f74cebea578233c3cc6033b7
 "canvaskit/canvaskit.js": "728b2d477d9b8c14593d4f9b82b484f3",
 "canvaskit/canvaskit.js.symbols": "bdcd3835edf8586b6d6edfce8749fb77",
 "favicon.webp": "5d8a19c576a1ba2a24af3b99f340237d",
-"index.html": "a82d3b60fc66299737b5b8ac10e6a364",
-"/": "a82d3b60fc66299737b5b8ac10e6a364",
+"index.html": "2bafd047950914a2364e2a3f34c707f8",
+"/": "2bafd047950914a2364e2a3f34c707f8",
 "flutter.js": "83d881c1dbb6d6bcd6b42e274605b69c",
-"main.dart.js": "1c6b610a6d54e87c097c3a9e9c163094"};
+"main.dart.js": "eb7874b56a8a5e282cb7eb78a1ad88f2"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",
