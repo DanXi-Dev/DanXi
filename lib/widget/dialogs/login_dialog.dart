@@ -18,6 +18,7 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/fdu/ecard_repository.dart';
 import 'package:dan_xi/repository/fdu/ehall_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
@@ -100,6 +101,8 @@ class LoginDialogState extends State<LoginDialog> {
             PersonInfo(id, password, "No User Account", UserGroup.VISITOR);
         await newInfo.saveToSharedPreferences(widget.sharedPreferences!);
         widget.personInfo.value = newInfo;
+        // disable WebVPN by default in VISITOR mode
+        SettingsProvider.getInstance().useWebvpn = false;
         progressDialog.dismiss(showAnim: false);
         Navigator.of(context).pop();
         showFAQ();
