@@ -15,39 +15,24 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-enum Stickers {
-  dx_angry,
-  dx_call,
-  dx_cate,
-  dx_dying,
-  dx_egg,
-  dx_fright,
-  dx_heart,
-  dx_hug,
-  dx_overwhelm,
-  dx_roll,
-  dx_roped,
-  dx_sleep,
-  dx_swim,
-  dx_thrill,
-  dx_touch_fish,
-  dx_twin,
-  dx_kiss,
-  dx_onlooker,
-  dx_craving,
-  dx_caught,
-  dx_worn,
-  dx_murderous,
-  dx_confused,
-  dx_like;
-}
+import 'dart:io';
+import 'package:dan_xi/repository/app/announcement_repository.dart';
+import 'package:dan_xi/util/sticker_download_manager.dart';
 
-String? getStickerAssetPath(String stickerName) {
-  try {
-    Stickers sticker =
-        Stickers.values.firstWhere((e) => e.name.toString() == stickerName);
-    return "assets/graphics/stickers/${sticker.name}.webp";
-  } catch (error) {
-    return null;
+Future<String?> getStickerPath(String stickerName) async {
+  final repository = AnnouncementRepository.getInstance();
+  final remotePath = await repository.getStickerFilePath(stickerName);
+  
+  // If file exists, return it
+  if (remotePath != null && await File(remotePath).exists()) {
+    return remotePath;
   }
+  
+  // If file doesn't exist, trigger download through download manager
+  final downloadManager = StickerDownloadManager.instance;
+  downloadManager.downloadSticker(stickerName);
+  
+  // Return null for now - the download will happen in background
+  // Widgets should listen to the download manager's state notifiers
+  return null;
 }

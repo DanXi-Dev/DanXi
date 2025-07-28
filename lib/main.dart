@@ -48,6 +48,7 @@ import 'package:dan_xi/page/settings/hidden_tags_preference.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
+import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/provider/language_manager.dart';
 import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
@@ -110,6 +111,9 @@ void main() {
       final registerDeviceIdentity =
           PlatformX.isAndroid ? DeviceIdentity.register() : Future.value();
       registerDeviceIdentity.then((_) {
+        // Initialize remote stickers on app startup (background)
+        unawaited(AnnouncementRepository.getInstance().syncStickers());
+        
         // This is the entrypoint of a simple Flutter app.
         // runApp() is a function that takes a [Widget] and makes it the root
         // of the widget tree.
