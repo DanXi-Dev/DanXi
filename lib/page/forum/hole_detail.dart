@@ -141,7 +141,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
     final results = switch (_renderModel) {
       Normal(hole: var hole) => await ForumRepository.getInstance()
-          .loadFloors(hole, startFloor: page * Constant.POST_COUNT_PER_PAGE),
+          .loadFloors(hole, offset: page * Constant.POST_COUNT_PER_PAGE),
       Search(keyword: var searchKeyword, :final dateRange, :final accurate) =>
         await ForumRepository.getInstance().loadSearchResults(searchKeyword,
             startFloor: _listViewController.length(),
@@ -674,7 +674,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   // Load all floors, in case we have to scroll to end or to a specific floor.
   Future<List<OTFloor>> _loadAllContent() async {
     final allFloors = await ForumRepository.getInstance()
-        .loadFloors((_renderModel as Normal).hole, startFloor: 0, length: 0);
+        .loadFloors((_renderModel as Normal).hole, offset: 0, size: 0);
 
     if (allFloors == null) {
       throw Exception("Failed to fetch all floors");
@@ -1270,7 +1270,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       List<OTFloor>? result = switch (_renderModel) {
         Normal(hole: var hole) => await ForumRepository.getInstance()
             .loadFloors(hole,
-                startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
+                offset: pageIndex * Constant.POST_COUNT_PER_PAGE),
         Search(keyword: var searchKeyword, :final dateRange, :final accurate) =>
           await ForumRepository.getInstance().loadSearchResults(searchKeyword,
               startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE,
