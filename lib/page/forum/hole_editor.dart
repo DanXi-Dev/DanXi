@@ -35,6 +35,9 @@ import 'package:dan_xi/util/forum/editor_object.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stickers.dart';
+import 'package:dan_xi/repository/app/announcement_repository.dart';
+import 'package:dan_xi/model/cloud_sticker.dart';
+import 'dart:io';
 import 'package:dan_xi/widget/dialogs/care_dialog.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
@@ -357,14 +360,10 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
   }
 
   Future<T?> _buildStickersSheet<T>(BuildContext context) {
-    int stickerSheetColumns = 5;
-    int stickerSheetRows =
-        (Stickers.values.length / stickerSheetColumns).ceil();
-
     return showPlatformModalSheet(
         context: context,
         builder: (BuildContext context) {
-          final Widget body = SafeArea(
+          return SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Column(
@@ -374,53 +373,84 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                     ListTile(
                         leading: const Icon(Icons.emoji_emotions),
                         title: Text(S.of(context).sticker)),
-                    // const Divider(),
                     Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: LayoutGrid(
-                            columnSizes: List.filled(stickerSheetColumns, 1.fr),
-                            rowSizes: List.filled(stickerSheetRows, auto),
-                            rowGap: 8,
-                            columnGap: 8,
-                            children: Stickers.values.map((e) {
-                              return Container(
-                                alignment: Alignment.center,
-                                child: InkWell(
-                                  onTap: () {
-                                    var cursorPosition =
-                                        widget.controller.selection.base.offset;
-                                    cursorPosition = cursorPosition == -1
-                                        ? widget.controller.text.length
-                                        : cursorPosition;
-                                    widget.controller.text =
-                                        "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Image.asset(
-                                    getStickerAssetPath(e.name)!,
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                      child: FutureBuilder<List<CloudSticker>>(
+                        future: AnnouncementRepository.getInstance().getAvailableStickers(),
+                        builder: (context, cloudSnapshot) {
+                          final localStickers = Stickers.values;
+                          final cloudStickers = cloudSnapshot.data ?? [];
+                          final allStickerIds = [
+                            ...localStickers.map((e) => e.name),
+                            ...cloudStickers.map((e) => e.id)
+                          ];
+                          
+                          final stickerSheetColumns = 5;
+                          final stickerSheetRows = (allStickerIds.length / stickerSheetColumns).ceil();
+                          
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: LayoutGrid(
+                                columnSizes: List.filled(stickerSheetColumns, 1.fr),
+                                rowSizes: List.filled(stickerSheetRows, auto),
+                                rowGap: 8,
+                                columnGap: 8,
+                                children: allStickerIds.map((stickerId) {
+                                  return Container(
+                                    alignment: Alignment.center,
+                                    child: InkWell(
+                                      onTap: () {
+                                        var cursorPosition = widget.controller.selection.base.offset;
+                                        cursorPosition = cursorPosition == -1
+                                            ? widget.controller.text.length
+                                            : cursorPosition;
+                                        widget.controller.text =
+                                            "${widget.controller.text.substring(0, cursorPosition)}![]($stickerId)${widget.controller.text.substring(cursorPosition)}";
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: FutureBuilder<String?>(
+                                        future: getStickerPath(stickerId),
+                                        builder: (context, pathSnapshot) {
+                                          if (pathSnapshot.hasData && pathSnapshot.data != null) {
+                                            final path = pathSnapshot.data!;
+                                            if (path.startsWith('assets/')) {
+                                              return Image.asset(
+                                                path,
+                                                width: 60,
+                                                height: 60,
+                                                fit: BoxFit.contain,
+                                              );
+                                            } else {
+                                              return Image.file(
+                                                File(path),
+                                                width: 60,
+                                                height: 60,
+                                                fit: BoxFit.contain,
+                                              );
+                                            }
+                                          }
+                                          return Container(
+                                            width: 60,
+                                            height: 60,
+                                            child: const Center(
+                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ]),
             ),
           );
-          return PlatformX.isCupertino(context)
-              ? ConstrainedBox(
-                  constraints: BoxConstraints(
-                      maxHeight: 0.66 * MediaQuery.of(context).size.height),
-                  child: Card(child: body))
-              : body;
         });
   }
 
