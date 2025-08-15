@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
@@ -657,7 +656,7 @@ class OTRegisterSuccessWidget extends SubStatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(S.of(context).copy_password)),
               onPressed: () async {
-                await FlutterClipboard.copy(model.password!);
+                await Clipboard.setData(ClipboardData(text: model.password!));
                 if (PlatformX.isMaterial(context)) {
                   await Noticing.showNotice(
                       context, S.of(context).copy_success);

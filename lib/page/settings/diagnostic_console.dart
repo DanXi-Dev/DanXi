@@ -18,7 +18,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
@@ -30,6 +29,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:provider/provider.dart';
@@ -267,7 +267,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
                 PlatformElevatedButton(
                   child: const Text("Copy Everything"),
                   onPressed: () async {
-                    await FlutterClipboard.copy(_console.toString());
+                    await Clipboard.setData(ClipboardData(text: _console.toString()));
                     if (mounted) {
                       Noticing.showMaterialNotice(context, "Copied.");
                     }

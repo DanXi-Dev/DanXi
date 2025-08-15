@@ -18,7 +18,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:clipboard/clipboard.dart';
 import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -184,7 +183,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   Future<bool> _shareFloorAsText(OTFloor floor, int index) async {
     try {
-      await FlutterClipboard.copy(_renderFloorAsText(floor, index));
+      await Clipboard.setData(
+          ClipboardData(text: _renderFloorAsText(floor, index)));
     } catch (e) {
       return false;
     }
@@ -328,7 +328,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       }
     });
     try {
-      await FlutterClipboard.copy(shareText.toString());
+      await Clipboard.setData(ClipboardData(text: shareText.toString()));
       return true;
     } catch (e) {
       return false;
@@ -377,7 +377,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   /// Refresh the list view.
-  Future<void> refreshListView({bool scrollToEnd = false, bool queueDataClear = true}) async {
+  Future<void> refreshListView(
+      {bool scrollToEnd = false, bool queueDataClear = true}) async {
     _allDataLoaded = false;
     await _listViewController.notifyUpdate(queueDataClear: queueDataClear);
 
@@ -568,7 +569,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 PopupMenuOption(
                   label: S.of(context).copy_hole_id,
                   onTap: (_) async {
-                    await FlutterClipboard.copy('#${hole.hole_id}');
+                    await Clipboard.setData(ClipboardData(text: '#${hole.hole_id}'));
                     if (context.mounted) {
                       Noticing.showMaterialNotice(
                           context, S.of(context).copy_hole_id_success);
@@ -1066,7 +1067,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           child: Text(postTimeStr),
           onPressed: () async {
-            await FlutterClipboard.copy(postTimeStr);
+            await Clipboard.setData(ClipboardData(text: postTimeStr));
             if (mounted && menuContext.mounted) {
               Noticing.showMaterialNotice(
                   context, S.of(menuContext).copy_success);
@@ -1082,8 +1083,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           child: Text(S.of(menuContext).copy),
           onPressed: () async {
-            await FlutterClipboard.copy(
-                renderText(e.filteredContent!, '', '', ''));
+            await Clipboard.setData(ClipboardData(text: renderText(e.filteredContent!, '', '', '')));
             if (mounted && menuContext.mounted) {
               Noticing.showMaterialNotice(
                   context, S.of(menuContext).copy_success);
@@ -1092,7 +1092,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       PlatformContextMenuItem(
         menuContext: menuContext,
         onPressed: () async {
-          FlutterClipboard.copy('##${e.floor_id}');
+          await Clipboard.setData(ClipboardData(text: '##${e.floor_id}'));
           if (mounted) {
             Noticing.showMaterialNotice(
                 context, S.of(context).copy_floor_id_success);
