@@ -47,7 +47,6 @@ dependencies:
   flutter_phoenix: ^1.0.0
   asn1lib: ^1.1.0
   image_picker: ^1.0.0
-  clipboard: ^0.1.3
   # fixme: v6.2.0-beta.3 fixes issue #498, but it's still unpublished. We have to use the master branch directly.
   flutter_inappwebview:
     git:
