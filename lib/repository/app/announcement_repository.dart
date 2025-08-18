@@ -34,7 +34,6 @@ import 'package:toml/toml.dart';
 
 class AnnouncementRepository {
   static const KEY_SEEN_ANNOUNCEMENT = "seen_announcement";
-  static const String _CACHE_KEY_STICKERS = "remote_sticker_cache";
 
   AnnouncementRepository._();
   static const _URL =
@@ -44,7 +43,6 @@ class AnnouncementRepository {
 
   factory AnnouncementRepository.getInstance() => _instance;
   Map<String, dynamic>? _tomlCache;
-  List<RemoteSticker>? _cachedStickers;
   String? _cacheDirectory;
 
   Future<bool?> loadAnnouncements() async {
@@ -212,9 +210,11 @@ class AnnouncementRepository {
     // Get stickers directly from TOML cache
     final stickerList = _tomlCache!['sticker'] as List?;
     if (stickerList == null) return null;
-    
+
     try {
-      return stickerList.map((data) => RemoteSticker.fromToml(data as Map<String, dynamic>)).toList();
+      return stickerList
+          .map((data) => RemoteSticker.fromToml(data as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       return null;
     }
@@ -225,32 +225,29 @@ class AnnouncementRepository {
     if (_tomlCache == null) {
       await loadAnnouncements();
     }
-    
+
     // Get stickers directly from the main TOML file
     final stickers = getStickersFromCache();
     return stickers ?? [];
   }
 
-  Future<List<RemoteSticker>> getCachedStickers() async {
-    if (_cachedStickers != null) return _cachedStickers!;
-    
-    final prefs = await XSharedPreferences.getInstance();
-    final cachedData = prefs.getString(_CACHE_KEY_STICKERS);
-    
-    if (cachedData != null) {
-      final List<dynamic> jsonList = json.decode(cachedData);
-      _cachedStickers = jsonList.map((json) => RemoteSticker.fromJson(json)).toList();
-      return _cachedStickers!;
-    }
-    
-    return [];
-  }
+  Future<List<String>> getCachedStickerIds() async {
+    final cacheDir = await _stickerCacheDir;
+    final directory = Directory(cacheDir);
 
-  Future<void> saveCachedStickers(List<RemoteSticker> stickers) async {
-    _cachedStickers = stickers;
-    final prefs = await XSharedPreferences.getInstance();
-    final jsonString = json.encode(stickers.map((s) => s.toJson()).toList());
-    await prefs.setString(_CACHE_KEY_STICKERS, jsonString);
+    if (!directory.existsSync()) {
+      return [];
+    }
+
+    return directory
+        .listSync()
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.webp'))
+        .map((file) {
+      final fileName = file.path.split(Platform.pathSeparator).last;
+      return fileName.substring(
+          0, fileName.length - 5); // Remove .webp extension
+    }).toList();
   }
 
   Future<String?> getStickerFilePath(String stickerId) async {
@@ -264,11 +261,12 @@ class AnnouncementRepository {
     return digest.toString();
   }
 
-  Future<bool> _validateStickerFile(String filePath, String expectedSha256) async {
+  Future<bool> _validateStickerFile(
+      String filePath, String expectedSha256) async {
     try {
       final file = File(filePath);
       if (!file.existsSync()) return false;
-      
+
       final data = await file.readAsBytes();
       final actualSha256 = await _calculateSha256(data);
       return actualSha256 == expectedSha256;
@@ -283,18 +281,18 @@ class AnnouncementRepository {
         sticker.url,
         options: Options(responseType: ResponseType.bytes),
       );
-      
+
       if (response.data == null) return false;
-      
+
       final actualSha256 = await _calculateSha256(response.data!);
       if (actualSha256 != sticker.sha256) {
         return false;
       }
-      
+
       final cacheDir = await _stickerCacheDir;
       final file = File("$cacheDir/${sticker.id}.webp");
       await file.writeAsBytes(response.data!);
-      
+
       return true;
     } catch (e) {
       return false;
@@ -307,45 +305,26 @@ class AnnouncementRepository {
       if (_tomlCache == null) {
         await loadAnnouncements();
       }
-      
+
       // Get stickers from TOML
       final networkStickers = getStickersFromCache() ?? [];
       if (networkStickers.isEmpty) {
-        return await getCachedStickers();
+        return [];
       }
-      
-      final cachedStickers = await getCachedStickers();
-      
-      final Map<String, RemoteSticker> cachedMap = {
-        for (var sticker in cachedStickers) sticker.id: sticker
-      };
-      
-      final List<RemoteSticker> toDownload = [];
-      final List<RemoteSticker> toRevalidate = [];
-      
+
       for (final networkSticker in networkStickers) {
-        final cached = cachedMap[networkSticker.id];
-        
-        if (cached == null) {
-          toDownload.add(networkSticker);
-        } else if (cached.sha256 != networkSticker.sha256) {
-          toRevalidate.add(networkSticker);
-        } else {
-          final filePath = await getStickerFilePath(networkSticker.id);
-          if (filePath == null || !await _validateStickerFile(filePath, networkSticker.sha256)) {
-            toRevalidate.add(networkSticker);
-          }
+        final filePath = await getStickerFilePath(networkSticker.id);
+
+        // Download if not cached or if validation fails
+        if (filePath == null ||
+            !await _validateStickerFile(filePath, networkSticker.sha256)) {
+          await downloadAndValidateSticker(networkSticker);
         }
       }
-      
-      for (final sticker in [...toDownload, ...toRevalidate]) {
-        await downloadAndValidateSticker(sticker);
-      }
-      
-      await saveCachedStickers(networkStickers);
+
       return networkStickers;
     } catch (e) {
-      return await getCachedStickers();
+      return getStickersFromCache() ?? [];
     }
   }
 
@@ -354,12 +333,14 @@ class AnnouncementRepository {
     if (_tomlCache == null) {
       await loadAnnouncements();
     }
-    
-    final cached = await getCachedStickers();
-    if (cached.isEmpty) {
-      return await syncStickers();
-    }
-    return cached;
+
+    final networkStickers = getStickersFromCache() ?? [];
+    final cachedStickerIds = await getCachedStickerIds();
+
+    // Return only stickers that are both defined in TOML and have cached files
+    return networkStickers.where((sticker) {
+      return cachedStickerIds.contains(sticker.id);
+    }).toList();
   }
 }
 
