@@ -48,7 +48,6 @@ import 'package:dan_xi/page/settings/hidden_tags_preference.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
-import 'package:dan_xi/provider/remote_sticker_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/provider/language_manager.dart';
 import 'package:dan_xi/provider/notification_provider.dart';
@@ -365,8 +364,7 @@ class DanxiApp extends StatelessWidget {
       child: MultiProvider(providers: [
         ChangeNotifierProvider.value(value: SettingsProvider.getInstance()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
-        ChangeNotifierProvider.value(value: fduHoleProvider),
-        ChangeNotifierProvider(create: (_) => RemoteStickerProvider())
+        ChangeNotifierProvider.value(value: fduHoleProvider)
       ], child: mainApp),
     );
   }
