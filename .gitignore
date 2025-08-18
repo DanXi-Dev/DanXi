@@ -68,3 +68,7 @@ devtools_options.yaml
 
 # Android NDK build intermediate files
 android/app/.cxx
+
+# Claude Code
+/CLAUDE.md
+/.claude/*.local.*
