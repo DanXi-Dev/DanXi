@@ -197,7 +197,7 @@ class AnnouncementRepository {
   // Cloud Sticker Methods
   Future<String> get _stickerCacheDir async {
     if (_cacheDirectory != null) return _cacheDirectory!;
-    final dir = await getApplicationSupportDirectory();
+    final dir = await getApplicationCacheDirectory();
     _cacheDirectory = "${dir.path}/remote_stickers";
     await Directory(_cacheDirectory!).create(recursive: true);
     return _cacheDirectory!;
