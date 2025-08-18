@@ -363,7 +363,7 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
     return showPlatformModalSheet(
         context: context,
         builder: (BuildContext context) {
-          return SafeArea(
+          final Widget body = SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Column(
@@ -451,6 +451,12 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                   ]),
             ),
           );
+          return PlatformX.isCupertino(context)
+              ? ConstrainedBox(
+                  constraints: BoxConstraints(
+                      maxHeight: 0.66 * MediaQuery.of(context).size.height),
+                  child: Card(child: body))
+              : body;
         });
   }
 
