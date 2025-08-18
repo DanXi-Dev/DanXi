@@ -203,33 +203,7 @@ class AnnouncementRepository {
     return _cacheDirectory!;
   }
 
-  List<RemoteSticker>? getStickersFromCache() {
-    if (_tomlCache == null) {
-      return null;
-    }
-    // Get stickers directly from TOML cache
-    final stickerList = _tomlCache!['sticker'] as List?;
-    if (stickerList == null) return null;
 
-    try {
-      return stickerList
-          .map((data) => RemoteSticker.fromToml(data as Map<String, dynamic>))
-          .toList();
-    } catch (e) {
-      return null;
-    }
-  }
-
-  Future<List<RemoteSticker>> loadStickersFromNetwork() async {
-    // Ensure TOML is loaded
-    if (_tomlCache == null) {
-      await loadAnnouncements();
-    }
-
-    // Get stickers directly from the main TOML file
-    final stickers = getStickersFromCache();
-    return stickers ?? [];
-  }
 
   Future<List<String>> getCachedStickerIds() async {
     final cacheDir = await _stickerCacheDir;
@@ -307,7 +281,11 @@ class AnnouncementRepository {
       }
 
       // Get stickers from TOML
-      final networkStickers = getStickersFromCache() ?? [];
+      final stickerList = _tomlCache!['sticker'] as List?;
+      final networkStickers = stickerList != null
+          ? stickerList.map((data) => RemoteSticker.fromToml(data as Map<String, dynamic>)).toList()
+          : <RemoteSticker>[];
+      
       if (networkStickers.isEmpty) {
         return [];
       }
@@ -324,7 +302,10 @@ class AnnouncementRepository {
 
       return networkStickers;
     } catch (e) {
-      return getStickersFromCache() ?? [];
+      final stickerList = _tomlCache?['sticker'] as List?;
+      return stickerList != null
+          ? stickerList.map((data) => RemoteSticker.fromToml(data as Map<String, dynamic>)).toList()
+          : <RemoteSticker>[];
     }
   }
 
@@ -334,7 +315,12 @@ class AnnouncementRepository {
       await loadAnnouncements();
     }
 
-    final networkStickers = getStickersFromCache() ?? [];
+    // Get stickers from TOML
+    final stickerList = _tomlCache!['sticker'] as List?;
+    final networkStickers = stickerList != null
+        ? stickerList.map((data) => RemoteSticker.fromToml(data as Map<String, dynamic>)).toList()
+        : <RemoteSticker>[];
+    
     final cachedStickerIds = await getCachedStickerIds();
 
     // Return only stickers that are both defined in TOML and have cached files
