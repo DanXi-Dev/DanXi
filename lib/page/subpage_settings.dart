@@ -121,6 +121,8 @@ class SettingsPageState extends State<SettingsPage> {
     LicenseItem("dio", LICENSE_MIT, "https://github.com/flutterchina/dio"),
     LicenseItem("dio_cookie_manager", LICENSE_MIT,
         "https://github.com/flutterchina/dio"),
+    LicenseItem("dio_redirect_interceptor", LICENSE_MIT,
+        "https://github.com/wilinz/dio_redirect_interceptor"),
     LicenseItem("dio_log", LICENSE_APACHE_2_0,
         "https://github.com/flutterplugin/dio_log"),
     LicenseItem("event_bus", LICENSE_MIT,
