@@ -23,7 +23,7 @@ import 'package:crypto/crypto.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/celebration.dart';
-import 'package:dan_xi/model/cloud_sticker.dart';
+import 'package:dan_xi/model/remote_sticker.dart';
 import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
@@ -34,7 +34,7 @@ import 'package:toml/toml.dart';
 
 class AnnouncementRepository {
   static const KEY_SEEN_ANNOUNCEMENT = "seen_announcement";
-  static const String _CACHE_KEY_STICKERS = "cloud_sticker_cache";
+  static const String _CACHE_KEY_STICKERS = "remote_sticker_cache";
 
   AnnouncementRepository._();
   static const _URL =
@@ -44,7 +44,7 @@ class AnnouncementRepository {
 
   factory AnnouncementRepository.getInstance() => _instance;
   Map<String, dynamic>? _tomlCache;
-  List<CloudSticker>? _cachedStickers;
+  List<RemoteSticker>? _cachedStickers;
   String? _cacheDirectory;
 
   Future<bool?> loadAnnouncements() async {
@@ -200,12 +200,12 @@ class AnnouncementRepository {
   Future<String> get _stickerCacheDir async {
     if (_cacheDirectory != null) return _cacheDirectory!;
     final dir = await getApplicationSupportDirectory();
-    _cacheDirectory = "${dir.path}/cloud_stickers";
+    _cacheDirectory = "${dir.path}/remote_stickers";
     await Directory(_cacheDirectory!).create(recursive: true);
     return _cacheDirectory!;
   }
 
-  List<CloudSticker>? getStickersFromCache() {
+  List<RemoteSticker>? getStickersFromCache() {
     if (_tomlCache == null) {
       return null;
     }
@@ -214,13 +214,13 @@ class AnnouncementRepository {
     if (stickerList == null) return null;
     
     try {
-      return stickerList.map((data) => CloudSticker.fromToml(data as Map<String, dynamic>)).toList();
+      return stickerList.map((data) => RemoteSticker.fromToml(data as Map<String, dynamic>)).toList();
     } catch (e) {
       return null;
     }
   }
 
-  Future<List<CloudSticker>> loadStickersFromNetwork() async {
+  Future<List<RemoteSticker>> loadStickersFromNetwork() async {
     // Ensure TOML is loaded
     if (_tomlCache == null) {
       await loadAnnouncements();
@@ -231,7 +231,7 @@ class AnnouncementRepository {
     return stickers ?? [];
   }
 
-  Future<List<CloudSticker>> getCachedStickers() async {
+  Future<List<RemoteSticker>> getCachedStickers() async {
     if (_cachedStickers != null) return _cachedStickers!;
     
     final prefs = await XSharedPreferences.getInstance();
@@ -239,14 +239,14 @@ class AnnouncementRepository {
     
     if (cachedData != null) {
       final List<dynamic> jsonList = json.decode(cachedData);
-      _cachedStickers = jsonList.map((json) => CloudSticker.fromJson(json)).toList();
+      _cachedStickers = jsonList.map((json) => RemoteSticker.fromJson(json)).toList();
       return _cachedStickers!;
     }
     
     return [];
   }
 
-  Future<void> saveCachedStickers(List<CloudSticker> stickers) async {
+  Future<void> saveCachedStickers(List<RemoteSticker> stickers) async {
     _cachedStickers = stickers;
     final prefs = await XSharedPreferences.getInstance();
     final jsonString = json.encode(stickers.map((s) => s.toJson()).toList());
@@ -277,7 +277,7 @@ class AnnouncementRepository {
     }
   }
 
-  Future<bool> downloadAndValidateSticker(CloudSticker sticker) async {
+  Future<bool> downloadAndValidateSticker(RemoteSticker sticker) async {
     try {
       final response = await DioUtils.newDioWithProxy().get<Uint8List>(
         sticker.url,
@@ -301,7 +301,7 @@ class AnnouncementRepository {
     }
   }
 
-  Future<List<CloudSticker>> syncStickers() async {
+  Future<List<RemoteSticker>> syncStickers() async {
     try {
       // Ensure announcements are loaded first
       if (_tomlCache == null) {
@@ -316,12 +316,12 @@ class AnnouncementRepository {
       
       final cachedStickers = await getCachedStickers();
       
-      final Map<String, CloudSticker> cachedMap = {
+      final Map<String, RemoteSticker> cachedMap = {
         for (var sticker in cachedStickers) sticker.id: sticker
       };
       
-      final List<CloudSticker> toDownload = [];
-      final List<CloudSticker> toRevalidate = [];
+      final List<RemoteSticker> toDownload = [];
+      final List<RemoteSticker> toRevalidate = [];
       
       for (final networkSticker in networkStickers) {
         final cached = cachedMap[networkSticker.id];
@@ -349,7 +349,7 @@ class AnnouncementRepository {
     }
   }
 
-  Future<List<CloudSticker>> getAvailableStickers() async {
+  Future<List<RemoteSticker>> getAvailableStickers() async {
     // Ensure announcements are loaded first
     if (_tomlCache == null) {
       await loadAnnouncements();

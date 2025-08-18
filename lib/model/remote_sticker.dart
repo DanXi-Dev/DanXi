@@ -17,27 +17,27 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
-part 'cloud_sticker.g.dart';
+part 'remote_sticker.g.dart';
 
 @JsonSerializable()
-class CloudSticker {
+class RemoteSticker {
   final String id;
   final String url;
   final String sha256;
 
-  CloudSticker({
+  RemoteSticker({
     required this.id,
     required this.url,
     required this.sha256,
   });
 
-  factory CloudSticker.fromJson(Map<String, dynamic> json) =>
-      _$CloudStickerFromJson(json);
+  factory RemoteSticker.fromJson(Map<String, dynamic> json) =>
+      _$RemoteStickerFromJson(json);
 
-  Map<String, dynamic> toJson() => _$CloudStickerToJson(this);
+  Map<String, dynamic> toJson() => _$RemoteStickerToJson(this);
 
-  factory CloudSticker.fromToml(Map<String, dynamic> tomlData) {
-    return CloudSticker(
+  factory RemoteSticker.fromToml(Map<String, dynamic> tomlData) {
+    return RemoteSticker(
       id: tomlData['id'] as String,
       url: tomlData['url'] as String,
       sha256: tomlData['sha256'] as String,

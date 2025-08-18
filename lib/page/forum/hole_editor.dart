@@ -36,7 +36,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stickers.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
-import 'package:dan_xi/model/cloud_sticker.dart';
+import 'package:dan_xi/model/remote_sticker.dart';
 import 'dart:io';
 import 'package:dan_xi/widget/dialogs/care_dialog.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
@@ -374,14 +374,14 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                         leading: const Icon(Icons.emoji_emotions),
                         title: Text(S.of(context).sticker)),
                     Expanded(
-                      child: FutureBuilder<List<CloudSticker>>(
+                      child: FutureBuilder<List<RemoteSticker>>(
                         future: AnnouncementRepository.getInstance().getAvailableStickers(),
-                        builder: (context, cloudSnapshot) {
+                        builder: (context, remoteSnapshot) {
                           final localStickers = Stickers.values;
-                          final cloudStickers = cloudSnapshot.data ?? [];
+                          final remoteStickers = remoteSnapshot.data ?? [];
                           final allStickerIds = [
                             ...localStickers.map((e) => e.name),
-                            ...cloudStickers.map((e) => e.id)
+                            ...remoteStickers.map((e) => e.id)
                           ];
                           
                           final stickerSheetColumns = 5;

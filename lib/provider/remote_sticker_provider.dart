@@ -15,18 +15,18 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/model/cloud_sticker.dart';
+import 'package:dan_xi/model/remote_sticker.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:flutter/foundation.dart';
 
-class CloudStickerProvider with ChangeNotifier {
+class RemoteStickerProvider with ChangeNotifier {
   final AnnouncementRepository _repository = AnnouncementRepository.getInstance();
   
-  List<CloudSticker> _stickers = [];
+  List<RemoteSticker> _stickers = [];
   bool _isLoading = false;
   String? _error;
 
-  List<CloudSticker> get stickers => _stickers;
+  List<RemoteSticker> get stickers => _stickers;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
