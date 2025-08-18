@@ -433,6 +433,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.3.0"
+  dio_redirect_interceptor:
+    dependency: "direct main"
+    description:
+      name: dio_redirect_interceptor
+      sha256: f7f19cd66c72be89aebab9621008df3bce0d8dd880d01f928b89594ceb74ec2c
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   dio_web_adapter:
     dependency: transitive
     description:

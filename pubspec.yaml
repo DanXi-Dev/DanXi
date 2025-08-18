@@ -15,6 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.5
 
   dio_cookie_manager: ^3.0.0
+  dio_redirect_interceptor: ^1.0.0
   flutter_progress_dialog:
     git:
       url: https://github.com/w568w/flutter_progress_dialog.git
