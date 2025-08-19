@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/cookie/independent_cookie_jar.dart';
+import 'package:dan_xi/util/condition_variable.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
@@ -8,11 +12,42 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_redirect_interceptor/dio_redirect_interceptor.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:mutex/mutex.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 
+/// Supported Fudan authentication systems.
+enum FudanLoginType {
+  /// The new Fudan authentication system using id.fudan.edu.cn
+  Neo,
+}
+
+/// A session manager that provides authenticated HTTP requests to Fudan services.
+///
+/// This class handles:
+/// 1. Automatic authentication when services require login
+/// 2. Cookie management across requests to maintain session state
+/// 3. Request queuing to prevent concurrent login attempts
+///
+/// ## Usage
+/// ```dart
+/// final response = await FudanSession.request(
+///   RequestOptions(path: "https://service.fudan.edu.cn/api/data"),
+///   (response) => MyModel.fromJson(response.data),
+/// );
+/// ```
 class FudanSession {
+  /// Lazily-initialized HTTP client with custom configuration.
   static Dio? _dio;
-  static final IndependentCookieJar _cookieJar = IndependentCookieJar();
+
+  /// Shared cookie jar to maintain authentication sessions across all requests.
+  static final IndependentCookieJar _sessionCookieJar = IndependentCookieJar();
+
+  /// Login queues for each authentication type to coordinate concurrent requests.
+  /// Ensures only one login operation runs at a time per authentication method.
+  static final Map<FudanLoginType, LoginQueue> _authenticationQueues =
+      FudanLoginType.values
+          .asMap()
+          .map((_, type) => MapEntry(type, LoginQueue()));
 
   static Dio get dio {
     if (_dio == null) {
@@ -21,18 +56,88 @@ class FudanSession {
         connectTimeout: const Duration(seconds: 5),
         receiveTimeout: const Duration(seconds: 5),
         sendTimeout: const Duration(seconds: 5),
-        // Disable Dio's built-in redirect handling by [http] package
+        // Disable Dio's built-in redirect handling as it has issues
+        // RedirectInterceptor provides proper redirect tracking
         followRedirects: false,
+        // Allow 3xx status codes to avoid exceptions, since we handle redirects manually
         validateStatus: (status) => status != null && status < 400,
       ));
+
+      // 1. Request throttling (must be first)
       _dio!.interceptors.add(LimitedQueuedInterceptor.getInstance());
-      // Use custom user agent to bypass restrictions
+      // 2. User agent spoofing to bypass restrictions
       _dio!.interceptors.add(UserAgentInterceptor());
-      _dio!.interceptors.add(CookieManager(_cookieJar));
+      // 3. Cookie management for session persistence
+      _dio!.interceptors.add(CookieManager(_sessionCookieJar));
+      // 4. Custom redirect handling (must be last)
       _dio!.interceptors.add(RedirectInterceptor(() => _dio!));
     }
     return _dio!;
   }
+
+  /// Executes an authenticated request to a Fudan service with automatic login retry.
+  ///
+  /// This method:
+  /// 1. Executes the request using the configured HTTP client
+  /// 2. Detects if authentication is required based on response characteristics
+  /// 3. Automatically performs login and retries the request if needed
+  ///
+  /// [req] - The HTTP request to execute
+  /// [validateAndParse] - Function to validate and parse the successful response
+  /// [manualLoginUrl] - Override login URL for services that don't auto-redirect to auth
+  /// [type] - Authentication system to use
+  /// [isFatalError] - Optional function to identify errors that shouldn't trigger login
+  /// [info] - User credentials (defaults to global StateProvider.personInfo)
+  ///
+  /// Returns the parsed result from [validateAndParse]
+  /// Throws [ArgumentError] if no valid PersonInfo is available
+  static Future<T> request<T>(RequestOptions req,
+      FutureOr<T> Function(Response<dynamic>) validateAndParse,
+      {Uri? manualLoginUrl,
+      FudanLoginType type = FudanLoginType.Neo,
+      bool Function(dynamic error)? isFatalError,
+      PersonInfo? info}) async {
+    final personInfo = info ?? StateProvider.personInfo.value;
+    if (personInfo == null) {
+      throw ArgumentError("PersonInfo is required for authentication");
+    }
+
+    final loginServiceUrl = manualLoginUrl ?? req.uri;
+
+    switch (type) {
+      case FudanLoginType.Neo:
+        return _authenticationQueues[type]!.runNormalRequest(
+          () async {
+            // Work around Dio bug: FormData objects can only be used once
+            final requestData = req.data;
+            if (requestData is FormData) {
+              req.data = requestData.clone();
+            }
+
+            final response = await dio.fetch(req);
+            if (_isAuthenticationRequired(response)) {
+              throw Exception(
+                  "Authentication required for request: ${response.realUri}");
+            }
+            return await validateAndParse(response);
+          },
+          () async {
+            await FudanAuthenticationAPIV2.authenticate(
+                personInfo, loginServiceUrl);
+          },
+          isFatalError: isFatalError,
+        );
+    }
+  }
+
+  /// Determines if a response indicates that authentication is required.
+  ///
+  /// This is an ad-hoc heuristic: if the response was redirected to the authentication
+  /// server (id.fudan.edu.cn), we can be confident that login is needed.
+  /// However, the absence of a redirect doesn't guarantee that authentication is not needed.
+  static bool _isAuthenticationRequired(Response<dynamic> response) =>
+      response.realUri.host == FudanAuthenticationAPIV2.idHost &&
+      response.redirectCount > 0;
 }
 
 class FudanAuthenticationAPIV2 {
@@ -159,4 +264,210 @@ class AuthenticationParameters {
   final String chainCode;
 
   AuthenticationParameters(this.lck, this.entityId, this.chainCode);
+}
+
+/// A specialized queue that manages login requests to prevent concurrent authentication attempts.
+///
+/// This class ensures that:
+/// 1. Only one login operation runs at a time across all threads
+/// 2. Failed requests are automatically retried with login, but with batch-based retry limits
+/// 3. Multiple requests needing login are efficiently batched together
+///
+/// ## Batch Concept
+/// A "batch" consists of normal requests that started within a time window and all need login.
+/// Specifically, for a login request B triggered by normal request A, other normal requests
+/// that satisfy: startTime(other) < startTime(B) AND startTime(other) > startTime(lastLogin)
+/// are considered in the same batch as A.
+class LoginQueue {
+  /// Protects all instance variables to ensure thread safety.
+  final Mutex _mutex = Mutex();
+
+  /// Whether a login operation is currently in progress.
+  bool _isCurrentlyLoggingIn = false;
+
+  /// Number of login attempts made within the current batch.
+  /// Reset to 0 when a new batch starts or when login succeeds.
+  int _loginAttemptsInCurrentBatch = 0;
+
+  /// State and timestamp of the most recent login attempt.
+  _LastLoginState _mostRecentLoginState = _LastLoginNever();
+
+  /// Notifies waiting threads when a login operation completes (success or failure).
+  late final ConditionVariable _loginCompletedNotifier =
+      ConditionVariable(_mutex);
+
+  /// Monotonically increasing timer to generate timestamps immune to system time changes.
+  /// Used to determine request ordering and batch boundaries.
+  static final Stopwatch _globalTimer = Stopwatch()..start();
+
+  /// Executes a normal request with automatic login retry on authentication failure.
+  ///
+  /// This method:
+  /// 1. Waits for any ongoing login to complete
+  /// 2. Attempts the requested action
+  /// 3. If the action fails due to authentication, triggers a login and retries once
+  ///
+  /// [action] - The main request logic to execute
+  /// [loginLogic] - The login procedure to run if authentication is needed
+  /// [hasBeenRetried] - Flag to prevent infinite retry loops (for internal use)
+  /// [actionStartTime] - Override for the request start timestamp (for internal use)
+  /// [isFatalError] - Optional function to identify errors that should not trigger login
+  Future<T> runNormalRequest<T>(
+      Future<T> Function() action, Future<void> Function() loginLogic,
+      {bool hasBeenRetried = false,
+      int? actionStartTime,
+      bool Function(dynamic error)? isFatalError}) async {
+    // Wait for any currently running login to complete before proceeding
+    await _mutex.protect(() async {
+      while (_isCurrentlyLoggingIn) {
+        await _loginCompletedNotifier.wait();
+      }
+    });
+
+    final requestStartTime =
+        actionStartTime ?? _globalTimer.elapsedMicroseconds;
+
+    try {
+      // Attempt to execute the main action
+      return await action();
+    } catch (e) {
+      // Check if this is a fatal error that should not trigger login retry
+      if (isFatalError != null && isFatalError(e)) {
+        rethrow;
+      }
+
+      // If we've already retried once, don't retry again to avoid infinite loops
+      if (hasBeenRetried) {
+        rethrow;
+      }
+
+      // The action failed, likely due to authentication. Try to login and retry.
+      final loginSucceeded =
+          await _triggerAndAwaitLogin(loginLogic, requestStartTime);
+
+      if (loginSucceeded) {
+        // Login succeeded, retry the original action once
+        return await runNormalRequest(action, loginLogic,
+            hasBeenRetried: true, actionStartTime: requestStartTime);
+      } else {
+        // Login failed, propagate the login error if available
+        if (_mostRecentLoginState
+            case _LastLoginFailure(
+              error: final loginError,
+              stackTrace: final st
+            )) {
+          Error.throwWithStackTrace(loginError, st);
+        } else {
+          // Login state is unexpected (Never or Success), rethrow the original error
+          rethrow;
+        }
+      }
+    }
+  }
+
+  /// Manages the login process with proper synchronization and batch-based retry limits.
+  ///
+  /// This method handles:
+  /// 1. Waiting for ongoing logins to complete
+  /// 2. Determining if a new batch has started (resetting retry counter)
+  /// 3. Enforcing the 3-attempt limit per batch
+  /// 4. Coordinating the actual login execution
+  /// 5. Notifying all waiting threads when login completes
+  ///
+  /// [loginLogic] - The actual login implementation to execute
+  /// [requestStartTime] - Timestamp of the request that triggered this login
+  ///
+  /// Returns true if login succeeded, false if retry limit exceeded or login failed
+  Future<bool> _triggerAndAwaitLogin(
+      Future<void> Function() loginLogic, int requestStartTime) async {
+    await _mutex.acquire();
+
+    // Wait for any ongoing login to finish, but keep checking if we need to adjust batch counts
+    while (_isCurrentlyLoggingIn) {
+      await _loginCompletedNotifier.wait();
+
+      // If another thread's login succeeded, we can piggyback on it
+      if (_mostRecentLoginState case _LastLoginSuccess()) {
+        _mutex.release();
+        return true;
+      }
+
+      // Check if this request started after the most recent login, indicating a new batch
+      if (requestStartTime > _mostRecentLoginState.startTime) {
+        _loginAttemptsInCurrentBatch =
+            0; // Reset attempts counter for the new batch
+      }
+    }
+
+    // Check if we've exceeded the retry limit for this batch
+    if (_loginAttemptsInCurrentBatch >= 3) {
+      _mutex.release();
+      return false; // Too many failed attempts, give up
+    }
+
+    // Initiate login: mark as in-progress and increment attempt counter
+    _isCurrentlyLoggingIn = true;
+    _loginAttemptsInCurrentBatch++;
+    final loginStartTime = _globalTimer.elapsedMicroseconds;
+    _mutex.release();
+
+    // Execute the actual login logic outside the mutex
+    _LastLoginState loginResult;
+    try {
+      await loginLogic();
+      loginResult = _LastLoginSuccess(loginStartTime);
+    } catch (error, stackTrace) {
+      loginResult = _LastLoginFailure(error, stackTrace, loginStartTime);
+    }
+
+    // Update state and notify all waiting threads
+    await _mutex.protect(() async {
+      _isCurrentlyLoggingIn = false;
+      _mostRecentLoginState = loginResult;
+
+      // If login succeeded, reset the batch attempt counter
+      if (loginResult case _LastLoginSuccess()) {
+        _loginAttemptsInCurrentBatch = 0;
+      }
+
+      // Wake up all threads waiting for this login to complete
+      await _loginCompletedNotifier.broadcast();
+    });
+
+    return loginResult is _LastLoginSuccess;
+  }
+}
+
+/// Represents the state and result of the most recent login attempt.
+/// Used to coordinate between multiple threads and implement batch-based retry logic.
+sealed class _LastLoginState {
+  /// Timestamp when this login state was recorded (from the global monotonic timer).
+  /// Used to determine batch boundaries and request ordering.
+  final int startTime;
+
+  _LastLoginState(this.startTime);
+}
+
+/// Initial state indicating no login has ever been attempted.
+/// This state is never returned to once the first login attempt is made.
+class _LastLoginNever extends _LastLoginState {
+  _LastLoginNever() : super(0); // Use timestamp 0 as the initial placeholder
+}
+
+/// Indicates that the most recent login attempt completed successfully.
+/// When other threads see this state, they can proceed without initiating their own login.
+class _LastLoginSuccess extends _LastLoginState {
+  _LastLoginSuccess(super.startTime);
+}
+
+/// Indicates that the most recent login attempt failed with an error.
+/// Contains the error details for propagation to threads that triggered this login.
+class _LastLoginFailure extends _LastLoginState {
+  /// The exception that caused the login to fail.
+  final dynamic error;
+
+  /// Stack trace associated with the login failure.
+  final StackTrace stackTrace;
+
+  _LastLoginFailure(this.error, this.stackTrace, super.startTime);
 }
