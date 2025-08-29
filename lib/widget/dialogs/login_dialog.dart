@@ -52,12 +52,14 @@ class LoginDialog extends StatefulWidget {
   final XSharedPreferences? sharedPreferences;
   final ValueNotifier<PersonInfo?> personInfo;
   final bool dismissible;
+  final bool showFullOptions;
+  final bool isGraduate;
   static bool _isShown = false;
 
   static bool get dialogShown => _isShown;
 
   static Future<void> showLoginDialog(BuildContext context, XSharedPreferences? preferences,
-      ValueNotifier<PersonInfo?> personInfo, bool dismissible) async {
+      ValueNotifier<PersonInfo?> personInfo, bool dismissible, {bool showFullOptions = true, bool isGraduate = false}) async {
     if (_isShown) return;
     _isShown = true;
     await showPlatformDialog(
@@ -66,7 +68,9 @@ class LoginDialog extends StatefulWidget {
         builder: (BuildContext context) => LoginDialog(
             sharedPreferences: preferences,
             personInfo: personInfo,
-            dismissible: dismissible));
+            dismissible: dismissible,
+            showFullOptions: showFullOptions,
+            isGraduate: isGraduate));
     _isShown = false;
   }
 
@@ -74,7 +78,9 @@ class LoginDialog extends StatefulWidget {
       {super.key,
       required this.sharedPreferences,
       required this.personInfo,
-      required this.dismissible});
+      required this.dismissible,
+      required this.showFullOptions,
+      required this.isGraduate});
 
   @override
   LoginDialogState createState() => LoginDialogState();
@@ -84,8 +90,17 @@ class LoginDialogState extends State<LoginDialog> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
   Widget _errorWidget = SizedBox.shrink();
-  static const DEFAULT_USERGROUP = UserGroup.FUDAN_UNDERGRADUATE_STUDENT;
-  UserGroup _group = DEFAULT_USERGROUP;
+  late final UserGroup _defaultUserGroup;
+  late UserGroup _group;
+
+  @override
+  void initState() {
+    super.initState();
+    _defaultUserGroup = widget.isGraduate 
+        ? UserGroup.FUDAN_POSTGRADUATE_STUDENT
+        : UserGroup.FUDAN_UNDERGRADUATE_STUDENT;
+    _group = _defaultUserGroup;
+  }
 
   /// Attempt to log in for verification.
   Future<void> _tryLogin(String id, String password) async {
@@ -101,8 +116,9 @@ class LoginDialogState extends State<LoginDialog> {
         await newInfo.saveToSharedPreferences(widget.sharedPreferences!);
         widget.personInfo.value = newInfo;
         progressDialog.dismiss(showAnim: false);
-        Navigator.of(context).pop();
-        showFAQ();
+        if (mounted) {
+          Navigator.of(context).pop(); 
+        }
         break;
       case UserGroup.FUDAN_POSTGRADUATE_STUDENT:
       case UserGroup.FUDAN_UNDERGRADUATE_STUDENT:
@@ -114,8 +130,9 @@ class LoginDialogState extends State<LoginDialog> {
           await newInfo.saveToSharedPreferences(widget.sharedPreferences!);
           widget.personInfo.value = newInfo;
           progressDialog.dismiss(showAnim: false);
-          Navigator.of(context).pop();
-          showFAQ();
+          if (mounted) {
+            Navigator.of(context).pop(); 
+          }
         } catch (e) {
           if (e is DioException) {
             progressDialog.dismiss(showAnim: false);
@@ -129,7 +146,9 @@ class LoginDialogState extends State<LoginDialog> {
             await newInfo.saveToSharedPreferences(widget.sharedPreferences!);
             widget.personInfo.value = newInfo;
             progressDialog.dismiss(showAnim: false);
-            Navigator.of(context).pop();
+            if (mounted) {
+              Navigator.of(context).pop(); 
+            }
           } catch (error) {
             progressDialog.dismiss(showAnim: false);
             rethrow;
@@ -143,30 +162,7 @@ class LoginDialogState extends State<LoginDialog> {
     }
   }
 
-  Future<bool?> showFAQ() {
-    return showPlatformDialog(
-        context: context,
-        builder: (BuildContext context) => PlatformAlertDialog(
-              title: PlatformText(
-                S.of(context).welcome_feature,
-                textAlign: TextAlign.center,
-              ),
-              content: PlatformText(
-                S.of(context).welcome_prompt,
-                textAlign: TextAlign.center,
-              ),
-              actions: <Widget>[
-                PlatformDialogAction(
-                    child: PlatformText(S.of(context).skip),
-                    onPressed: () => Navigator.pop(context)),
-                PlatformDialogAction(
-                    child: PlatformText(S.of(context).i_see),
-                    onPressed: () {
-                      BrowserUtil.openUrl(Constant.FAQ_URL, context);
-                    }),
-              ],
-            ));
-  }
+  
 
   void requestInternetAccess() async {
     // This webpage only returns plain-text 'SUCCESS' and is ideal for testing connection.
@@ -237,7 +233,7 @@ class LoginDialogState extends State<LoginDialog> {
                 S.of(context).login_uis_description,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              if (_group == DEFAULT_USERGROUP) ...[
+              if (_group == _defaultUserGroup && widget.showFullOptions) ...[
                 GestureDetector(
                   child: Text(
                     S.of(context).not_undergraduate,
@@ -339,9 +335,10 @@ class LoginDialogState extends State<LoginDialog> {
           onPressed: _executeLogin,
           child: Text(S.of(context).login),
         ),
-        TextButton(
-            onPressed: () {
-              _showSwitchGroupModal();
+        if (widget.showFullOptions)
+          TextButton(
+              onPressed: () {
+                _showSwitchGroupModal();
             },
             child: Text(S.of(context).login_as_others))
       ],
