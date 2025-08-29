@@ -81,7 +81,7 @@ class DioUtils {
     String? location = getRedirectLocation(response);
     if (location != null) {
       if (location.isEmpty) return response;
-      if (!Uri.parse(location).isAbsolute) {
+      if (!Uri.parse(location).hasScheme) {
         location = '${response.requestOptions.uri.origin}$location';
       }
       return processRedirect(dio,
