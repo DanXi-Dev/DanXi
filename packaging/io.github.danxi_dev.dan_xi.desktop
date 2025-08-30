@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=DanXi
+Name[zh_CN]=旦挞
+Comment=Maybe the best all-rounded service app for Fudan University students
+Comment[zh_CN]=可能是复旦学生最好的第三方校园服务 APP
+Exec=dan_xi
+Icon=dan_xi
+Terminal=false
+Categories=Education

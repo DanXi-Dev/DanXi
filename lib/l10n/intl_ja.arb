@@ -59,6 +59,7 @@
   "clear_cache_description": "次回表示時に写真が再ロードされます",
   "community_convention": "コミュニティー公約",
   "confirm": "確認",
+  "confirm_delete_image": "エディターからこの画像のすべてのインスタンスを削除しますか？",
   "connection_cancelled": "接続が異常に切断された",
   "connection_failed": "接続がタイムアウトしました。ネットワーク接続を確認し、もう一度やり直してください。\niOSの場合、「WLANと携帯電話データ」の許可をご確認ください。\n通常、このエラーはキャンパスサーバーの不備によるものですので、必ず3～5回ほどリトライしてください。",
   "connection_timeout": "ネット接続タイムアウト",
@@ -105,6 +106,7 @@
   "default_language": "言語",
   "delete": "削除",
   "delete_floor": "このフロアを削除",
+  "delete_image": "画像を削除",
   "delete_this_tag": "このタグを削除しますか？",
   "deleted": "削除済み",
   "developer_announcement": "開発チームのお知らせ {date}",
@@ -551,5 +553,9 @@
   "login_agreement": "ログインすることで同意したものとみなされます",
   "terms_and_privacy": "サービス利用規約とプライバシーポリシー",
   "enter_app": "アプリに入る",
-  "logged_in": "ログイン済み"
+  "logged_in": "ログイン済み",
+  "hide_post_success": "成功に隠された。再表示するには、設定で回复して",
+  "hide_post_confirm": "隠しますか？左上隅のボタンで隠されたものを再表示にするのは可能です",
+  "restore_hidden_confirm": "隠していたものを全部復元しますか？",
+  "clear_history_confirm": "ローカルの閲覧履歴を削除しますか？この過程は不可逆です"
 }

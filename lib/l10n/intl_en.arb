@@ -60,6 +60,7 @@
   "clear_cache_description": "Images will reload next time you view them",
   "community_convention": "Community Norm",
   "confirm": "Confirm",
+  "confirm_delete_image": "Are you sure you want to delete all instances of this image from the editor?",
   "connection_cancelled": "Connection cancelled unexpectedly",
   "connection_failed": "Connection failed. Check your Internet connection and try again.\nIf using iOS, make sure to grant WLAN & Cellular permission when prompted.\nIt's usually caused by weak network. Please try 3~5 times.",
   "connection_timeout": "Connection Timeout",
@@ -107,6 +108,7 @@
   "default_language": "Language",
   "delete": "Delete",
   "delete_floor": "Delete Floor",
+  "delete_image": "Delete Image",
   "delete_this_tag": "Delete this tag?",
   "deleted": "Deleted",
   "developer_announcement": "Dev Team Announcement {date}",
@@ -569,5 +571,9 @@
   "login_agreement": "By logging in, you agree to",
   "terms_and_privacy": "Terms of Service and Privacy Policy",
   "enter_app": "Enter Application",
-  "logged_in": "Logged In"
+  "logged_in": "Logged In",
+  "hide_post_success": "Successfully hidden item",
+  "hide_post_confirm": "Are you sure to hide the item? you may restore hidden items through the button on the top-right corner. ",
+  "restore_hidden_confirm": "Are you sure to restore all hidden items? ",
+  "clear_history_confirm": "Are you sure to clear local view history? this cannot be reverted. "
 }

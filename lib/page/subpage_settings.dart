@@ -21,6 +21,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/forum/user.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
@@ -402,7 +403,7 @@ class SettingsPageState extends State<SettingsPage> {
                                         actions: _buildCampusAreaList(sheetContext),
                                         cancelButton: CupertinoActionSheetAction(
                                                 child: Text(S.of(sheetContext).cancel),
-                                                onPressed: () => 
+                                                onPressed: () =>
                                                     Navigator.of(sheetContext).pop()))),
                           ),
                         ]),
@@ -426,7 +427,7 @@ class SettingsPageState extends State<SettingsPage> {
                                           actions: _buildLanguageList(sheetContext),
                                           cancelButton: CupertinoActionSheetAction(
                                                   child: Text(S.of(sheetContext).cancel),
-                                                  onPressed: () => 
+                                                  onPressed: () =>
                                                       Navigator.of(sheetContext).pop()))),
                             ),
 
@@ -520,7 +521,7 @@ class SettingsPageState extends State<SettingsPage> {
                                           actions: _buildThemeList(sheetContext),
                                           cancelButton: CupertinoActionSheetAction(
                                                   child: Text(S.of(sheetContext).cancel),
-                                                  onPressed: () => 
+                                                  onPressed: () =>
                                                   Navigator.of(sheetContext).pop()))),
                             ),
                             ListTile(
@@ -561,17 +562,28 @@ class SettingsPageState extends State<SettingsPage> {
                                         .read<SettingsProvider>()
                                         .hiddenNotifications = [],
                               ),
-                            SwitchListTile.adaptive(
-                                title: Text(S.of(context).use_webvpn_title),
-                                secondary: const Icon(Icons.network_cell),
-                                subtitle:
-                                    Text(S.of(context).use_webvpn_description),
-                                value: context.select<SettingsProvider, bool>(
-                                    (s) => s.useWebvpn),
-                                onChanged: (bool value) async {
-                                  context.read<SettingsProvider>().useWebvpn =
-                                      value;
-                                })
+                            ValueListenableBuilder<PersonInfo?>(
+                              valueListenable: StateProvider.personInfo,
+                              builder: (context, personInfo, __) {
+                                final isVisitor =
+                                    personInfo?.group == UserGroup.VISITOR;
+                                return SwitchListTile.adaptive(
+                                  title: Text(S.of(context).use_webvpn_title),
+                                  secondary: const Icon(Icons.network_cell),
+                                  subtitle:
+                                      Text(S.of(context).use_webvpn_description),
+                                  value: context.select<SettingsProvider, bool>(
+                                      (s) => s.useWebvpn),
+                                  onChanged: isVisitor
+                                      ? null
+                                      : (bool value) async {
+                                          context
+                                              .read<SettingsProvider>()
+                                              .useWebvpn = value;
+                                        },
+                                );
+                              },
+                            )
                           ],
                         ),
                       ),

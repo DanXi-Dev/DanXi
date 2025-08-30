@@ -200,7 +200,8 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                 Align(
                     alignment: Alignment.topLeft,
                     child: smartRender(
-                        context, e.reason!, onLinkTap, onImageTap, false)),
+                        context, e.reason!, false,
+                        onTapLink: onLinkTap, onTapImage: onImageTap)),
                 const Divider(),
                 Align(
                     alignment: Alignment.topLeft,
@@ -413,9 +414,9 @@ class AuditListState extends State<AuditList> {
                       child: smartRender(
                           context,
                           processStringForAudit(e.content, e.sensitive_detail),
-                          onLinkTap,
-                          onImageTap,
-                          false)),
+                          false,
+                          onTapLink: onLinkTap,
+                          onTapImage: onImageTap)),
                   const Divider(),
                 ],
               ),

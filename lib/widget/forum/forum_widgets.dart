@@ -514,9 +514,9 @@ class OTFloorWidget extends StatelessWidget {
                     : smartRender(
                         context,
                         floor.filteredContent ?? S.of(context).fatal_error,
-                        onLinkTap,
-                        onTapImage ?? defaultOnImageTap,
-                        hasBackgroundImage)),
+                        hasBackgroundImage,
+                        onTapLink: onLinkTap,
+                        onTapImage: onTapImage ?? defaultOnImageTap)),
             if (showBottomBar) ...[
               const SizedBox(height: 5),
               OTFloorWidgetBottomBar(floor: floor, index: index),

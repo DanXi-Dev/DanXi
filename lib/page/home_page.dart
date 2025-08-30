@@ -677,15 +677,21 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         : const Icon(CupertinoIcons.calendar),
                     label: S.of(context).timetable,
                   ),
-                // BottomNavigationBarItem(
-                //   icon: PlatformX.isMaterial(context)
-                //       ? const Icon(Icons.settings)
-                //       : const Icon(CupertinoIcons.gear_alt),
-                //   label: S.of(context).settings,
-                // ),
+                if (StateProvider.personInfo.value?.group == UserGroup.VISITOR)
+                  BottomNavigationBarItem(
+                    icon: PlatformX.isMaterial(context)
+                        ? const Icon(Icons.settings)
+                        : const Icon(CupertinoIcons.gear_alt),
+                    label: S.of(context).settings,
+                  ),
               ],
               currentIndex: pageIndex,
               itemChanged: (index) {
+                if (StateProvider.personInfo.value?.group == UserGroup.VISITOR &&
+                    index >= _subpage.length) {
+                  smartNavigatorPush(context, '/settings');
+                  return;
+                }
                 if (index != pageIndex) {
                   // Dispatch [SubpageViewState] events.
                   _subpage[pageIndex]

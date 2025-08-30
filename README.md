@@ -50,16 +50,38 @@
 Apple Intel 用户请打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版
 dmg 硬盘映像，挂载拷贝即可。
 
+## Linux
+
+### Arch Linux
+
+从 [AUR](https://aur.archlinux.org/danxi-git.git) 或 [archlinuxcn](https://github.com/archlinuxcn/repo/tree/master/archlinuxcn/danxi-git) 安装。
+
+#### AUR
+
+```shell
+[yay/paru] -S danxi-git
+```
+
+#### archlinuxcn
+
+```shell
+sudo pacman -S danxi-git
+```
+
+### 其他 Linux 发行版
+
+打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版 zip 压缩包，解压运行即可。
+
 # 构建
 
 ## 我们当前使用的 Flutter 编译版本
 
 ```shell
 $ flutter --version
-Flutter 3.32.2 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 8defaa71a7 (2 天前) • 2025-06-04 11:02:51 -0700
-Engine • revision 1091508939 (7 天前) • 2025-05-30 12:17:36 -0700
-Tools • Dart 3.8.1 • DevTools 2.45.1
+Flutter 3.35.1 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 20f8274939 (12 小时前) • 2025-08-14 10:53:09 -0700
+Engine • hash 6cd51c08a88e7bbe848a762c20ad3ecb8b063c0e (revision 1e9a811bf8) (29 hours ago) • 2025-08-13 23:35:25.000Z
+Tools • Dart 3.9.0 • DevTools 2.48.0
 ```
 
 ## 编译说明

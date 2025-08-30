@@ -415,14 +415,13 @@ class ForumRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<OTFloor>?> loadFloors(OTHole post,
-      {int startFloor = 0, int length = Constant.POST_COUNT_PER_PAGE}) async {
+      {int offset = 0, int size = Constant.POST_COUNT_PER_PAGE}) async {
     final options = RequestOptions(
-        path: "$_BASE_URL/floors",
+        path: "$_BASE_URL/holes/${post.hole_id}/floors",
         method: "GET",
         queryParameters: {
-          "start_floor": startFloor,
-          "hole_id": post.hole_id,
-          "length": length
+          "offset": offset,
+          "size": size
         },
         headers: _tokenHeader);
     final Response<List<dynamic>> response =
@@ -490,10 +489,9 @@ class ForumRepository extends BaseRepositoryWithDio {
     if (tags == null || tags.isEmpty) tags = [const OTTag(0, 0, KEY_NO_TAG)];
     // Suppose user is logged in. He should be.
     final options = RequestOptions(
-        path: "$_BASE_URL/holes",
+        path: "$_BASE_URL/divisions/${divisionId}/holes",
         method: "POST",
         data: {
-          "division_id": divisionId,
           "content": content,
           "tags": tags,
         },
@@ -526,11 +524,10 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   Future<int?> newFloor(int? discussionId, String content) async {
     final options = RequestOptions(
-        path: "$_BASE_URL/floors",
+        path: "$_BASE_URL/holes/$discussionId/floors",
         method: "POST",
         data: {
           "content": content,
-          "hole_id": discussionId,
           //"mention": findMention(content)
         },
         headers: _tokenHeader);

@@ -521,7 +521,7 @@ class CourseReviewEditorWidgetState extends State<CourseReviewEditorWidget> {
                   padding: const EdgeInsets.only(top: 4.0),
                   child: ValueListenableBuilder<TextEditingValue>(
                     builder: (context, value, child) => smartRender(
-                        context, value.text, null, null, false,
+                        context, value.text, false,
                         preview: true),
                     valueListenable: contentController,
                   ),
