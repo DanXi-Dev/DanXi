@@ -553,5 +553,15 @@
   "select_date_range_to": "到",
   "select_date_range_far_past": "遥远的过去",
   "select_date_range_now": "现在",
-  "hole_force_deleted": "已删除"
+  "hole_force_deleted": "已删除",
+  "identity_service": "统一身份认证服务",
+  "login_undergraduate": "本科生登录",
+  "login_postgraduate": "研究生登录",
+  "login_uis": "复旦 UIS 登录",
+  "login_danta_account": "旦挞帐号登录",
+  "login_danta_community": "旦挞社区与服务",
+  "login_agreement": "登录即代表您同意",
+  "terms_and_privacy": "服务条款和隐私政策",
+  "enter_app": "进入应用",
+  "logged_in": "已登录"
 }

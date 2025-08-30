@@ -541,5 +541,15 @@
   "select_date_range_to": "終了：",
   "select_date_range_far_past": "遠い過去",
   "select_date_range_now": "現在",
-  "hole_force_deleted": "削除され"
+  "hole_force_deleted": "削除され",
+  "identity_service": "統一アイデンティティ認証サービス",
+  "login_undergraduate": "学部生ログイン",
+  "login_postgraduate": "大学院生ログイン",
+  "login_uis": "復旦UISログイン",
+  "login_danta_account": "旦タアカウントログイン",
+  "login_danta_community": "旦タコミュニティとサービス",
+  "login_agreement": "ログインすることで同意したものとみなされます",
+  "terms_and_privacy": "サービス利用規約とプライバシーポリシー",
+  "enter_app": "アプリに入る",
+  "logged_in": "ログイン済み"
 }
