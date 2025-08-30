@@ -57,7 +57,7 @@ class HoleLoginPageState extends State<HoleLoginPage> {
   @override
   void initState() {
     super.initState();
-    info = widget.arguments!["info"];
+    info = widget.arguments!["info"] as PersonInfo? ?? PersonInfo.empty();
     _currentWidget = OTEmailSelectionWidget(state: this);
     _widgetStack.add(_currentWidget);
   }

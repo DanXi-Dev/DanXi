@@ -58,6 +58,8 @@ class PersonInfo {
 
   PersonInfo(this.id, this.password, this.name, this.group);
 
+  PersonInfo.empty() : this("", "", "", UserGroup.VISITOR);
+
   PersonInfo.createNewInfo(this.id, this.password, this.group) {
     name = "";
   }

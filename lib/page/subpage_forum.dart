@@ -366,9 +366,10 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
   ///Set the Future of the page when the framework calls build(), the content is not reloaded every time.
   Future<List<OTHole>?> _loadContent(int page) async {
-    if (!checkGroup(kCompatibleUserGroup)) {
-      throw NotLoginError("Logged in as a visitor.");
-    }
+    // Do not check here, because info may be empty, and kCompatibleUserGroup is actually all groups we have.
+    // if (!checkGroup(kCompatibleUserGroup)) {
+    //   throw NotLoginError("Logged in as a visitor.");
+    // }
     // Initialize the user token from shared preferences.
     // If no token, NotLoginError will be thrown.
     if (!context.read<ForumProvider>().isUserInitialized) {
