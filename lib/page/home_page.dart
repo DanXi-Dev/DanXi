@@ -452,6 +452,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // Refresh the page when account changes.
     StateProvider.isLoggedIn.addListener(() {
       _rebuildPage();
+      _subpage[_pageIndex.value].onFirstShownAsHomepage(context);
       refreshSelf();
     });
     _loadPersonInfo();

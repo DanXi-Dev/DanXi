@@ -281,6 +281,14 @@ class ForumSubpage extends PlatformSubpage<ForumSubpage> {
   void onDoubleTapOnTab() => RefreshListEvent().fire();
 
   @override
+  void onFirstShownAsHomepage(BuildContext parentContext) {
+    // Add watermark when first shown as homepage
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Watermark.addWatermark(parentContext);
+    });
+  }
+
+  @override
   void onViewStateChanged(BuildContext parentContext, SubpageViewState state) {
     super.onViewStateChanged(parentContext, state);
     switch (state) {
