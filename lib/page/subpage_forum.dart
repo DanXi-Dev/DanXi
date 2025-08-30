@@ -19,7 +19,6 @@ import 'dart:async';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/forum/division.dart';
 import 'package:dan_xi/model/forum/hole.dart';
