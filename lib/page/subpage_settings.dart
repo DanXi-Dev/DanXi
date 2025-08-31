@@ -569,10 +569,12 @@ class SettingsPageState extends State<SettingsPage> {
                                 return SwitchListTile.adaptive(
                                   title: Text(S.of(context).use_webvpn_title),
                                   secondary: const Icon(Icons.network_cell),
-                                  subtitle:
-                                      Text(S.of(context).use_webvpn_description),
-                                  value: context.select<SettingsProvider, bool>(
-                                      (s) => s.useWebvpn),
+                                  subtitle: Text(
+                                      S.of(context).use_webvpn_description),
+                                  value: isVisitor
+                                      ? false
+                                      : context.select<SettingsProvider, bool>(
+                                          (s) => s.useWebvpn),
                                   onChanged: isVisitor
                                       ? null
                                       : (bool value) async {
