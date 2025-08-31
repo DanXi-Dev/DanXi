@@ -565,8 +565,7 @@ class SettingsPageState extends State<SettingsPage> {
                             ValueListenableBuilder<PersonInfo?>(
                               valueListenable: StateProvider.personInfo,
                               builder: (context, personInfo, __) {
-                                final isVisitor =
-                                    personInfo?.group == UserGroup.VISITOR;
+                                final isVisitor = (personInfo == null);
                                 return SwitchListTile.adaptive(
                                   title: Text(S.of(context).use_webvpn_title),
                                   secondary: const Icon(Icons.network_cell),

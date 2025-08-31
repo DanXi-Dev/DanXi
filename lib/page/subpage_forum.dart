@@ -23,7 +23,6 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/forum/division.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/model/forum/tag.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/forum/hole_editor.dart';
 import 'package:dan_xi/page/forum/quiz.dart';
 import 'package:dan_xi/page/home_page.dart';

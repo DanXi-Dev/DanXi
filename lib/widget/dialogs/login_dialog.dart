@@ -18,7 +18,6 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/fdu/ecard_repository.dart';
 import 'package:dan_xi/repository/fdu/ehall_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
@@ -39,12 +38,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:provider/provider.dart';
 
 const kCompatibleUserGroup = [
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
   UserGroup.FUDAN_POSTGRADUATE_STUDENT,
-  UserGroup.VISITOR
 ];
 
 /// [LoginDialog] is a dialog allowing user to log in by inputting their UIS ID/Password.
@@ -112,18 +109,6 @@ class LoginDialogState extends State<LoginDialog> {
     ProgressFuture progressDialog = showProgressDialog(
         loadingText: S.of(context).logining, context: context);
     switch (_group) {
-      case UserGroup.VISITOR:
-        PersonInfo newInfo =
-            PersonInfo(id, password, "No User Account", UserGroup.VISITOR);
-        await newInfo.saveToSharedPreferences(widget.sharedPreferences!);
-        widget.personInfo.value = newInfo;
-        // disable WebVPN by default in VISITOR mode
-        context.read<SettingsProvider>().useWebvpn = false;
-        progressDialog.dismiss(showAnim: false);
-        if (mounted) {
-          Navigator.of(context).pop(); 
-        }
-        break;
       case UserGroup.FUDAN_POSTGRADUATE_STUDENT:
       case UserGroup.FUDAN_UNDERGRADUATE_STUDENT:
         PersonInfo newInfo = PersonInfo.createNewInfo(id, password, _group);
@@ -257,7 +242,7 @@ class LoginDialogState extends State<LoginDialog> {
               _errorWidget,
               TextField(
                 controller: _nameController,
-                enabled: _group != UserGroup.VISITOR,
+                enabled: true,
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                     labelText: S.of(context).login_uis_uid,
@@ -269,7 +254,7 @@ class LoginDialogState extends State<LoginDialog> {
               if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
               TextField(
                 controller: _pwdController,
-                enabled: _group != UserGroup.VISITOR,
+                enabled: true,
                 decoration: InputDecoration(
                   labelText: S.of(context).login_uis_pwd,
                   icon: PlatformX.isMaterial(context)
@@ -362,11 +347,7 @@ class LoginDialogState extends State<LoginDialog> {
 
   /// Change the login group and rebuild the dialog.
   void _switchLoginGroup(UserGroup e) {
-    if (e == UserGroup.VISITOR) {
-      _nameController.text = _pwdController.text = "[ Forum Only ]";
-    } else {
-      _nameController.text = _pwdController.text = "";
-    }
+    _nameController.text = _pwdController.text = "";
     setState(() => _group = e);
   }
 }

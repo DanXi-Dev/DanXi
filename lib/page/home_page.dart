@@ -133,17 +133,16 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// It's usually called when user changes his account.
   void _rebuildPage() {
     _lastRefreshTime = DateTime.now();
-    UserGroup group =
-        StateProvider.personInfo.value?.group ?? UserGroup.VISITOR;
+    PersonInfo? info = StateProvider.personInfo.value;
     _subpage = [
       // Don't show Dashboard in visitor mode
-      if (group != UserGroup.VISITOR)
+      if (info != null)
         HomeSubpage(key: dashboardPageKey),
       if (!SettingsProvider.getInstance().hideHole)
         ForumSubpage(key: forumPageKey),
       DankeSubPage(key: dankePageKey),
       // Don't show Timetable in visitor mode
-      if (group != UserGroup.VISITOR)
+      if (info != null)
         TimetableSubPage(key: timetablePageKey),
     ];
   }
@@ -632,8 +631,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       showDebugBtn(context, btnSize: 50);
     }
 
-    UserGroup group =
-        StateProvider.personInfo.value?.group ?? UserGroup.VISITOR;
+    PersonInfo? info = StateProvider.personInfo.value;
 
     return MultiProvider(
       providers: [ValueListenableProvider.value(value: _pageIndex)],
@@ -652,7 +650,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             bottomNavBar: PlatformNavBarM3(
               items: [
                 // Don't show Dashboard in visitor mode
-                if (group != UserGroup.VISITOR)
+                if (info != null)
                   BottomNavigationBarItem(
                     icon: PlatformX.isMaterial(context)
                         ? const Icon(Icons.dashboard)
@@ -673,14 +671,14 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   label: S.of(context).curriculum,
                 ),
                 // Don't show Timetable in visitor mode
-                if (group != UserGroup.VISITOR)
+                if (info != null)
                   BottomNavigationBarItem(
                     icon: PlatformX.isMaterial(context)
                         ? const Icon(Icons.calendar_today)
                         : const Icon(CupertinoIcons.calendar),
                     label: S.of(context).timetable,
                   ),
-                if (StateProvider.personInfo.value?.group == UserGroup.VISITOR)
+                if (info == null)
                   BottomNavigationBarItem(
                     icon: PlatformX.isMaterial(context)
                         ? const Icon(Icons.settings)
@@ -690,8 +688,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
               ],
               currentIndex: pageIndex,
               itemChanged: (index) {
-                if (StateProvider.personInfo.value?.group == UserGroup.VISITOR &&
-                    index >= _subpage.length) {
+                if (info == null && index >= _subpage.length) {
                   smartNavigatorPush(context, '/settings');
                   return;
                 }
