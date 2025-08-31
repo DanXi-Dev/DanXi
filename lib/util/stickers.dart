@@ -63,7 +63,7 @@ Future<String?> getStickerPath(String stickerName) async {
   
   final repository = AnnouncementRepository.getInstance();
   final remotePath = await repository.getStickerFilePath(stickerName);
-  if (remotePath != null && File(remotePath).existsSync()) {
+  if (remotePath != null && await File(remotePath).exists()) {
     return remotePath;
   }
   
