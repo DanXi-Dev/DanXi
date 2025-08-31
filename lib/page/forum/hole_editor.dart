@@ -409,26 +409,25 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                                             "${widget.controller.text.substring(0, cursorPosition)}![]($stickerId)${widget.controller.text.substring(cursorPosition)}";
                                         Navigator.of(context).pop();
                                       },
-                                      child: FutureBuilder<String?>(
+                                      child: FutureBuilder<StickerPath?>(
                                         future: getStickerPath(stickerId),
                                         builder: (context, pathSnapshot) {
                                           if (pathSnapshot.hasData && pathSnapshot.data != null) {
-                                            final path = pathSnapshot.data!;
-                                            if (path.startsWith('assets/')) {
-                                              return Image.asset(
-                                                path,
+                                            final stickerPath = pathSnapshot.data!;
+                                            return switch (stickerPath) {
+                                              AssetStickerPath(:final assetPath) => Image.asset(
+                                                assetPath,
                                                 width: 60,
                                                 height: 60,
                                                 fit: BoxFit.contain,
-                                              );
-                                            } else {
-                                              return Image.file(
-                                                File(path),
+                                              ),
+                                              FileStickerPath(:final filePath) => Image.file(
+                                                File(filePath),
                                                 width: 60,
                                                 height: 60,
                                                 fit: BoxFit.contain,
-                                              );
-                                            }
+                                              ),
+                                            };
                                           }
                                           return Container(
                                             width: 60,
