@@ -817,6 +817,8 @@ class SettingsProvider with ChangeNotifier {
 
   set isLoggedIn(bool value) {
     preferences!.setBool(KEY_IS_LOGGED_IN, value);
+    notifyListeners();
+  }
 
   List<int> get hiddenMyPosts {
     if (preferences!.containsKey(KEY_HIDDEN_MY_POSTS)) {
