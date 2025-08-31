@@ -12,11 +12,11 @@ import 'package:provider/provider.dart';
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
-  final Color _primary = const Color(0xFF5660C9);
-  final Color _tint = const Color(0xFFE7E9FC);
-
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final bool forumLoggedIn =
         context.watch<SettingsProvider>().forumToken != null;
 
@@ -27,7 +27,6 @@ class LoginPage extends StatelessWidget {
         final bool canEnter = uisLoggedIn || forumLoggedIn;
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF3F6FF),
           body: SafeArea(
             child: Column(
               children: [
@@ -43,7 +42,7 @@ class LoginPage extends StatelessWidget {
                         buttons: [
                           _gradientBtn(
                             label: S.of(context).login_undergraduate,
-                            tint: _primary,
+                            tint: colorScheme.primary,
                             enabled: !uisLoggedIn,
                             onTap: () => LoginDialog.showLoginDialog(
                                 context,
@@ -54,7 +53,7 @@ class LoginPage extends StatelessWidget {
                           ),
                           _gradientBtn(
                             label: S.of(context).login_postgraduate,
-                            tint: _primary,
+                            tint: colorScheme.primary,
                             enabled: !uisLoggedIn,
                             onTap: () => LoginDialog.showLoginDialog(
                                 context,
@@ -75,7 +74,7 @@ class LoginPage extends StatelessWidget {
                         buttons: [
                           _gradientBtn(
                             label: S.of(context).login_by_email_password,
-                            tint: _primary,
+                            tint: colorScheme.primary,
                             enabled: !forumLoggedIn,
                             onTap: () async {
                               await smartNavigatorPush(context, "/bbs/login",
@@ -96,8 +95,8 @@ class LoginPage extends StatelessWidget {
                     child: Text.rich(
                       TextSpan(
                         text: S.of(context).login_agreement,
-                        style: const TextStyle(
-                            fontSize: 12, color: Colors.black54),
+                        style: TextStyle(
+                            fontSize: 12, color: theme.textTheme.bodySmall?.color),
                         children: [
                           WidgetSpan(
                             alignment: PlaceholderAlignment.middle,
@@ -108,9 +107,9 @@ class LoginPage extends StatelessWidget {
                               },
                               child: Text(
                                 S.of(context).terms_and_privacy,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
-                                  // color: Colors.blue,
+                                  color: colorScheme.primary,
                                   decoration: TextDecoration.underline,
                                 ),
                               ),
@@ -134,9 +133,9 @@ class LoginPage extends StatelessWidget {
                         : null,
                     style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(48),
-                      backgroundColor: canEnter ? _primary : _tint,
-                      foregroundColor: canEnter ? Colors.white : Colors.black38,
-                      disabledBackgroundColor: _tint,
+                      backgroundColor: canEnter ? colorScheme.primary : colorScheme.surfaceContainerHighest,
+                      foregroundColor: canEnter ? colorScheme.onPrimary : theme.disabledColor,
+                      disabledBackgroundColor: colorScheme.surfaceContainerHighest,
                     ),
                     child: Text(S.of(context).enter_app,
                         style: TextStyle(fontSize: 16)),
@@ -157,6 +156,9 @@ class LoginPage extends StatelessWidget {
     required List<Widget> buttons,
     required bool logged,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Card(
       elevation: 6,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -173,7 +175,7 @@ class LoginPage extends StatelessWidget {
                         fontSize: 22, fontWeight: FontWeight.w800)),
                 if (logged) ...[
                   const SizedBox(width: 8),
-                  const Icon(Icons.check_circle, color: Colors.green, size: 22),
+                  Icon(Icons.check_circle, color: colorScheme.primary, size: 22),
                 ],
               ],
             ),
@@ -181,7 +183,7 @@ class LoginPage extends StatelessWidget {
             Text(
               logged ? S.of(context).logged_in : subtitle,
               style: TextStyle(
-                color: logged ? Colors.green : Colors.black54,
+                color: logged ? colorScheme.primary : theme.textTheme.bodySmall?.color,
                 fontSize: 14,
               ),
             ),
@@ -199,36 +201,44 @@ class LoginPage extends StatelessWidget {
     required bool enabled,
     Color? tint,
   }) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(40),
-      onTap: onTap,
-      child: Ink(
-        height: 52,
-        decoration: BoxDecoration(
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        final effectiveTint = tint ?? colorScheme.primary;
+
+        return InkWell(
           borderRadius: BorderRadius.circular(40),
-          gradient: enabled
-              ? LinearGradient(
-                  colors: [
-                    tint ?? _tint,
-                    tint != null ? tint.withOpacity(0.8) : _tint,
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                )
-              : null,
-          color: enabled ? null : _tint,
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              color: enabled ? Colors.white : Colors.black38,
-              fontWeight: FontWeight.w600,
-              fontSize: 16,
+          onTap: onTap,
+          child: Ink(
+            height: 52,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(40),
+              gradient: enabled
+                  ? LinearGradient(
+                      colors: [
+                        effectiveTint,
+                        effectiveTint.withValues(alpha: 0.8),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    )
+                  : null,
+              color: enabled ? null : colorScheme.surfaceContainerHighest,
+            ),
+            child: Center(
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: enabled ? colorScheme.onPrimary : theme.disabledColor,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
