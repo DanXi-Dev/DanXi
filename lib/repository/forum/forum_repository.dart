@@ -140,6 +140,7 @@ class ForumRepository extends BaseRepositoryWithDio {
             SettingsProvider.getInstance().forumToken = token));
     dio.interceptors.add(
         UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
+    dio.interceptors.add(WebVPNInterceptor());
   }
 
   /// A "minimal" initialization of the provider.

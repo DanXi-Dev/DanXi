@@ -52,12 +52,7 @@ abstract class BaseRepositoryWithDio {
       _dios[linkHost]!.interceptors.add(LimitedQueuedInterceptor.getInstance());
       _dios[linkHost]!.interceptors.add(UserAgentInterceptor(
           userAgent: SettingsProvider.getInstance().customUserAgent));
-      if (isWebvpnApplicable && SettingsProvider.getInstance().useWebvpn) {
-        _dios[linkHost]!.interceptors.add(CookieManager(
-            ParallelCookieJars([cookieJar!, WebvpnProxy.webvpnCookieJar])));
-      } else {
-        _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
-      }
+      _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
       DioLogInterceptor.enablePrintLog = false;
       _dios[linkHost]!.interceptors.add(DioLogInterceptor());
     }

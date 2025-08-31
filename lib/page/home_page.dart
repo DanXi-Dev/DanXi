@@ -617,9 +617,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// Load persistent data (e.g. user name, password, etc.) from the local storage.
   /// Since it does not pop login dialog anymore, it is safe to call it in [initState].
   void _loadPersonInfo() {
-    /// Register person info at [WebvpnProxy] to enable webvpn services to use it
-    WebvpnProxy.bindPersonInfo(StateProvider.personInfo);
-
     var preferences = SettingsProvider.getInstance().preferences;
     if (PersonInfo.verifySharedPreferences(preferences!)) {
       StateProvider.personInfo.value =

@@ -122,7 +122,7 @@ class FudanSession {
               throw Exception(
                   "Authentication required for request: ${response.realUri}");
             }
-            return await validateAndParse(response);
+            return Future.sync(() => validateAndParse(response));
           },
           () async {
             await FudanAuthenticationAPIV2.authenticate(
