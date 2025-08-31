@@ -9,14 +9,9 @@ import 'package:dan_xi/provider/state_provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
   final Color _primary = const Color(0xFF5660C9);
   final Color _tint = const Color(0xFFE7E9FC);
 
@@ -41,6 +36,7 @@ class _LoginPageState extends State<LoginPage> {
                     padding: const EdgeInsets.all(20),
                     children: [
                       _loginCard(
+                        context,
                         title: S.of(context).login_uis,
                         subtitle: S.of(context).identity_service,
                         logged: uisLoggedIn,
@@ -72,6 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 24),
                       _loginCard(
+                        context,
                         title: S.of(context).login_danta_account,
                         subtitle: S.of(context).login_danta_community,
                         logged: forumLoggedIn,
@@ -132,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                         ? () {
                             SettingsProvider.getInstance().isLoggedIn = true;
                             StateProvider.isLoggedIn.value = true;
-                            showFAQ();
+                            showFAQ(context);
                           }
                         : null,
                     style: FilledButton.styleFrom(
@@ -153,7 +150,8 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _loginCard({
+  Widget _loginCard(
+    BuildContext context, {
     required String title,
     required String subtitle,
     required List<Widget> buttons,
@@ -244,7 +242,7 @@ class _LoginPageState extends State<LoginPage> {
     return output;
   }
 
-  Future<bool?> showFAQ() {
+  Future<bool?> showFAQ(BuildContext context) {
     return showPlatformDialog(
         context: context,
         builder: (BuildContext context) => PlatformAlertDialog(
