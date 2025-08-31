@@ -41,6 +41,7 @@ class LoginPage extends StatelessWidget {
                         logged: uisLoggedIn,
                         buttons: [
                           _gradientBtn(
+                            context,
                             label: S.of(context).login_undergraduate,
                             tint: colorScheme.primary,
                             enabled: !uisLoggedIn,
@@ -52,6 +53,7 @@ class LoginPage extends StatelessWidget {
                                 showFullOptions: false),
                           ),
                           _gradientBtn(
+                            context,
                             label: S.of(context).login_postgraduate,
                             tint: colorScheme.primary,
                             enabled: !uisLoggedIn,
@@ -73,6 +75,7 @@ class LoginPage extends StatelessWidget {
                         logged: forumLoggedIn,
                         buttons: [
                           _gradientBtn(
+                            context,
                             label: S.of(context).login_by_email_password,
                             tint: colorScheme.primary,
                             enabled: !forumLoggedIn,
@@ -96,7 +99,8 @@ class LoginPage extends StatelessWidget {
                       TextSpan(
                         text: S.of(context).login_agreement,
                         style: TextStyle(
-                            fontSize: 12, color: theme.textTheme.bodySmall?.color),
+                            fontSize: 12,
+                            color: theme.textTheme.bodySmall?.color),
                         children: [
                           WidgetSpan(
                             alignment: PlaceholderAlignment.middle,
@@ -133,9 +137,14 @@ class LoginPage extends StatelessWidget {
                         : null,
                     style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(48),
-                      backgroundColor: canEnter ? colorScheme.primary : colorScheme.surfaceContainerHighest,
-                      foregroundColor: canEnter ? colorScheme.onPrimary : theme.disabledColor,
-                      disabledBackgroundColor: colorScheme.surfaceContainerHighest,
+                      backgroundColor: canEnter
+                          ? colorScheme.primary
+                          : colorScheme.surfaceContainerHighest,
+                      foregroundColor: canEnter
+                          ? colorScheme.onPrimary
+                          : theme.disabledColor,
+                      disabledBackgroundColor:
+                          colorScheme.surfaceContainerHighest,
                     ),
                     child: Text(S.of(context).enter_app,
                         style: TextStyle(fontSize: 16)),
@@ -175,7 +184,8 @@ class LoginPage extends StatelessWidget {
                         fontSize: 22, fontWeight: FontWeight.w800)),
                 if (logged) ...[
                   const SizedBox(width: 8),
-                  Icon(Icons.check_circle, color: colorScheme.primary, size: 22),
+                  Icon(Icons.check_circle,
+                      color: colorScheme.primary, size: 22),
                 ],
               ],
             ),
@@ -183,7 +193,9 @@ class LoginPage extends StatelessWidget {
             Text(
               logged ? S.of(context).logged_in : subtitle,
               style: TextStyle(
-                color: logged ? colorScheme.primary : theme.textTheme.bodySmall?.color,
+                color: logged
+                    ? colorScheme.primary
+                    : theme.textTheme.bodySmall?.color,
                 fontSize: 14,
               ),
             ),
@@ -195,50 +207,46 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _gradientBtn({
+  Widget _gradientBtn(
+    BuildContext context, {
     required String label,
     required VoidCallback? onTap,
     required bool enabled,
-    Color? tint,
+    required Color tint,
   }) {
-    return Builder(
-      builder: (context) {
-        final theme = Theme.of(context);
-        final colorScheme = theme.colorScheme;
-        final effectiveTint = tint ?? colorScheme.primary;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
-        return InkWell(
+    return InkWell(
+      borderRadius: BorderRadius.circular(40),
+      onTap: onTap,
+      child: Ink(
+        height: 52,
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(40),
-          onTap: onTap,
-          child: Ink(
-            height: 52,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(40),
-              gradient: enabled
-                  ? LinearGradient(
-                      colors: [
-                        effectiveTint,
-                        effectiveTint.withValues(alpha: 0.8),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    )
-                  : null,
-              color: enabled ? null : colorScheme.surfaceContainerHighest,
-            ),
-            child: Center(
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: enabled ? colorScheme.onPrimary : theme.disabledColor,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-              ),
+          gradient: enabled
+              ? LinearGradient(
+                  colors: [
+                    tint,
+                    tint.withValues(alpha: 0.8),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                )
+              : null,
+          color: enabled ? null : colorScheme.surfaceContainerHighest,
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: enabled ? colorScheme.onPrimary : theme.disabledColor,
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
