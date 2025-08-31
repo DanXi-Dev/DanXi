@@ -32,49 +32,7 @@ class FileStickerPath extends StickerPath {
   const FileStickerPath(this.filePath);
 }
 
-enum Stickers {
-  dx_angry,
-  dx_call,
-  dx_cate,
-  dx_dying,
-  dx_egg,
-  dx_fright,
-  dx_heart,
-  dx_hug,
-  dx_overwhelm,
-  dx_roll,
-  dx_roped,
-  dx_sleep,
-  dx_swim,
-  dx_thrill,
-  dx_touch_fish,
-  dx_twin,
-  dx_kiss,
-  dx_onlooker,
-  dx_craving,
-  dx_caught,
-  dx_worn,
-  dx_murderous,
-  dx_confused,
-  dx_like;
-}
-
-String? getStickerAssetPath(String stickerName) {
-  try {
-    Stickers sticker =
-        Stickers.values.firstWhere((e) => e.name.toString() == stickerName);
-    return "assets/graphics/stickers/${sticker.name}.webp";
-  } catch (error) {
-    return null;
-  }
-}
-
 Future<StickerPath?> getStickerPath(String stickerName) async {
-  final localAssetPath = getStickerAssetPath(stickerName);
-  if (localAssetPath != null) {
-    return AssetStickerPath(localAssetPath);
-  }
-  
   final repository = AnnouncementRepository.getInstance();
   final remotePath = await repository.getStickerFilePath(stickerName);
   if (remotePath != null && await File(remotePath).exists()) {

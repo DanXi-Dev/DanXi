@@ -377,12 +377,8 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                       child: FutureBuilder<List<RemoteSticker>>(
                         future: AnnouncementRepository.getInstance().getAvailableStickers(),
                         builder: (context, remoteSnapshot) {
-                          final localStickers = Stickers.values;
                           final remoteStickers = remoteSnapshot.data ?? [];
-                          final allStickerIds = [
-                            ...localStickers.map((e) => e.name),
-                            ...remoteStickers.map((e) => e.id)
-                          ];
+                          final allStickerIds = remoteStickers.map((e) => e.id).toList();
                           
                           final stickerSheetColumns = 5;
                           final stickerSheetRows = (allStickerIds.length / stickerSheetColumns).ceil();

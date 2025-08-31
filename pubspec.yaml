@@ -154,7 +154,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/graphics/
-    - assets/graphics/stickers/
     - assets/texts/
   fonts:
     - family: iconfont
