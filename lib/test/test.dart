@@ -42,8 +42,8 @@ class _TestLifeCycle {
   }
 
   static void onStartAsync(BuildContext context) async {
-    final rep = await FudanAuthenticationAPIV2.authenticate(StateProvider.personInfo.value!, Uri.parse("https://webvpn.fudan.edu.cn/login?cas_login=true"));
-    debugPrint(rep.data.toString());
+    // final rep = await FudanAuthenticationAPIV2.authenticate(StateProvider.personInfo.value!, Uri.parse("https://webvpn.fudan.edu.cn/login?cas_login=true"));
+    // debugPrint(rep.data.toString());
   }
 }
 
