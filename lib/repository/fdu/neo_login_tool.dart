@@ -9,6 +9,7 @@ import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dio/dio.dart';
+import 'package:dio5_log/dio_log.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_redirect_interceptor/dio_redirect_interceptor.dart';
 import 'package:encrypt/encrypt.dart';
@@ -69,7 +70,9 @@ class FudanSession {
       _dio!.interceptors.add(UserAgentInterceptor());
       // 3. Cookie management for session persistence
       _dio!.interceptors.add(CookieManager(_sessionCookieJar));
-      // 4. Custom redirect handling (must be last)
+      // 4. Dio Logger for debugging
+      _dio!.interceptors.add(DioLogInterceptor());
+      // 5. Custom redirect handling (must be last)
       _dio!.interceptors.add(RedirectInterceptor(() => _dio!));
     }
     return _dio!;
@@ -138,6 +141,13 @@ class FudanSession {
   static bool _isAuthenticationRequired(Response<dynamic> response) =>
       response.realUri.host == FudanAuthenticationAPIV2.idHost &&
       response.redirectCount > 0;
+
+  static Future<void> clearSession() async {
+    // Clear cookies to reset the session
+    await _sessionCookieJar.deleteAll();
+    // Clear the Dio instance to reset interceptors and state
+    _dio = null;
+  }
 }
 
 class FudanAuthenticationAPIV2 {
