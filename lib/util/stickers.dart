@@ -18,6 +18,20 @@
 import 'dart:io';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 
+sealed class StickerPath {
+  const StickerPath();
+}
+
+class AssetStickerPath extends StickerPath {
+  final String assetPath;
+  const AssetStickerPath(this.assetPath);
+}
+
+class FileStickerPath extends StickerPath {
+  final String filePath;
+  const FileStickerPath(this.filePath);
+}
+
 enum Stickers {
   dx_angry,
   dx_call,
@@ -55,16 +69,16 @@ String? getStickerAssetPath(String stickerName) {
   }
 }
 
-Future<String?> getStickerPath(String stickerName) async {
+Future<StickerPath?> getStickerPath(String stickerName) async {
   final localAssetPath = getStickerAssetPath(stickerName);
   if (localAssetPath != null) {
-    return localAssetPath;
+    return AssetStickerPath(localAssetPath);
   }
   
   final repository = AnnouncementRepository.getInstance();
   final remotePath = await repository.getStickerFilePath(stickerName);
   if (remotePath != null && await File(remotePath).exists()) {
-    return remotePath;
+    return FileStickerPath(remotePath);
   }
   
   return null;
