@@ -353,7 +353,7 @@ class SettingsPageState extends State<SettingsPage> {
                                 ? const Icon(Icons.account_circle)
                                 : const Icon(CupertinoIcons.person_circle),
                             subtitle: Text(
-                                "${StateProvider.personInfo.value?.name ?? ""} (${StateProvider.personInfo.value?.id ?? ""})"),
+                                "${StateProvider.personInfo.value?.name ?? "???"} (${StateProvider.personInfo.value?.id ?? "???"})"),
                             onTap: () {
                               showPlatformDialog(
                                 context: context,
