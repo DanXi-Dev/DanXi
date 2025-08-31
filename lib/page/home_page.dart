@@ -150,6 +150,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    StateProvider.isLoggedIn.removeListener(_loginListener);
     _captchaSubscription.cancel();
     _receivedIntentSubscription.cancel();
     _uniLinksSubscription.cancel();
@@ -445,19 +446,23 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         forcePushOnMainNavigator: true);
   }
 
+  void _loginListener() {
+    _rebuildPage();
+    _subpage[_pageIndex.value].onFirstShownAsHomepage(context);
+    refreshSelf();
+  }
+
   @override
   void initState() {
     super.initState();
 
     _loadPersonInfo();
     _rebuildPage();
+    _subpage[_pageIndex.value].onFirstShownAsHomepage(context);
 
     // Refresh the page when account changes.
-    StateProvider.isLoggedIn.addListener(() {
-      _rebuildPage();
-      _subpage[_pageIndex.value].onFirstShownAsHomepage(context);
-      refreshSelf();
-    });
+    StateProvider.isLoggedIn.addListener(_loginListener);
+
     initSystemTray().catchError((ignored) {});
     WidgetsBinding.instance.addObserver(this);
 
