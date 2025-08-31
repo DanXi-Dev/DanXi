@@ -23,9 +23,12 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dio/dio.dart';
 
 class UserAgentInterceptor extends Interceptor {
-  String? userAgent;
+  static const String EXTRA_USER_AGENT_SET = "user_agent_set";
 
-  UserAgentInterceptor({this.userAgent});
+  String? userAgent;
+  bool important;
+
+  UserAgentInterceptor({this.userAgent, this.important = true});
 
   static String? get defaultUsedUserAgent =>
       StateProvider.onlineUserAgent ??
@@ -36,7 +39,10 @@ class UserAgentInterceptor extends Interceptor {
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (!PlatformX.isWeb) {
       userAgent ??= defaultUsedUserAgent;
-      options.headers[HttpHeaders.userAgentHeader] = userAgent;
+      if (important || options.extra[EXTRA_USER_AGENT_SET] != true) {
+        options.extra[EXTRA_USER_AGENT_SET] = true;
+        options.headers[HttpHeaders.userAgentHeader] = userAgent;
+      }
     }
     return handler.next(options);
   }

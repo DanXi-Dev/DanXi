@@ -67,7 +67,7 @@ class FudanSession {
       // 1. Request throttling (must be first)
       _dio!.interceptors.add(LimitedQueuedInterceptor.getInstance());
       // 2. User agent spoofing to bypass restrictions
-      _dio!.interceptors.add(UserAgentInterceptor());
+      _dio!.interceptors.add(UserAgentInterceptor(important: false));
       // 3. Cookie management for session persistence
       _dio!.interceptors.add(CookieManager(_sessionCookieJar));
       // 4. Dio Logger for debugging
