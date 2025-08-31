@@ -20,9 +20,6 @@ import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:flutter/widgets.dart';
 
 enum UserGroup {
-  /// Not logged in
-  VISITOR,
-
   /// Log in as Fudan undergraduate student
   FUDAN_UNDERGRADUATE_STUDENT,
 
@@ -37,7 +34,6 @@ enum UserGroup {
 }
 
 Map<UserGroup, Function> kUserGroupDescription = {
-  UserGroup.VISITOR: (BuildContext context) => S.of(context).visitor,
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT: (BuildContext context) =>
       S.of(context).login_uis,
   UserGroup.FUDAN_POSTGRADUATE_STUDENT: (BuildContext context) =>

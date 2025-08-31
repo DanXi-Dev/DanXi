@@ -28,6 +28,7 @@ import 'package:provider/provider.dart';
 /// Do NOT break the decoupling of the project!
 class StateProvider {
   /// The user's basic information.
+  static final ValueNotifier<bool> isLoggedIn = ValueNotifier(false);
   static final ValueNotifier<PersonInfo?> personInfo = ValueNotifier(null);
   static bool needScreenshotWarning = false;
   static bool isForeground = true;
@@ -38,6 +39,7 @@ class StateProvider {
   static void initialize(BuildContext context) {
     ForumProvider provider = context.read<ForumProvider>();
     provider.currentDivisionId = null;
+    isLoggedIn.value = false;
     personInfo.value = null;
     isForeground = true;
     needScreenshotWarning = showingScreenshotWarning = false;

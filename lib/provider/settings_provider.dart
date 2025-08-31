@@ -92,6 +92,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_USE_WEBVPN = "use_webvpn";
   static const String KEY_VIEW_HISTORY = "view_history";
   static const String KEY_FOLLOW_SYSTEM_PALETTE = "follow_system_palette";
+  static const String KEY_IS_LOGGED_IN = "is_logged_in";
   static const String KEY_HIDDEN_MY_POSTS = "hidden_my_posts";
   static const String KEY_HIDDEN_MY_REPLIES = "hidden_my_replies";
 
@@ -804,6 +805,18 @@ class SettingsProvider with ChangeNotifier {
 
   set followSystemPalette(bool value) {
     preferences!.setBool(KEY_FOLLOW_SYSTEM_PALETTE, value);
+    notifyListeners();
+  }
+
+  bool get isLoggedIn {
+    if (preferences!.containsKey(KEY_IS_LOGGED_IN)) {
+      return preferences!.getBool(KEY_IS_LOGGED_IN)!;
+    }
+    return false;
+  }
+
+  set isLoggedIn(bool value) {
+    preferences!.setBool(KEY_IS_LOGGED_IN, value);
     notifyListeners();
   }
 

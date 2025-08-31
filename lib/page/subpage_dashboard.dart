@@ -182,7 +182,7 @@ class HomeSubpageState extends PlatformSubpageState<HomeSubpage> {
         if (widget is FeatureContainer) {
           FeatureContainer container = widget as FeatureContainer;
           if (!checkFeature(
-              container.childFeature, StateProvider.personInfo.value!.group)) {
+              container.childFeature, StateProvider.personInfo.value?.group)) {
             continue;
           }
         }
