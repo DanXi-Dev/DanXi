@@ -112,10 +112,7 @@ void main() {
           PlatformX.isAndroid ? DeviceIdentity.register() : Future.value();
       registerDeviceIdentity.then((_) {
         // Initialize remote stickers on app startup (background)
-        // Only sync if sticker URL is available
-        AnnouncementRepository.getInstance().loadAnnouncements().then((_) {
-          unawaited(AnnouncementRepository.getInstance().syncStickers());
-        });
+        unawaited(AnnouncementRepository.getInstance().syncStickers());
         
         // This is the entrypoint of a simple Flutter app.
         // runApp() is a function that takes a [Widget] and makes it the root
