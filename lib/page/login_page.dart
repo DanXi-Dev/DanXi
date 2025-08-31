@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final bool forumLoggedIn =
         context.watch<SettingsProvider>().forumToken != null;
-    bool canEnter = _uisLoggedIn || forumLoggedIn;
+    final bool canEnter = _uisLoggedIn || forumLoggedIn;
     return Scaffold(
       backgroundColor: const Color(0xFFF3F6FF),
       body: SafeArea(
