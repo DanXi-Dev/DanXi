@@ -353,7 +353,7 @@ class SettingsPageState extends State<SettingsPage> {
                                 ? const Icon(Icons.account_circle)
                                 : const Icon(CupertinoIcons.person_circle),
                             subtitle: Text(
-                                "${StateProvider.personInfo.value!.name} (${StateProvider.personInfo.value!.id})"),
+                                "${StateProvider.personInfo.value?.name ?? "???"} (${StateProvider.personInfo.value?.id ?? "???"})"),
                             onTap: () {
                               showPlatformDialog(
                                 context: context,
@@ -565,15 +565,16 @@ class SettingsPageState extends State<SettingsPage> {
                             ValueListenableBuilder<PersonInfo?>(
                               valueListenable: StateProvider.personInfo,
                               builder: (context, personInfo, __) {
-                                final isVisitor =
-                                    personInfo?.group == UserGroup.VISITOR;
+                                final isVisitor = (personInfo == null);
                                 return SwitchListTile.adaptive(
                                   title: Text(S.of(context).use_webvpn_title),
                                   secondary: const Icon(Icons.network_cell),
-                                  subtitle:
-                                      Text(S.of(context).use_webvpn_description),
-                                  value: context.select<SettingsProvider, bool>(
-                                      (s) => s.useWebvpn),
+                                  subtitle: Text(
+                                      S.of(context).use_webvpn_description),
+                                  value: isVisitor
+                                      ? false
+                                      : context.select<SettingsProvider, bool>(
+                                          (s) => s.useWebvpn),
                                   onChanged: isVisitor
                                       ? null
                                       : (bool value) async {
@@ -1113,7 +1114,7 @@ class SettingsPageState extends State<SettingsPage> {
                       //Version
                       Align(
                         alignment: Alignment.centerRight,
-                        child: Text(
+                        child: SelectableText(
                           '${S.of(context).version} ${FlutterApp.versionName} build ${Pubspec.version.build.single} #${const String.fromEnvironment("GIT_HASH", defaultValue: "?")}',
                           textScaler: const TextScaler.linear(0.7),
                           style: const TextStyle(fontWeight: FontWeight.bold),

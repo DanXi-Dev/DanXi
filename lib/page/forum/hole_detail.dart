@@ -343,14 +343,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       _renderModel = Normal(hole);
 
       // Record view history
-      SettingsProvider.getInstance().viewHistory = [
-        hole.hole_id!,
-        // Limit the number of view history, and avoid duplicate entries
-        ...SettingsProvider.getInstance()
-            .viewHistory
-            .filter((id) => id != hole.hole_id!)
-            .take(SettingsProvider.MAX_VIEW_HISTORY - 1)
-      ];
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        SettingsProvider.getInstance().viewHistory = [
+          hole.hole_id!,
+          // Limit the number of view history, and avoid duplicate entries
+          ...SettingsProvider.getInstance()
+              .viewHistory
+              .filter((id) => id != hole.hole_id!)
+              .take(SettingsProvider.MAX_VIEW_HISTORY - 1)
+        ];
+      });
 
       // Update hole view count
       if (hole.hole_id != null) {

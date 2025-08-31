@@ -25,6 +25,7 @@ import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/page/login_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_danke.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
@@ -132,15 +133,16 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// It's usually called when user changes his account.
   void _rebuildPage() {
     _lastRefreshTime = DateTime.now();
+    PersonInfo? info = StateProvider.personInfo.value;
     _subpage = [
       // Don't show Dashboard in visitor mode
-      if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
+      if (info != null)
         HomeSubpage(key: dashboardPageKey),
       if (!SettingsProvider.getInstance().hideHole)
         ForumSubpage(key: forumPageKey),
-      // Don't show Timetable in visitor mode
       DankeSubPage(key: dankePageKey),
-      if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
+      // Don't show Timetable in visitor mode
+      if (info != null)
         TimetableSubPage(key: timetablePageKey),
     ];
   }
@@ -148,6 +150,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    StateProvider.isLoggedIn.removeListener(_loginListener);
     _captchaSubscription.cancel();
     _receivedIntentSubscription.cancel();
     _uniLinksSubscription.cancel();
@@ -443,16 +446,23 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         forcePushOnMainNavigator: true);
   }
 
+  void _loginListener() {
+    _rebuildPage();
+    _subpage[_pageIndex.value].onFirstShownAsHomepage(context);
+    refreshSelf();
+  }
+
   @override
   void initState() {
     super.initState();
+
+    _loadPersonInfo();
+    _rebuildPage();
+    _subpage[_pageIndex.value].onFirstShownAsHomepage(context);
+
     // Refresh the page when account changes.
-    StateProvider.personInfo.addListener(() {
-      if (StateProvider.personInfo.value != null) {
-        _rebuildPage();
-        refreshSelf();
-      }
-    });
+    StateProvider.isLoggedIn.addListener(_loginListener);
+
     initSystemTray().catchError((ignored) {});
     WidgetsBinding.instance.addObserver(this);
 
@@ -604,60 +614,29 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       Noticing.showNotice(context, S.of(context).screenshot_warning,
           title: S.of(context).screenshot_warning_title, useSnackBar: false);
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // We have to load personInfo after [initState] and [build], since it may pop up a dialog,
-    // which is not allowed in both methods. It is because that the widget's reference to its inherited widget hasn't been changed.
-    // Also, otherwise it will call [setState] before the frame is completed.
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => _loadPersonInfoOrLogin());
-  }
-
   /// Load persistent data (e.g. user name, password, etc.) from the local storage.
-  ///
-  /// If user hasn't logged in before, request him to do so.
-  void _loadPersonInfoOrLogin() {
+  /// Since it does not pop login dialog anymore, it is safe to call it in [initState].
+  void _loadPersonInfo() {
     /// Register person info at [WebvpnProxy] to enable webvpn services to use it
     WebvpnProxy.bindPersonInfo(StateProvider.personInfo);
 
     var preferences = SettingsProvider.getInstance().preferences;
-
     if (PersonInfo.verifySharedPreferences(preferences!)) {
       StateProvider.personInfo.value =
           PersonInfo.fromSharedPreferences(preferences);
       TestLifeCycle.onStart(context);
-    } else {
-      LoginDialog.showLoginDialog(
-          context, preferences, StateProvider.personInfo, false);
     }
-  }
 
-  /// Show an empty container, if no person info is set.
-  Widget _buildDummyBody(Widget title) => PlatformScaffold(
-        iosContentBottomPadding: false,
-        iosContentPadding: true,
-        appBar: PlatformAppBar(title: title),
-        body: Column(children: [
-          Card(
-            child: ListTile(
-              leading: Icon(PlatformIcons(context).accountCircle),
-              title: Text(S.of(context).login),
-              onTap: () => LoginDialog.showLoginDialog(
-                  context,
-                  SettingsProvider.getInstance().preferences,
-                  StateProvider.personInfo,
-                  false),
-            ),
-          )
-        ]),
-      );
+    StateProvider.isLoggedIn.value = SettingsProvider.getInstance().isLoggedIn;
+  }
 
   Widget _buildBody(Widget title) {
     // Show debug button for [Dio].
     if (PlatformX.isDebugMode(SettingsProvider.getInstance().preferences)) {
       showDebugBtn(context, btnSize: 50);
     }
+
+    PersonInfo? info = StateProvider.personInfo.value;
 
     return MultiProvider(
       providers: [ValueListenableProvider.value(value: _pageIndex)],
@@ -676,7 +655,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             bottomNavBar: PlatformNavBarM3(
               items: [
                 // Don't show Dashboard in visitor mode
-                if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
+                if (info != null)
                   BottomNavigationBarItem(
                     icon: PlatformX.isMaterial(context)
                         ? const Icon(Icons.dashboard)
@@ -697,14 +676,14 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   label: S.of(context).curriculum,
                 ),
                 // Don't show Timetable in visitor mode
-                if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
+                if (info != null)
                   BottomNavigationBarItem(
                     icon: PlatformX.isMaterial(context)
                         ? const Icon(Icons.calendar_today)
                         : const Icon(CupertinoIcons.calendar),
                     label: S.of(context).timetable,
                   ),
-                if (StateProvider.personInfo.value?.group == UserGroup.VISITOR)
+                if (info == null)
                   BottomNavigationBarItem(
                     icon: PlatformX.isMaterial(context)
                         ? const Icon(Icons.settings)
@@ -714,8 +693,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
               ],
               currentIndex: pageIndex,
               itemChanged: (index) {
-                if (StateProvider.personInfo.value?.group == UserGroup.VISITOR &&
-                    index >= _subpage.length) {
+                if (info == null && index >= _subpage.length) {
                   smartNavigatorPush(context, '/settings');
                   return;
                 }
@@ -742,14 +720,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     Widget title = _subpage.isEmpty
         ? Text(S.of(context).app_name)
         : _subpage[_pageIndex.value].title.call(context);
-    return StateProvider.personInfo.value == null || _subpage.isEmpty
-        ? _buildDummyBody(title)
+    return !StateProvider.isLoggedIn.value || _subpage.isEmpty
+        ? LoginPage()
         : _buildBody(title);
   }
 
   Future<void> _loadUpdate() async {
-    //We don't need to check for update on iOS platform.
-    if (PlatformX.isIOS) return;
     final UpdateInfo? updateInfo =
         AnnouncementRepository.getInstance().checkVersion();
     if (updateInfo == null) {

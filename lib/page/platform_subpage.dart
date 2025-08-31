@@ -41,6 +41,8 @@ abstract class PlatformSubpage<T> extends StatefulWidget {
 
   void onDoubleTapOnTab() {}
 
+  void onFirstShownAsHomepage(BuildContext parentContext) {}
+
   @mustCallSuper
   void onViewStateChanged(BuildContext parentContext, SubpageViewState state) =>
       Constant.eventBus.fire(_ViewStateChangedNotification<T>(state));
