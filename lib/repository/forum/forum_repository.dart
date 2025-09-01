@@ -417,14 +417,25 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   Future<List<OTFloor>?> loadFloors(OTHole post,
       {int offset = 0, int size = Constant.POST_COUNT_PER_PAGE}) async {
-    final options = RequestOptions(
-        path: "$_BASE_URL/holes/${post.hole_id}/floors",
-        method: "GET",
-        queryParameters: {
-          "offset": offset,
-          "size": size
-        },
-        headers: _tokenHeader);
+    final loadsAllFloors = offset == 0 && size == 0;
+    final RequestOptions options;
+    if (loadsAllFloors) {
+      options = RequestOptions(
+          path: "$_BASE_URL/floors",
+          method: "GET",
+          queryParameters: {
+            "start_floor": offset,
+            "length": size,
+            "hole_id": post.hole_id
+          },
+          headers: _tokenHeader);
+    } else {
+      options = RequestOptions(
+          path: "$_BASE_URL/holes/${post.hole_id}/floors",
+          method: "GET",
+          queryParameters: {"offset": offset, "size": size},
+          headers: _tokenHeader);
+    }
     final Response<List<dynamic>> response =
         await WebvpnProxy.requestWithProxy(dio, options);
     final floors = response.data?.map((e) => OTFloor.fromJson(e)).toList();
