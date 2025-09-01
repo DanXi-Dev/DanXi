@@ -108,9 +108,10 @@ class FudanSession {
     }
 
     // Ensure the request options are set to not follow redirects automatically too.
+    final originalValidateStatus = req.validateStatus;
     req
       ..followRedirects = false
-      ..validateStatus = (status) => status != null && status < 400;
+      ..validateStatus = (status) => originalValidateStatus(status) || (status != null && status < 400);
 
     final effectiveServiceUrl = manualLoginUrl ?? req.uri;
     final effectiveLoginMethod = manualLoginMethod ?? req.method;
