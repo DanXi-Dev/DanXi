@@ -36,6 +36,8 @@ class OTHole {
   OTFloors? floors;
   bool? hidden;
   bool? locked;
+  int? favorite_count;
+  int? subscription_count;
 
   factory OTHole.fromJson(Map<String, dynamic> json) => _$OTHoleFromJson(json);
 
