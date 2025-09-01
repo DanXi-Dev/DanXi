@@ -49,7 +49,7 @@ class QRCodeRepository extends BaseRepositoryWithDio {
           rethrow;
         }
       }
-    });
+    }, isFatalError: (e) => e is TermsNotAgreed);
   }
 
   @override
