@@ -155,7 +155,7 @@ class WebVPNInterceptor extends Interceptor {
       // The first request submits the job to evaluate if direct connection works and waits for result.
       // Other concurrent requests just simply wait for the result.
       tryDirectSession ??= tryDirect();
-      _canConnectDirectly = false;
+      _canConnectDirectly = await tryDirectSession;
     }
 
     if (_canConnectDirectly! || !SettingsProvider.getInstance().useWebvpn) {
