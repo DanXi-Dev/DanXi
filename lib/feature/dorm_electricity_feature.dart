@@ -18,7 +18,6 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/dorm_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -61,8 +60,8 @@ class DormElectricityFeature extends Feature {
     _status = ConnectionStatus.CONNECTING;
     try {
       // Await the repository to load data.
-      _electricity = await FudanDormRepository.getInstance()
-          .loadElectricityInfo(StateProvider.personInfo.value);
+      _electricity =
+          await FudanDormRepository.getInstance().loadElectricityInfo();
       _status = ConnectionStatus.DONE;
     } catch (e) {
       _status = ConnectionStatus.FAILED;

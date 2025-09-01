@@ -45,8 +45,8 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   factory EmptyClassroomRepository.getInstance() => _instance;
 
   /// Get [RoomInfo]s at [buildingName] on [date].
-  Future<List<RoomInfo>?> getBuildingRoomInfo(
-      _, __, String? buildingName, DateTime date) async {
+  Future<List<RoomInfo>> getBuildingRoomInfo(
+      _, String? buildingName, DateTime date) async {
     List<RoomInfo> result = [];
     final Response<String> classroomIdData =
         await dio.get(classroomIdUrl(buildingName, date));
@@ -115,8 +115,8 @@ class EhallEmptyClassroomRepository extends BaseRepositoryWithDio {
   /// Get [RoomInfo]s at [buildingName] on [date].
   ///
   /// Request [PersonInfo] for logging in, if necessary.
-  Future<List<RoomInfo>?> getBuildingRoomInfo(
-      PersonInfo? info, String areaName, String? buildingName, DateTime date) {
+  Future<List<RoomInfo>> getBuildingRoomInfo(
+      String areaName, String? buildingName, DateTime date) {
     final options = RequestOptions(
       method: "GET",
       path: detailUrl(areaName, buildingName, date),

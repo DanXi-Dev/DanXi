@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dio/dio.dart';
@@ -33,8 +32,8 @@ class FudanDormRepository extends BaseRepositoryWithDio {
 
   /// For every network request, you should write a private `_xxx` and a public
   /// `xxx`. `_xxx` is the actual implementation, and the `xxx` wraps it with
-  /// [Retrier] and/or [UISLoginTool.tryAsyncWithAuth].
-  Future<ElectricityItem?> loadElectricityInfo(PersonInfo? info) {
+  /// [FudanSession.request].
+  Future<ElectricityItem> loadElectricityInfo() {
     final options = RequestOptions(
       method: "GET",
       path: electricityUrl,
