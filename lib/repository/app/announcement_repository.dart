@@ -278,6 +278,11 @@ class AnnouncementRepository {
     }
   }
 
+  /// Public method to download and validate a single sticker
+  Future<bool> downloadAndValidateSticker(RemoteSticker sticker) async {
+    return await _downloadAndValidateSticker(sticker);
+  }
+
   Future<List<RemoteSticker>> syncStickers() async {
     try {
       // Ensure announcements are loaded first
@@ -314,7 +319,8 @@ class AnnouncementRepository {
     }
   }
 
-  Future<List<RemoteSticker>> getAvailableStickers() async {
+  /// Get all network stickers from TOML, regardless of cache status
+  Future<List<RemoteSticker>> getAllNetworkStickers() async {
     // Ensure announcements are loaded first
     if (_tomlCache == null) {
       await loadAnnouncements();
@@ -322,16 +328,14 @@ class AnnouncementRepository {
 
     // Get stickers from TOML
     final stickerList = _tomlCache!['sticker'] as List?;
-    final networkStickers = stickerList != null
+    return stickerList != null
         ? stickerList.map((data) => RemoteSticker.fromToml(data as Map<String, dynamic>)).toList()
         : <RemoteSticker>[];
-    
-    final cachedStickerIds = await getCachedStickerIds();
+  }
 
-    // Return only stickers that are both defined in TOML and have cached files
-    return networkStickers.where((sticker) {
-      return cachedStickerIds.contains(sticker.id);
-    }).toList();
+  Future<List<RemoteSticker>> getAvailableStickers() async {
+    // Return all network stickers to allow background downloading
+    return await getAllNetworkStickers();
   }
 }
 

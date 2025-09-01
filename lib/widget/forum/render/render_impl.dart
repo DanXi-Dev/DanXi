@@ -16,8 +16,10 @@
  */
 
 import 'dart:io';
+import 'package:dan_xi/model/sticker_download_state.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/sticker_download_manager.dart';
 import 'package:dan_xi/util/stickers.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/forum/auto_bbs_image.dart';
@@ -107,70 +109,63 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
           url = url.replaceFirst("danxi_", "dx_");
         }
         if (url.startsWith("dx_")) {
-          return FutureBuilder<String?>(
-            future: getStickerPath(url),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                // Loading state
-                return const SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              }
-              
-              if (snapshot.hasError) {
-                // Error state
-                return const SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: Center(
-                    child: Icon(
-                      Icons.error_outline,
-                      color: Colors.grey,
-                      size: 24,
+          return ValueListenableBuilder(
+            valueListenable: StickerDownloadManager.instance.getStickerStateNotifier(url),
+            builder: (context, stickerState, child) {
+              switch (stickerState) {
+                case StickerNotDownloaded():
+                  // Trigger download and show loading
+                  getStickerPath(url);
+                  return const SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: Center(
+                      child: CircularProgressIndicator(),
                     ),
-                  ),
-                );
-              }
-              
-              if (snapshot.hasData && snapshot.data != null) {
-                // Success state
-                final filePath = snapshot.data!;
-                return Image.file(
-                  File(filePath),
-                  width: 50,
-                  height: 50,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: Center(
-                        child: Icon(
-                          Icons.broken_image,
-                          color: Colors.grey,
-                          size: 24,
+                  );
+                
+                case StickerDownloading():
+                  return const SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                
+                case StickerDownloaded(filePath: final filePath):
+                  return Image.file(
+                    File(filePath),
+                    width: 50,
+                    height: 50,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            color: Colors.grey,
+                            size: 24,
+                          ),
                         ),
+                      );
+                    },
+                  );
+                
+                case StickerDownloadFailed():
+                  return const SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: Center(
+                      child: Icon(
+                        Icons.error_outline,
+                        color: Colors.grey,
+                        size: 24,
                       ),
-                    );
-                  },
-                );
+                    ),
+                  );
               }
-              
-              // No data state
-              return const SizedBox(
-                width: 50,
-                height: 50,
-                child: Center(
-                  child: Icon(
-                    Icons.image_not_supported,
-                    color: Colors.grey,
-                    size: 24,
-                  ),
-                ),
-              );
             },
           );
         }

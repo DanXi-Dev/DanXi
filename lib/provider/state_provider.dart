@@ -19,6 +19,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/remote_sticker.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
+import 'package:dan_xi/util/sticker_download_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
@@ -53,6 +54,15 @@ class StateProvider {
     try {
       final stickers = await AnnouncementRepository.getInstance().getAvailableStickers();
       availableStickers.value = stickers;
+      
+      // Register all stickers with the download manager for background downloading
+      final downloadManager = StickerDownloadManager.instance;
+      for (final sticker in stickers) {
+        downloadManager.registerSticker(sticker);
+      }
+      
+      // Start background downloads for all stickers that aren't already downloaded
+      downloadManager.downloadAllStickers();
     } catch (error) {
       stickersError.value = error;
     } finally {
@@ -79,5 +89,8 @@ class StateProvider {
     availableStickers.value = null;
     stickersLoading.value = false;
     stickersError.value = null;
+    
+    // Clear download manager state
+    StickerDownloadManager.instance.clearAllState();
   }
 }

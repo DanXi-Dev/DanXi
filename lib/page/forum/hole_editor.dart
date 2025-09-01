@@ -36,8 +36,8 @@ import 'package:dan_xi/util/forum/editor_object.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stickers.dart';
-import 'package:dan_xi/model/remote_sticker.dart';
-import 'dart:io';
+import 'package:dan_xi/model/sticker_download_state.dart';
+import 'package:dan_xi/util/sticker_download_manager.dart';
 import 'package:dan_xi/widget/dialogs/care_dialog.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
@@ -458,41 +458,73 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                                             "${widget.controller.text.substring(0, cursorPosition)}![]($stickerId)${widget.controller.text.substring(cursorPosition)}";
                                         Navigator.of(context).pop();
                                       },
-                                      child: FutureBuilder<String?>(
-                                        future: getStickerPath(stickerId),
-                                        builder: (context, pathSnapshot) {
-                                          if (pathSnapshot.hasData && pathSnapshot.data != null) {
-                                            final filePath = pathSnapshot.data!;
-                                            return Image.file(
-                                              File(filePath),
-                                              width: 60,
-                                              height: 60,
-                                              fit: BoxFit.contain,
-                                            );
-                                          } else if (pathSnapshot.hasError) {
-                                            return Container(
-                                              width: 60,
-                                              height: 60,
-                                              decoration: BoxDecoration(
-                                                color: Colors.grey[200],
-                                                borderRadius: BorderRadius.circular(4),
-                                              ),
-                                              child: Center(
-                                                child: Icon(
-                                                  Icons.error_outline,
-                                                  color: Theme.of(context).colorScheme.error,
-                                                  size: 24,
+                                      child: ValueListenableBuilder(
+                                        valueListenable: StickerDownloadManager.instance.getStickerStateNotifier(stickerId),
+                                        builder: (context, stickerState, child) {
+                                          switch (stickerState) {
+                                            case StickerNotDownloaded():
+                                              // Trigger download and show loading
+                                              getStickerPath(stickerId);
+                                              return Container(
+                                                width: 60,
+                                                height: 60,
+                                                child: const Center(
+                                                  child: CircularProgressIndicator(strokeWidth: 2),
                                                 ),
-                                              ),
-                                            );
+                                              );
+                                            
+                                            case StickerDownloading():
+                                              return Container(
+                                                width: 60,
+                                                height: 60,
+                                                child: const Center(
+                                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                                ),
+                                              );
+                                            
+                                            case StickerDownloaded(filePath: final filePath):
+                                              return Image.file(
+                                                File(filePath),
+                                                width: 60,
+                                                height: 60,
+                                                fit: BoxFit.contain,
+                                              );
+                                            
+                                            case StickerDownloadFailed():
+                                              return Container(
+                                                width: 60,
+                                                height: 60,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey[200],
+                                                  borderRadius: BorderRadius.circular(4),
+                                                ),
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    StickerDownloadManager.instance.retryDownload(stickerId);
+                                                  },
+                                                  child: Center(
+                                                    child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Icon(
+                                                          Icons.refresh,
+                                                          color: Theme.of(context).colorScheme.error,
+                                                          size: 20,
+                                                        ),
+                                                        const SizedBox(height: 2),
+                                                        Text(
+                                                          'Retry',
+                                                          style: TextStyle(
+                                                            color: Theme.of(context).colorScheme.error,
+                                                            fontSize: 10,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
                                           }
-                                          return Container(
-                                            width: 60,
-                                            height: 60,
-                                            child: const Center(
-                                              child: CircularProgressIndicator(strokeWidth: 2),
-                                            ),
-                                          );
                                         },
                                       ),
                                     ),
