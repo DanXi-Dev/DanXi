@@ -93,7 +93,10 @@ class HoleLoginPageState extends State<HoleLoginPage> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (_) async {
+      onPopInvokedWithResult: (bool didPop, __) {
+        // If already popped (by back gesture OR [Navigator.pop]), do nothing.
+        // Or we may recursively pop again.
+        if (didPop) return;
         if (_widgetStack.isNotEmpty && !_widgetStack.last.backable) {
           return;
         }
