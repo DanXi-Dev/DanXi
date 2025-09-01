@@ -458,25 +458,17 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                                             "${widget.controller.text.substring(0, cursorPosition)}![]($stickerId)${widget.controller.text.substring(cursorPosition)}";
                                         Navigator.of(context).pop();
                                       },
-                                      child: FutureBuilder<StickerPath?>(
+                                      child: FutureBuilder<String?>(
                                         future: getStickerPath(stickerId),
                                         builder: (context, pathSnapshot) {
                                           if (pathSnapshot.hasData && pathSnapshot.data != null) {
-                                            final stickerPath = pathSnapshot.data!;
-                                            return switch (stickerPath) {
-                                              AssetStickerPath(:final assetPath) => Image.asset(
-                                                assetPath,
-                                                width: 60,
-                                                height: 60,
-                                                fit: BoxFit.contain,
-                                              ),
-                                              FileStickerPath(:final filePath) => Image.file(
-                                                File(filePath),
-                                                width: 60,
-                                                height: 60,
-                                                fit: BoxFit.contain,
-                                              ),
-                                            };
+                                            final filePath = pathSnapshot.data!;
+                                            return Image.file(
+                                              File(filePath),
+                                              width: 60,
+                                              height: 60,
+                                              fit: BoxFit.contain,
+                                            );
                                           } else if (pathSnapshot.hasError) {
                                             return Container(
                                               width: 60,

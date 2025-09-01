@@ -18,25 +18,11 @@
 import 'dart:io';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 
-sealed class StickerPath {
-  const StickerPath();
-}
-
-class AssetStickerPath extends StickerPath {
-  final String assetPath;
-  const AssetStickerPath(this.assetPath);
-}
-
-class FileStickerPath extends StickerPath {
-  final String filePath;
-  const FileStickerPath(this.filePath);
-}
-
-Future<StickerPath?> getStickerPath(String stickerName) async {
+Future<String?> getStickerPath(String stickerName) async {
   final repository = AnnouncementRepository.getInstance();
   final remotePath = await repository.getStickerFilePath(stickerName);
   if (remotePath != null && await File(remotePath).exists()) {
-    return FileStickerPath(remotePath);
+    return remotePath;
   }
   
   return null;

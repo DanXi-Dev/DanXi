@@ -107,23 +107,16 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
           url = url.replaceFirst("danxi_", "dx_");
         }
         if (url.startsWith("dx_")) {
-          return FutureBuilder<StickerPath?>(
+          return FutureBuilder<String?>(
             future: getStickerPath(url),
             builder: (context, snapshot) {
               if (snapshot.hasData && snapshot.data != null) {
-                final stickerPath = snapshot.data!;
-                return switch (stickerPath) {
-                  AssetStickerPath(:final assetPath) => Image.asset(
-                    assetPath,
-                    width: 50,
-                    height: 50,
-                  ),
-                  FileStickerPath(:final filePath) => Image.file(
-                    File(filePath),
-                    width: 50,
-                    height: 50,
-                  ),
-                };
+                final filePath = snapshot.data!;
+                return Image.file(
+                  File(filePath),
+                  width: 50,
+                  height: 50,
+                );
               }
               return const SizedBox(
                 width: 50,
