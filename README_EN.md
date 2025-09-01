@@ -86,9 +86,9 @@ unzip it.
 
 ```shell
 $ flutter --version
-Flutter 3.35.1 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 20f8274939 (12 hours ago) • 2025-08-14 10:53:09 -0700
-Engine • hash 6cd51c08a88e7bbe848a762c20ad3ecb8b063c0e (revision 1e9a811bf8) (29 hours ago) • 2025-08-13 23:35:25.000Z
+Flutter 3.35.2 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 05db968908 (6 days ago) • 2025-08-25 10:21:35 -0700
+Engine • hash abb725c9a5211af2a862b83f74b7eaf2652db083 (revision a8bfdfc394) (9 days ago) • 2025-08-22 23:51:12.000Z
 Tools • Dart 3.9.0 • DevTools 2.48.0
 ```
 
