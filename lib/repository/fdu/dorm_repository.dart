@@ -17,15 +17,11 @@
 
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dio/dio.dart';
 
 /// To implement a repository, you should extend BaseRepositoryWithDio.
 class FudanDormRepository extends BaseRepositoryWithDio {
-  /// You can get the url from the UIS login page.
-  static const String _LOGIN_URL =
-      "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fzlapp.fudan.edu.cn%2Fa_fudanzlapp%2Fapi%2Fsso%2Findex%3Fredirect%3Dhttps%253A%252F%252Fzlapp.fudan.edu.cn%252Ffudanelec%252Fwap%252Fdefault%252Finfo%26from%3Dwap";
-
   /// A repository acts as a spider. This is the page containing the target data.
   static const String electricityUrl =
       'https://zlapp.fudan.edu.cn/fudanelec/wap/default/info';
@@ -39,27 +35,26 @@ class FudanDormRepository extends BaseRepositoryWithDio {
   /// `xxx`. `_xxx` is the actual implementation, and the `xxx` wraps it with
   /// [Retrier] and/or [UISLoginTool.tryAsyncWithAuth].
   Future<ElectricityItem?> loadElectricityInfo(PersonInfo? info) {
-    return UISLoginTool.tryAsyncWithAuth(
-        dio, _LOGIN_URL, cookieJar!, info, () => _loadElectricityInfo());
-  }
+    final options = RequestOptions(
+      method: "GET",
+      path: electricityUrl,
+    );
+    return FudanSession.request(options, (rep) {
+      final Map<String, dynamic> json = rep.data!;
 
-  /// Show your great talent here.
-  Future<ElectricityItem?> _loadElectricityInfo() async {
-    final Response<Map<String, dynamic>> r = await dio.get(electricityUrl);
-    final Map<String, dynamic> json = r.data!;
+      final data = json['d'];
+      // An example of data:
+      // {xq: (string, 校区), ting: (bool), xqid: (int, 校区), roomid: (int), tingid: null, realname: (string), ssmc: (string, 楼号), fjmc: (maybe int, 房间号), fj_update_time: 2021-08-24 00:00:00, fj_used: (double), fj_all: (double), fj_surplus: (double), t_update_time: (double), t_used: (double), t_all: (double), t_surplus: (double)}
 
-    final data = json['d'];
-    // An example of data:
-    // {xq: (string, 校区), ting: (bool), xqid: (int, 校区), roomid: (int), tingid: null, realname: (string), ssmc: (string, 楼号), fjmc: (maybe int, 房间号), fj_update_time: 2021-08-24 00:00:00, fj_used: (double), fj_all: (double), fj_surplus: (double), t_update_time: (double), t_used: (double), t_all: (double), t_surplus: (double)}
-
-    return ElectricityItem(
-        data['fj_surplus'].toString(),
-        data['fj_used'].toString(),
-        data['fj_update_time'].toString(),
-        data['roomid'].toString(),
-        data['xq'].toString() +
-            data['ssmc'].toString() +
-            data['fjmc'].toString());
+      return ElectricityItem(
+          data['fj_surplus'].toString(),
+          data['fj_used'].toString(),
+          data['fj_update_time'].toString(),
+          data['roomid'].toString(),
+          data['xq'].toString() +
+              data['ssmc'].toString() +
+              data['fjmc'].toString());
+    });
   }
 
   @override
