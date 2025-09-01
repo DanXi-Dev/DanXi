@@ -169,7 +169,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           UserGroup.FUDAN_UNDERGRADUATE_STUDENT) {
         _contentFuture = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
             TimeTableRepository.getInstance().loadTimeTable(
-                StateProvider.personInfo.value,
+                StateProvider.personInfo.value!,
                 forceLoadFromRemote: forceLoadFromRemote)));
       } else if (forceLoadFromRemote) {
         _contentFuture = LazyFuture.pack(
@@ -614,11 +614,14 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
     String? chosenSemester = SettingsProvider.getInstance().timetableSemester;
     if (chosenSemester == null || chosenSemester.isEmpty) {
       chosenSemester = _semesterInfo!.defaultSemesterId;
+      SettingsProvider.getInstance().timetableSemester = chosenSemester;
     }
     _selectionInfo = _semesterInfo!.semesters
         .firstWhere((element) => element.semesterId == chosenSemester!);
     SettingsProvider.getInstance().semesterStartDates =
         _semesterInfo!.startDates;
+    SettingsProvider.getInstance().thisSemesterStartDate =
+        _semesterInfo!.startDates.parseStartDate(chosenSemester!);
   }
 
   @override
@@ -650,8 +653,10 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
                               SettingsProvider.getInstance()
                                   .semesterStartDates
                                   ?.parseStartDate(
-                                      StateProvider.personInfo.value!.group,
-                                      e.semesterId!);
+                                    e.semesterId!,
+                                    group:
+                                        StateProvider.personInfo.value!.group,
+                                  );
                           if (parsedStartDate != null) {
                             SettingsProvider.getInstance()
                                 .thisSemesterStartDate = parsedStartDate;

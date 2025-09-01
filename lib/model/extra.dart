@@ -31,7 +31,8 @@ class TimeTableExtra {
 
   Map<String, dynamic> toJson() => _$TimeTableExtraToJson(this);
 
-  String? parseStartDate(UserGroup group, String semesterId) {
+  String? parseStartDate(String semesterId,
+      {UserGroup group = UserGroup.FUDAN_UNDERGRADUATE_STUDENT}) {
     List<TimeTableStartTimeItem>? items;
     switch (group) {
       case UserGroup.FUDAN_UNDERGRADUATE_STUDENT:
