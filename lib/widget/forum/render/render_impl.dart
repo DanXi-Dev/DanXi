@@ -110,19 +110,65 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
           return FutureBuilder<String?>(
             future: getStickerPath(url),
             builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // Loading state
+                return const SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+              
+              if (snapshot.hasError) {
+                // Error state
+                return const SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: Center(
+                    child: Icon(
+                      Icons.error_outline,
+                      color: Colors.grey,
+                      size: 24,
+                    ),
+                  ),
+                );
+              }
+              
               if (snapshot.hasData && snapshot.data != null) {
+                // Success state
                 final filePath = snapshot.data!;
                 return Image.file(
                   File(filePath),
                   width: 50,
                   height: 50,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: Center(
+                        child: Icon(
+                          Icons.broken_image,
+                          color: Colors.grey,
+                          size: 24,
+                        ),
+                      ),
+                    );
+                  },
                 );
               }
+              
+              // No data state
               return const SizedBox(
                 width: 50,
                 height: 50,
                 child: Center(
-                  child: CircularProgressIndicator(),
+                  child: Icon(
+                    Icons.image_not_supported,
+                    color: Colors.grey,
+                    size: 24,
+                  ),
                 ),
               );
             },
