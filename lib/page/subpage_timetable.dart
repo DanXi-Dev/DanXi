@@ -275,9 +275,10 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   @override
   void initState() {
     if (!SettingsProvider.getInstance().hasVisitedTimeTable) {
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => createTutorial().show(context: context));
-      SettingsProvider.getInstance().hasVisitedTimeTable = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        createTutorial().show(context: context);
+        SettingsProvider.getInstance().hasVisitedTimeTable = true;
+      });
     }
     super.initState();
     _setContent();
