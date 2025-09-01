@@ -694,7 +694,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       icon: PlatformX.isMaterial(context)
           ? Icons.star_outline
           : CupertinoIcons.star,
-      text: (_renderModel as Normal).hole.subscription_count.toString(),
+      text: "${(_renderModel as Normal).hole.favorite_count}",
     );
 
     void toggleFavoredState() {
@@ -723,13 +723,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   icon: PlatformX.isMaterial(context)
                       ? Icons.star
                       : CupertinoIcons.star_fill,
-                  text: normalModel.hole.favorite_count.toString(),
+                  text: "${(_renderModel as Normal).hole.favorite_count}",
                 )
               : IconWithNumberTextButton(
                   icon: PlatformX.isMaterial(context)
                       ? Icons.star_outline
                       : CupertinoIcons.star,
-                  text: normalModel.hole.favorite_count.toString(),
+                  text: "${(_renderModel as Normal).hole.favorite_count}",
                 );
         },
         errorBuilder: () => Icon(
@@ -763,7 +763,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       icon: PlatformX.isMaterial(context)
           ? Icons.visibility_off
           : CupertinoIcons.eye_slash,
-      text: (_renderModel as Normal).hole.subscription_count.toString(),
+      text: "${(_renderModel as Normal).hole.subscription_count}",
     );
 
     void toggleSubscribedState() {
@@ -792,13 +792,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   icon: PlatformX.isMaterial(context)
                       ? Icons.visibility
                       : CupertinoIcons.eye,
-                  text: normalModel.hole.subscription_count.toString(),
+                  text: "${(_renderModel as Normal).hole.subscription_count}",
                 )
               : IconWithNumberTextButton(
                   icon: PlatformX.isMaterial(context)
                       ? Icons.visibility_off
                       : CupertinoIcons.eye_slash,
-                  text: normalModel.hole.subscription_count.toString(),
+                  text: "${(_renderModel as Normal).hole.subscription_count}",
                 );
         },
         errorBuilder: () => Icon(
