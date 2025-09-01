@@ -19,7 +19,6 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dio/dio.dart';
 
-/// To implement a repository, you should extend BaseRepositoryWithDio.
 class FudanDormRepository extends BaseRepositoryWithDio {
   /// A repository acts as a spider. This is the page containing the target data.
   static const String electricityUrl =
@@ -30,9 +29,6 @@ class FudanDormRepository extends BaseRepositoryWithDio {
   static final _instance = FudanDormRepository._();
   factory FudanDormRepository.getInstance() => _instance;
 
-  /// For every network request, you should write a private `_xxx` and a public
-  /// `xxx`. `_xxx` is the actual implementation, and the `xxx` wraps it with
-  /// [FudanSession.request].
   Future<ElectricityItem> loadElectricityInfo() {
     final options = RequestOptions(
       method: "GET",
