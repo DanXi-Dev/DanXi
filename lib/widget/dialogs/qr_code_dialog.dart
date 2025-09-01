@@ -32,8 +32,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 ///
 /// Also contains methods to send qr code to Apple Watch.
 class QRHelper {
-  static Future<void> showQRCode(
-      BuildContext context, PersonInfo? personInfo) async {
+  static Future<void> showQRCode(BuildContext context) async {
     //Set screen brightness for displaying QR Code
     //ScreenProxy.keepOn(true);
     ScreenProxy.setBrightness(1.0);
@@ -41,16 +40,14 @@ class QRHelper {
     await showPlatformDialog(
         context: context,
         barrierDismissible: false,
-        builder: (BuildContext context) => QRDialog(personInfo: personInfo));
+        builder: (BuildContext context) => QRDialog());
     ScreenProxy.resetBrightness();
     //ScreenProxy.keepOn(false);
   }
 }
 
 class QRDialog extends StatefulWidget {
-  final PersonInfo? personInfo;
-
-  const QRDialog({super.key, this.personInfo});
+  const QRDialog({super.key});
 
   @override
   QRDialogState createState() => QRDialogState();
@@ -67,8 +64,8 @@ class QRDialogState extends State<QRDialog> {
             height: 200.0,
             child: Center(
               child: FutureWidget<String?>(
-                future: LazyFuture.pack(QRCodeRepository.getInstance()
-                    .getQRCode(widget.personInfo)),
+                future:
+                    LazyFuture.pack(QRCodeRepository.getInstance().getQRCode()),
                 successBuilder: (_, snapshot) {
                   return QrImageView(
                       data: snapshot.data!,

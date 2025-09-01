@@ -37,7 +37,7 @@ class QRFeature extends Feature {
 
   @override
   void onTap() {
-    QRHelper.showQRCode(context!, StateProvider.personInfo.value);
+    QRHelper.showQRCode(context!);
   }
 
   @override

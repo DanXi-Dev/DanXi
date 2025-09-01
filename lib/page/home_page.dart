@@ -486,7 +486,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       quickActions.initialize((shortcutType) {
         if (shortcutType == 'action_qr_code' &&
             StateProvider.personInfo.value != null) {
-          QRHelper.showQRCode(context, StateProvider.personInfo.value);
+          QRHelper.showQRCode(context);
         }
       });
     }
