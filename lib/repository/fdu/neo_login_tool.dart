@@ -85,9 +85,10 @@ class FudanSession {
   /// 2. Detects if authentication is required based on response characteristics
   /// 3. Automatically performs login and retries the request if needed
   ///
-  /// [req] - The HTTP request to execute
+  /// [req] - The HTTP request to execute. TODO: should be Options instead of RequestOptions
   /// [validateAndParse] - Function to validate and parse the successful response
   /// [manualLoginUrl] - Override login URL for services that don't auto-redirect to auth
+  /// [manualLoginMethod] - HTTP method to use for requesting [manualLoginUrl] (defaults to req.method)
   /// [type] - Authentication system to use
   /// [isFatalError] - Optional function to identify errors that shouldn't trigger login
   /// [info] - User credentials (defaults to global StateProvider.personInfo)
@@ -97,6 +98,7 @@ class FudanSession {
   static Future<T> request<T>(RequestOptions req,
       FutureOr<T> Function(Response<dynamic>) validateAndParse,
       {Uri? manualLoginUrl,
+      String? manualLoginMethod,
       FudanLoginType type = FudanLoginType.Neo,
       bool Function(dynamic error)? isFatalError,
       PersonInfo? info}) async {
@@ -105,7 +107,13 @@ class FudanSession {
       throw ArgumentError("PersonInfo is required for authentication");
     }
 
-    final loginServiceUrl = manualLoginUrl ?? req.uri;
+    // Ensure the request options are set to not follow redirects automatically too.
+    req
+      ..followRedirects = false
+      ..validateStatus = (status) => status != null && status < 400;
+
+    final effectiveServiceUrl = manualLoginUrl ?? req.uri;
+    final effectiveLoginMethod = manualLoginMethod ?? req.method;
 
     switch (type) {
       case FudanLoginType.Neo:
@@ -126,7 +134,7 @@ class FudanSession {
           },
           () async {
             await FudanAuthenticationAPIV2.authenticate(
-                personInfo, loginServiceUrl);
+                personInfo, effectiveServiceUrl, effectiveLoginMethod);
           },
           isFatalError: isFatalError,
         );
@@ -184,7 +192,28 @@ class FudanAuthenticationAPIV2 {
     final targetUrl = _retrieveUrlWithTicket(document);
 
     // Now we have the target URL with the ticket, we can redirect to it
-    return await FudanSession.dio.getUri(targetUrl);
+    try {
+      return await FudanSession.dio.getUri(targetUrl);
+    } on DioException catch (e) {
+      if (e.response?.realUri.host != serviceUrl.host) {
+        // If the final redirect is not to the target service, rethrow
+        rethrow;
+      }
+      if (e.type != DioExceptionType.badResponse) {
+        // If the error is not due to a bad response (e.g. 404), rethrow
+        rethrow;
+      }
+      if ((serviceRequestMethod ?? "GET") == "GET") {
+        // If the original request is a GET request, we should not get a bad response
+        // from the target service, rethrow
+        rethrow;
+      }
+      // else, we are getting a bad response from the target service,
+      // which may indicate wrong method (GET/POST), which is not a problem of authentication.
+      // Ignore and suppose the login is successful.
+      return e.response!;
+    }
+
   }
 
   static Uri _retrieveUrlWithTicket(BeautifulSoup idPageDocument) {

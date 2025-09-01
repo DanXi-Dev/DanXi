@@ -21,6 +21,7 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dio/dio.dart';
@@ -35,6 +36,8 @@ class DataCenterRepository extends BaseRepositoryWithDio {
       "https://my.fudan.edu.cn/list/bks_xx_cj";
   static const String CARD_DETAIL_URL =
       "https://my.fudan.edu.cn/data_tables/ykt_xx.json";
+  static final Uri NEO_LOGIN_URL = Uri.parse(
+      "https://id.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fmy.fudan.edu.cn%2Fdata_tables%2Fykt_xx.json");
 
   DataCenterRepository._();
 
@@ -143,16 +146,19 @@ class DataCenterRepository extends BaseRepositoryWithDio {
         .toList();
   }
 
-  Future<List<CardDetailInfo>?> getCardDetailInfo(PersonInfo? info) =>
-      UISLoginTool.tryAsyncWithAuth(
-          dio, LOGIN_URL, cookieJar!, info, () => _getCardDetailInfo());
-
-  Future<List<CardDetailInfo>?> _getCardDetailInfo() async {
-    Response<Map<String, dynamic>> r = await dio.post(CARD_DETAIL_URL);
-    return r.data?["data"]
-        .map<CardDetailInfo>(
-            (e) => CardDetailInfo.fromList(List<String>.from(e)))
-        .toList();
+  Future<List<CardDetailInfo>> getCardDetailInfo() {
+    final options = RequestOptions(
+      method: "POST",
+      path: CARD_DETAIL_URL,
+      responseType: ResponseType.json,
+    );
+    return FudanSession.request(options, (req) {
+      final data = req.data as Map<String, dynamic>;
+      return data["data"]
+          .map<CardDetailInfo>(
+              (e) => CardDetailInfo.fromList(List<String>.from(e)))
+          .toList();
+    });
   }
 
   @override
