@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
@@ -43,11 +42,17 @@ class AnnouncementRepository {
 
   factory AnnouncementRepository.getInstance() => _instance;
   Map<String, dynamic>? _tomlCache;
-  String? _cacheDirectory;
+  String? _remoteStickerCacheDir;
+  Dio? _cachedHttpClient;
+
+  /// Get cached HTTP client with lazy initialization
+  Dio get _httpClient {
+    _cachedHttpClient ??= DioUtils.newDioWithProxy();
+    return _cachedHttpClient!;
+  }
 
   Future<bool?> loadAnnouncements() async {
-    final Response<dynamic> response =
-        await DioUtils.newDioWithProxy().get(_URL);
+    final Response<dynamic> response = await _httpClient.get(_URL);
     _tomlCache = TomlDocument.parse(response.data).toMap();
     return _tomlCache?.isNotEmpty ?? false;
   }
@@ -196,11 +201,11 @@ class AnnouncementRepository {
 
   // Cloud Sticker Methods
   Future<String> get _stickerCacheDir async {
-    if (_cacheDirectory != null) return _cacheDirectory!;
+    if (_remoteStickerCacheDir != null) return _remoteStickerCacheDir!;
     final dir = await getApplicationCacheDirectory();
-    _cacheDirectory = "${dir.path}/remote_stickers";
-    await Directory(_cacheDirectory!).create(recursive: true);
-    return _cacheDirectory!;
+    _remoteStickerCacheDir = "${dir.path}/remote_stickers";
+    await Directory(_remoteStickerCacheDir!).create(recursive: true);
+    return _remoteStickerCacheDir!;
   }
 
 
@@ -209,12 +214,12 @@ class AnnouncementRepository {
     final cacheDir = await _stickerCacheDir;
     final directory = Directory(cacheDir);
 
-    if (!directory.existsSync()) {
+    if (!await directory.exists()) {
       return [];
     }
 
-    return directory
-        .listSync()
+    final entities = await directory.list().toList();
+    return entities
         .whereType<File>()
         .where((file) => file.path.endsWith('.webp'))
         .map((file) {
@@ -227,7 +232,7 @@ class AnnouncementRepository {
   Future<String?> getStickerFilePath(String stickerId) async {
     final cacheDir = await _stickerCacheDir;
     final file = File("$cacheDir/$stickerId.webp");
-    return file.existsSync() ? file.path : null;
+    return await file.exists() ? file.path : null;
   }
 
   Future<String> _calculateSha256(Uint8List data) async {
@@ -239,7 +244,7 @@ class AnnouncementRepository {
       String filePath, String expectedSha256) async {
     try {
       final file = File(filePath);
-      if (!file.existsSync()) return false;
+      if (!await file.exists()) return false;
 
       final data = await file.readAsBytes();
       final actualSha256 = await _calculateSha256(data);
@@ -249,9 +254,9 @@ class AnnouncementRepository {
     }
   }
 
-  Future<bool> downloadAndValidateSticker(RemoteSticker sticker) async {
+  Future<bool> _downloadAndValidateSticker(RemoteSticker sticker) async {
     try {
-      final response = await DioUtils.newDioWithProxy().get<Uint8List>(
+      final response = await _httpClient.get<Uint8List>(
         sticker.url,
         options: Options(responseType: ResponseType.bytes),
       );
@@ -296,7 +301,7 @@ class AnnouncementRepository {
         // Download if not cached or if validation fails
         if (filePath == null ||
             !await _validateStickerFile(filePath, networkSticker.sha256)) {
-          await downloadAndValidateSticker(networkSticker);
+          await _downloadAndValidateSticker(networkSticker);
         }
       }
 

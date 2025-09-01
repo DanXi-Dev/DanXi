@@ -26,6 +26,7 @@ import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/forum/hole_detail.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/danxi_care.dart';
@@ -35,7 +36,6 @@ import 'package:dan_xi/util/forum/editor_object.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stickers.dart';
-import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/model/remote_sticker.dart';
 import 'dart:io';
 import 'package:dan_xi/widget/dialogs/care_dialog.dart';
@@ -374,10 +374,63 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                         leading: const Icon(Icons.emoji_emotions),
                         title: Text(S.of(context).sticker)),
                     Expanded(
-                      child: FutureBuilder<List<RemoteSticker>>(
-                        future: AnnouncementRepository.getInstance().getAvailableStickers(),
-                        builder: (context, remoteSnapshot) {
-                          final remoteStickers = remoteSnapshot.data ?? [];
+                      child: ValueListenableBuilder<List<RemoteSticker>?>(
+                        valueListenable: StateProvider.availableStickers,
+                        builder: (context, stickers, child) {
+                          return ValueListenableBuilder<bool>(
+                            valueListenable: StateProvider.stickersLoading,
+                            builder: (context, loading, child) {
+                              return ValueListenableBuilder<dynamic>(
+                                valueListenable: StateProvider.stickersError,
+                                builder: (context, error, child) {
+                                  if (loading) {
+                                    return const Center(
+                                      child: PlatformCircularProgressIndicator(),
+                                    );
+                                  }
+                                  
+                                  if (error != null) {
+                                    return Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.error_outline,
+                                            size: 48,
+                                            color: Theme.of(context).colorScheme.error,
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                            child: Text(
+                                              ErrorPageWidget.generateUserFriendlyDescription(
+                                                S.of(context), error),
+                                              style: TextStyle(
+                                                color: Theme.of(context).colorScheme.error,
+                                                fontSize: 16,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          TextButton(
+                                            onPressed: () {
+                                              StateProvider.refreshAvailableStickers();
+                                            },
+                                            child: Text(S.of(context).retry),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text(S.of(context).cancel),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                  
+                                  final remoteStickers = stickers ?? [];
                           final allStickerIds = remoteStickers.map((e) => e.id).toList();
                           
                           final stickerSheetColumns = 5;
@@ -424,6 +477,22 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                                                 fit: BoxFit.contain,
                                               ),
                                             };
+                                          } else if (pathSnapshot.hasError) {
+                                            return Container(
+                                              width: 60,
+                                              height: 60,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[200],
+                                                borderRadius: BorderRadius.circular(4),
+                                              ),
+                                              child: Center(
+                                                child: Icon(
+                                                  Icons.error_outline,
+                                                  color: Theme.of(context).colorScheme.error,
+                                                  size: 24,
+                                                ),
+                                              ),
+                                            );
                                           }
                                           return Container(
                                             width: 60,
@@ -439,6 +508,10 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                                 }).toList(),
                               ),
                             ),
+                          );
+                                },
+                              );
+                            },
                           );
                         },
                       ),

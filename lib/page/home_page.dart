@@ -460,6 +460,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _rebuildPage();
     _subpage[_pageIndex.value].onFirstShownAsHomepage(context);
 
+    // Load available stickers for the app
+    StateProvider.loadAvailableStickers();
+
     // Refresh the page when account changes.
     StateProvider.isLoggedIn.addListener(_loginListener);
 
