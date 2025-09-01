@@ -117,12 +117,12 @@ class BusPageState extends State<BusPage> {
     super.initState();
     if (widget.arguments!['dataIsHoliday']) {
       _busListWeekday = LazyFuture.pack(FudanBusRepository.getInstance()
-          .loadBusList(StateProvider.personInfo.value, holiday: false));
+          .loadBusList(holiday: false));
       _busListHolidayLoaded = widget.arguments!['busList'];
       _holidaySliding = 1;
     } else {
       _busListHoliday = LazyFuture.pack(FudanBusRepository.getInstance()
-          .loadBusList(StateProvider.personInfo.value, holiday: true));
+          .loadBusList(holiday: true));
       _busListWeekdayLoaded = widget.arguments!['busList'];
       _holidaySliding = 0;
     }

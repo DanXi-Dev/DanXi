@@ -18,17 +18,14 @@
 import 'dart:convert';
 
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/vague_time.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 
 class FudanBusRepository extends BaseRepositoryWithDio {
-  static const String _LOGIN_URL =
-      "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fzlapp.fudan.edu.cn%2Fa_fudanzlapp%2Fapi%2Fsso%2Findex%3Fredirect%3Dhttps%253A%252F%252Fzlapp.fudan.edu.cn%252Ffudanbus%252Fwap%252Fdefault%252Flists%26from%3Dwap";
   static const String _INFO_URL =
       "https://zlapp.fudan.edu.cn/fudanbus/wap/default/lists";
 
@@ -38,24 +35,24 @@ class FudanBusRepository extends BaseRepositoryWithDio {
 
   factory FudanBusRepository.getInstance() => _instance;
 
-  Future<List<BusScheduleItem>?> loadBusList(PersonInfo? info,
-          {bool holiday = false}) =>
-      UISLoginTool.tryAsyncWithAuth(dio, _LOGIN_URL, cookieJar!, info,
-          () => _loadBusList(holiday: holiday));
-
-  Future<List<BusScheduleItem>?> _loadBusList({bool holiday = false}) async {
-    List<BusScheduleItem> items = [];
-    Response<String> r = await dio.post(_INFO_URL,
-        data: FormData.fromMap(
-            {"holiday": holiday.toRequestParamStringRepresentation()}));
-    Map<String, dynamic> json = jsonDecode(r.data!);
-    json['d']['data'].forEach((route) {
-      if (route['lists'] is List) {
-        items.addAll((route['lists'] as List)
-            .map((e) => BusScheduleItem.fromRawJson(e)));
-      }
+  Future<List<BusScheduleItem>> loadBusList({bool holiday = false}) {
+    final options = RequestOptions(
+      method: "POST",
+      path: _INFO_URL,
+      data: FormData.fromMap(
+          {"holiday": holiday.toRequestParamStringRepresentation()}),
+    );
+    return FudanSession.request(options, (rep) {
+      List<BusScheduleItem> items = [];
+      Map<String, dynamic> json = jsonDecode(rep.data.toString());
+      json['d']['data'].forEach((route) {
+        if (route['lists'] is List) {
+          items.addAll((route['lists'] as List)
+              .map((e) => BusScheduleItem.fromRawJson(e)));
+        }
+      });
+      return items.filter((element) => element.realStartTime != null);
     });
-    return items.filter((element) => element.realStartTime != null);
   }
 
   @override

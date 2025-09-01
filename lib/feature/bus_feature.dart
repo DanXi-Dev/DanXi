@@ -51,7 +51,7 @@ class BusFeature extends Feature {
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
-      _loadBusList(StateProvider.personInfo.value).catchError((error) {
+      _loadBusList().catchError((error) {
         _status = ConnectionStatus.FAILED;
         notifyUpdate();
       });
@@ -63,10 +63,10 @@ class BusFeature extends Feature {
     return (today == DateTime.sunday) || (today == DateTime.saturday);
   }
 
-  Future<void> _loadBusList(PersonInfo? personInfo) async {
+  Future<void> _loadBusList() async {
     _status = ConnectionStatus.CONNECTING;
     _busList = await FudanBusRepository.getInstance()
-        .loadBusList(personInfo, holiday: isHoliday!);
+        .loadBusList(holiday: isHoliday!);
     _status = ConnectionStatus.DONE;
     notifyUpdate();
   }
