@@ -41,10 +41,11 @@ class FudanBusRepository extends BaseRepositoryWithDio {
       path: _INFO_URL,
       data: FormData.fromMap(
           {"holiday": holiday.toRequestParamStringRepresentation()}),
+      responseType: ResponseType.json,
     );
     return FudanSession.request(options, (rep) {
       List<BusScheduleItem> items = [];
-      Map<String, dynamic> json = jsonDecode(rep.data.toString());
+      final json = rep.data as Map<String, dynamic>;
       json['d']['data'].forEach((route) {
         if (route['lists'] is List) {
           items.addAll((route['lists'] as List)
