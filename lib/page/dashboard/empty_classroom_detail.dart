@@ -17,10 +17,8 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/empty_classroom_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -50,8 +48,6 @@ class EmptyClassroomDetailPage extends StatefulWidget {
 }
 
 class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
-  PersonInfo? _personInfo;
-
   List<Tag>? _campusTags;
   int? _selectCampusIndex = 0;
 
@@ -80,7 +76,6 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
   @override
   void initState() {
     super.initState();
-    _personInfo = StateProvider.personInfo.value;
     _loadDefaultRoom();
   }
 
@@ -103,8 +98,8 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
 
   bool useEhall = false;
 
-  Future<List<RoomInfo>?> _getRoomInfo(PersonInfo? info, String areaName,
-      String? buildingName, DateTime date) async {
+  Future<List<RoomInfo>> _getRoomInfo(
+      String areaName, String? buildingName, DateTime date) async {
     dynamic repository;
     bool connected =
         await EmptyClassroomRepository.getInstance().checkConnection();
@@ -115,7 +110,7 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
       useEhall = true;
       repository = EhallEmptyClassroomRepository.getInstance();
     }
-    return repository.getBuildingRoomInfo(info, areaName, buildingName, date);
+    return repository.getBuildingRoomInfo(areaName, buildingName, date);
   }
 
   @override
@@ -163,7 +158,6 @@ class EmptyClassroomDetailPageState extends State<EmptyClassroomDetailPage> {
           bottom: false,
           child: FutureWidget<List<RoomInfo>?>(
               future: LazyFuture.pack(_getRoomInfo(
-                  _personInfo,
                   _buildingList[_selectBuildingIndex]!.data![0],
                   _buildingList[_selectBuildingIndex]!.data,
                   selectDate!)),

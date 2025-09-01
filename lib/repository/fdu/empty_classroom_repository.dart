@@ -19,7 +19,7 @@ import 'dart:convert';
 
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
@@ -45,8 +45,8 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   factory EmptyClassroomRepository.getInstance() => _instance;
 
   /// Get [RoomInfo]s at [buildingName] on [date].
-  Future<List<RoomInfo>?> getBuildingRoomInfo(
-      _, __, String? buildingName, DateTime date) async {
+  Future<List<RoomInfo>> getBuildingRoomInfo(
+      _, String? buildingName, DateTime date) async {
     List<RoomInfo> result = [];
     final Response<String> classroomIdData =
         await dio.get(classroomIdUrl(buildingName, date));
@@ -101,9 +101,6 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
 }
 
 class EhallEmptyClassroomRepository extends BaseRepositoryWithDio {
-  static const String LOGIN_URL =
-      "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fzlapp.fudan.edu.cn%2Fa_fudanzlapp%2Fapi%2Fsso%2Findex%3Fredirect%3Dhttps%253A%252F%252Fzlapp.fudan.edu.cn%252Ffudanzlfreeclass%252Fwap%252Fmobile%252Findex%253Fxqdm%253D%2526amp%253Bfloor%253D%2526amp%253Bdate%253D%2526amp%253Bpage%253D1%2526amp%253Bflag%253D3%2526amp%253Broomnum%253D%2526amp%253Bpagesize%253D10000%26from%3Dwap";
-
   static String detailUrl(
       String areaName, String? buildingName, DateTime date) {
     return "https://zlapp.fudan.edu.cn/fudanzlfreeclass/wap/mobile/index?xqdm=$areaName&floor=$buildingName&date=${DateFormat("yyyy-MM-dd").format(date)}&page=1&flag=3&roomnum=&pagesize=10000";
@@ -118,33 +115,32 @@ class EhallEmptyClassroomRepository extends BaseRepositoryWithDio {
   /// Get [RoomInfo]s at [buildingName] on [date].
   ///
   /// Request [PersonInfo] for logging in, if necessary.
-  Future<List<RoomInfo>?> getBuildingRoomInfo(PersonInfo? info, String areaName,
-          String? buildingName, DateTime? date) =>
-      UISLoginTool.tryAsyncWithAuth(dio, LOGIN_URL, cookieJar!, info,
-          () => _getBuildingRoomInfo(areaName, buildingName, date!));
-
-  Future<List<RoomInfo>?> _getBuildingRoomInfo(
-      String areaName, String? buildingName, DateTime date) async {
-    List<RoomInfo> result = [];
-    final Response<String> response =
-        await dio.get(detailUrl(areaName, buildingName, date));
-    final Map<String, dynamic> json = jsonDecode(response.data!);
-    final Map<String, dynamic> buildingInfo = json['d']['list'];
-    for (var element in buildingInfo.values) {
-      if (element is List) {
-        for (var element in element) {
-          RoomInfo info = RoomInfo(element['name'], date, element['roomrl']);
-          info.busy = [];
-          if (element['kxsds'] is Map) {
-            element['kxsds']
-                .values
-                .forEach((element) => info.busy!.add(element != "闲"));
-            result.add(info);
+  Future<List<RoomInfo>> getBuildingRoomInfo(
+      String areaName, String? buildingName, DateTime date) {
+    final options = RequestOptions(
+      method: "GET",
+      path: detailUrl(areaName, buildingName, date),
+    );
+    return FudanSession.request(options, (rep) {
+      List<RoomInfo> result = [];
+      final Map<String, dynamic> json = jsonDecode(rep.data!);
+      final Map<String, dynamic> buildingInfo = json['d']['list'];
+      for (var element in buildingInfo.values) {
+        if (element is List) {
+          for (var element in element) {
+            RoomInfo info = RoomInfo(element['name'], date, element['roomrl']);
+            info.busy = [];
+            if (element['kxsds'] is Map) {
+              element['kxsds']
+                  .values
+                  .forEach((element) => info.busy!.add(element != "闲"));
+              result.add(info);
+            }
           }
         }
       }
-    }
-    return result;
+      return result;
+    });
   }
 
   @override
