@@ -162,9 +162,9 @@ class FudanAuthenticationAPIV2 {
   static final String idHost = 'id.fudan.edu.cn';
 
   static Future<Response<dynamic>> authenticate(
-      PersonInfo info, Uri serviceUrl) async {
-    final Response<dynamic> firstResponse =
-        await FudanSession.dio.getUri(serviceUrl);
+      PersonInfo info, Uri serviceUrl, String? serviceRequestMethod) async {
+    final Response<dynamic> firstResponse = await FudanSession.dio
+        .requestUri(serviceUrl, options: Options(method: serviceRequestMethod));
     // already redirected to the target service, return the response
     if (firstResponse.realUri.host == serviceUrl.host) {
       return firstResponse;
