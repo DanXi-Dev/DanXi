@@ -61,7 +61,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   }
 
   /// Load all semesters and their start dates
-  Future<TimeTableSemesterInfo> loadSemestersForTimeTable() async {
+  Future<SemesterBundle> loadSemestersForTimeTable() async {
     final options = RequestOptions(
       method: "GET",
       path: TIMETABLE_URL,
@@ -75,7 +75,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   Future<TimeTable?> _loadTimeTableRemotely({DateTime? startTime}) async {
     // Determine which semester we need to load.
     // If not stored in [SettingsProvider], we use default semester.
-    Future<CurrentSemesterInfo> getAppropriateSemesterInfo() async {
+    Future<SemesterInfoWithStartDate> getAppropriateSemesterInfo() async {
       String? semesterId = SettingsProvider.getInstance().timetableSemester;
       String? startDate = SettingsProvider.getInstance().thisSemesterStartDate;
       if (semesterId == null ||
@@ -84,11 +84,12 @@ class TimeTableRepository extends BaseRepositoryWithDio {
           startDate.isEmpty) {
         return await _loadDefaultSemesterInfo();
       } else {
-        return CurrentSemesterInfo(semesterId, DateTime.tryParse(startDate));
+        return SemesterInfoWithStartDate(
+            semesterId, DateTime.tryParse(startDate));
       }
     }
 
-    CurrentSemesterInfo semesterInfo = await getAppropriateSemesterInfo();
+    SemesterInfoWithStartDate semesterInfo = await getAppropriateSemesterInfo();
     final options = RequestOptions(
       method: "GET",
       path: TIMETABLE_DATA_URL.replaceAll("{sem_id}", semesterInfo.semesterId!),
@@ -96,13 +97,13 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     return FudanSession.request(options, (res) {
       SettingsProvider.getInstance().timetableLastUpdated = DateTime.now();
       return TimeTable.fromJWGLJson(
-          startTime ?? semesterInfo.startDate ?? TimeTable.defaultStartTime,
+          startTime ?? semesterInfo.startDate ?? TimeTable.defaultStartDate,
           res.data!);
     });
   }
 
   /// Load default semester id and start date from JWGL, then store start date in settings.
-  Future<CurrentSemesterInfo> _loadDefaultSemesterInfo() async {
+  Future<SemesterInfoWithStartDate> _loadDefaultSemesterInfo() async {
     final options = RequestOptions(
       method: "GET",
       path: TIMETABLE_URL,
@@ -113,7 +114,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   }
 
   /// Parse all semesters and their start dates
-  TimeTableSemesterInfo _parseSemesters(String semesterHtml) {
+  SemesterBundle _parseSemesters(String semesterHtml) {
     final semestersRegex =
         RegExp(r'var semesters = JSON\.parse\(([\s\S]*?)\);');
     final semestersMatch = semestersRegex.firstMatch(semesterHtml);
@@ -124,7 +125,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
         semestersMatch.group(1)!.replaceAll('\'', '').replaceAll(r'\"', '"');
     final semestersJson = jsonDecode(semestersJsonText);
     List<SemesterInfo> sems = [];
-    List<TimeTableStartTimeItem> startDates = [];
+    List<TimeTableStartDateItem> startDates = [];
     for (var element in semestersJson) {
       if (element is Map<String, dynamic> && element.isNotEmpty) {
         var annualSemesters = SemesterInfo.fromCourseTableJson(element);
@@ -136,7 +137,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
           // Start date at JWGL is Sunday, we need to add one day to make it Monday.
           startDate = startDate.add(Duration(days: 1));
         }
-        startDates.add(TimeTableStartTimeItem(
+        startDates.add(TimeTableStartDateItem(
           element['id'].toString(),
           startDate?.toIso8601String(),
         ));
@@ -146,10 +147,10 @@ class TimeTableRepository extends BaseRepositoryWithDio {
 
     String defaultSemesterId = _parseDefaultSemesterId(semesterHtml);
 
-    return TimeTableSemesterInfo(
+    return SemesterBundle(
       sems,
       defaultSemesterId,
-      TimeTableExtra(startDates),
+      SemesterStartDates(startDates),
     );
   }
 
@@ -159,11 +160,11 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     return firstOption!['value']!;
   }
 
-  CurrentSemesterInfo _parseDefaultSemesterInfo(String semesterHtml) {
-    String defaultSemesterId = _parseDefaultSemesterId(semesterHtml);
-    TimeTableSemesterInfo semesters = _parseSemesters(semesterHtml);
+  SemesterInfoWithStartDate _parseDefaultSemesterInfo(String semesterHtml) {
+    SemesterBundle semesters = _parseSemesters(semesterHtml);
+    String defaultSemesterId = semesters.defaultSemesterId;
     String? startDate = semesters.startDates.parseStartDate(defaultSemesterId);
-    return CurrentSemesterInfo(
+    return SemesterInfoWithStartDate(
         defaultSemesterId, DateTime.tryParse(startDate!));
   }
 
@@ -179,18 +180,17 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   String get linkHost => "fdjwgl.fudan.edu.cn";
 }
 
-class CurrentSemesterInfo {
+class SemesterInfoWithStartDate {
   String? semesterId;
   DateTime? startDate;
 
-  CurrentSemesterInfo(this.semesterId, this.startDate);
+  SemesterInfoWithStartDate(this.semesterId, this.startDate);
 }
 
-class TimeTableSemesterInfo {
+class SemesterBundle {
   List<SemesterInfo> semesters;
-  TimeTableExtra startDates;
-  String? defaultSemesterId;
+  SemesterStartDates startDates;
+  String defaultSemesterId;
 
-  TimeTableSemesterInfo(
-      this.semesters, this.defaultSemesterId, this.startDates);
+  SemesterBundle(this.semesters, this.defaultSemesterId, this.startDates);
 }

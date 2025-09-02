@@ -65,16 +65,16 @@ class TimeTable {
   ///
   /// We decide what the start date is in this priority order:
   /// 1. StartDate passed in as a parameters
-  /// 2. [TimeTable.defaultStartTime] (It should be same as [SettingsProvider.getInstance().thisSemesterStartDate])
+  /// 2. [TimeTable.defaultStartDate] (It should be same as [SettingsProvider.getInstance().thisSemesterStartDate])
   /// 3. [Constant.DEFAULT_SEMESTER_START_DATE].
   ///
   /// When user changes the semester, we should look for the semester id in [SettingsProvider.getInstance().semesterStartDates],
   /// which was obtained from Bmob Database.
-  /// If found, we set [defaultStartTime] to that date.
-  /// Otherwise we do nothing and notify the user to set [TimeTable.defaultStartTime] manually.
+  /// If found, we set [defaultStartDate] to that date.
+  /// Otherwise we do nothing and notify the user to set [TimeTable.defaultStartDate] manually.
   ///
-  /// If you need to listen to the change of [defaultStartTime], see codes in
-  static DateTime get defaultStartTime {
+  /// If you need to listen to the change of [defaultStartDate], see codes in
+  static DateTime get defaultStartDate {
     var startDateStr = SettingsProvider.getInstance().thisSemesterStartDate;
     DateTime? startDate;
     if (startDateStr != null) startDate = DateTime.tryParse(startDateStr);
@@ -189,7 +189,7 @@ class TimeTable {
   /// See [now] for details.
   static TimeNow defaultNow() {
     DateTime now = DateTime.now();
-    Duration diff = now.difference(defaultStartTime);
+    Duration diff = now.difference(defaultStartDate);
     int slot = -1;
     for (int i = 0; i < kCourseSlotStartTime.length; i++) {
       if (now.isAfter(kCourseSlotStartTime[i].toExactTime())) {
@@ -313,8 +313,7 @@ class Course {
 
     return newCourse
       ..teacherNames = List<String>.from(activity["teachers"])
-      ..courseId =
-          "${activity['lessonId']}(${activity['lessonCode']})"
+      ..courseId = "${activity['lessonId']}(${activity['lessonCode']})"
       ..courseName = activity["courseName"]
       ..roomId = activity["room"]
       ..roomName = activity['room']

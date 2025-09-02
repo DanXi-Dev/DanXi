@@ -105,7 +105,7 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
 
   Future<TimeTable?> loadTimeTable(PersonInfo info, OnCaptchaCallback callback,
       {DateTime? startTime, bool forceLoadFromRemote = false}) async {
-    startTime ??= TimeTable.defaultStartTime;
+    startTime ??= TimeTable.defaultStartDate;
     if (forceLoadFromRemote) {
       TimeTable? result = (await Cache.getRemotely<TimeTable>(
           TimeTableRepository.KEY_TIMETABLE_CACHE,

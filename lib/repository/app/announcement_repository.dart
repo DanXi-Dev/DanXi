@@ -106,7 +106,7 @@ class AnnouncementRepository {
     return announcements;
   }
 
-  TimeTableExtra? getStartDates() {
+  SemesterStartDates? getStartDates() {
     if (_tomlCache == null) {
       return null;
     }
@@ -116,7 +116,7 @@ class AnnouncementRepository {
         .map<TimeTableStartTimeItem>(
             (entry) => TimeTableStartTimeItem(entry.key, entry.value))
         .toList();
-    return TimeTableExtra(fduUg);
+    return SemesterStartDates(fduUg);
   }
 
   String? getUserAgent() {

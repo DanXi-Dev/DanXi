@@ -597,7 +597,7 @@ class SemesterSelectionButton extends StatefulWidget {
 }
 
 class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
-  TimeTableSemesterInfo? _semesterInfo;
+  SemesterBundle? _semesterBundle;
   SemesterInfo? _selectionInfo;
   late Future<void> _future;
 
@@ -608,19 +608,19 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
   }
 
   Future<void> loadSemesterInfo() async {
-    _semesterInfo =
+    _semesterBundle =
         await TimeTableRepository.getInstance().loadSemestersForTimeTable();
     String? chosenSemester = SettingsProvider.getInstance().timetableSemester;
     if (chosenSemester == null || chosenSemester.isEmpty) {
-      chosenSemester = _semesterInfo!.defaultSemesterId;
+      chosenSemester = _semesterBundle!.defaultSemesterId;
       SettingsProvider.getInstance().timetableSemester = chosenSemester;
     }
-    _selectionInfo = _semesterInfo!.semesters
+    _selectionInfo = _semesterBundle!.semesters
         .firstWhere((element) => element.semesterId == chosenSemester!);
     SettingsProvider.getInstance().semesterStartDates =
-        _semesterInfo!.startDates;
+        _semesterBundle!.startDates;
     SettingsProvider.getInstance().thisSemesterStartDate =
-        _semesterInfo!.startDates.parseStartDate(chosenSemester!);
+        _semesterBundle!.startDates.parseStartDate(chosenSemester);
   }
 
   @override
@@ -639,7 +639,7 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
                 cancelButton: CupertinoActionSheetAction(
                     child: Text(S.of(menuContext).cancel),
                     onPressed: () => Navigator.of(menuContext).pop()),
-                actions: _semesterInfo!.semesters
+                actions: _semesterBundle!.semesters
                     .map((e) => PlatformContextMenuItem(
                         menuContext: menuContext,
                         onPressed: () {

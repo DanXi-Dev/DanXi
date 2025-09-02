@@ -804,7 +804,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _loadStartDate() async {
-    TimeTableExtra? startDateData;
+    SemesterStartDates? startDateData;
     try {
       startDateData = AnnouncementRepository.getInstance().getStartDates();
     } catch (_) {}
