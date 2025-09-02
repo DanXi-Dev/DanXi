@@ -350,15 +350,15 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  TimeTableExtra? get semesterStartDates {
+  SemesterStartDates? get semesterStartDates {
     if (preferences!.containsKey(KEY_SEMESTER_START_DATES)) {
-      return TimeTableExtra.fromJson(
+      return SemesterStartDates.fromJson(
           jsonDecode(preferences!.getString(KEY_SEMESTER_START_DATES)!));
     }
     return null;
   }
 
-  set semesterStartDates(TimeTableExtra? value) {
+  set semesterStartDates(SemesterStartDates? value) {
     preferences!.setString(KEY_SEMESTER_START_DATES, jsonEncode(value!));
     notifyListeners();
   }
