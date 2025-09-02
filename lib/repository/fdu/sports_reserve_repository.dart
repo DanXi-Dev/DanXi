@@ -27,91 +27,91 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class SportsReserveRepository extends BaseRepositoryWithDio {
-  static const String LOGIN_URL =
-      "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Felife.fudan.edu.cn%2Flogin2.action";
-  static const String STADIUM_LIST_URL =
-      "https://elife.fudan.edu.cn/public/front/search.htm??id=2c9c486e4f821a19014f82381feb0001";
-  static const String STADIUM_LIST_NUMBER_URL =
-      "https://elife.fudan.edu.cn/public/front/search.htm?1=1&id=2c9c486e4f821a19014f82381feb0001&orderBack=null&fieldID=&dicID=&dicSql=&pageBean.pageNo=1&pageBean.pageSize=10";
-
-  static String sStadiumDetailUrl(String? contentId, DateTime queryDate) =>
-      "https://elife.fudan.edu.cn/public/front/getResource2.htm?contentId=$contentId&ordersId=&"
-      "currentDate=${DateFormat('yyyy-MM-dd').format(queryDate)}";
-
-  SportsReserveRepository._();
-
-  static final _instance = SportsReserveRepository._();
-
-  factory SportsReserveRepository.getInstance() => _instance;
-
-  Future<List<StadiumData>?> getStadiumFullList(PersonInfo info,
-          {DateTime? queryDate, SportsType? type, Campus? campus}) =>
-      UISLoginTool.tryAsyncWithAuth(
-          dio,
-          LOGIN_URL,
-          cookieJar!,
-          info,
-          () => _getStadiumFullList(
-              queryDate: queryDate, type: type, campus: campus));
-
-  Future<int> _getStadiumPageNumber() async {
-    Response<String> rep = await dio.get(STADIUM_LIST_NUMBER_URL);
-    String pageNumber = rep.data!.between('页次:1/', '页')!;
-    return int.parse(pageNumber);
-  }
-
-  Future<List<StadiumData>?> _getStadiumFullList(
-      {DateTime? queryDate, SportsType? type, Campus? campus}) async {
-    var result = <StadiumData>[];
-    int pages = await _getStadiumPageNumber();
-    for (int i = 1; i <= pages; i++) {
-      result.addAll((await _getStadiumList(
-          queryDate: queryDate, type: type, campus: campus, page: i))!);
-    }
-    return result;
-  }
-
-  Future<List<StadiumData>?> _getStadiumList(
-      {DateTime? queryDate,
-      SportsType? type,
-      Campus? campus,
-      int page = 1}) async {
-    String body = "id=2c9c486e4f821a19014f82381feb0001&"
-        "resourceDate=${queryDate == null ? '' : DateFormat('yyyy-MM-dd').format(queryDate)}&"
-        "beginTime=&"
-        "endTime=&"
-        "fieldID=2c9c486e4f821a19014f824467b70006&"
-        "dicID=&"
-        "fieldID=2c9c486e4f821a19014f824535480007&"
-        "dicID=${type?.id ?? ''}&"
-        "pageBean.pageNo=$page";
-    Response<String> res = await dio.post(STADIUM_LIST_URL,
-        data: body,
-        options: Options(contentType: 'application/x-www-form-urlencoded'));
-    BeautifulSoup soup = BeautifulSoup(res.data!);
-    Iterable<dom.Element> elements =
-        soup.findAll('.order_list > table').map((e) => e.element!);
-
-    return elements.map((e) => StadiumData.fromHtml(e)).toList();
-  }
-
-  Future<StadiumScheduleData?> getScheduleData(
-          PersonInfo info, StadiumData stadium, DateTime date) =>
-      UISLoginTool.tryAsyncWithAuth(dio, LOGIN_URL, cookieJar!, info,
-          () => _getScheduleData(stadium, date));
-
-  Future<StadiumScheduleData?> _getScheduleData(
-      StadiumData stadium, DateTime date) async {
-    Response<String> res =
-        await dio.get(sStadiumDetailUrl(stadium.contentId, date));
-    BeautifulSoup soup = BeautifulSoup(res.data!);
-    List<Bs4Element> listOfSchedule = soup
-        .findAll("table", class_: "site_table")
-        .first
-        .findAll("", selector: "tbody>tr");
-    return StadiumScheduleData.fromHtmlPart(
-        stadium, date, listOfSchedule.map((e) => e.element!).toList());
-  }
+  // static const String LOGIN_URL =
+  //     "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Felife.fudan.edu.cn%2Flogin2.action";
+  // static const String STADIUM_LIST_URL =
+  //     "https://elife.fudan.edu.cn/public/front/search.htm??id=2c9c486e4f821a19014f82381feb0001";
+  // static const String STADIUM_LIST_NUMBER_URL =
+  //     "https://elife.fudan.edu.cn/public/front/search.htm?1=1&id=2c9c486e4f821a19014f82381feb0001&orderBack=null&fieldID=&dicID=&dicSql=&pageBean.pageNo=1&pageBean.pageSize=10";
+  //
+  // static String sStadiumDetailUrl(String? contentId, DateTime queryDate) =>
+  //     "https://elife.fudan.edu.cn/public/front/getResource2.htm?contentId=$contentId&ordersId=&"
+  //     "currentDate=${DateFormat('yyyy-MM-dd').format(queryDate)}";
+  //
+  // SportsReserveRepository._();
+  //
+  // static final _instance = SportsReserveRepository._();
+  //
+  // factory SportsReserveRepository.getInstance() => _instance;
+  //
+  // Future<List<StadiumData>?> getStadiumFullList(PersonInfo info,
+  //         {DateTime? queryDate, SportsType? type, Campus? campus}) =>
+  //     UISLoginTool.tryAsyncWithAuth(
+  //         dio,
+  //         LOGIN_URL,
+  //         cookieJar!,
+  //         info,
+  //         () => _getStadiumFullList(
+  //             queryDate: queryDate, type: type, campus: campus));
+  //
+  // Future<int> _getStadiumPageNumber() async {
+  //   Response<String> rep = await dio.get(STADIUM_LIST_NUMBER_URL);
+  //   String pageNumber = rep.data!.between('页次:1/', '页')!;
+  //   return int.parse(pageNumber);
+  // }
+  //
+  // Future<List<StadiumData>?> _getStadiumFullList(
+  //     {DateTime? queryDate, SportsType? type, Campus? campus}) async {
+  //   var result = <StadiumData>[];
+  //   int pages = await _getStadiumPageNumber();
+  //   for (int i = 1; i <= pages; i++) {
+  //     result.addAll((await _getStadiumList(
+  //         queryDate: queryDate, type: type, campus: campus, page: i))!);
+  //   }
+  //   return result;
+  // }
+  //
+  // Future<List<StadiumData>?> _getStadiumList(
+  //     {DateTime? queryDate,
+  //     SportsType? type,
+  //     Campus? campus,
+  //     int page = 1}) async {
+  //   String body = "id=2c9c486e4f821a19014f82381feb0001&"
+  //       "resourceDate=${queryDate == null ? '' : DateFormat('yyyy-MM-dd').format(queryDate)}&"
+  //       "beginTime=&"
+  //       "endTime=&"
+  //       "fieldID=2c9c486e4f821a19014f824467b70006&"
+  //       "dicID=&"
+  //       "fieldID=2c9c486e4f821a19014f824535480007&"
+  //       "dicID=${type?.id ?? ''}&"
+  //       "pageBean.pageNo=$page";
+  //   Response<String> res = await dio.post(STADIUM_LIST_URL,
+  //       data: body,
+  //       options: Options(contentType: 'application/x-www-form-urlencoded'));
+  //   BeautifulSoup soup = BeautifulSoup(res.data!);
+  //   Iterable<dom.Element> elements =
+  //       soup.findAll('.order_list > table').map((e) => e.element!);
+  //
+  //   return elements.map((e) => StadiumData.fromHtml(e)).toList();
+  // }
+  //
+  // Future<StadiumScheduleData?> getScheduleData(
+  //         PersonInfo info, StadiumData stadium, DateTime date) =>
+  //     UISLoginTool.tryAsyncWithAuth(dio, LOGIN_URL, cookieJar!, info,
+  //         () => _getScheduleData(stadium, date));
+  //
+  // Future<StadiumScheduleData?> _getScheduleData(
+  //     StadiumData stadium, DateTime date) async {
+  //   Response<String> res =
+  //       await dio.get(sStadiumDetailUrl(stadium.contentId, date));
+  //   BeautifulSoup soup = BeautifulSoup(res.data!);
+  //   List<Bs4Element> listOfSchedule = soup
+  //       .findAll("table", class_: "site_table")
+  //       .first
+  //       .findAll("", selector: "tbody>tr");
+  //   return StadiumScheduleData.fromHtmlPart(
+  //       stadium, date, listOfSchedule.map((e) => e.element!).toList());
+  // }
 
   @override
   String get linkHost => "fudan.edu.cn";
