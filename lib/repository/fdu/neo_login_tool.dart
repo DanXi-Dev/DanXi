@@ -22,6 +22,11 @@ enum FudanLoginType {
   /// The new Fudan authentication system using id.fudan.edu.cn
   Neo,
 
+  /// The hybrid Fudan authentication system using id.fudan.edu.cn but jump through uis.fudan.edu.cn
+  ///
+  /// Currently only used by eHall.
+  UISNeo,
+
   /// The legacy Fudan authentication system using uis.fudan.edu.cn
   UISLegacy,
 }
@@ -120,18 +125,26 @@ class FudanSession {
     final effectiveServiceUrl = manualLoginUrl ?? req.uri;
     final effectiveLoginMethod = manualLoginMethod ?? req.method;
 
+    /// Determines if a response indicates that authentication is required.
+    ///
+    /// This is an ad-hoc heuristic: if the response was redirected to the authentication
+    /// server (id.fudan.edu.cn), we can be confident that login is needed.
+    /// However, the absence of a redirect doesn't guarantee that authentication is not needed.
+    bool isNeoAuthenticationRequired(Response<dynamic> response) =>
+        response.realUri.host == FudanAuthenticationAPIV2.idHost &&
+        response.redirectCount > 0;
+
+    bool isLegacyAuthenticationRequired(Response<dynamic> response) =>
+        response.realUri.host == FudanAuthenticationAPIV1.uisHost &&
+        response.redirectCount > 0;
+
+    bool isLegacyFatalError(dynamic e) => e is AuthenticationV1FailedException;
+    final effectiveIsFatalError = (isFatalError == null)
+        ? isLegacyFatalError
+        : (dynamic e) => isFatalError(e) || isLegacyFatalError(e);
+
     switch (type) {
       case FudanLoginType.Neo:
-
-        /// Determines if a response indicates that authentication is required.
-        ///
-        /// This is an ad-hoc heuristic: if the response was redirected to the authentication
-        /// server (id.fudan.edu.cn), we can be confident that login is needed.
-        /// However, the absence of a redirect doesn't guarantee that authentication is not needed.
-        bool isNeoAuthenticationRequired(Response<dynamic> response) =>
-            response.realUri.host == FudanAuthenticationAPIV2.idHost &&
-            response.redirectCount > 0;
-
         return _authenticationQueues[type]!.runNormalRequest(
           () async {
             // Work around Dio bug: FormData objects can only be used once
@@ -152,6 +165,28 @@ class FudanSession {
                 personInfo, effectiveServiceUrl, effectiveLoginMethod);
           },
           isFatalError: isFatalError,
+        );
+      case FudanLoginType.UISNeo:
+        return _authenticationQueues[type]!.runNormalRequest(
+          () async {
+            // Work around Dio bug: FormData objects can only be used once
+            final requestData = req.data;
+            if (requestData is FormData) {
+              req.data = requestData.clone();
+            }
+
+            final response = await dio.fetch(req);
+            if (isLegacyAuthenticationRequired(response)) {
+              throw Exception(
+                  "Authentication required for request: ${response.realUri}");
+            }
+            return Future.sync(() => validateAndParse(response));
+          },
+          () async {
+            await FudanAuthenticationAPIV2WithUIS.authenticate(
+                personInfo, effectiveServiceUrl, effectiveLoginMethod);
+          },
+          isFatalError: effectiveIsFatalError,
         );
       case FudanLoginType.UISLegacy:
         bool isLegacyAuthenticationRequired(Response<dynamic> response) =>
@@ -343,6 +378,71 @@ class AuthenticationParameters {
   AuthenticationParameters(this.lck, this.entityId, this.chainCode);
 }
 
+class FudanAuthenticationAPIV2WithUIS {
+  static Future<Response<dynamic>> authenticate(
+      PersonInfo info, Uri serviceUrl, String? serviceRequestMethod) async {
+    final Response<dynamic> firstResponse = await FudanSession.dio
+        .requestUri(serviceUrl, options: Options(method: serviceRequestMethod));
+    final Uri redirectedUrl = firstResponse.realUri;
+    final isInLoginSystem =
+        redirectedUrl.host == FudanAuthenticationAPIV1.uisHost ||
+            redirectedUrl.host == FudanAuthenticationAPIV2.idHost;
+    // already redirected to the target service, return the response
+    if (redirectedUrl.host == serviceUrl.host && !isInLoginSystem) {
+      return firstResponse;
+    }
+
+    if (!isInLoginSystem) {
+      // The response must be a redirect to the id.fudan.edu.cn or uis.fudan.edu.cn
+      throw Exception(
+          'Unexpected redirect to $redirectedUrl, expected ${FudanAuthenticationAPIV2.idHost} or ${FudanAuthenticationAPIV1.uisHost}');
+    }
+
+    try {
+      // check if already authenticated by try to call [_retrieveUrlWithTicket]
+      final document = BeautifulSoup(firstResponse.data.toString());
+      final targetUrl =
+          FudanAuthenticationAPIV2._retrieveUrlWithTicket(document);
+      return await FudanSession.dio.getUri(targetUrl);
+    } catch (_) {}
+
+    // If not authenticated, we need to login
+    if (redirectedUrl.host != FudanAuthenticationAPIV1.uisHost) {
+      // We must start from uis.fudan.edu.cn
+      throw Exception(
+          'Unexpected redirect to $redirectedUrl, expected ${FudanAuthenticationAPIV1.uisHost}');
+    }
+    final uisHtml = firstResponse.data.toString();
+    final rep =
+        await FudanAuthenticationAPIV1._login(info, uisHtml, redirectedUrl);
+    final document = BeautifulSoup(rep.data.toString());
+    final targetUrl = FudanAuthenticationAPIV2._retrieveUrlWithTicket(document);
+
+    // Now we have the target URL with the ticket, we can redirect to it
+    try {
+      return await FudanSession.dio.getUri(targetUrl);
+    } on DioException catch (e) {
+      if (e.response?.realUri.host != serviceUrl.host) {
+        // If the final redirect is not to the target service, rethrow
+        rethrow;
+      }
+      if (e.type != DioExceptionType.badResponse) {
+        // If the error is not due to a bad response (e.g. 404), rethrow
+        rethrow;
+      }
+      if ((serviceRequestMethod ?? "GET") == "GET") {
+        // If the original request is a GET request, we should not get a bad response
+        // from the target service, rethrow
+        rethrow;
+      }
+      // else, we are getting a bad response from the target service,
+      // which may indicate wrong method (GET/POST), which is not a problem of authentication.
+      // Ignore and suppose the login is successful.
+      return e.response!;
+    }
+  }
+}
+
 class FudanAuthenticationAPIV1 {
   static const String uisHost = 'uis.fudan.edu.cn';
 
@@ -370,8 +470,26 @@ class FudanAuthenticationAPIV1 {
       throw Exception('Unexpected redirect to $redirectedUrl');
     }
 
-    final postData = _getAuthData(info, firstResponse.data!);
-    final rep = await FudanSession.dio.postUri<String>(redirectedUrl,
+    return await _login(info, firstResponse.data!, redirectedUrl);
+  }
+
+  static Map<String?, String?> _getAuthData(PersonInfo info, String uisHtml) {
+    Map<String?, String?> data = {};
+    for (final element in BeautifulSoup(uisHtml).findAll("input")) {
+      if (element.attributes['type'] != "button") {
+        data[element.attributes['name']] = element.attributes['value'];
+      }
+    }
+    data
+      ..['username'] = info.id
+      ..["password"] = info.password;
+    return data;
+  }
+
+  static Future<Response<String>> _login(
+      PersonInfo info, String uisHtml, Uri uisUrl) async {
+    final postData = _getAuthData(info, uisHtml);
+    final rep = await FudanSession.dio.postUri<String>(uisUrl,
         data: postData.encodeMap(),
         options: Options(contentType: Headers.formUrlEncodedContentType));
     final responseHtml = rep.data!;
@@ -386,21 +504,7 @@ class FudanAuthenticationAPIV1 {
     } else if (responseHtml.contains(WEAK_PASSWORD)) {
       throw WeakPasswordException();
     }
-
     return rep;
-  }
-
-  static Map<String?, String?> _getAuthData(PersonInfo info, String uisHtml) {
-    Map<String?, String?> data = {};
-    for (final element in BeautifulSoup(uisHtml).findAll("input")) {
-      if (element.attributes['type'] != "button") {
-        data[element.attributes['name']] = element.attributes['value'];
-      }
-    }
-    data
-      ..['username'] = info.id
-      ..["password"] = info.password;
-    return data;
   }
 }
 
