@@ -18,7 +18,7 @@
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/time_table.dart';
-import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -48,7 +48,10 @@ class NextCourseFeature extends Feature {
     }
     TimeTable? timetable = await Retrier.runAsyncWithRetry(() async {
       await Future.delayed(const Duration(milliseconds: 500));
-      return await TimeTableRepository.getInstance().loadTimeTable();
+      return await TimeTableRepository.getInstance().loadTimeTable(
+        SettingsProvider.getInstance().timetableSemester,
+        SettingsProvider.getInstance().thisSemesterStartDate
+      );
     });
     _data = getNextCourse(timetable!);
     _status = CourseFeatureStatus.DONE;

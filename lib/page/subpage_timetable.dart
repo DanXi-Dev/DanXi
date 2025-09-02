@@ -168,8 +168,10 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       if (StateProvider.personInfo.value!.group ==
           UserGroup.FUDAN_UNDERGRADUATE_STUDENT) {
         _contentFuture = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
-            TimeTableRepository.getInstance()
-                .loadTimeTable(forceLoadFromRemote: forceLoadFromRemote)));
+            TimeTableRepository.getInstance().loadTimeTable(
+                SettingsProvider.getInstance().timetableSemester,
+                SettingsProvider.getInstance().thisSemesterStartDate,
+                forceLoadFromRemote: forceLoadFromRemote)));
       } else if (forceLoadFromRemote) {
         _contentFuture = LazyFuture.pack(
             PostgraduateTimetableRepository.getInstance().loadTimeTable(

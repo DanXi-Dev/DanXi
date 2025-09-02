@@ -18,7 +18,6 @@
 import 'dart:convert';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/extra.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
@@ -42,19 +41,19 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   factory TimeTableRepository.getInstance() => _instance;
 
   /// Load TimeTable. [SettingsProvider] determines which semester to load.
-  Future<TimeTable?> loadTimeTable(
-      {DateTime? startTime, bool forceLoadFromRemote = false}) async {
+  Future<TimeTable?> loadTimeTable(String? semesterId, String? startDate,
+      {bool forceLoadFromRemote = false}) async {
     if (forceLoadFromRemote) {
       TimeTable? result = await Cache.getRemotely<TimeTable>(
           KEY_TIMETABLE_CACHE,
-          () async => (await _loadTimeTableRemotely(startTime: startTime))!,
+          () async => (await _loadTimeTableRemotely(semesterId, startDate))!,
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
       return result;
     } else {
       return Cache.get<TimeTable>(
           KEY_TIMETABLE_CACHE,
-          () async => (await _loadTimeTableRemotely(startTime: startTime))!,
+          () async => (await _loadTimeTableRemotely(semesterId, startDate))!,
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
     }
@@ -72,12 +71,12 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   }
 
   /// Load TimeTable from FDU server.
-  Future<TimeTable?> _loadTimeTableRemotely({DateTime? startTime}) async {
+  Future<TimeTable?> _loadTimeTableRemotely(
+      String? semesterId, String? startDate) async {
     // Determine which semester we need to load.
     // If not stored in [SettingsProvider], we use default semester.
-    Future<SemesterInfoWithStartDate> getAppropriateSemesterInfo() async {
-      String? semesterId = SettingsProvider.getInstance().timetableSemester;
-      String? startDate = SettingsProvider.getInstance().thisSemesterStartDate;
+    Future<SemesterInfoWithStartDate> getAppropriateSemesterInfo(
+        String? semesterId, String? startDate) async {
       if (semesterId == null ||
           semesterId.isEmpty ||
           startDate == null ||
@@ -89,7 +88,8 @@ class TimeTableRepository extends BaseRepositoryWithDio {
       }
     }
 
-    SemesterInfoWithStartDate semesterInfo = await getAppropriateSemesterInfo();
+    SemesterInfoWithStartDate semesterInfo =
+        await getAppropriateSemesterInfo(semesterId, startDate);
     final options = RequestOptions(
       method: "GET",
       path: TIMETABLE_DATA_URL.replaceAll("{sem_id}", semesterInfo.semesterId!),
@@ -97,8 +97,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     return FudanSession.request(options, (res) {
       SettingsProvider.getInstance().timetableLastUpdated = DateTime.now();
       return TimeTable.fromJWGLJson(
-          startTime ?? semesterInfo.startDate ?? TimeTable.defaultStartDate,
-          res.data!);
+          semesterInfo.startDate ?? TimeTable.defaultStartDate, res.data!);
     });
   }
 
