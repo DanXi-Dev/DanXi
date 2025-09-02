@@ -38,10 +38,7 @@ class FudanAAONoticesFeature extends Feature {
 
   Future<void> _loadNotices() async {
     _status = ConnectionStatus.CONNECTING;
-    _initialData = await FudanAAORepository.getInstance().getNotices(
-        FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT,
-        1,
-        StateProvider.personInfo.value);
+    _initialData = await getNoticesForUserGroup(1);
     _status = ConnectionStatus.DONE;
     notifyUpdate();
   }
