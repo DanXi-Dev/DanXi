@@ -41,7 +41,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
 
   factory TimeTableRepository.getInstance() => _instance;
 
-  // Load TimeTable. [SettingsProvider] determines which semester to load.
+  /// Load TimeTable. [SettingsProvider] determines which semester to load.
   Future<TimeTable?> loadTimeTable(PersonInfo info,
       {DateTime? startTime, bool forceLoadFromRemote = false}) async {
     if (forceLoadFromRemote) {
@@ -62,7 +62,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     }
   }
 
-  // Load all semesters and their start dates
+  /// Load all semesters and their start dates
   Future<TimeTableSemesterInfo> loadSemestersForTimeTable(
       PersonInfo info) async {
     final options = RequestOptions(
@@ -74,7 +74,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     });
   }
 
-  // Load TimeTable from FDU server.
+  /// Load TimeTable from FDU server.
   Future<TimeTable?> _loadTimeTableRemotely(PersonInfo info,
       {DateTime? startTime}) async {
     // Determine which semester we need to load.
@@ -106,7 +106,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     });
   }
 
-  // Load default semester id and start date from JWGL, then store start date in settings.
+  /// Load default semester id and start date from JWGL, then store start date in settings.
   Future<CurrentSemesterInfo> _loadDefaultSemesterInfo() async {
     final options = RequestOptions(
       method: "GET",
@@ -117,7 +117,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     });
   }
 
-  // Parse all semesters and their start dates
+  /// Parse all semesters and their start dates
   TimeTableSemesterInfo _parseSemesters(String semesterHtml) {
     final semestersRegex =
         RegExp(r'var semesters = JSON\.parse\(([\s\S]*?)\);');
@@ -172,7 +172,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
         defaultSemesterId, DateTime.tryParse(startDate!));
   }
 
-  // Check if the timetable has been fetched before.
+  /// Check if the timetable has been fetched before.
   bool hasCache() {
     XSharedPreferences preferences =
         SettingsProvider.getInstance().preferences!;
