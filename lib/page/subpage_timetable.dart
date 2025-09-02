@@ -168,9 +168,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       if (StateProvider.personInfo.value!.group ==
           UserGroup.FUDAN_UNDERGRADUATE_STUDENT) {
         _contentFuture = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
-            TimeTableRepository.getInstance().loadTimeTable(
-                StateProvider.personInfo.value!,
-                forceLoadFromRemote: forceLoadFromRemote)));
+            TimeTableRepository.getInstance()
+                .loadTimeTable(forceLoadFromRemote: forceLoadFromRemote)));
       } else if (forceLoadFromRemote) {
         _contentFuture = LazyFuture.pack(
             PostgraduateTimetableRepository.getInstance().loadTimeTable(
@@ -609,8 +608,8 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
   }
 
   Future<void> loadSemesterInfo() async {
-    _semesterInfo = await TimeTableRepository.getInstance()
-        .loadSemestersForTimeTable(StateProvider.personInfo.value!);
+    _semesterInfo =
+        await TimeTableRepository.getInstance().loadSemestersForTimeTable();
     String? chosenSemester = SettingsProvider.getInstance().timetableSemester;
     if (chosenSemester == null || chosenSemester.isEmpty) {
       chosenSemester = _semesterInfo!.defaultSemesterId;

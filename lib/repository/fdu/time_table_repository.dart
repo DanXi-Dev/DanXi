@@ -42,29 +42,26 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   factory TimeTableRepository.getInstance() => _instance;
 
   /// Load TimeTable. [SettingsProvider] determines which semester to load.
-  Future<TimeTable?> loadTimeTable(PersonInfo info,
+  Future<TimeTable?> loadTimeTable(
       {DateTime? startTime, bool forceLoadFromRemote = false}) async {
     if (forceLoadFromRemote) {
       TimeTable? result = await Cache.getRemotely<TimeTable>(
           KEY_TIMETABLE_CACHE,
-          () async =>
-              (await _loadTimeTableRemotely(info, startTime: startTime))!,
+          () async => (await _loadTimeTableRemotely(startTime: startTime))!,
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
       return result;
     } else {
       return Cache.get<TimeTable>(
           KEY_TIMETABLE_CACHE,
-          () async =>
-              (await _loadTimeTableRemotely(info, startTime: startTime))!,
+          () async => (await _loadTimeTableRemotely(startTime: startTime))!,
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
     }
   }
 
   /// Load all semesters and their start dates
-  Future<TimeTableSemesterInfo> loadSemestersForTimeTable(
-      PersonInfo info) async {
+  Future<TimeTableSemesterInfo> loadSemestersForTimeTable() async {
     final options = RequestOptions(
       method: "GET",
       path: TIMETABLE_URL,
@@ -75,12 +72,10 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   }
 
   /// Load TimeTable from FDU server.
-  Future<TimeTable?> _loadTimeTableRemotely(PersonInfo info,
-      {DateTime? startTime}) async {
+  Future<TimeTable?> _loadTimeTableRemotely({DateTime? startTime}) async {
     // Determine which semester we need to load.
     // If not stored in [SettingsProvider], we use default semester.
-    Future<CurrentSemesterInfo> getAppropriateSemesterInfo(
-        PersonInfo info) async {
+    Future<CurrentSemesterInfo> getAppropriateSemesterInfo() async {
       String? semesterId = SettingsProvider.getInstance().timetableSemester;
       String? startDate = SettingsProvider.getInstance().thisSemesterStartDate;
       if (semesterId == null ||
@@ -93,7 +88,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
       }
     }
 
-    CurrentSemesterInfo semesterInfo = await getAppropriateSemesterInfo(info);
+    CurrentSemesterInfo semesterInfo = await getAppropriateSemesterInfo();
     final options = RequestOptions(
       method: "GET",
       path: TIMETABLE_DATA_URL.replaceAll("{sem_id}", semesterInfo.semesterId!),
@@ -160,7 +155,7 @@ class TimeTableRepository extends BaseRepositoryWithDio {
 
   String _parseDefaultSemesterId(String semesterHtml) {
     BeautifulSoup soup = BeautifulSoup(semesterHtml);
-    final firstOption = soup.find('option', selector: '#allSemesters option');
+    final firstOption = soup.find('', selector: '#allSemesters option');
     return firstOption!['value']!;
   }
 
