@@ -8,6 +8,7 @@ import 'package:dan_xi/util/condition_variable.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dio/dio.dart';
 import 'package:dio5_log/dio_log.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -20,6 +21,9 @@ import 'package:pointycastle/asymmetric/api.dart';
 enum FudanLoginType {
   /// The new Fudan authentication system using id.fudan.edu.cn
   Neo,
+
+  /// The legacy Fudan authentication system using uis.fudan.edu.cn
+  UISLegacy,
 }
 
 /// A session manager that provides authenticated HTTP requests to Fudan services.
@@ -118,6 +122,16 @@ class FudanSession {
 
     switch (type) {
       case FudanLoginType.Neo:
+
+        /// Determines if a response indicates that authentication is required.
+        ///
+        /// This is an ad-hoc heuristic: if the response was redirected to the authentication
+        /// server (id.fudan.edu.cn), we can be confident that login is needed.
+        /// However, the absence of a redirect doesn't guarantee that authentication is not needed.
+        bool isNeoAuthenticationRequired(Response<dynamic> response) =>
+            response.realUri.host == FudanAuthenticationAPIV2.idHost &&
+            response.redirectCount > 0;
+
         return _authenticationQueues[type]!.runNormalRequest(
           () async {
             // Work around Dio bug: FormData objects can only be used once
@@ -127,7 +141,7 @@ class FudanSession {
             }
 
             final response = await dio.fetch(req);
-            if (_isAuthenticationRequired(response)) {
+            if (isNeoAuthenticationRequired(response)) {
               throw Exception(
                   "Authentication required for request: ${response.realUri}");
             }
@@ -139,17 +153,40 @@ class FudanSession {
           },
           isFatalError: isFatalError,
         );
+      case FudanLoginType.UISLegacy:
+        bool isLegacyAuthenticationRequired(Response<dynamic> response) =>
+            response.realUri.host == FudanAuthenticationAPIV1.uisHost &&
+            response.redirectCount > 0;
+
+        bool isLegacyFatalError(dynamic e) =>
+            e is AuthenticationV1FailedException;
+        final effectiveIsFatalError = (isFatalError == null)
+            ? isLegacyFatalError
+            : (dynamic e) => isFatalError(e) || isLegacyFatalError(e);
+
+        return _authenticationQueues[type]!.runNormalRequest(
+          () async {
+            // Work around Dio bug: FormData objects can only be used once
+            final requestData = req.data;
+            if (requestData is FormData) {
+              req.data = requestData.clone();
+            }
+
+            final response = await dio.fetch(req);
+            if (isLegacyAuthenticationRequired(response)) {
+              throw Exception(
+                  "Authentication required for request: ${response.realUri}");
+            }
+            return Future.sync(() => validateAndParse(response));
+          },
+          () async {
+            await FudanAuthenticationAPIV1.authenticate(
+                personInfo, effectiveServiceUrl, effectiveLoginMethod);
+          },
+          isFatalError: effectiveIsFatalError,
+        );
     }
   }
-
-  /// Determines if a response indicates that authentication is required.
-  ///
-  /// This is an ad-hoc heuristic: if the response was redirected to the authentication
-  /// server (id.fudan.edu.cn), we can be confident that login is needed.
-  /// However, the absence of a redirect doesn't guarantee that authentication is not needed.
-  static bool _isAuthenticationRequired(Response<dynamic> response) =>
-      response.realUri.host == FudanAuthenticationAPIV2.idHost &&
-      response.redirectCount > 0;
 
   static Future<void> clearSession() async {
     // Clear cookies to reset the session
@@ -305,6 +342,78 @@ class AuthenticationParameters {
 
   AuthenticationParameters(this.lck, this.entityId, this.chainCode);
 }
+
+class FudanAuthenticationAPIV1 {
+  static const String uisHost = 'uis.fudan.edu.cn';
+
+  /// Error patterns from UIS.
+  static const String CAPTCHA_CODE_NEEDED = "请输入验证码";
+  static const String CREDENTIALS_INVALID = "密码有误";
+  static const String WEAK_PASSWORD = "弱密码提示";
+  static const String UNDER_MAINTENANCE = "网络维护中 | Under Maintenance";
+
+  static Future<Response<dynamic>> authenticate(
+      PersonInfo info, Uri serviceUrl, String? serviceRequestMethod) async {
+    final Response<String> firstResponse = await FudanSession.dio
+        .requestUri<String>(serviceUrl,
+            options: Options(method: serviceRequestMethod));
+    // already redirected to the target service, return the response
+    if (firstResponse.realUri.host == serviceUrl.host &&
+        serviceUrl.host != uisHost) {
+      return firstResponse;
+    }
+
+    // else start authentication
+    final Uri redirectedUrl = firstResponse.realUri;
+    if (redirectedUrl.host != uisHost) {
+      // The response must be arrive at uis.fudan.edu.cn
+      throw Exception('Unexpected redirect to $redirectedUrl');
+    }
+
+    final postData = _getAuthData(info, firstResponse.data!);
+    final rep = await FudanSession.dio.postUri<String>(redirectedUrl,
+        data: postData.encodeMap(),
+        options: Options(contentType: Headers.formUrlEncodedContentType));
+    final responseHtml = rep.data!;
+    if (responseHtml.contains(CREDENTIALS_INVALID)) {
+      throw CredentialsInvalidException();
+    } else if (responseHtml.contains(CAPTCHA_CODE_NEEDED)) {
+      // Notify [main.dart] to show up a dialog to guide users to log in manually.
+      CaptchaNeededException().fire();
+      throw CaptchaNeededException();
+    } else if (responseHtml.contains(UNDER_MAINTENANCE)) {
+      throw NetworkMaintenanceException();
+    } else if (responseHtml.contains(WEAK_PASSWORD)) {
+      throw WeakPasswordException();
+    }
+
+    return rep;
+  }
+
+  static Map<String?, String?> _getAuthData(PersonInfo info, String uisHtml) {
+    Map<String?, String?> data = {};
+    for (final element in BeautifulSoup(uisHtml).findAll("input")) {
+      if (element.attributes['type'] != "button") {
+        data[element.attributes['name']] = element.attributes['value'];
+      }
+    }
+    data
+      ..['username'] = info.id
+      ..["password"] = info.password;
+    return data;
+  }
+}
+
+/// Several exceptions that can be thrown during authentication V1.
+class AuthenticationV1FailedException implements Exception {}
+
+class CaptchaNeededException implements AuthenticationV1FailedException {}
+
+class CredentialsInvalidException implements AuthenticationV1FailedException {}
+
+class NetworkMaintenanceException implements AuthenticationV1FailedException {}
+
+class WeakPasswordException implements AuthenticationV1FailedException {}
 
 /// A specialized queue that manages login requests to prevent concurrent authentication attempts.
 ///
