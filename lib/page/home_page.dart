@@ -244,7 +244,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           (value) => _loadAnnouncement().catchError((ignored) {}),
           onError: (ignored) {});
       _loadUserAgent().catchError((ignored) {});
-      _loadStartDate().catchError((ignored) {});
       _loadCelebration().catchError((ignored, st) {});
     }, onError: (e) {
       _dealWithBmobError();
@@ -800,16 +799,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (userAgent != null) {
       SettingsProvider.getInstance().customUserAgent =
           StateProvider.onlineUserAgent = userAgent;
-    }
-  }
-
-  Future<void> _loadStartDate() async {
-    SemesterStartDates? startDateData;
-    try {
-      startDateData = AnnouncementRepository.getInstance().getStartDates();
-    } catch (_) {}
-    if (startDateData != null) {
-      SettingsProvider.getInstance().semesterStartDates = startDateData;
     }
   }
 
