@@ -16,6 +16,7 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/aao_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
@@ -87,12 +88,30 @@ class AAONoticesListState extends State<AAONoticesList> {
             ),
             initialData: _data,
             startPage: 1,
-            dataReceiver: (index) => FudanAAORepository.getInstance()
-                .getNotices(FudanAAORepository.TYPE_NOTICE_ANNOUNCEMENT, index,
-                    StateProvider.personInfo.value),
+            dataReceiver: getNoticesForUserGroup,
           ))
         ],
       ),
     );
+  }
+}
+
+/// Get notices for current user group.
+///
+/// E.g. if the user is a postgraduate student, get postgraduate notices.
+/// If the user is an undergraduate student, get undergraduate notices.
+Future<List<Notice>> getNoticesForUserGroup(int page, {String? type}) {
+  switch (StateProvider.personInfo.value?.group) {
+    case UserGroup.FUDAN_POSTGRADUATE_STUDENT:
+      return FudanAAORepository.getInstance().getPostgraduateNotices(
+          type ?? FudanAAORepository.TYPE_POSTGRADUATE_NOTICE_ANNOUNCEMENT,
+          page);
+    case null:
+      // Not logged in (should not happen?!)
+      return Future.value([]);
+    default:
+      return FudanAAORepository.getInstance().getUndergraduateNotices(
+          type ?? FudanAAORepository.TYPE_UNDERGRADUATE_NOTICE_ANNOUNCEMENT,
+          page);
   }
 }
