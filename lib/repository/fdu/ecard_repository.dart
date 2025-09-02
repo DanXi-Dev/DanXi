@@ -19,10 +19,8 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
-import 'package:dan_xi/util/io/dio_utils.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/retrier.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:html/dom.dart';
@@ -57,14 +55,16 @@ class CardRepository extends BaseRepositoryWithDio {
 
   factory CardRepository.getInstance() => _instance;
 
-  Future<String?> getName(PersonInfo? info) async =>
-      UISLoginTool.tryAsyncWithAuth(dio, _LOGIN_URL, cookieJar!, info,
-          () async => (await _loadCardInfo(-1))?.name);
+  Future<String?> getName(PersonInfo? info) async {
+    final cardInfo = await loadCardInfo(info, -1);
+    return cardInfo?.name;
+  }
 
   Future<Iterable<CardRecord>> _loadOnePageCardRecord(
       Map<String, String?> requestData, int pageNum) async {
     requestData['pageNo'] = pageNum.toString();
-    Response<String> detailResponse = await dio.post(_CONSUME_DETAIL_URL,
+    Response<String> detailResponse = await FudanSession.dio.post(
+        _CONSUME_DETAIL_URL,
         data: requestData.encodeMap(),
         options: Options(headers: Map.of(_CONSUME_DETAIL_HEADER)));
     BeautifulSoup soup =
@@ -88,16 +88,21 @@ class CardRepository extends BaseRepositoryWithDio {
   /// If [logDays] > 0, it will return records of recent [logDays] days;
   /// If [logDays] = 0, it will return the latest records;
   /// If [logDays] < 0, it will return empty list.
-  Future<List<CardRecord>> loadCardRecord(
-          PersonInfo? info, int logDays) async =>
-      UISLoginTool.tryAsyncWithAuth(
-          dio, _LOGIN_URL, cookieJar!, info, () => _loadCardRecord(logDays));
+  Future<List<CardRecord>> loadCardRecord(int logDays) async {
+    final options = RequestOptions(
+      method: "GET",
+      path: _LOGIN_URL,
+      responseType: ResponseType.plain,
+    );
+    return FudanSession.request(options, (_) => _loadCardRecord(logDays),
+        type: FudanLoginType.UISLegacy);
+  }
 
   Future<List<CardRecord>> _loadCardRecord(int logDays) async {
     if (logDays < 0) return [];
     // Get csrf id.
     Response<String> consumeCsrfPageResponse =
-        await dio.get(_CONSUME_DETAIL_CSRF_URL);
+        await FudanSession.dio.get(_CONSUME_DETAIL_CSRF_URL);
     BeautifulSoup consumeCsrfPageSoup =
         BeautifulSoup(consumeCsrfPageResponse.data!);
     Iterable<Element> metas =
@@ -126,7 +131,8 @@ class CardRepository extends BaseRepositoryWithDio {
     // Get the number of pages, only when logDays > 0.
     int totalPages = 1;
     if (logDays > 0) {
-      Response<String> detailResponse = await dio.post(_CONSUME_DETAIL_URL,
+      Response<String> detailResponse = await FudanSession.dio.post(
+          _CONSUME_DETAIL_URL,
           data: data.encodeMap(),
           options: Options(headers: Map.of(_CONSUME_DETAIL_HEADER)));
 
@@ -140,29 +146,36 @@ class CardRepository extends BaseRepositoryWithDio {
     return list;
   }
 
-  Future<CardInfo?> loadCardInfo(PersonInfo? info, int logDays) async =>
-      UISLoginTool.tryAsyncWithAuth(
-          dio, _LOGIN_URL, cookieJar!, info, () => _loadCardInfo(logDays));
+  Future<CardInfo?> loadCardInfo(PersonInfo? info, int logDays) async {
+    final options = RequestOptions(
+      method: "GET",
+      path: _LOGIN_URL,
+      responseType: ResponseType.plain,
+    );
+    return FudanSession.request(options, (_) => _loadCardInfo(logDays),
+        type: FudanLoginType.UISLegacy, info: info);
+  }
 
   Future<CardInfo?> _loadCardInfo(int logDays) async {
-    var cardInfo = CardInfo();
+    final cardInfo = CardInfo();
 
-    // 2024-11-18 (@w568w): The ECard system is a little bit tricky, we need to
-    // obtain the ticket first. During this process, the correct JSESSIONID will be set.
-    final res = await dio.get(_LOGIN_URL,
-        options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    await DioUtils.processRedirect(dio, res);
+    // // 2024-11-18 (@w568w): The ECard system is a little bit tricky, we need to
+    // // obtain the ticket first. During this process, the correct JSESSIONID will be set.
+    // final res = await dio.get(_LOGIN_URL,
+    //     options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
+    // await DioUtils.processRedirect(dio, res);
 
-    var userPageResponse = await dio.get(_USER_DETAIL_URL);
-    var soup = BeautifulSoup(userPageResponse.data.toString());
+    // FIXME: FudanSession should provide a method to request with login queue.
+    final userPageResponse =
+        await FudanSession.dio.get<String>(_USER_DETAIL_URL);
+    final soup = BeautifulSoup(userPageResponse.data.toString());
 
-    var nameElement = soup.find("*", class_: "custname");
-    var cashElement = soup.find("", selector: ".payway-box-bottom-item>p");
-    cardInfo.cash = cashElement?.text.trim();
-    cardInfo.name = nameElement?.text.between("您好，", "！")?.trim();
-    List<CardRecord>? records =
-        await Retrier.runAsyncWithRetry(() => _loadCardRecord(logDays));
-    cardInfo.records = records;
+    final nameElement = soup.find("*", class_: "custname");
+    final cashElement = soup.find("", selector: ".payway-box-bottom-item>p");
+    cardInfo
+      ..name = nameElement?.text.between("您好，", "！")?.trim()
+      ..cash = cashElement?.text.trim()
+      ..records = await _loadCardRecord(logDays);
     return cardInfo;
   }
 
