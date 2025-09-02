@@ -88,6 +88,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_IMAGE_BASE_URL = "image_base_url";
   static const String KEY_DANKE_BASE_URL = "danke_base_url";
   static const String KEY_PROXY = "proxy";
+  static const String KEY_SAVED_PROXIES = "saved_proxies";
   static const String KEY_TIMETABLE_LAST_UPDATED = "timetable_last_updated";
   static const String KEY_USE_WEBVPN = "use_webvpn";
   static const String KEY_VIEW_HISTORY = "view_history";
@@ -141,6 +142,13 @@ class SettingsProvider with ChangeNotifier {
     } else {
       preferences!.remove(KEY_PROXY);
     }
+    notifyListeners();
+  }
+
+  List<String> get savedProxies => preferences!.getStringList(KEY_SAVED_PROXIES) ?? [];
+
+  set savedProxies(List<String> value) {
+    preferences!.setStringList(KEY_SAVED_PROXIES, value);
     notifyListeners();
   }
 
