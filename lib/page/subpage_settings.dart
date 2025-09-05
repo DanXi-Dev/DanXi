@@ -293,11 +293,15 @@ class SettingsPageState extends State<SettingsPage> {
           if (addr.isEmpty) {
             addr = null;
           } else {
-            var proxies = SettingsProvider.getInstance().savedProxies;
-            proxies.add(addr);
-            SettingsProvider.getInstance().savedProxies = proxies;
             final proxies = List<String>.from(context.read<SettingsProvider>().savedProxies);
-            context.read<SettingsProvider>().savedProxies = proxies..add(addr);
+            if (proxies.contains(addr)) {
+              Noticing.showNotice(
+                context,
+                S.of(context).proxy_setting_already_exists,
+              );
+            } else {
+              context.read<SettingsProvider>().savedProxies = proxies..add(addr);
+            }
           }
           onTapListener(addr);
         },

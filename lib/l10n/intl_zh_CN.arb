@@ -544,6 +544,7 @@
   "proxy_setting_do_not_use": "不使用代理",
   "proxy_setting_add_new": "添加新代理",
   "proxy_setting_remove": "移除代理",
+  "proxy_setting_already_exists": "该代理已存在",
   "use_webvpn_title": "自动使用 WebVPN 代理",
   "use_webvpn_description": "启动该项后，允许在非校园网环境下直接访问茶楼、评教等功能（需要重启应用）",
   "show_this_person": "只看此人",

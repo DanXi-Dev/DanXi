@@ -550,6 +550,7 @@
   "proxy_setting_do_not_use": "Do not use proxies",
   "proxy_setting_add_new": "Add a new proxy",
   "proxy_setting_remove": "Remove a proxy",
+  "proxy_setting_already_exists": "Proxy already exists",
   "use_webvpn_title": "Use WebVPN proxy",
   "use_webvpn_description": "When enabled, certain functions could be accessed directly without Fudan LAN (restart required)",
   "show_this_person": "Filter by this user",
