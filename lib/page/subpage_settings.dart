@@ -270,6 +270,89 @@ class SettingsPageState extends State<SettingsPage> {
     return list;
   }
 
+  List<Widget> _buildProxyList(BuildContext menuContext) {
+    onTapListener(String? proxyUrl) {
+      context.read<SettingsProvider>().proxy = proxyUrl;
+    }
+    List<Widget> list = [
+      PlatformContextMenuItem(
+        menuContext: menuContext,
+        child: Text(S.of(context).proxy_setting_do_not_use),
+        onPressed: () => onTapListener(null),
+      ),
+      PlatformContextMenuItem(
+        menuContext: menuContext,
+        child: Text(S.of(context).proxy_setting_add_new),
+        onPressed: () async {
+          String? addr = await Noticing.showInputDialog(
+              context,
+              S.of(context).proxy_setting_input_title,
+              initialText: context.read<SettingsProvider>().proxy,
+              hintText: S.of(context).proxy_setting_input_hint);
+          if (!context.mounted || addr == null) {
+            return; // return if cancelled
+          }
+          if (addr.isEmpty) {
+            addr = null;
+          } else {
+            final proxies = List<String>.from(context.read<SettingsProvider>().savedProxies);
+            if (proxies.contains(addr)) {
+              Noticing.showNotice(
+                context,
+                S.of(context).proxy_setting_already_exists,
+              );
+            } else {
+              context.read<SettingsProvider>().savedProxies = proxies..add(addr);
+            }
+          }
+          onTapListener(addr);
+        },
+      ),
+      PlatformContextMenuItem(
+        menuContext: menuContext,
+        child: Text(S.of(context).proxy_setting_remove),
+        onPressed: () => showPlatformModalSheet(
+            context: context,
+            builder: (BuildContext sheetContext) =>
+                PlatformContextMenu(
+                    actions: _buildRemoveProxyList(sheetContext),
+                    cancelButton: CupertinoActionSheetAction(
+                        child: Text(S.of(sheetContext).cancel),
+                        onPressed: () =>
+                            Navigator.of(sheetContext).pop()))),
+      ),
+    ];
+
+    for (final proxyUrl in context.read<SettingsProvider>().savedProxies) {
+      list.add(PlatformContextMenuItem(
+        menuContext: menuContext,
+        child: Text(proxyUrl),
+        onPressed: () => onTapListener(proxyUrl),
+      ));
+    }
+    return list;
+  }
+
+  List<Widget> _buildRemoveProxyList(BuildContext menuContext) {
+    onTapListener(String proxyUrl) {
+      final proxies = List<String>.from(context.read<SettingsProvider>().savedProxies);
+      context.read<SettingsProvider>().savedProxies = proxies..remove(proxyUrl);
+      if (context.read<SettingsProvider>().proxy == proxyUrl) {
+        context.read<SettingsProvider>().proxy = null;
+      }
+    }
+    List<Widget> list = [];
+
+    for (final proxyUrl in context.read<SettingsProvider>().savedProxies) {
+      list.add(PlatformContextMenuItem(
+        menuContext: menuContext,
+        child: Text(proxyUrl),
+        onPressed: () => onTapListener(proxyUrl),
+      ));
+    }
+    return list;
+  }
+
   List<Widget> _buildFoldBehaviorList(BuildContext menuContext) {
     List<Widget> list = [];
     void onTapListener(FoldBehavior value) {
@@ -533,22 +616,15 @@ class SettingsPageState extends State<SettingsPage> {
                                           (s) => s.proxy) ??
                                       S.of(context).proxy_setting_unset),
                               leading: const Icon(Icons.network_ping),
-                              onTap: () async {
-                                String? addr = await Noticing.showInputDialog(
-                                    context,
-                                    S.of(context).proxy_setting_input_title,
-                                    initialText:
-                                        context.read<SettingsProvider>().proxy,
-                                    hintText:
-                                        S.of(context).proxy_setting_input_hint);
-                                if (!context.mounted || addr == null) {
-                                  return; // return if cancelled
-                                }
-                                if (addr.isEmpty) addr = null;
-                                context.read<SettingsProvider>().proxy = addr;
-                                await Noticing.showNotice(context,
-                                    S.of(context).proxy_setting_set_successfully);
-                              },
+                              onTap: () => showPlatformModalSheet(
+                                  context: context,
+                                  builder: (BuildContext sheetContext) =>
+                                      PlatformContextMenu(
+                                          actions: _buildProxyList(sheetContext),
+                                          cancelButton: CupertinoActionSheetAction(
+                                              child: Text(S.of(sheetContext).cancel),
+                                              onPressed: () =>
+                                                  Navigator.of(sheetContext).pop()))),
                               enabled: !PlatformX.isWeb,
                             ),
                             if (context.select<SettingsProvider, bool>(
