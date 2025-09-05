@@ -145,7 +145,7 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  List<String> get savedProxies => preferences!.getStringList(KEY_SAVED_PROXIES) ?? [];
+  List<String> get savedProxies => preferences!.getStringList(KEY_SAVED_PROXIES) ?? List.empty();
 
   set savedProxies(List<String> value) {
     preferences!.setStringList(KEY_SAVED_PROXIES, value);

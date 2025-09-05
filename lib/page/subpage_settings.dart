@@ -270,8 +270,7 @@ class SettingsPageState extends State<SettingsPage> {
 
   List<Widget> _buildProxyList(BuildContext menuContext) {
     onTapListener(String? proxyUrl) {
-      SettingsProvider.getInstance().proxy = proxyUrl;
-      setState(() {});
+      context.read<SettingsProvider>().proxy = proxyUrl;
     }
     List<Widget> list = [
       PlatformContextMenuItem(
@@ -297,6 +296,8 @@ class SettingsPageState extends State<SettingsPage> {
             var proxies = SettingsProvider.getInstance().savedProxies;
             proxies.add(addr);
             SettingsProvider.getInstance().savedProxies = proxies;
+            final proxies = List<String>.from(context.read<SettingsProvider>().savedProxies);
+            context.read<SettingsProvider>().savedProxies = proxies..add(addr);
           }
           onTapListener(addr);
         },
@@ -316,7 +317,7 @@ class SettingsPageState extends State<SettingsPage> {
       ),
     ];
 
-    for (var proxyUrl in SettingsProvider.getInstance().savedProxies) {
+    for (final proxyUrl in context.read<SettingsProvider>().savedProxies) {
       list.add(PlatformContextMenuItem(
         menuContext: menuContext,
         child: Text(proxyUrl),
@@ -328,17 +329,15 @@ class SettingsPageState extends State<SettingsPage> {
 
   List<Widget> _buildRemoveProxyList(BuildContext menuContext) {
     onTapListener(String proxyUrl) {
-      var proxies = SettingsProvider.getInstance().savedProxies;
-      proxies.remove(proxyUrl);
-      SettingsProvider.getInstance().savedProxies = proxies;
-      if (SettingsProvider.getInstance().proxy == proxyUrl) {
-        SettingsProvider.getInstance().proxy = null;
+      final proxies = List<String>.from(context.read<SettingsProvider>().savedProxies);
+      context.read<SettingsProvider>().savedProxies = proxies..remove(proxyUrl);
+      if (context.read<SettingsProvider>().proxy == proxyUrl) {
+        context.read<SettingsProvider>().proxy = null;
       }
-      setState(() {});
     }
     List<Widget> list = [];
 
-    for (var proxyUrl in SettingsProvider.getInstance().savedProxies) {
+    for (final proxyUrl in context.read<SettingsProvider>().savedProxies) {
       list.add(PlatformContextMenuItem(
         menuContext: menuContext,
         child: Text(proxyUrl),
