@@ -36,8 +36,6 @@ class DataCenterRepository extends BaseRepositoryWithDio {
       "https://my.fudan.edu.cn/list/bks_xx_cj";
   static const String CARD_DETAIL_URL =
       "https://my.fudan.edu.cn/data_tables/ykt_xx.json";
-  static final Uri NEO_LOGIN_URL = Uri.parse(
-      "https://id.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fmy.fudan.edu.cn%2Fdata_tables%2Fykt_xx.json");
 
   DataCenterRepository._();
 
@@ -85,17 +83,17 @@ class DataCenterRepository extends BaseRepositoryWithDio {
     return zoneTraffic;
   }
 
-  Future<Map<String, TrafficInfo>?> getCrowdednessInfo(
-      PersonInfo? info, int areaCode) async {
+  Future<Map<String, TrafficInfo>> getCrowdednessInfo(
+      PersonInfo info, int areaCode) async {
     final options = RequestOptions(
       method: "GET",
       path: DINING_DETAIL_URL,
       responseType: ResponseType.plain,
     );
-    return FudanSession.request(options, (req) => _getCrowdednessInfo(req.data, areaCode));
+    return FudanSession.request(options, (req) => _parseCrowdednessInfo(req.data, areaCode));
   }
 
-  Map<String, TrafficInfo>? _getCrowdednessInfo(String responseData, int areaCode) {
+  Map<String, TrafficInfo> _parseCrowdednessInfo(String responseData, int areaCode) {
     var result = <String, TrafficInfo>{};
 
     //If it's not time for a meal
