@@ -682,12 +682,17 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
               ),
             ),
           ),
-      errorBuilder: () => PlatformIconButton(
+      errorBuilder: (BuildContext context, AsyncSnapshot<void> snapshot) =>
+          PlatformIconButton(
             padding: EdgeInsets.zero,
             icon: Text(S.of(context).failed),
-            onPressed: () => setState(() {
-              _future = LazyFuture.pack(loadSemesterInfo());
-            }),
+            onPressed: () async {
+              await Noticing.showErrorDialog(context, snapshot.error,
+                  trace: snapshot.stackTrace);
+              setState(() {
+                _future = LazyFuture.pack(loadSemesterInfo());
+              });
+            },
           ),
       loadingBuilder: () => PlatformIconButton(
             padding: EdgeInsets.zero,
