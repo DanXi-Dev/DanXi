@@ -70,10 +70,10 @@ class FeatureListItemState extends State<FeatureListItem>
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: widget.feature.customSubtitle ?? Text(summary.join("\n")),
-        onTap: widget.feature.clickable ? () {
+        onTap: widget.feature.onTap == null ? null : () {
           HapticFeedbackUtil.light();
           widget.feature.onTap?.call();
-        } : null,
+        },
       );
       widget.feature.onEvent(FeatureEvent.CREATE);
       return tile;

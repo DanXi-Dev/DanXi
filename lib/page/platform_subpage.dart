@@ -145,10 +145,10 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
               MaterialIconButtonData(tooltip: leadingItems.first.caption),
           padding: EdgeInsets.zero,
           icon: leadingItems.first.widget,
-          onPressed: () {
+          onPressed: leadingItems.first.onPressed == null ? null : () {
             HapticFeedbackUtil.light();
             leadingItems.first.onPressed?.call();
-            },
+          },
         );
       }
     }
@@ -160,10 +160,10 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
             material: (_, __) => MaterialIconButtonData(tooltip: e.caption),
             padding: EdgeInsets.zero,
             icon: e.widget,
-            onPressed: () {
+            onPressed: e.onPressed == null ? null : () {
               HapticFeedbackUtil.light();
               e.onPressed?.call();
-              });
+            });
       }).toList();
     }
 

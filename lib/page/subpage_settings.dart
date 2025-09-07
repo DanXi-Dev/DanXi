@@ -352,9 +352,8 @@ class SettingsPageState extends State<SettingsPage> {
                             leading: PlatformX.isMaterial(context)
                                 ? const Icon(Icons.account_circle)
                                 : const Icon(CupertinoIcons.person_circle),
-                            subtitle: Text(StateProvider.personInfo.value != null 
-                                ? "${StateProvider.personInfo.value!.name} (${StateProvider.personInfo.value!.id})"
-                                : S.of(context).not_logged_in),
+                            subtitle: Text(
+                              "${StateProvider.personInfo.value!.name} (${StateProvider.personInfo.value!.id})"),
                             onTap: () {
                               HapticFeedbackUtil.medium();
                               showPlatformDialog(

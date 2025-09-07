@@ -531,10 +531,10 @@ class OTFloorWidget extends StatelessWidget {
     );
 
     final card = GestureDetector(
-      onLongPress: () {
+      onLongPress: onLongPress == null ? null : () {
         HapticFeedbackUtil.medium();
         onLongPress?.call();
-        },
+      },
       child: Card(
         color: isInMention && PlatformX.isCupertino(context)
             ? Theme.of(context).dividerColor.withValues(alpha: 0.05)
