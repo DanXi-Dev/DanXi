@@ -22,7 +22,6 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/announcement.dart';
-import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/login_page.dart';
@@ -35,7 +34,8 @@ import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
-import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/repository/fdu/uis_login_tool.dart' as uis;
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart' as neo;
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/test/test.dart';
 import 'package:dan_xi/util/browser_util.dart';
@@ -45,7 +45,6 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
-import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dan_xi/widget/dialogs/login_dialog.dart';
 import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
 import 'package:dan_xi/widget/forum/post_render.dart';
@@ -98,18 +97,18 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// Listener to the failure of logging in caused by different reasons.
   ///
   /// Open up a dialog to request user to log in manually in the browser.
-  static final StateStreamListener<CaptchaNeededException>
-      _captchaSubscription = StateStreamListener();
-  static final StateStreamListener<CredentialsInvalidException>
-      _credentialsInvalidSubscription = StateStreamListener();
+  final StateStreamListener<dynamic> _captchaSubscription =
+      StateStreamListener();
+  final StateStreamListener<dynamic> _credentialsInvalidSubscription =
+      StateStreamListener();
 
   /// Listener to Android Activity intents.
-  static final StateStreamListener<ri.Intent?> _receivedIntentSubscription =
+  final StateStreamListener<ri.Intent?> _receivedIntentSubscription =
       StateStreamListener();
 
   /// Listener to the url scheme.
   /// debounced to avoid duplicated events.
-  static final StateStreamListener<Uri?> _uniLinksSubscription =
+  final StateStreamListener<Uri?> _uniLinksSubscription =
       StateStreamListener();
 
   /// If we need to send the QR code to iWatch now.
@@ -152,6 +151,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     StateProvider.isLoggedIn.removeListener(_loginListener);
     _captchaSubscription.cancel();
+    _credentialsInvalidSubscription.cancel();
     _receivedIntentSubscription.cancel();
     _uniLinksSubscription.cancel();
     screenListener?.dispose();
@@ -467,12 +467,18 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     _captchaSubscription.bindOnlyInvalid(
         Constant.eventBus
-            .on<CaptchaNeededException>()
+            .on()
+            .where((e) =>
+                e is uis.CaptchaNeededException ||
+                e is neo.CaptchaNeededException)
             .listen((_) => _dealWithCaptchaNeededException()),
         hashCode);
     _credentialsInvalidSubscription.bindOnlyInvalid(
         Constant.eventBus
-            .on<CredentialsInvalidException>()
+            .on()
+            .where((e) =>
+                e is uis.CredentialsInvalidException ||
+                e is neo.CredentialsInvalidException)
             .listen((_) => _dealWithCredentialsInvalidException()),
         hashCode);
     _initReceiveIntents();
