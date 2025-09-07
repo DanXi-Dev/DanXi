@@ -369,7 +369,6 @@ class ForumRepository extends BaseRepositoryWithDio {
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
-  // NEVER USED
   Future<OTHole?> loadHoleById(int holeId) async {
     final options = RequestOptions(
         path: "$_BASE_URL/holes/$holeId", method: "GET", headers: _tokenHeader);
