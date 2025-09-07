@@ -263,7 +263,7 @@
   "login_issue_2": "Failed to fetch information related to the semester from the server, please retry. \nIf you skip directly, there may be problems with date calculation for course schedules.",
   "login_problem": "If you encounter problems while logging in, please contact us at dev@danta.tech or QQ group {QQ}.\n\nYou may also want to read Dev Team Announcements in case your problem is a known issue.",
   "login_problem_occurred": "Some problem occurred when logging in, please retry later.",
-  "login_uis": "Fudan Undergraduate Login",
+  "login_uis_dialog_title": "Fudan Undergraduate Login",
   "login_uis_description": "Your password is only sent to Fudan servers via secure connection.",
   "login_uis_pwd": "Password",
   "login_uis_uid": "ID",
