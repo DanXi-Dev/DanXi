@@ -87,24 +87,26 @@ class DataCenterRepository extends BaseRepositoryWithDio {
 
   Future<Map<String, TrafficInfo>?> getCrowdednessInfo(
       PersonInfo? info, int areaCode) async {
-    return UISLoginTool.tryAsyncWithAuth(
-        dio, LOGIN_URL, cookieJar!, info, () => _getCrowdednessInfo(areaCode),
-        isFatalError: (e) => e is UnsuitableTimeException);
+    final options = RequestOptions(
+      method: "GET",
+      path: DINING_DETAIL_URL,
+      responseType: ResponseType.plain,
+    );
+    return FudanSession.request(options, (req) => _getCrowdednessInfo(req.data, areaCode));
   }
 
-  Future<Map<String, TrafficInfo>?> _getCrowdednessInfo(int areaCode) async {
+  Map<String, TrafficInfo>? _getCrowdednessInfo(String responseData, int areaCode) {
     var result = <String, TrafficInfo>{};
-    Response<String> response = await dio.get(DINING_DETAIL_URL);
 
     //If it's not time for a meal
-    if (response.data.toString().contains("仅")) {
+    if (responseData.contains("仅")) {
       throw UnsuitableTimeException();
     }
     // Regex cannot match things like [..\n..], so replace it with '-'
     // Notice that we need to replace the exact word '\n' in the string,
     // not the line break in the end of a line. So use r'\n' or '\\n', not '\n'
     // It also unifies delimiter in string for generateSummary
-    var dataString = response.data!
+    var dataString = responseData
         .between("<script>", "</script>", headGreedy: false)!
         .replaceAll(r"\n", "-");
     var jsonExtraction = RegExp(r'\[.+?\]').allMatches(dataString);
