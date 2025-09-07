@@ -35,7 +35,7 @@ enum UserGroup {
 
 Map<UserGroup, Function> kUserGroupDescription = {
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT: (BuildContext context) =>
-      S.of(context).login_uis,
+      S.of(context).login_uis_dialog_title,
   UserGroup.FUDAN_POSTGRADUATE_STUDENT: (BuildContext context) =>
       S.of(context).fudan_postgraduate_student,
   UserGroup.FUDAN_STAFF: (BuildContext context) => S.of(context).fudan_staff,

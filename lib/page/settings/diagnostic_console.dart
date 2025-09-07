@@ -17,7 +17,9 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:archive/archive.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
@@ -26,13 +28,19 @@ import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
+import 'package:dio5_log/bean/net_options.dart';
+import 'package:dio5_log/dio_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:intl/intl.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
 
 class DiagnosticConsole extends StatefulWidget {
@@ -127,6 +135,106 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
       }
     } else {
       _console.writeln("Nothing!");
+    }
+  }
+
+  Future<void> exportLogArchive() async {
+    String requestRepresentation(String key, NetOptions option) {
+      StringBuffer sb = StringBuffer();
+      sb.writeln(
+          "=============================== REQUEST $key ===============================");
+      sb.writeln("Id: $key");
+      if (option.reqOptions != null) {
+        sb.writeln("Request (ID ${option.reqOptions?.id}): ");
+        sb.writeln("${option.reqOptions?.method} ${option.reqOptions?.url}");
+        sb.writeln("Request Content-Type: ${option.reqOptions?.contentType}");
+        sb.writeln("Request Time: ${option.reqOptions?.requestTime}");
+        sb.writeln("Request Params: ${option.reqOptions?.params}");
+        sb.writeln("Request Data:");
+        sb.writeln(option.reqOptions?.data);
+        sb.writeln("Request Headers:");
+        for (final entry in (option.reqOptions?.headers ?? {})
+            .entries
+            .toList(growable: false)) {
+          sb.writeln("${entry.key}=${entry.value}");
+        }
+      }
+
+      if (option.resOptions != null) {
+        sb.writeln("Response (ID ${option.resOptions?.id}): ");
+        sb.writeln(
+            "Response HTTP Status Code: ${option.resOptions?.statusCode}");
+        sb.writeln("Response Time: ${option.resOptions?.responseTime}");
+        sb.writeln("Response Headers:");
+        for (final entry in (option.resOptions?.headers ?? {})
+            .entries
+            .toList(growable: false)) {
+          sb.writeln("${entry.key}=${entry.value}");
+        }
+        sb.writeln("Response Data:");
+        sb.writeln(option.resOptions?.data);
+      }
+
+      if (option.errOptions != null) {
+        sb.writeln("Error occurred during request.");
+        sb.writeln("Error (ID ${option.errOptions?.id}): ");
+        sb.writeln(option.errOptions?.errorMsg);
+      }
+      sb.writeln(
+          "=============================== END OF $key ===============================");
+      sb.writeln();
+      return sb.toString();
+    }
+
+    final confirm = await Noticing.showConfirmationDialog(context,
+        S.of(context).export_log_confirmation);
+    if (confirm != true || !mounted) return;
+    final progDialog =
+        showProgressDialog(context: context, loadingText: S.of(context).export_log_exporting);
+    final Archive archive = Archive();
+    StringBuffer sb = StringBuffer();
+    try {
+      final dioLogger = LogPoolManager.getInstance();
+      for (final key in dioLogger.keys) {
+        sb.writeln(requestRepresentation(key, dioLogger.logMap[key]!));
+      }
+      archive.add(ArchiveFile.string("dio_requests.log", sb.toString()));
+    } catch (e, st) {
+      archive.add(ArchiveFile.string("dio_requests.log", sb.toString()));
+      archive.add(ArchiveFile.string("dio_requests.log.err",
+          "Met error when exporting dio logs! Error is: $e\n$st"));
+    }
+
+    archive
+        .add(ArchiveFile.string("diagnostic_console.log", _console.toString()));
+    archive.comment = "Exported by DanXi App version ${Constant.version}";
+
+    final dateFormat = DateFormat("yyyyMMdd_HHmmss");
+    final fileName =
+        "DanXi_Log_Archive_${dateFormat.format(DateTime.now().toUtc())}.zip";
+    try {
+      final zipData = ZipEncoder().encodeBytes(archive);
+      if (PlatformX.isLinux) {
+        // On Linux, share_plus does not support sharing files yet.
+        // So we just write to a temporary file and show the path to user.
+        final tempDir = await Directory.systemTemp.createTemp("danxi_log_");
+        final tempFile = File("${tempDir.path}/$fileName");
+        await tempFile.writeAsBytes(zipData);
+        if (!mounted) return;
+        await Noticing.showModalNotice(context,
+            message: S.of(context).export_log_to_path(tempFile.path),
+            selectable: true,
+            title: S.of(context).export_log_success);
+      } else {
+        await SharePlus.instance.share(ShareParams(files: [
+          XFile.fromData(zipData, mimeType: "application/zip", name: fileName),
+        ]));
+      }
+    } catch (e, st) {
+      if (!mounted) return;
+      Noticing.showErrorDialog(context, e, trace: st);
+    } finally {
+      progDialog.dismiss(showAnim: false);
     }
   }
 
@@ -248,6 +356,10 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
             primary: true,
             child: Column(
               children: [
+                PlatformElevatedButton(
+                  onPressed: exportLogArchive,
+                  child: const Text("Export Log Archive"),
+                ),
                 PlatformElevatedButton(
                   onPressed: changePassword,
                   child: const Text("Password Change [Only ADMIN]"),

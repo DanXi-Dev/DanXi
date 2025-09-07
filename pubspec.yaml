@@ -116,6 +116,7 @@ dependencies:
   hooks_riverpod: ^2.6.1
   flutter_hooks:
   riverpod_annotation: ^2.6.1
+  archive: ^4.0.7
 
 dependency_overrides:
   linkify:
