@@ -36,8 +36,6 @@ class DataCenterRepository extends BaseRepositoryWithDio {
       "https://my.fudan.edu.cn/list/bks_xx_cj";
   static const String CARD_DETAIL_URL =
       "https://my.fudan.edu.cn/data_tables/ykt_xx.json";
-  static final Uri NEO_LOGIN_URL = Uri.parse(
-      "https://id.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fmy.fudan.edu.cn%2Fdata_tables%2Fykt_xx.json");
 
   DataCenterRepository._();
 
@@ -85,26 +83,28 @@ class DataCenterRepository extends BaseRepositoryWithDio {
     return zoneTraffic;
   }
 
-  Future<Map<String, TrafficInfo>?> getCrowdednessInfo(
-      PersonInfo? info, int areaCode) async {
-    return UISLoginTool.tryAsyncWithAuth(
-        dio, LOGIN_URL, cookieJar!, info, () => _getCrowdednessInfo(areaCode),
-        isFatalError: (e) => e is UnsuitableTimeException);
+  Future<Map<String, TrafficInfo>> getCrowdednessInfo(
+      PersonInfo info, int areaCode) async {
+    final options = RequestOptions(
+      method: "GET",
+      path: DINING_DETAIL_URL,
+      responseType: ResponseType.plain,
+    );
+    return FudanSession.request(options, (req) => _parseCrowdednessInfo(req.data, areaCode));
   }
 
-  Future<Map<String, TrafficInfo>?> _getCrowdednessInfo(int areaCode) async {
+  Map<String, TrafficInfo> _parseCrowdednessInfo(String responseData, int areaCode) {
     var result = <String, TrafficInfo>{};
-    Response<String> response = await dio.get(DINING_DETAIL_URL);
 
     //If it's not time for a meal
-    if (response.data.toString().contains("仅")) {
+    if (responseData.contains("仅")) {
       throw UnsuitableTimeException();
     }
     // Regex cannot match things like [..\n..], so replace it with '-'
     // Notice that we need to replace the exact word '\n' in the string,
     // not the line break in the end of a line. So use r'\n' or '\\n', not '\n'
     // It also unifies delimiter in string for generateSummary
-    var dataString = response.data!
+    var dataString = responseData
         .between("<script>", "</script>", headGreedy: false)!
         .replaceAll(r"\n", "-");
     var jsonExtraction = RegExp(r'\[.+?\]').allMatches(dataString);
