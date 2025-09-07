@@ -612,13 +612,21 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
   Future<void> loadSemesterInfo() async {
     _semesterBundle =
         await TimeTableRepository.getInstance().loadSemestersForTimeTable();
-    String? chosenSemester = SettingsProvider.getInstance().timetableSemester;
-    if (chosenSemester == null || chosenSemester.isEmpty) {
+
+    String chosenSemester;
+    try {
+      // Check if the stored chosen semester is valid (i.e. not null AND exists in the list)
+      chosenSemester = SettingsProvider.getInstance().timetableSemester!;
+      _selectionInfo = _semesterBundle!.semesters
+          .firstWhere((element) => element.semesterId == chosenSemester);
+    } catch (_) {
+      // If not, reset it to default...
       chosenSemester = _semesterBundle!.defaultSemesterId;
       SettingsProvider.getInstance().timetableSemester = chosenSemester;
+      // ... and retry
+      _selectionInfo = _semesterBundle!.semesters
+          .firstWhere((element) => element.semesterId == chosenSemester);
     }
-    _selectionInfo = _semesterBundle!.semesters
-        .firstWhere((element) => element.semesterId == chosenSemester!);
     SettingsProvider.getInstance().semesterStartDates =
         _semesterBundle!.startDates;
     SettingsProvider.getInstance().thisSemesterStartDate =
