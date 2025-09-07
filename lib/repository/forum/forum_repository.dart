@@ -927,6 +927,15 @@ class ForumRepository extends BaseRepositoryWithDio {
     return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }
 
+  Future<int?> adminFrozeHole(int? holeId, bool frozen) async {
+    final options = RequestOptions(
+        path: "$_BASE_URL/holes/$holeId/_webvpn",
+        method: "PATCH",
+        data: {"frozen": frozen},
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
+  }
+
   @Deprecated("Use adminAddPenaltyDays instead")
   Future<int?> adminAddPenalty(int? floorId, int penaltyLevel) async {
     final options = RequestOptions(

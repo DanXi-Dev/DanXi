@@ -897,6 +897,24 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
         PlatformContextMenuItem(
           onPressed: () async {
+            bool? frozen = await Noticing.showConfirmationDialog(
+                context, "冻结或解冻帖子？",
+                confirmText: "冻结", cancelText: "解冻");
+            if (frozen != null) {
+              int? result = await ForumRepository.getInstance()
+                  .adminFrozeHole(e.hole_id, frozen);
+              if (result != null && result < 300 && mounted) {
+                Noticing.showMaterialNotice(
+                    context, S.of(context).operation_successful);
+              }
+            }
+          },
+          isDestructive: true,
+          menuContext: menuContext,
+          child: const Text("冻结/解冻帖子"),
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
             bool? sens = await Noticing.showConfirmationDialog(
                 context, "标记或取消帖子敏感状态？",
                 confirmText: "标记敏感", cancelText: "取消敏感");

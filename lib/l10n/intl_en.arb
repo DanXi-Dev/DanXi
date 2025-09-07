@@ -583,5 +583,6 @@
   "export_log_confirmation": "Please confirm before exporting:\n1. An error occurred recently during the current application session. If not, please reproduce the error first, then return here to export the log immediately;\n2. The developer requesting the log is a trusted individual. The log may contain your personal sensitive information (including login credentials), so please share with caution.\n\nConfirm to export the log?",
   "export_log_exporting": "Exporting logs…",
   "export_log_to_path": "Log file has been exported to a temporary file: {path}. Please send this file to a developer.",
-  "export_log_success": "Export successful"
+  "export_log_success": "Export successful",
+  "hole_frozen": "Frozen"
 }

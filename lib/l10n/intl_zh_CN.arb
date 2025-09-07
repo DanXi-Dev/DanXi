@@ -577,5 +577,6 @@
   "export_log_confirmation": "导出前请确认：\n1. 在本次应用运行期间内最近发生过错误。如果没有，请先重现错误，然后立刻返回这里重新导出日志；\n2. 要求你分享日志的是可信的开发者。日志中可能包含你的个人敏感信息（包括登录凭据），请谨慎分享。\n\n确认导出日志？",
   "export_log_exporting": "导出日志中…",
   "export_log_to_path": "日志文件已导出到临时文件：{path}，请自行处理该文件。",
-  "export_log_success": "导出成功"
+  "export_log_success": "导出成功",
+  "hole_frozen": "已冻结"
 }
