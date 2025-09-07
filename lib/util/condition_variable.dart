@@ -30,6 +30,7 @@ class ConditionVariable {
 
   Future<void> broadcast() async {
     final completers = _readyQueue.toList();
+    _readyQueue.clear();
     for (final completer in completers) {
       completer.complete();
     }
