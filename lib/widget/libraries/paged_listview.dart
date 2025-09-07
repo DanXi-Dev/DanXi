@@ -331,9 +331,15 @@ class PagedListViewState<T> extends State<PagedListView<T>>
         item = Dismissible(
           key: valueKeys[index],
           background: ColoredBox(color: Theme.of(context).colorScheme.error),
-          confirmDismiss: (direction) =>
-              widget.onConfirmDismissItem?.call(context, index, _data[index]) ??
-              Future.value(null),
+          confirmDismiss: (direction) {
+            if (widget.onConfirmDismissItem != null) {
+              return widget.onConfirmDismissItem!
+                  .call(context, index, _data[index]);
+            } else {
+              // If confirmation function not provided, then just go on removing
+              return Future.value(true);
+            }
+          },
           onDismissed: (direction) {
             widget.onDismissItem!.call(context, index, _data[index]);
             _data.removeAt(index);
@@ -550,7 +556,8 @@ class PagedListViewController<T> implements ListProvider<T> {
 
   bool get isEnded => _state.isEnded;
 
-  Future<void> notifyUpdate({bool useInitialData = true, bool queueDataClear = true}) =>
+  Future<void> notifyUpdate(
+          {bool useInitialData = true, bool queueDataClear = true}) =>
       _state.notifyUpdate(useInitialData, queueDataClear);
 
   /// Returns whether the scroll was successful or not

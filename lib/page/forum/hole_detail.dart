@@ -18,7 +18,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:clipboard/clipboard.dart';
 import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -141,14 +140,18 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
     final results = switch (_renderModel) {
       Normal(hole: var hole) => await ForumRepository.getInstance()
-          .loadFloors(hole, startFloor: page * Constant.POST_COUNT_PER_PAGE),
+          .loadFloors(hole, offset: page * Constant.POST_COUNT_PER_PAGE),
       Search(keyword: var searchKeyword, :final dateRange, :final accurate) =>
         await ForumRepository.getInstance().loadSearchResults(searchKeyword,
             startFloor: _listViewController.length(),
             dateRange: dateRange,
             accurate: accurate),
-      MyReplies() => await ForumRepository.getInstance()
-          .loadUserFloors(startFloor: _listViewController.length()),
+      MyReplies() => (await ForumRepository.getInstance()
+              .loadUserFloors(startFloor: _listViewController.length()))
+          // Filter manually hidden floors
+          .filter((element) => !SettingsProvider.getInstance()
+              .hiddenMyReplies
+              .contains(element.floor_id)),
       ViewHistory() => (await ForumRepository.getInstance().loadHolesById(
                   SettingsProvider.getInstance()
                       .viewHistory
@@ -180,7 +183,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   Future<bool> _shareFloorAsText(OTFloor floor, int index) async {
     try {
-      await FlutterClipboard.copy(_renderFloorAsText(floor, index));
+      await Clipboard.setData(
+          ClipboardData(text: _renderFloorAsText(floor, index)));
     } catch (e) {
       return false;
     }
@@ -324,7 +328,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       }
     });
     try {
-      await FlutterClipboard.copy(shareText.toString());
+      await Clipboard.setData(ClipboardData(text: shareText.toString()));
       return true;
     } catch (e) {
       return false;
@@ -339,14 +343,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       _renderModel = Normal(hole);
 
       // Record view history
-      SettingsProvider.getInstance().viewHistory = [
-        hole.hole_id!,
-        // Limit the number of view history, and avoid duplicate entries
-        ...SettingsProvider.getInstance()
-            .viewHistory
-            .filter((id) => id != hole.hole_id!)
-            .take(SettingsProvider.MAX_VIEW_HISTORY - 1)
-      ];
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        SettingsProvider.getInstance().viewHistory = [
+          hole.hole_id!,
+          // Limit the number of view history, and avoid duplicate entries
+          ...SettingsProvider.getInstance()
+              .viewHistory
+              .filter((id) => id != hole.hole_id!)
+              .take(SettingsProvider.MAX_VIEW_HISTORY - 1)
+        ];
+      });
 
       // Update hole view count
       if (hole.hole_id != null) {
@@ -373,9 +379,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   /// Refresh the list view.
-  Future<void> refreshListView({bool scrollToEnd = false}) async {
+  Future<void> refreshListView(
+      {bool scrollToEnd = false, bool queueDataClear = true}) async {
     _allDataLoaded = false;
-    await _listViewController.notifyUpdate(queueDataClear: true);
+    await _listViewController.notifyUpdate(queueDataClear: queueDataClear);
 
     if (scrollToEnd) {
       setState(() {
@@ -457,6 +464,24 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               ),
             ),
         _ => null,
+      },
+      onDismissItem: switch (_renderModel) {
+        MyReplies() => (context, index, item) {
+            SettingsProvider.getInstance().hiddenMyReplies = [
+              item.floor_id!,
+              ...SettingsProvider.getInstance().hiddenMyReplies
+            ];
+            Noticing.showMaterialNotice(
+                context, S.of(context).hide_post_success);
+          },
+        _ => null
+      },
+      onConfirmDismissItem: switch (_renderModel) {
+        MyReplies() => (context, index, item) =>
+            Noticing.showConfirmationDialog(
+                context, S.of(context).hide_post_confirm,
+                isConfirmDestructive: true),
+        _ => null
       },
     );
 
@@ -546,7 +571,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 PopupMenuOption(
                   label: S.of(context).copy_hole_id,
                   onTap: (_) async {
-                    await FlutterClipboard.copy('#${hole.hole_id}');
+                    await Clipboard.setData(ClipboardData(text: '#${hole.hole_id}'));
                     if (context.mounted) {
                       Noticing.showMaterialNotice(
                           context, S.of(context).copy_hole_id_success);
@@ -587,11 +612,26 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               icon: Icon(Icons.delete),
               onPressed: () async {
                 if (await Noticing.showConfirmationDialog(
-                        context, S.of(context).are_you_sure,
+                        context, S.of(context).clear_history_confirm,
                         isConfirmDestructive: true) ==
                     true) {
                   SettingsProvider.getInstance().viewHistory = [];
-                  refreshListView();
+                  refreshListView(queueDataClear: false);
+                }
+              },
+            ),
+          if (_renderModel case MyReplies())
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: Icon(Icons.restore_page),
+              onPressed: () async {
+                if (await Noticing.showConfirmationDialog(
+                        context, S.of(context).restore_hidden_confirm,
+                        isConfirmDestructive: false) ==
+                    true) {
+                  SettingsProvider.getInstance().hiddenMyReplies = [];
+                  // Set `queueDataClear` to false to instantly clear the [ListView]
+                  refreshListView(queueDataClear: false);
                 }
               },
             )
@@ -637,7 +677,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   // Load all floors, in case we have to scroll to end or to a specific floor.
   Future<List<OTFloor>> _loadAllContent() async {
     final allFloors = await ForumRepository.getInstance()
-        .loadFloors((_renderModel as Normal).hole, startFloor: 0, length: 0);
+        .loadFloors((_renderModel as Normal).hole, offset: 0, size: 0);
 
     if (allFloors == null) {
       throw Exception("Failed to fetch all floors");
@@ -1029,7 +1069,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           child: Text(postTimeStr),
           onPressed: () async {
-            await FlutterClipboard.copy(postTimeStr);
+            await Clipboard.setData(ClipboardData(text: postTimeStr));
             if (mounted && menuContext.mounted) {
               Noticing.showMaterialNotice(
                   context, S.of(menuContext).copy_success);
@@ -1045,8 +1085,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           child: Text(S.of(menuContext).copy),
           onPressed: () async {
-            await FlutterClipboard.copy(
-                renderText(e.filteredContent!, '', '', ''));
+            await Clipboard.setData(ClipboardData(text: renderText(e.filteredContent!, '', '', '')));
             if (mounted && menuContext.mounted) {
               Noticing.showMaterialNotice(
                   context, S.of(menuContext).copy_success);
@@ -1055,7 +1094,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       PlatformContextMenuItem(
         menuContext: menuContext,
         onPressed: () async {
-          FlutterClipboard.copy('##${e.floor_id}');
+          await Clipboard.setData(ClipboardData(text: '##${e.floor_id}'));
           if (mounted) {
             Noticing.showMaterialNotice(
                 context, S.of(context).copy_floor_id_success);
@@ -1233,7 +1272,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       List<OTFloor>? result = switch (_renderModel) {
         Normal(hole: var hole) => await ForumRepository.getInstance()
             .loadFloors(hole,
-                startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
+                offset: pageIndex * Constant.POST_COUNT_PER_PAGE),
         Search(keyword: var searchKeyword, :final dateRange, :final accurate) =>
           await ForumRepository.getInstance().loadSearchResults(searchKeyword,
               startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE,
@@ -1393,19 +1432,21 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 StatelessWidget smartRender(
     BuildContext context,
     String content,
+    bool translucentCard,
+    {bool preview = false,
     LinkTapCallback? onTapLink,
     ImageTapCallback? onTapImage,
-    bool translucentCard,
-    {bool preview = false}) {
+    ImageLongPressCallback? onLongPressImage}) {
   return PostRenderWidget(
     render: SettingsProvider.getInstance().isMarkdownRenderingEnabled
         ? kMarkdownRender
         : kPlainRender,
     content: preprocessContentForDisplay(content),
-    onTapImage: onTapImage,
-    onTapLink: onTapLink,
     hasBackgroundImage: translucentCard,
     isPreviewWidget: preview,
+    onTapImage: onTapImage,
+    onTapLink: onTapLink,
+    onLongPressImage: onLongPressImage,
   );
 }
 

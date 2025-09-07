@@ -18,6 +18,7 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/danke/course_group.dart';
 import 'package:dan_xi/model/danke/course_review.dart';
+import 'package:dan_xi/model/danke/review_extra.dart';
 import 'package:dan_xi/page/danke/course_review_editor.dart';
 import 'package:dan_xi/page/forum/hole_detail.dart';
 import 'package:dan_xi/repository/danke/curriculum_board_repository.dart';
@@ -80,6 +81,7 @@ class CourseReviewWidget extends StatelessWidget {
                     teacher: review.courseInfo.teachers,
                     time: review.courseInfo.time,
                     title: review.title!,
+                    reviewExtra: review.extra,
                   ),
                 ),
                 const Divider(),
@@ -87,7 +89,7 @@ class CourseReviewWidget extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                   child: smartRender(
-                      context, review.content!, null, null, translucent),
+                      context, review.content!, translucent),
                 ),
                 const Divider(),
                 Padding(
@@ -124,6 +126,7 @@ class ReviewHeader extends StatelessWidget {
   final String teacher;
   final String title;
   final String time;
+  final ReviewExtra? reviewExtra;
 
   // final String reviewContent;
 
@@ -132,7 +135,8 @@ class ReviewHeader extends StatelessWidget {
       required this.userId,
       required this.teacher,
       required this.time,
-      required this.title});
+      required this.title,
+      required this.reviewExtra});
 
   @override
   Widget build(BuildContext context) {
@@ -147,37 +151,23 @@ class ReviewHeader extends StatelessWidget {
           const SizedBox(width: 8),
           // user
           Text(
-            "User $userId",
+            "User $userId  ",
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           Expanded(
               child: GestureDetector(
-            onTap: () {},
-            child: const Wrap(
-              // todo this is the badge list of the user
-              spacing: 3,
-              runSpacing: 2,
-              alignment: WrapAlignment.end,
-              children: [
-                // rating
-                Icon(
-                  Icons.circle,
-                  color: Colors.yellow,
-                  size: 12,
-                ),
-                Icon(
-                  Icons.circle,
-                  color: Colors.red,
-                  size: 12,
-                ),
-                Icon(
-                  Icons.circle,
-                  color: Colors.blue,
-                  size: 12,
-                ),
-              ],
-            ),
-          )),
+                  onTap: () {},
+                  child: Wrap(
+                      alignment: WrapAlignment.start,
+                      spacing: 3,
+                      runSpacing: 2,
+                      children: reviewExtra?.achievements
+                              ?.map((badge) => BadgeWidget(
+                                    text: badge.name,
+                                    onTap: () {},
+                                  ))
+                              .toList() ??
+                          const <Widget>[]))),
         ],
       ),
       Padding(

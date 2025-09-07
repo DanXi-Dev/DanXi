@@ -21,6 +21,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/forum/user.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
@@ -353,7 +354,7 @@ class SettingsPageState extends State<SettingsPage> {
                                 ? const Icon(Icons.account_circle)
                                 : const Icon(CupertinoIcons.person_circle),
                             subtitle: Text(
-                              "${StateProvider.personInfo.value!.name} (${StateProvider.personInfo.value!.id})"),
+                                "${StateProvider.personInfo.value?.name ?? "???"} (${StateProvider.personInfo.value?.id ?? "???"})"),
                             onTap: () {
                               HapticFeedbackUtil.medium();
                               showPlatformDialog(
@@ -595,18 +596,27 @@ class SettingsPageState extends State<SettingsPage> {
                                 }
                               },
                             ),
-                            SwitchListTile.adaptive(
-                                title: Text(S.of(context).use_webvpn_title),
-                                secondary: const Icon(Icons.network_cell),
-                                subtitle:
-                                    Text(S.of(context).use_webvpn_description),
-                                value: context.select<SettingsProvider, bool>(
-                                    (s) => s.useWebvpn),
-                                onChanged: (bool value) async {
-                                   HapticFeedbackUtil.selection();
-                                  context.read<SettingsProvider>().useWebvpn =
-                                      value;
-                                })
+                            ValueListenableBuilder<PersonInfo?>(
+                              valueListenable: StateProvider.personInfo,
+                              builder: (context, personInfo, __) {
+                                final isVisitor = (personInfo == null);
+                                return SwitchListTile.adaptive(
+                                  title: Text(S.of(context).use_webvpn_title),
+                                  secondary: const Icon(Icons.network_cell),
+                                  subtitle: Text(S.of(context).use_webvpn_description),
+                                  value: isVisitor
+                                      ? false
+                                      : context.select<SettingsProvider, bool>(
+                                          (s) => s.useWebvpn),
+                                  onChanged: isVisitor
+                                      ? null
+                                      : (bool value) async {
+                                          HapticFeedbackUtil.selection();
+                                          context.read<SettingsProvider>().useWebvpn = value;
+                                        },
+                                );
+                              },
+                            )
                           ],
                         ),
                       ),
@@ -1179,7 +1189,7 @@ class SettingsPageState extends State<SettingsPage> {
                       //Version
                       Align(
                         alignment: Alignment.centerRight,
-                        child: Text(
+                        child: SelectableText(
                           '${S.of(context).version} ${FlutterApp.versionName} build ${Pubspec.version.build.single} #${const String.fromEnvironment("GIT_HASH", defaultValue: "?")}',
                           textScaler: const TextScaler.linear(0.7),
                           style: const TextStyle(fontWeight: FontWeight.bold),

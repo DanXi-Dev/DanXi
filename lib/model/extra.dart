@@ -37,7 +37,6 @@ class TimeTableExtra {
       case UserGroup.FUDAN_UNDERGRADUATE_STUDENT:
         items = fdu_ug;
         break;
-      case UserGroup.VISITOR:
       case UserGroup.FUDAN_POSTGRADUATE_STUDENT:
       case UserGroup.FUDAN_STAFF:
       case UserGroup.SJTU_STUDENT:

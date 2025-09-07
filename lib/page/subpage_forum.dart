@@ -19,12 +19,10 @@ import 'dart:async';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
-import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/forum/division.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/model/forum/tag.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/page/forum/hole_editor.dart';
 import 'package:dan_xi/page/forum/quiz.dart';
 import 'package:dan_xi/page/home_page.dart';
@@ -59,14 +57,6 @@ import 'package:provider/provider.dart';
 
 import '../util/watermark.dart';
 import '../widget/forum/tag_selector/tag.dart';
-
-const kCompatibleUserGroup = [
-  UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
-  UserGroup.FUDAN_POSTGRADUATE_STUDENT,
-  UserGroup.FUDAN_STAFF,
-  UserGroup.SJTU_STUDENT,
-  UserGroup.VISITOR
-];
 
 bool isHtml(String content) {
   var htmlMatcher = RegExp(r'<.+>.*</.+>', dotAll: true);
@@ -282,6 +272,14 @@ class ForumSubpage extends PlatformSubpage<ForumSubpage> {
   void onDoubleTapOnTab() => RefreshListEvent().fire();
 
   @override
+  void onFirstShownAsHomepage(BuildContext parentContext) {
+    // Add watermark when first shown as homepage
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Watermark.addWatermark(parentContext);
+    });
+  }
+
+  @override
   void onViewStateChanged(BuildContext parentContext, SubpageViewState state) {
     super.onViewStateChanged(parentContext, state);
     switch (state) {
@@ -367,9 +365,6 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
   ///Set the Future of the page when the framework calls build(), the content is not reloaded every time.
   Future<List<OTHole>?> _loadContent(int page) async {
-    if (!checkGroup(kCompatibleUserGroup)) {
-      throw NotLoginError("Logged in as a visitor.");
-    }
     // Initialize the user token from shared preferences.
     // If no token, NotLoginError will be thrown.
     if (!context.read<ForumProvider>().isUserInitialized) {
@@ -403,6 +398,13 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           return ForumRepository.getInstance()
               .loadUserHoles(time, sortOrder: SortOrder.LAST_CREATED);
         }).call(page);
+
+        // Filter away hidden posts (I know this is O(n^2), but the list won't be too large so I assume it's OK)
+        loadedPost = loadedPost?.filter((element) =>
+            !SettingsProvider.getInstance()
+                .hiddenMyPosts
+                .contains(element.hole_id));
+
         // If not more posts, notify ListView that we reached the end.
         if (loadedPost?.isEmpty ?? false) return [];
 
@@ -455,7 +457,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   }
 
   /// Refresh the whole list.
-  Future<void> refreshList() async {
+  Future<void> refreshList({bool queueDataClear = true}) async {
     try {
       if (_postsType == PostsType.FAVORED_DISCUSSION) {
         await ForumRepository.getInstance().getFavoriteHoleId();
@@ -470,7 +472,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
         await _delegate?.triggerRefresh();
       } else {
         await listViewController.notifyUpdate(
-            useInitialData: true, queueDataClear: true);
+            useInitialData: true, queueDataClear: queueDataClear);
       }
     }
   }
@@ -615,18 +617,40 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           ),
         );
       case PostsType.FILTER_BY_ME:
+        return PlatformScaffold(
+          iosContentPadding: false,
+          iosContentBottomPadding: false,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          appBar: PlatformAppBarX(
+            title: Text(S.of(context).list_my_posts),
+            trailingActions: [
+              PlatformIconButton(
+                padding: EdgeInsets.zero,
+                icon: Icon(Icons.restore_page),
+                onPressed: () async {
+                  if (await Noticing.showConfirmationDialog(
+                          context, S.of(context).restore_hidden_confirm,
+                          isConfirmDestructive: false) ==
+                      true) {
+                    SettingsProvider.getInstance().hiddenMyPosts = [];
+                    refreshList(queueDataClear: false);
+                  }
+                },
+              )
+            ],
+          ),
+          body: Builder(
+            // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
+            builder: (context) => _buildPageBody(context, false),
+          ),
+        );
       case PostsType.FILTER_BY_TAG:
         return PlatformScaffold(
           iosContentPadding: false,
           iosContentBottomPadding: false,
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: PlatformAppBarX(
-            title: Text(switch (_postsType) {
-              PostsType.FILTER_BY_ME => S.of(context).list_my_posts,
-              PostsType.FILTER_BY_TAG =>
-                S.of(context).filtering_by_tag(_tagFilter ?? "?"),
-              _ => throw Exception("Unreachable"),
-            }),
+            title: Text(S.of(context).filtering_by_tag(_tagFilter ?? "?")),
           ),
           body: Builder(
             // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
@@ -770,6 +794,14 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
                 return null;
               });
             },
+          PostsType.FILTER_BY_ME => (context, index, item) {
+              SettingsProvider.getInstance().hiddenMyPosts = [
+                item.hole_id!,
+                ...SettingsProvider.getInstance().hiddenMyPosts
+              ];
+              Noticing.showMaterialNotice(
+                  context, S.of(context).hide_post_success);
+            },
           _ => null
         },
         onConfirmDismissItem: switch (_postsType) {
@@ -781,6 +813,11 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           PostsType.SUBSCRIBED_DISCUSSION => (context, index, item) {
               return Noticing.showConfirmationDialog(
                   context, S.of(context).remove_subscribed_hole_confirmation,
+                  isConfirmDestructive: true);
+            },
+          PostsType.FILTER_BY_ME => (context, index, item) {
+              return Noticing.showConfirmationDialog(
+                  context, S.of(context).hide_post_confirm,
                   isConfirmDestructive: true);
             },
           _ => null

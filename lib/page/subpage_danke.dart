@@ -46,6 +46,14 @@ class DankeSubPage extends PlatformSubpage<DankeSubPage> {
   Create<Widget> get title => (cxt) => Text(S.of(cxt).curriculum);
 
   @override
+  void onFirstShownAsHomepage(BuildContext parentContext) {
+    // Add watermark when first shown as homepage
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Watermark.addWatermark(parentContext);
+    });
+  }
+
+  @override
   void onViewStateChanged(BuildContext parentContext, SubpageViewState state) {
     super.onViewStateChanged(parentContext, state);
     switch (state) {

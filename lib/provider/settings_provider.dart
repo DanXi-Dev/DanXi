@@ -93,6 +93,9 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_VIEW_HISTORY = "view_history";
   static const String KEY_FOLLOW_SYSTEM_PALETTE = "follow_system_palette";
   static const String KEY_HAPTIC_FEEDBACK_ENABLED = "haptic_feedback_enabled";
+  static const String KEY_IS_LOGGED_IN = "is_logged_in";
+  static const String KEY_HIDDEN_MY_POSTS = "hidden_my_posts";
+  static const String KEY_HIDDEN_MY_REPLIES = "hidden_my_replies";
 
   static const int MAX_VIEW_HISTORY = 250;
 
@@ -809,6 +812,10 @@ class SettingsProvider with ChangeNotifier {
   bool get hapticFeedbackEnabled {
     if (preferences!.containsKey(KEY_HAPTIC_FEEDBACK_ENABLED)) {
       return preferences!.getBool(KEY_HAPTIC_FEEDBACK_ENABLED)!;
+
+  bool get isLoggedIn {
+    if (preferences!.containsKey(KEY_IS_LOGGED_IN)) {
+      return preferences!.getBool(KEY_IS_LOGGED_IN)!;
     }
     return false;
   }
@@ -818,6 +825,34 @@ class SettingsProvider with ChangeNotifier {
       notifyListeners();
   }
 
+  set isLoggedIn(bool value) {
+    preferences!.setBool(KEY_IS_LOGGED_IN, value);
+    notifyListeners();
+  }
+
+  List<int> get hiddenMyPosts {
+    if (preferences!.containsKey(KEY_HIDDEN_MY_POSTS)) {
+      return preferences!.getIntList(KEY_HIDDEN_MY_POSTS)!;
+    }
+    return [];
+  }
+
+  set hiddenMyPosts(List<int> value) {
+    preferences!.setIntList(KEY_HIDDEN_MY_POSTS, value);
+    notifyListeners();
+  }
+
+  List<int> get hiddenMyReplies {
+    if (preferences!.containsKey(KEY_HIDDEN_MY_REPLIES)) {
+      return preferences!.getIntList(KEY_HIDDEN_MY_REPLIES)!;
+    }
+    return [];
+  }
+
+  set hiddenMyReplies(List<int> value) {
+    preferences!.setIntList(KEY_HIDDEN_MY_REPLIES, value);
+    notifyListeners();
+  }
 }
 
 enum SortOrder { LAST_REPLIED, LAST_CREATED }

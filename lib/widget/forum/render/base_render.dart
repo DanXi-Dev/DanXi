@@ -19,6 +19,7 @@ import 'package:flutter/cupertino.dart';
 
 typedef LinkTapCallback = void Function(String? url);
 typedef ImageTapCallback = void Function(String? url, Object heroTag);
+typedef ImageLongPressCallback = void Function(String? url);
 
 /// BaseRender is the base type of a render which renders the post raw [content] into a [Widget].
 ///
@@ -26,7 +27,8 @@ typedef ImageTapCallback = void Function(String? url, Object heroTag);
 typedef BaseRender = Widget Function(
     BuildContext context,
     String? content,
-    ImageTapCallback? onTapImage,
-    LinkTapCallback? onTapLink,
     bool translucentCard,
-    bool isPreviewWidget);
+    bool isPreviewWidget,
+    {ImageTapCallback? onTapImage,
+    LinkTapCallback? onTapLink,
+    ImageLongPressCallback? onLongPressImage});
