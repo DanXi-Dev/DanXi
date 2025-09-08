@@ -812,17 +812,20 @@ class SettingsProvider with ChangeNotifier {
   bool get hapticFeedbackEnabled {
     if (preferences!.containsKey(KEY_HAPTIC_FEEDBACK_ENABLED)) {
       return preferences!.getBool(KEY_HAPTIC_FEEDBACK_ENABLED)!;
-
-  bool get isLoggedIn {
-    if (preferences!.containsKey(KEY_IS_LOGGED_IN)) {
-      return preferences!.getBool(KEY_IS_LOGGED_IN)!;
     }
     return false;
   }
 
   set hapticFeedbackEnabled(bool value) {
     preferences!.setBool(KEY_HAPTIC_FEEDBACK_ENABLED, value);
-      notifyListeners();
+    notifyListeners();
+  }
+
+  bool get isLoggedIn {
+    if (preferences!.containsKey(KEY_IS_LOGGED_IN)) {
+      return preferences!.getBool(KEY_IS_LOGGED_IN)!;
+    }
+    return false;
   }
 
   set isLoggedIn(bool value) {

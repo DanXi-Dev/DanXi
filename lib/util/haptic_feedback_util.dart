@@ -22,6 +22,8 @@ class HapticFeedbackUtil {
   static void light() {
     if (SettingsProvider.getInstance().hapticFeedbackEnabled) {
       // HapticFeedback.lightImpact();   // IDK WHY, For some reason, it's reversed here.
+      // HapticFeedback.lightImpact();   // For some reason, it's reversed here on Android, see:
+      // https://github.com/flutter/flutter/blob/0081ee50dc3fe1ee45556c88aabe3da514f8565b/engine/src/flutter/shell/platform/android/io/flutter/plugin/platform/PlatformPlugin.java#L190-L213
       HapticFeedback.heavyImpact();
     }
   }
@@ -35,6 +37,8 @@ class HapticFeedbackUtil {
   static void heavy() {
     if (SettingsProvider.getInstance().hapticFeedbackEnabled) {
       // HapticFeedback.heavyImpact();   // IDK WHY, For some reason, it's reversed here.
+      // HapticFeedback.heavyImpact();   // For some reason, it's reversed on Android, see:
+      // https://github.com/flutter/flutter/blob/0081ee50dc3fe1ee45556c88aabe3da514f8565b/engine/src/flutter/shell/platform/android/io/flutter/plugin/platform/PlatformPlugin.java#L190-L213
       HapticFeedback.lightImpact();
     }
   }
