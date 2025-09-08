@@ -89,10 +89,12 @@ class DataCenterRepository extends BaseRepositoryWithDio {
       path: DINING_DETAIL_URL,
       responseType: ResponseType.plain,
     );
-    return FudanSession.request(options, (req) => _parseCrowdednessInfo(req.data, areaCode));
+    return FudanSession.request(
+        options, (req) => _parseCrowdednessInfo(req.data, areaCode));
   }
 
-  Map<String, TrafficInfo> _parseCrowdednessInfo(String responseData, int areaCode) {
+  Map<String, TrafficInfo> _parseCrowdednessInfo(
+      String responseData, int areaCode) {
     var result = <String, TrafficInfo>{};
 
     //If it's not time for a meal
