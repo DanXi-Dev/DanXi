@@ -32,7 +32,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DiningHallCrowdednessFeature extends Feature {
-  PersonInfo? _info;
   Map<String, TrafficInfo>? _trafficInfo;
   String? _leastCrowdedCanteen;
   String? _mostCrowdedCanteen;
@@ -40,11 +39,11 @@ class DiningHallCrowdednessFeature extends Feature {
   /// Status of the request.
   ConnectionStatus _status = ConnectionStatus.NONE;
 
-  Future<void> _loadCrowdednessSummary(PersonInfo? info) async {
+  Future<void> _loadCrowdednessSummary() async {
     Campus preferredCampus = SettingsProvider.getInstance().campus;
     try {
       _trafficInfo = await DataCenterRepository.getInstance()
-          .getCrowdednessInfo(info, preferredCampus.index);
+          .getCrowdednessInfo(preferredCampus.index);
       generateSummary(preferredCampus);
     } on UnsuitableTimeException {
       _status = ConnectionStatus.FATAL_ERROR;
@@ -163,7 +162,6 @@ class DiningHallCrowdednessFeature extends Feature {
 
   @override
   void buildFeature([Map<String, dynamic>? arguments]) {
-    _info = StateProvider.personInfo.value;
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
@@ -172,7 +170,7 @@ class DiningHallCrowdednessFeature extends Feature {
       _trafficInfo = null;
       _mostCrowdedCanteen = "";
       _leastCrowdedCanteen = "";
-      _loadCrowdednessSummary(_info);
+      _loadCrowdednessSummary();
     }
   }
 

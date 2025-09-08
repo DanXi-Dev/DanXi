@@ -83,8 +83,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
     return zoneTraffic;
   }
 
-  Future<Map<String, TrafficInfo>> getCrowdednessInfo(
-      PersonInfo info, int areaCode) async {
+  Future<Map<String, TrafficInfo>> getCrowdednessInfo(int areaCode) async {
     final options = RequestOptions(
       method: "GET",
       path: DINING_DETAIL_URL,
