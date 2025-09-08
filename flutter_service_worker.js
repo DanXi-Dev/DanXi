@@ -18,8 +18,8 @@ const RESOURCES = {"canvaskit/skwasm.js": "1ef3ea3a0fec4569e5d531da25f34095",
 "favicon.webp": "5d8a19c576a1ba2a24af3b99f340237d",
 "flutter.js": "888483df48293866f9f41d3d9274a779",
 "manifest.json": "012d91b9edf492757ddf24dd1b15d03e",
-"main.dart.js": "dee8b7ea2a8927c8597ea3a57d3814a9",
-"version.json": "765670aadbb82516d3fc9d87335ae78c",
+"main.dart.js": "51b1efa9546b8cf4524c807d0f4727c9",
+"version.json": "3ac35de81d647f650b6f3a674887919c",
 "assets/NOTICES": "d8db9dae8abc2bb8e1111ea52d66892d",
 "assets/fonts/MaterialIcons-Regular.otf": "4b3e2c198761cc0ff43b22148efde931",
 "assets/AssetManifest.json": "db88196cd21249b4d0ffbf4ac406229b",
@@ -95,9 +95,9 @@ const RESOURCES = {"canvaskit/skwasm.js": "1ef3ea3a0fec4569e5d531da25f34095",
 "assets/packages/flutter_math_fork/lib/katex_fonts/fonts/KaTeX_SansSerif-Bold.ttf": "ad0a28f28f736cf4c121bcb0e719b88a",
 "assets/packages/flutter_math_fork/lib/katex_fonts/fonts/KaTeX_Fraktur-Regular.ttf": "dede6f2c7dad4402fa205644391b3a94",
 "assets/packages/flutter_inappwebview_web/assets/web/web_support.js": "509ae636cfdd93e49b5a6eaf0f06d79f",
-"flutter_bootstrap.js": "be26d5241d2dee6df9688154c18572db",
-"index.html": "4cd358dd0d24fd589da9a880e17c4945",
-"/": "4cd358dd0d24fd589da9a880e17c4945"};
+"flutter_bootstrap.js": "2e3d62b4afe7a7df3607b1a83ab0c40d",
+"index.html": "c3e5b64c641e8a7798c4816b794adaca",
+"/": "c3e5b64c641e8a7798c4816b794adaca"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",
