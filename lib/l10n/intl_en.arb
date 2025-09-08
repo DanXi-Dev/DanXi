@@ -566,6 +566,8 @@
   "select_date_range_far_past": "Far Past",
   "select_date_range_now": "Now",
   "hole_force_deleted": "Deleted",
+  "haptic_feedback": "Haptic Feedback",
+  "haptic_feedback_description": "Provide vibration feedback during interactions",
   "identity_service": "Identity Service",
   "login_undergraduate": "Undergraduate Login",
   "login_postgraduate": "Postgraduate Login",

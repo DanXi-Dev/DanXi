@@ -27,6 +27,7 @@ import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/widget/dialogs/care_dialog.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -280,6 +281,7 @@ Widget searchByTextGeneral(
           ? const Icon(Icons.text_fields)
           : const Icon(CupertinoIcons.search),
       onTap: () async {
+        HapticFeedbackUtil.light();
         submit(context, searchKeyword);
         bool isCareWordsDetected = await detectCareWords(searchKeyword);
         if (context.mounted && isCareWordsDetected) {
@@ -314,6 +316,7 @@ Widget searchByPid(BuildContext context, String searchKeyword,
           : const Icon(CupertinoIcons.arrow_right_square),
       title: Text(S.of(context).search_by_pid_tip(pidMatch.group(0)!)),
       onTap: () {
+        HapticFeedbackUtil.light();
         submit(context, searchKeyword);
         goToPIDResultPage(context, int.parse(pidMatch.group(1)!));
       },
@@ -333,6 +336,7 @@ Widget searchByFloorId(BuildContext context, String searchKeyword,
           : const Icon(CupertinoIcons.arrow_right_square),
       title: Text(S.of(context).search_by_floor_tip(floorMatch.group(0)!)),
       onTap: () {
+        HapticFeedbackUtil.light();
         submit(context, searchKeyword);
         goToFloorIdResultPage(context, int.parse(floorMatch.group(1)!));
       },
@@ -357,6 +361,7 @@ Widget searchByTag(BuildContext context, String searchKeyword,
                     leading: Icon(PlatformIcons(context).tag),
                     title: Text(S.of(context).search_by_tag_tip(e.name!)),
                     onTap: () {
+                      HapticFeedbackUtil.light();
                       submit(context, searchKeyword);
                       smartNavigatorPush(context, '/bbs/discussions',
                           arguments: {"tagFilter": e.name},

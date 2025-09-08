@@ -93,6 +93,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_USE_WEBVPN = "use_webvpn";
   static const String KEY_VIEW_HISTORY = "view_history";
   static const String KEY_FOLLOW_SYSTEM_PALETTE = "follow_system_palette";
+  static const String KEY_HAPTIC_FEEDBACK_ENABLED = "haptic_feedback_enabled";
   static const String KEY_IS_LOGGED_IN = "is_logged_in";
   static const String KEY_HIDDEN_MY_POSTS = "hidden_my_posts";
   static const String KEY_HIDDEN_MY_REPLIES = "hidden_my_replies";
@@ -808,11 +809,23 @@ class SettingsProvider with ChangeNotifier {
     if (preferences!.containsKey(KEY_FOLLOW_SYSTEM_PALETTE)) {
       return preferences!.getBool(KEY_FOLLOW_SYSTEM_PALETTE)!;
     }
-    return false; // Default to false if not set
+    return false;
   }
 
   set followSystemPalette(bool value) {
     preferences!.setBool(KEY_FOLLOW_SYSTEM_PALETTE, value);
+    notifyListeners();
+  }
+
+  bool get hapticFeedbackEnabled {
+    if (preferences!.containsKey(KEY_HAPTIC_FEEDBACK_ENABLED)) {
+      return preferences!.getBool(KEY_HAPTIC_FEEDBACK_ENABLED)!;
+    }
+    return false;
+  }
+
+  set hapticFeedbackEnabled(bool value) {
+    preferences!.setBool(KEY_HAPTIC_FEEDBACK_ENABLED, value);
     notifyListeners();
   }
 
