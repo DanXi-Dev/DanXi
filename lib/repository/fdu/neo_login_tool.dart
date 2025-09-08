@@ -138,10 +138,10 @@ class FudanSession {
         response.realUri.host == FudanAuthenticationAPIV1.uisHost &&
         response.redirectCount > 0;
 
-    bool isLegacyFatalError(dynamic e) => e is AuthenticationV1FailedException;
-    final effectiveIsFatalError = (isFatalError == null)
-        ? isLegacyFatalError
-        : (dynamic e) => isFatalError(e) || isLegacyFatalError(e);
+    bool isNeoFatalError(dynamic e) => e is AuthenticationV2FailedException;
+    final effectiveIsFatalErrorNeo = (isFatalError == null)
+        ? isNeoFatalError
+        : (dynamic e) => isFatalError(e) || isNeoFatalError(e);
 
     switch (type) {
       case FudanLoginType.Neo:
@@ -164,7 +164,7 @@ class FudanSession {
             await FudanAuthenticationAPIV2.authenticate(
                 personInfo, effectiveServiceUrl, effectiveLoginMethod);
           },
-          isFatalError: isFatalError,
+          isFatalError: effectiveIsFatalErrorNeo,
         );
       case FudanLoginType.UISNeo:
         return _authenticationQueues[type]!.runNormalRequest(
@@ -186,7 +186,7 @@ class FudanSession {
             await FudanAuthenticationAPIV2WithUIS.authenticate(
                 personInfo, effectiveServiceUrl, effectiveLoginMethod);
           },
-          isFatalError: effectiveIsFatalError,
+          isFatalError: effectiveIsFatalErrorNeo,
         );
       case FudanLoginType.UISLegacy:
         bool isLegacyAuthenticationRequired(Response<dynamic> response) =>
@@ -233,6 +233,9 @@ class FudanSession {
 
 class FudanAuthenticationAPIV2 {
   static final String idHost = 'id.fudan.edu.cn';
+
+  /// Error patterns from ID.
+  static const String CAPTCHA_CODE_NEEDED = "请输入验证码";
 
   static Future<Response<dynamic>> authenticate(
       PersonInfo info, Uri serviceUrl, String? serviceRequestMethod) async {
@@ -356,6 +359,12 @@ class FudanAuthenticationAPIV2 {
       },
     );
 
+    final message = response.data!["message"] as String?;
+    if (message?.contains(CAPTCHA_CODE_NEEDED) ?? false) {
+      // Notify [main.dart] to show up a dialog to guide users to log in manually.
+      CaptchaNeededException().fire();
+      throw CaptchaNeededException();
+    }
     return response.data!["loginToken"] as String;
   }
 
@@ -511,7 +520,10 @@ class FudanAuthenticationAPIV1 {
 /// Several exceptions that can be thrown during authentication V1.
 class AuthenticationV1FailedException implements Exception {}
 
-class CaptchaNeededException implements AuthenticationV1FailedException {}
+/// Several exceptions that can be thrown during authentication V2.
+class AuthenticationV2FailedException implements Exception {}
+
+class CaptchaNeededException implements AuthenticationV1FailedException, AuthenticationV2FailedException {}
 
 class CredentialsInvalidException implements AuthenticationV1FailedException {}
 
