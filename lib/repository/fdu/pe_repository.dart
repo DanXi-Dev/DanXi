@@ -23,6 +23,7 @@ import 'package:html/dom.dart' as dom;
 class FudanPERepository extends BaseRepositoryWithDio {
   static const String _INFO_URL =
       "https://fdtyjw.fudan.edu.cn/sportScore/stScore.aspx";
+  static final Uri _LOGIN_URL = Uri.parse("https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Ftac.fudan.edu.cn%2Fthirds%2Ftjb.act%3Fredir%3DsportScore");
 
   FudanPERepository._();
 
@@ -72,7 +73,7 @@ class FudanPERepository extends BaseRepositoryWithDio {
         }
       }
       return items;
-    });
+    }, manualLoginUrl: _LOGIN_URL);
   }
 
   @override

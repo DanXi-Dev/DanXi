@@ -5,13 +5,13 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/cookie/independent_cookie_jar.dart';
 import 'package:dan_xi/util/condition_variable.dart';
+import 'package:dan_xi/util/io/cookie_manager_fix.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dio/dio.dart';
 import 'package:dio5_log/dio_log.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_redirect_interceptor/dio_redirect_interceptor.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:mutex/mutex.dart';
@@ -78,7 +78,7 @@ class FudanSession {
       // 2. User agent spoofing to bypass restrictions
       _dio!.interceptors.add(UserAgentInterceptor(important: false));
       // 3. Cookie management for session persistence
-      _dio!.interceptors.add(CookieManager(_sessionCookieJar));
+      _dio!.interceptors.add(TolerantCookieManager(_sessionCookieJar));
       // 4. Dio Logger for debugging
       _dio!.interceptors.add(DioLogInterceptor());
       // 5. Custom redirect handling (must be last)
