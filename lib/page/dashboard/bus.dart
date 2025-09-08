@@ -20,7 +20,6 @@ import 'dart:async';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/bus_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/platform_universal.dart';
