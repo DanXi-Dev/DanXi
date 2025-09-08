@@ -18,9 +18,7 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/bus_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/vague_time.dart';
@@ -51,7 +49,7 @@ class BusFeature extends Feature {
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
     if (_status == ConnectionStatus.NONE) {
-      _loadBusList(StateProvider.personInfo.value).catchError((error) {
+      _loadBusList().catchError((error) {
         _status = ConnectionStatus.FAILED;
         notifyUpdate();
       });
@@ -63,10 +61,10 @@ class BusFeature extends Feature {
     return (today == DateTime.sunday) || (today == DateTime.saturday);
   }
 
-  Future<void> _loadBusList(PersonInfo? personInfo) async {
+  Future<void> _loadBusList() async {
     _status = ConnectionStatus.CONNECTING;
     _busList = await FudanBusRepository.getInstance()
-        .loadBusList(personInfo, holiday: isHoliday!);
+        .loadBusList(holiday: isHoliday!);
     _status = ConnectionStatus.DONE;
     notifyUpdate();
   }

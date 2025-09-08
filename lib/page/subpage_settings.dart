@@ -122,6 +122,8 @@ class SettingsPageState extends State<SettingsPage> {
     LicenseItem("dio", LICENSE_MIT, "https://github.com/flutterchina/dio"),
     LicenseItem("dio_cookie_manager", LICENSE_MIT,
         "https://github.com/flutterchina/dio"),
+    LicenseItem("dio_redirect_interceptor", LICENSE_MIT,
+        "https://github.com/wilinz/dio_redirect_interceptor"),
     LicenseItem("dio_log", LICENSE_APACHE_2_0,
         "https://github.com/flutterplugin/dio_log"),
     LicenseItem("event_bus", LICENSE_MIT,
@@ -264,6 +266,89 @@ class SettingsPageState extends State<SettingsPage> {
         menuContext: menuContext,
         child: Text(value.displayTitle(menuContext)),
         onPressed: () => onTapListener(value),
+      ));
+    }
+    return list;
+  }
+
+  List<Widget> _buildProxyList(BuildContext menuContext) {
+    onTapListener(String? proxyUrl) {
+      context.read<SettingsProvider>().proxy = proxyUrl;
+    }
+    List<Widget> list = [
+      PlatformContextMenuItem(
+        menuContext: menuContext,
+        child: Text(S.of(context).proxy_setting_do_not_use),
+        onPressed: () => onTapListener(null),
+      ),
+      PlatformContextMenuItem(
+        menuContext: menuContext,
+        child: Text(S.of(context).proxy_setting_add_new),
+        onPressed: () async {
+          String? addr = await Noticing.showInputDialog(
+              context,
+              S.of(context).proxy_setting_input_title,
+              initialText: context.read<SettingsProvider>().proxy,
+              hintText: S.of(context).proxy_setting_input_hint);
+          if (!context.mounted || addr == null) {
+            return; // return if cancelled
+          }
+          if (addr.isEmpty) {
+            addr = null;
+          } else {
+            final proxies = List<String>.from(context.read<SettingsProvider>().savedProxies);
+            if (proxies.contains(addr)) {
+              Noticing.showNotice(
+                context,
+                S.of(context).proxy_setting_already_exists,
+              );
+            } else {
+              context.read<SettingsProvider>().savedProxies = proxies..add(addr);
+            }
+          }
+          onTapListener(addr);
+        },
+      ),
+      PlatformContextMenuItem(
+        menuContext: menuContext,
+        child: Text(S.of(context).proxy_setting_remove),
+        onPressed: () => showPlatformModalSheet(
+            context: context,
+            builder: (BuildContext sheetContext) =>
+                PlatformContextMenu(
+                    actions: _buildRemoveProxyList(sheetContext),
+                    cancelButton: CupertinoActionSheetAction(
+                        child: Text(S.of(sheetContext).cancel),
+                        onPressed: () =>
+                            Navigator.of(sheetContext).pop()))),
+      ),
+    ];
+
+    for (final proxyUrl in context.read<SettingsProvider>().savedProxies) {
+      list.add(PlatformContextMenuItem(
+        menuContext: menuContext,
+        child: Text(proxyUrl),
+        onPressed: () => onTapListener(proxyUrl),
+      ));
+    }
+    return list;
+  }
+
+  List<Widget> _buildRemoveProxyList(BuildContext menuContext) {
+    onTapListener(String proxyUrl) {
+      final proxies = List<String>.from(context.read<SettingsProvider>().savedProxies);
+      context.read<SettingsProvider>().savedProxies = proxies..remove(proxyUrl);
+      if (context.read<SettingsProvider>().proxy == proxyUrl) {
+        context.read<SettingsProvider>().proxy = null;
+      }
+    }
+    List<Widget> list = [];
+
+    for (final proxyUrl in context.read<SettingsProvider>().savedProxies) {
+      list.add(PlatformContextMenuItem(
+        menuContext: menuContext,
+        child: Text(proxyUrl),
+        onPressed: () => onTapListener(proxyUrl),
       ));
     }
     return list;
@@ -435,7 +520,7 @@ class SettingsPageState extends State<SettingsPage> {
                                           actions: _buildLanguageList(sheetContext),
                                           cancelButton: CupertinoActionSheetAction(
                                                   child: Text(S.of(sheetContext).cancel),
-                                                  onPressed: () => 
+                                                  onPressed: () =>
                                                       Navigator.of(sheetContext).pop())));
                                                       },
                             ),
@@ -535,7 +620,7 @@ class SettingsPageState extends State<SettingsPage> {
                                           actions: _buildThemeList(sheetContext),
                                           cancelButton: CupertinoActionSheetAction(
                                                   child: Text(S.of(sheetContext).cancel),
-                                                  onPressed: () => 
+                                                  onPressed: () =>
                                                   Navigator.of(sheetContext).pop())));
                                                   },
                             ),
@@ -546,22 +631,17 @@ class SettingsPageState extends State<SettingsPage> {
                                           (s) => s.proxy) ??
                                       S.of(context).proxy_setting_unset),
                               leading: const Icon(Icons.network_ping),
-                              onTap: () async {
+                              onTap: () {
                                 HapticFeedbackUtil.light();
-                                String? addr = await Noticing.showInputDialog(
-                                    context,
-                                    S.of(context).proxy_setting_input_title,
-                                    initialText:
-                                        context.read<SettingsProvider>().proxy,
-                                    hintText:
-                                        S.of(context).proxy_setting_input_hint);
-                                if (!context.mounted || addr == null) {
-                                  return; // return if cancelled
-                                }
-                                if (addr.isEmpty) addr = null;
-                                context.read<SettingsProvider>().proxy = addr;
-                                await Noticing.showNotice(context,
-                                    S.of(context).proxy_setting_set_successfully);
+                                showPlatformModalSheet(
+                                    context: context,
+                                    builder: (BuildContext sheetContext) =>
+                                        PlatformContextMenu(
+                                            actions: _buildProxyList(sheetContext),
+                                            cancelButton: CupertinoActionSheetAction(
+                                                child: Text(S.of(sheetContext).cancel),
+                                                onPressed: () =>
+                                                    Navigator.of(sheetContext).pop())));
                               },
                               enabled: !PlatformX.isWeb,
                             ),
@@ -574,7 +654,7 @@ class SettingsPageState extends State<SettingsPage> {
                                     .of(context)
                                     .show_hidden_notifications_description),
                                 leading: const Icon(Icons.notifications_off),
-                                onTap: () { 
+                                onTap: () {
                                       HapticFeedbackUtil.light();
                                       context
                                         .read<SettingsProvider>()
@@ -767,7 +847,7 @@ class SettingsPageState extends State<SettingsPage> {
                         ? const Icon(Icons.hide_image)
                         : const Icon(CupertinoIcons.eye_slash),
                     subtitle: Text(S.of(context).fatal_error),
-                    onTap: () { 
+                    onTap: () {
                       HapticFeedbackUtil.light();
                       setState(() {});
                     }
@@ -778,7 +858,7 @@ class SettingsPageState extends State<SettingsPage> {
                         ? const Icon(Icons.hide_image)
                         : const Icon(CupertinoIcons.eye_slash),
                     subtitle: Text(S.of(context).loading),
-                    onTap: () { 
+                    onTap: () {
                       HapticFeedbackUtil.light();
                       setState(() {});
                     }
@@ -843,7 +923,7 @@ class SettingsPageState extends State<SettingsPage> {
                     title: Text(S.of(context).recommended_tags),
                     leading: const Icon(Icons.recommend),
                     subtitle: Text(S.of(context).unavailable),
-                    onTap: () { 
+                    onTap: () {
                       HapticFeedbackUtil.light();
                       Noticing.showModalNotice(context,
                         title: S.of(context).recommended_tags,
@@ -930,7 +1010,7 @@ class SettingsPageState extends State<SettingsPage> {
                 ListTile(
                   leading: nil,
                   title: Text(S.of(context).modify_password),
-                  onTap: () { 
+                  onTap: () {
                     HapticFeedbackUtil.light();
                     BrowserUtil.openUrl(
                       Constant.FORUM_FORGOT_PASSWORD_URL, context);
@@ -1093,7 +1173,7 @@ class SettingsPageState extends State<SettingsPage> {
                           fit: BoxFit.fill, image: AssetImage(e.imageUrl)))),
               title: Text(e.name),
               //subtitle: Text(e.description),
-              onTap: () { 
+              onTap: () {
                 HapticFeedbackUtil.light();
                 BrowserUtil.openUrl(e.url, context);
                 }

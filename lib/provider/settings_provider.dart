@@ -88,6 +88,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_IMAGE_BASE_URL = "image_base_url";
   static const String KEY_DANKE_BASE_URL = "danke_base_url";
   static const String KEY_PROXY = "proxy";
+  static const String KEY_SAVED_PROXIES = "saved_proxies";
   static const String KEY_TIMETABLE_LAST_UPDATED = "timetable_last_updated";
   static const String KEY_USE_WEBVPN = "use_webvpn";
   static const String KEY_VIEW_HISTORY = "view_history";
@@ -142,6 +143,13 @@ class SettingsProvider with ChangeNotifier {
     } else {
       preferences!.remove(KEY_PROXY);
     }
+    notifyListeners();
+  }
+
+  List<String> get savedProxies => preferences!.getStringList(KEY_SAVED_PROXIES) ?? List.empty();
+
+  set savedProxies(List<String> value) {
+    preferences!.setStringList(KEY_SAVED_PROXIES, value);
     notifyListeners();
   }
 
@@ -351,15 +359,15 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  TimeTableExtra? get semesterStartDates {
+  SemesterStartDates? get semesterStartDates {
     if (preferences!.containsKey(KEY_SEMESTER_START_DATES)) {
-      return TimeTableExtra.fromJson(
+      return SemesterStartDates.fromJson(
           jsonDecode(preferences!.getString(KEY_SEMESTER_START_DATES)!));
     }
     return null;
   }
 
-  set semesterStartDates(TimeTableExtra? value) {
+  set semesterStartDates(SemesterStartDates? value) {
     preferences!.setString(KEY_SEMESTER_START_DATES, jsonEncode(value!));
     notifyListeners();
   }

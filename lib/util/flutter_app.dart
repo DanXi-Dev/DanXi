@@ -20,6 +20,7 @@ import 'dart:io';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -41,6 +42,7 @@ class FlutterApp {
 
   static Future<void> restartApp(BuildContext context) async {
     await BaseRepositoryWithDio.clearAllCookies();
+    FudanSession.clearSession();
     ForumRepository.getInstance().clearCache();
     StateProvider.initialize(context);
     while (auxiliaryNavigatorState?.canPop() == true) {

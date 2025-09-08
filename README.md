@@ -78,10 +78,10 @@ sudo pacman -S danxi-git
 
 ```shell
 $ flutter --version
-Flutter 3.35.1 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 20f8274939 (12 小时前) • 2025-08-14 10:53:09 -0700
-Engine • hash 6cd51c08a88e7bbe848a762c20ad3ecb8b063c0e (revision 1e9a811bf8) (29 hours ago) • 2025-08-13 23:35:25.000Z
-Tools • Dart 3.9.0 • DevTools 2.48.0
+Flutter 3.35.3 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision a402d9a437 (5 天前) • 2025-09-03 14:54:31 -0700
+Engine • hash 672c59cfa87c8070c20ba2cd1a6c2a1baf5cf08b (revision ddf47dd3ff) (4 days ago) • 2025-09-03 20:02:13.000Z
+Tools • Dart 3.9.2 • DevTools 2.48.0
 ```
 
 ## 编译说明

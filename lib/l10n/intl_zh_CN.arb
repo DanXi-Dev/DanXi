@@ -260,7 +260,7 @@
   "login_issue_2": "未能正确从服务器获取本学期相关信息，请重试。\n如果直接跳过，课程表相关功能可能出现日期计算上的问题。",
   "login_problem": "如果您登录时遇到问题，请联系 dev@danta.tech 或加入 QQ 群 {QQ}.\n\n与此同时，建议您阅读开发组公告，您遇到的问题可能已经在其中被提及。",
   "login_problem_occurred": "登录时发生了一些问题，请重试。",
-  "login_uis": "复旦本科生 UIS 登录",
+  "login_uis_dialog_title": "复旦本科生 UIS 登录",
   "login_uis_description": "您的密码仅会被用于登录复旦 UIS（统一身份认证）",
   "login_uis_pwd": "密码",
   "login_uis_uid": "学号",
@@ -541,6 +541,10 @@
   "proxy_setting_input_title": "输入 HTTP 代理地址",
   "proxy_setting_input_hint": "如 127.0.0.1:1234（留空以关闭代理）",
   "proxy_setting_set_successfully": "代理设置已保存，重启应用后生效",
+  "proxy_setting_do_not_use": "不使用代理",
+  "proxy_setting_add_new": "添加新代理",
+  "proxy_setting_remove": "移除代理",
+  "proxy_setting_already_exists": "该代理已存在",
   "use_webvpn_title": "自动使用 WebVPN 代理",
   "use_webvpn_description": "启动该项后，允许在非校园网环境下直接访问茶楼、评教等功能（需要重启应用）",
   "show_this_person": "只看此人",
@@ -571,5 +575,10 @@
   "hide_post_success": "已成功隐藏该条目",
   "hide_post_confirm": "是否隐藏该条目？隐藏后仍可通过右上角恢复按钮恢复。",
   "restore_hidden_confirm": "是否复原所有隐藏条目？",
-  "clear_history_confirm": "是否清除本地浏览记录？清除后无法恢复。"
+  "clear_history_confirm": "是否清除本地浏览记录？清除后无法恢复。",
+  "export_log_confirmation": "导出前请确认：\n1. 在本次应用运行期间内最近发生过错误。如果没有，请先重现错误，然后立刻返回这里重新导出日志；\n2. 要求你分享日志的是可信的开发者。日志中可能包含你的个人敏感信息（包括登录凭据），请谨慎分享。\n\n确认导出日志？",
+  "export_log_exporting": "导出日志中…",
+  "export_log_to_path": "日志文件已导出到临时文件：{path}，请自行处理该文件。",
+  "export_log_success": "导出成功",
+  "hole_frozen": "已冻结"
 }

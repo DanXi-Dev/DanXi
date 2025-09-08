@@ -18,11 +18,9 @@
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/cookie/independent_cookie_jar.dart';
-import 'package:dan_xi/repository/cookie/parallel_cookie_jars.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
-import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dio/dio.dart';
 import 'package:dio5_log/interceptor/diox_log_interceptor.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -52,12 +50,7 @@ abstract class BaseRepositoryWithDio {
       _dios[linkHost]!.interceptors.add(LimitedQueuedInterceptor.getInstance());
       _dios[linkHost]!.interceptors.add(UserAgentInterceptor(
           userAgent: SettingsProvider.getInstance().customUserAgent));
-      if (isWebvpnApplicable && SettingsProvider.getInstance().useWebvpn) {
-        _dios[linkHost]!.interceptors.add(CookieManager(
-            ParallelCookieJars([cookieJar!, WebvpnProxy.webvpnCookieJar])));
-      } else {
-        _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
-      }
+      _dios[linkHost]!.interceptors.add(CookieManager(cookieJar!));
       DioLogInterceptor.enablePrintLog = false;
       _dios[linkHost]!.interceptors.add(DioLogInterceptor());
     }

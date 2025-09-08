@@ -42,7 +42,7 @@ class CurriculumBoardRepository extends BaseRepositoryWithDio {
             SettingsProvider.getInstance().forumToken = token));
     dio.interceptors.add(
         UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
-
+    dio.interceptors.add(WebVPNInterceptor());
     // First fetch of the course list is VERY SLOW
     dio.options = BaseOptions(
         receiveDataWhenStatusError: true,

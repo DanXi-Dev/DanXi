@@ -690,9 +690,25 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   Widget _buildFavoredActionButton() {
-    var notFavoredIcon = Icon(PlatformX.isMaterial(context)
-        ? Icons.star_outline
-        : CupertinoIcons.star);
+    final notFavoredIcon = IconWithNumberTextButton(
+      icon: PlatformX.isMaterial(context)
+          ? Icons.star_outline
+          : CupertinoIcons.star,
+      text: "${(_renderModel as Normal).hole.favorite_count}",
+    );
+
+    void toggleFavoredState() {
+      final normalModel = _renderModel as Normal;
+      if (normalModel.isFavored == null) return;
+      setState(() {
+        normalModel.isFavored = !normalModel.isFavored!;
+        final favorCnt = normalModel.hole.favorite_count;
+        if (favorCnt != null) {
+          normalModel.hole.favorite_count =
+              normalModel.isFavored! ? favorCnt + 1 : favorCnt - 1;
+        }
+      });
+    }
 
     return PlatformIconButton(
       padding: EdgeInsets.zero,
@@ -700,12 +716,21 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         future: (_renderModel as Normal).isHoleFavorite(),
         loadingBuilder: notFavoredIcon,
         successBuilder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-          bool? isFavored = snapshot.data;
-          return isFavored!
-              ? Icon(PlatformX.isMaterial(context)
-                  ? Icons.star
-                  : CupertinoIcons.star_fill)
-              : notFavoredIcon;
+          final normalModel = _renderModel as Normal;
+          final isFavored = snapshot.data!;
+          return isFavored
+              ? IconWithNumberTextButton(
+                  icon: PlatformX.isMaterial(context)
+                      ? Icons.star
+                      : CupertinoIcons.star_fill,
+                  text: "${(_renderModel as Normal).hole.favorite_count}",
+                )
+              : IconWithNumberTextButton(
+                  icon: PlatformX.isMaterial(context)
+                      ? Icons.star_outline
+                      : CupertinoIcons.star,
+                  text: "${(_renderModel as Normal).hole.favorite_count}",
+                );
         },
         errorBuilder: () => Icon(
           PlatformIcons(context).error,
@@ -715,7 +740,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       onPressed: () async {
         final normalModel = _renderModel as Normal;
         if (normalModel.isFavored == null) return;
-        setState(() => normalModel.isFavored = !normalModel.isFavored!);
+        toggleFavoredState();
         await ForumRepository.getInstance()
             .setFavorite(
                 normalModel.isFavored!
@@ -725,7 +750,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             .onError((dynamic error, stackTrace) {
           Noticing.showNotice(context, error.toString(),
               title: S.of(context).operation_failed, useSnackBar: false);
-          setState(() => normalModel.isFavored = !normalModel.isFavored!);
+          toggleFavoredState();
           return null;
         });
       },
@@ -734,9 +759,25 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   // TODO: refactor to reduce redundant code
   Widget _buildSubscribeActionButton() {
-    var notSubscribedIcon = Icon(PlatformX.isMaterial(context)
-        ? Icons.visibility_off
-        : CupertinoIcons.eye_slash);
+    final notSubscribedIcon = IconWithNumberTextButton(
+      icon: PlatformX.isMaterial(context)
+          ? Icons.visibility_off
+          : CupertinoIcons.eye_slash,
+      text: "${(_renderModel as Normal).hole.subscription_count}",
+    );
+
+    void toggleSubscribedState() {
+      final normalModel = _renderModel as Normal;
+      if (normalModel.isSubscribed == null) return;
+      setState(() {
+        normalModel.isSubscribed = !normalModel.isSubscribed!;
+        final subCnt = normalModel.hole.subscription_count;
+        if (subCnt != null) {
+          normalModel.hole.subscription_count =
+              normalModel.isSubscribed! ? subCnt + 1 : subCnt - 1;
+        }
+      });
+    }
 
     return PlatformIconButton(
       padding: EdgeInsets.zero,
@@ -744,12 +785,21 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         future: (_renderModel as Normal).isHoleSubscribed(),
         loadingBuilder: notSubscribedIcon,
         successBuilder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-          bool? isSubscribed = snapshot.data;
-          return isSubscribed!
-              ? Icon(PlatformX.isMaterial(context)
-                  ? Icons.visibility
-                  : CupertinoIcons.eye)
-              : notSubscribedIcon;
+          final normalModel = _renderModel as Normal;
+          final isSubscribed = snapshot.data!;
+          return isSubscribed
+              ? IconWithNumberTextButton(
+                  icon: PlatformX.isMaterial(context)
+                      ? Icons.visibility
+                      : CupertinoIcons.eye,
+                  text: "${(_renderModel as Normal).hole.subscription_count}",
+                )
+              : IconWithNumberTextButton(
+                  icon: PlatformX.isMaterial(context)
+                      ? Icons.visibility_off
+                      : CupertinoIcons.eye_slash,
+                  text: "${(_renderModel as Normal).hole.subscription_count}",
+                );
         },
         errorBuilder: () => Icon(
           PlatformIcons(context).error,
@@ -759,7 +809,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       onPressed: () async {
         final normalModel = _renderModel as Normal;
         if (normalModel.isSubscribed == null) return;
-        setState(() => normalModel.isSubscribed = !normalModel.isSubscribed!);
+        toggleSubscribedState();
         await ForumRepository.getInstance()
             .setSubscription(
                 normalModel.isSubscribed!
@@ -769,7 +819,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             .onError((dynamic error, stackTrace) {
           Noticing.showNotice(context, error.toString(),
               title: S.of(context).operation_failed, useSnackBar: false);
-          setState(() => normalModel.isSubscribed = !normalModel.isSubscribed!);
+          toggleSubscribedState();
           return null;
         });
       },
@@ -844,6 +894,24 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           isDestructive: true,
           menuContext: menuContext,
           child: const Text("隐藏/显示帖子"),
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
+            bool? frozen = await Noticing.showConfirmationDialog(
+                context, "冻结或解冻帖子？",
+                confirmText: "冻结", cancelText: "解冻");
+            if (frozen != null) {
+              int? result = await ForumRepository.getInstance()
+                  .adminFrozeHole(e.hole_id, frozen);
+              if (result != null && result < 300 && mounted) {
+                Noticing.showMaterialNotice(
+                    context, S.of(context).operation_successful);
+              }
+            }
+          },
+          isDestructive: true,
+          menuContext: menuContext,
+          child: const Text("冻结/解冻帖子"),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
@@ -1489,3 +1557,20 @@ class MyReplies extends RenderModel {}
 class ViewHistory extends RenderModel {}
 
 class PunishmentHistory extends RenderModel {}
+
+class IconWithNumberTextButton extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const IconWithNumberTextButton(
+      {super.key, required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) => Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 20),
+          Text(text, style: TextStyle(fontSize: 8))
+        ],
+      );
+}

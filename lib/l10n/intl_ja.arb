@@ -259,7 +259,7 @@
   "login_issue_2": "今学期の関連情報をサーバから正しく取得できませんでしたので、再試行してください。\nスキップすると、時間割に関する機能に日付上の問題が生じる可能性がある。",
   "login_problem": "ログインできない場合は、dev@danta.techまでご連絡ください、またはQQグループ（番号：{QQ}）にご参加ください。 .\n\nその間に、「開発チームのお知らせ」を読んでくださいと、こんな問題が言及されている可能性があります。",
   "login_problem_occurred": "ログイン時に問題が発生しました。リトライしてください。",
-  "login_uis": "復旦学部生UISログイン",
+  "login_uis_dialog_title": "復旦学部生UISログイン",
   "login_uis_description": "パスワードは、復旦UISのログインにのみ使用されます。",
   "login_uis_pwd": "暗証番号",
   "login_uis_uid": "学生番号",
@@ -529,6 +529,10 @@
   "proxy_setting_input_title": "HTTPプロキシアドレスを入力",
   "proxy_setting_input_hint": "例：127.0.0.1:1234（空白のままにしてプロキシを無効にする）",
   "proxy_setting_set_successfully": "プロキシ設定が保存されました。再起動すると有効になります。",
+  "proxy_setting_do_not_use": "プロキシを使用しない",
+  "proxy_setting_add_new": "新しいプロキシを追加",
+  "proxy_setting_remove": "プロキシを削除",
+  "proxy_setting_already_exists": "そのプロキシは既に存在します",
   "use_webvpn_title": "WebVPN を自動的に使う",
   "use_webvpn_description": "有効時、一部の機能はFudan LANなしで、直接に連接するのができます (再起動が必要)",
   "show_this_person": "この人だけ",
@@ -559,5 +563,10 @@
   "hide_post_success": "成功に隠された。再表示するには、設定で回复して",
   "hide_post_confirm": "隠しますか？左上隅のボタンで隠されたものを再表示にするのは可能です",
   "restore_hidden_confirm": "隠していたものを全部復元しますか？",
-  "clear_history_confirm": "ローカルの閲覧履歴を削除しますか？この過程は不可逆です"
+  "clear_history_confirm": "ローカルの閲覧履歴を削除しますか？この過程は不可逆です",
+  "export_log_confirmation": "エクスポートする前に確認してください。\n1. 今回のアプリ実行中に、最近エラーが発生しましたか？発生していない場合は、まずエラーを再現させてから、すぐにここに戻ってログを再エクスポートしてください。\n2. ログの共有を求めているのは信頼できる開発者ですか？ログには、あなたの個人情報（ログイン情報を含む）が含まれる可能性がありますので、共有には十分注意してください。\n\nログをエクスポートしますか？",
+  "export_log_exporting": "ログをエクスポート中…",
+  "export_log_to_path": "ログファイルは一時ファイルにエクスポートされました：{path}。開発者に送信してください。",
+  "export_log_success": "エクスポートに成功しました",
+  "hole_frozen": "凍結"
 }

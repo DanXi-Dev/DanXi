@@ -193,6 +193,13 @@ class OTHoleWidget extends StatelessWidget {
                                   color: Theme.of(context).colorScheme.primary,
                                   label: S.of(context).hole_locked,
                                 )
+                              ],
+                              if (postElement.frozen == true) ...[
+                                const SizedBox(width: 4),
+                                LeadingChip(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  label: S.of(context).hole_frozen,
+                                )
                               ]
                             ],
                           ),
@@ -478,6 +485,16 @@ class OTFloorWidget extends StatelessWidget {
                         LeadingChip(
                           color: Theme.of(context).colorScheme.primary,
                           label: S.of(context).hole_locked,
+                        ),
+                      ],
+                      // Show frozen tag if the hole is frozen and this is the first floor
+                      if (parentHole?.frozen == true &&
+                          floor.floor_id ==
+                              parentHole?.floors?.first_floor?.floor_id) ...[
+                        const SizedBox(width: 4),
+                        LeadingChip(
+                          color: Theme.of(context).colorScheme.primary,
+                          label: S.of(context).hole_frozen,
                         ),
                       ],
                       // Show pinned tag if this hole is in the pinned list and this is the first floor

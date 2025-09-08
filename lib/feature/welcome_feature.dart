@@ -40,8 +40,7 @@ class WelcomeFeature extends Feature {
 
   Future<void> _loadCardStatus() async {
     _status = ConnectionStatus.CONNECTING;
-    _cardInfos = await DataCenterRepository.getInstance()
-        .getCardDetailInfo(StateProvider.personInfo.value);
+    _cardInfos = await DataCenterRepository.getInstance().getCardDetailInfo();
     _status = ConnectionStatus.DONE;
     notifyUpdate();
   }
