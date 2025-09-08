@@ -1,0 +1,1 @@
+这是我们近一年来最大的更新，包括完全重写的网络栈以及对新系统的接口适配，并修复了大量遗留问题。更新日志请看 https://github.com/DanXi-Dev/DanXi/releases。

@@ -1,0 +1,1 @@
+This is our biggest update in a year, featuring a completely rewritten network stack, API adaptations for the new system, and fixes for numerous long-standing issues. You can find the complete changelog at https://github.com/DanXi-Dev/DanXi/releases.
