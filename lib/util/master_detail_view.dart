@@ -39,7 +39,8 @@ class PlatformMasterDetailApp extends StatelessWidget {
     } else {
       return PopScope(
           canPop: false,
-          onPopInvoked: (_) async {
+          onPopInvokedWithResult: (bool didPop, __) async {
+            if (didPop) return;
             if (isTablet(context) && detailNavigatorKey.currentState != null) {
               // DO NOT use pop(), which pops the current route without asking
               // for others' thoughts.

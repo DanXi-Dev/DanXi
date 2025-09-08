@@ -17,7 +17,6 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/provider/state_provider.dart' as sp;
 import 'package:dan_xi/repository/fdu/ecard_repository.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -42,7 +41,7 @@ Future<List<CardRecord>> cardRecord(Ref ref, int logDays,
   }
 
   return await CardRepository.getInstance()
-      .loadCardRecord(sp.StateProvider.personInfo.value, logDays);
+      .loadCardRecord(logDays);
 }
 
 class CardDetailPageArguments {

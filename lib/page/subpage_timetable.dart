@@ -169,7 +169,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           UserGroup.FUDAN_UNDERGRADUATE_STUDENT) {
         _contentFuture = LazyFuture.pack(Retrier.runAsyncWithRetry(() =>
             TimeTableRepository.getInstance().loadTimeTable(
-                StateProvider.personInfo.value,
+                SettingsProvider.getInstance().timetableSemester,
+                SettingsProvider.getInstance().thisSemesterStartDate,
                 forceLoadFromRemote: forceLoadFromRemote)));
       } else if (forceLoadFromRemote) {
         _contentFuture = LazyFuture.pack(
@@ -275,9 +276,10 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   @override
   void initState() {
     if (!SettingsProvider.getInstance().hasVisitedTimeTable) {
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => createTutorial().show(context: context));
-      SettingsProvider.getInstance().hasVisitedTimeTable = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        createTutorial().show(context: context);
+        SettingsProvider.getInstance().hasVisitedTimeTable = true;
+      });
     }
     super.initState();
     _setContent();
@@ -597,7 +599,7 @@ class SemesterSelectionButton extends StatefulWidget {
 }
 
 class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
-  TimeTableSemesterInfo? _semesterInfo;
+  SemesterBundle? _semesterBundle;
   SemesterInfo? _selectionInfo;
   late Future<void> _future;
 
@@ -608,16 +610,27 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
   }
 
   Future<void> loadSemesterInfo() async {
-    _semesterInfo = await TimeTableRepository.getInstance()
-        .loadSemestersForTimeTable(StateProvider.personInfo.value!);
-    String? chosenSemester = SettingsProvider.getInstance().timetableSemester;
-    if (chosenSemester == null || chosenSemester.isEmpty) {
-      chosenSemester = _semesterInfo!.defaultSemesterId;
+    _semesterBundle =
+        await TimeTableRepository.getInstance().loadSemestersForTimeTable();
+
+    String chosenSemester;
+    try {
+      // Check if the stored chosen semester is valid (i.e. not null AND exists in the list)
+      chosenSemester = SettingsProvider.getInstance().timetableSemester!;
+      _selectionInfo = _semesterBundle!.semesters
+          .firstWhere((element) => element.semesterId == chosenSemester);
+    } catch (_) {
+      // If not, reset it to default...
+      chosenSemester = _semesterBundle!.defaultSemesterId;
+      SettingsProvider.getInstance().timetableSemester = chosenSemester;
+      // ... and retry
+      _selectionInfo = _semesterBundle!.semesters
+          .firstWhere((element) => element.semesterId == chosenSemester);
     }
-    _selectionInfo = _semesterInfo!.semesters
-        .firstWhere((element) => element.semesterId == chosenSemester!);
     SettingsProvider.getInstance().semesterStartDates =
-        _semesterInfo!.startDates;
+        _semesterBundle!.startDates;
+    SettingsProvider.getInstance().thisSemesterStartDate =
+        _semesterBundle!.startDates.parseStartDate(chosenSemester);
   }
 
   @override
@@ -636,7 +649,7 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
                 cancelButton: CupertinoActionSheetAction(
                     child: Text(S.of(menuContext).cancel),
                     onPressed: () => Navigator.of(menuContext).pop()),
-                actions: _semesterInfo!.semesters
+                actions: _semesterBundle!.semesters
                     .map((e) => PlatformContextMenuItem(
                         menuContext: menuContext,
                         onPressed: () {
@@ -649,8 +662,10 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
                               SettingsProvider.getInstance()
                                   .semesterStartDates
                                   ?.parseStartDate(
-                                      StateProvider.personInfo.value!.group,
-                                      e.semesterId!);
+                                    e.semesterId!,
+                                    group:
+                                        StateProvider.personInfo.value!.group,
+                                  );
                           if (parsedStartDate != null) {
                             SettingsProvider.getInstance()
                                 .thisSemesterStartDate = parsedStartDate;
@@ -675,12 +690,17 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
               ),
             ),
           ),
-      errorBuilder: () => PlatformIconButton(
+      errorBuilder: (BuildContext context, AsyncSnapshot<void> snapshot) =>
+          PlatformIconButton(
             padding: EdgeInsets.zero,
             icon: Text(S.of(context).failed),
-            onPressed: () => setState(() {
-              _future = LazyFuture.pack(loadSemesterInfo());
-            }),
+            onPressed: () async {
+              await Noticing.showErrorDialog(context, snapshot.error,
+                  trace: snapshot.stackTrace);
+              setState(() {
+                _future = LazyFuture.pack(loadSemesterInfo());
+              });
+            },
           ),
       loadingBuilder: () => PlatformIconButton(
             padding: EdgeInsets.zero,

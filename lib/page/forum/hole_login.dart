@@ -15,7 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:clipboard/clipboard.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
@@ -46,7 +45,7 @@ class HoleLoginPage extends StatefulWidget {
 
 class HoleLoginPageState extends State<HoleLoginPage> {
   late SubStatelessWidget _currentWidget;
-  late PersonInfo info;
+  late PersonInfo? info;
   LoginInfoModel model = LoginInfoModel();
   final List<SubStatelessWidget> _widgetStack = [];
 
@@ -57,7 +56,7 @@ class HoleLoginPageState extends State<HoleLoginPage> {
   @override
   void initState() {
     super.initState();
-    info = widget.arguments!["info"];
+    info = widget.arguments!["info"] as PersonInfo?;
     _currentWidget = OTEmailSelectionWidget(state: this);
     _widgetStack.add(_currentWidget);
   }
@@ -94,7 +93,10 @@ class HoleLoginPageState extends State<HoleLoginPage> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (_) async {
+      onPopInvokedWithResult: (bool didPop, __) {
+        // If already popped (by back gesture OR [Navigator.pop]), do nothing.
+        // Or we may recursively pop again.
+        if (didPop) return;
         if (_widgetStack.isNotEmpty && !_widgetStack.last.backable) {
           return;
         }
@@ -657,7 +659,7 @@ class OTRegisterSuccessWidget extends SubStatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(S.of(context).copy_password)),
               onPressed: () async {
-                await FlutterClipboard.copy(model.password!);
+                await Clipboard.setData(ClipboardData(text: model.password!));
                 if (PlatformX.isMaterial(context)) {
                   await Noticing.showNotice(
                       context, S.of(context).copy_success);
@@ -717,15 +719,16 @@ class OTLoginSuccessWidget extends SubStatelessWidget {
 ///
 /// If return null, the corresponding [ListView] will be hidden.
 abstract class EmailProvider {
-  String? getRecommendedEmailList(PersonInfo info);
+  String? getRecommendedEmailList(PersonInfo? info);
 
-  List<String> getOptionalEmailList(PersonInfo info);
+  List<String> getOptionalEmailList(PersonInfo? info);
 }
 
 class EmailProviderImpl extends EmailProvider {
   @override
-  List<String> getOptionalEmailList(PersonInfo info) {
+  List<String> getOptionalEmailList(PersonInfo? info) {
     List<String> emailList = [];
+    if (info == null) return emailList;
     switch (info.group) {
       case UserGroup.FUDAN_UNDERGRADUATE_STUDENT:
       case UserGroup.FUDAN_POSTGRADUATE_STUDENT:
@@ -738,7 +741,6 @@ class EmailProviderImpl extends EmailProvider {
           }
         }
         break;
-      case UserGroup.VISITOR:
       case UserGroup.FUDAN_STAFF:
       case UserGroup.SJTU_STUDENT:
         break;
@@ -747,7 +749,8 @@ class EmailProviderImpl extends EmailProvider {
   }
 
   @override
-  String? getRecommendedEmailList(PersonInfo info) {
+  String? getRecommendedEmailList(PersonInfo? info) {
+    if (info == null) return null;
     switch (info.group) {
       case UserGroup.FUDAN_UNDERGRADUATE_STUDENT:
       case UserGroup.FUDAN_POSTGRADUATE_STUDENT:
@@ -760,7 +763,6 @@ class EmailProviderImpl extends EmailProvider {
           }
         }
         break;
-      case UserGroup.VISITOR:
       case UserGroup.FUDAN_STAFF:
       case UserGroup.SJTU_STUDENT:
         break;

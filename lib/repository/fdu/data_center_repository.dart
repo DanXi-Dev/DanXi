@@ -21,6 +21,7 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dio/dio.dart';
@@ -82,26 +83,29 @@ class DataCenterRepository extends BaseRepositoryWithDio {
     return zoneTraffic;
   }
 
-  Future<Map<String, TrafficInfo>?> getCrowdednessInfo(
-      PersonInfo? info, int areaCode) async {
-    return UISLoginTool.tryAsyncWithAuth(
-        dio, LOGIN_URL, cookieJar!, info, () => _getCrowdednessInfo(areaCode),
-        isFatalError: (e) => e is UnsuitableTimeException);
+  Future<Map<String, TrafficInfo>> getCrowdednessInfo(int areaCode) async {
+    final options = RequestOptions(
+      method: "GET",
+      path: DINING_DETAIL_URL,
+      responseType: ResponseType.plain,
+    );
+    return FudanSession.request(
+        options, (req) => _parseCrowdednessInfo(req.data, areaCode));
   }
 
-  Future<Map<String, TrafficInfo>?> _getCrowdednessInfo(int areaCode) async {
+  Map<String, TrafficInfo> _parseCrowdednessInfo(
+      String responseData, int areaCode) {
     var result = <String, TrafficInfo>{};
-    Response<String> response = await dio.get(DINING_DETAIL_URL);
 
     //If it's not time for a meal
-    if (response.data.toString().contains("仅")) {
+    if (responseData.contains("仅")) {
       throw UnsuitableTimeException();
     }
     // Regex cannot match things like [..\n..], so replace it with '-'
     // Notice that we need to replace the exact word '\n' in the string,
     // not the line break in the end of a line. So use r'\n' or '\\n', not '\n'
     // It also unifies delimiter in string for generateSummary
-    var dataString = response.data!
+    var dataString = responseData
         .between("<script>", "</script>", headGreedy: false)!
         .replaceAll(r"\n", "-");
     var jsonExtraction = RegExp(r'\[.+?\]').allMatches(dataString);
@@ -143,16 +147,19 @@ class DataCenterRepository extends BaseRepositoryWithDio {
         .toList();
   }
 
-  Future<List<CardDetailInfo>?> getCardDetailInfo(PersonInfo? info) =>
-      UISLoginTool.tryAsyncWithAuth(
-          dio, LOGIN_URL, cookieJar!, info, () => _getCardDetailInfo());
-
-  Future<List<CardDetailInfo>?> _getCardDetailInfo() async {
-    Response<Map<String, dynamic>> r = await dio.post(CARD_DETAIL_URL);
-    return r.data?["data"]
-        .map<CardDetailInfo>(
-            (e) => CardDetailInfo.fromList(List<String>.from(e)))
-        .toList();
+  Future<List<CardDetailInfo>> getCardDetailInfo() {
+    final options = RequestOptions(
+      method: "POST",
+      path: CARD_DETAIL_URL,
+      responseType: ResponseType.json,
+    );
+    return FudanSession.request(options, (req) {
+      final data = req.data as Map<String, dynamic>;
+      return data["data"]
+          .map<CardDetailInfo>(
+              (e) => CardDetailInfo.fromList(List<String>.from(e)))
+          .toList();
+    });
   }
 
   @override

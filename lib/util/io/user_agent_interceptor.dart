@@ -21,22 +21,45 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_redirect_interceptor/dio_redirect_interceptor.dart';
 
+/// An interceptor that sets the User-Agent header for HTTP requests.
+///
+/// If [userAgent] is not provided, it defaults to the value from
+/// [StateProvider.onlineUserAgent], [SettingsProvider.customUserAgent],
+/// or a predefined constant [Constant.DEFAULT_USER_AGENT].
+///
+/// The [important] flag determines whether to always set the User-Agent
+/// header, even if it has already been set in the request options.
+///
+/// This interceptor considers [RedirectInterceptor] and ensures that
+/// the User-Agent header is set once (and only once) per request.
 class UserAgentInterceptor extends Interceptor {
-  String? userAgent;
+  static const String EXTRA_USER_AGENT_SET_TIME = "user_agent_set";
 
-  UserAgentInterceptor({this.userAgent});
+  String? userAgent;
+  bool important;
+
+  UserAgentInterceptor({this.userAgent, this.important = true});
 
   static String? get defaultUsedUserAgent =>
       StateProvider.onlineUserAgent ??
       SettingsProvider.getInstance().customUserAgent ??
       Constant.DEFAULT_USER_AGENT;
 
+  int getCurrentRedirectTime(RequestOptions options) {
+    return options.extra[RedirectInterceptor.redirectCount] as int? ?? 1;
+  }
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (!PlatformX.isWeb) {
       userAgent ??= defaultUsedUserAgent;
-      options.headers[HttpHeaders.userAgentHeader] = userAgent;
+      final curTime = getCurrentRedirectTime(options);
+      if (important || options.extra[EXTRA_USER_AGENT_SET_TIME] != curTime) {
+        options.extra[EXTRA_USER_AGENT_SET_TIME] = curTime;
+        options.headers[HttpHeaders.userAgentHeader] = userAgent;
+      }
     }
     return handler.next(options);
   }

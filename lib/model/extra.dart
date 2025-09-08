@@ -20,46 +20,46 @@ import 'package:json_annotation/json_annotation.dart';
 part 'extra.g.dart';
 
 @JsonSerializable()
-class TimeTableExtra {
+class SemesterStartDates {
   /// The semester's start date of Fudan Undergraduates.
-  List<TimeTableStartTimeItem>? fdu_ug;
+  List<TimeTableStartDateItem>? undergraduateStartDates;
 
-  TimeTableExtra(this.fdu_ug);
+  SemesterStartDates(this.undergraduateStartDates);
 
-  factory TimeTableExtra.fromJson(Map<String, dynamic> json) =>
-      _$TimeTableExtraFromJson(json);
+  factory SemesterStartDates.fromJson(Map<String, dynamic> json) =>
+      _$SemesterStartDatesFromJson(json);
 
-  Map<String, dynamic> toJson() => _$TimeTableExtraToJson(this);
+  Map<String, dynamic> toJson() => _$SemesterStartDatesToJson(this);
 
-  String? parseStartDate(UserGroup group, String semesterId) {
-    List<TimeTableStartTimeItem>? items;
+  String? parseStartDate(String semesterId,
+      {UserGroup group = UserGroup.FUDAN_UNDERGRADUATE_STUDENT}) {
+    List<TimeTableStartDateItem>? items;
     switch (group) {
       case UserGroup.FUDAN_UNDERGRADUATE_STUDENT:
-        items = fdu_ug;
+        items = undergraduateStartDates;
         break;
-      case UserGroup.VISITOR:
       case UserGroup.FUDAN_POSTGRADUATE_STUDENT:
       case UserGroup.FUDAN_STAFF:
       case UserGroup.SJTU_STUDENT:
         break;
     }
     var item = items?.firstWhere((element) => element.id == semesterId,
-        orElse: () => TimeTableStartTimeItem(null, null));
+        orElse: () => TimeTableStartDateItem(null, null));
     return item?.startDate;
   }
 }
 
 @JsonSerializable()
-class TimeTableStartTimeItem {
+class TimeTableStartDateItem {
   String? id;
   String? startDate;
 
-  TimeTableStartTimeItem(this.id, this.startDate);
+  TimeTableStartDateItem(this.id, this.startDate);
 
-  factory TimeTableStartTimeItem.fromJson(Map<String, dynamic> json) =>
-      _$TimeTableStartTimeItemFromJson(json);
+  factory TimeTableStartDateItem.fromJson(Map<String, dynamic> json) =>
+      _$TimeTableStartDateItemFromJson(json);
 
-  Map<String, dynamic> toJson() => _$TimeTableStartTimeItemToJson(this);
+  Map<String, dynamic> toJson() => _$TimeTableStartDateItemToJson(this);
 }
 
 @JsonSerializable()

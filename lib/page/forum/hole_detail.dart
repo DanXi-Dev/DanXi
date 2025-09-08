@@ -18,7 +18,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:clipboard/clipboard.dart';
 import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -141,14 +140,18 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
     final results = switch (_renderModel) {
       Normal(hole: var hole) => await ForumRepository.getInstance()
-          .loadFloors(hole, startFloor: page * Constant.POST_COUNT_PER_PAGE),
+          .loadFloors(hole, offset: page * Constant.POST_COUNT_PER_PAGE),
       Search(keyword: var searchKeyword, :final dateRange, :final accurate) =>
         await ForumRepository.getInstance().loadSearchResults(searchKeyword,
             startFloor: _listViewController.length(),
             dateRange: dateRange,
             accurate: accurate),
-      MyReplies() => await ForumRepository.getInstance()
-          .loadUserFloors(startFloor: _listViewController.length()),
+      MyReplies() => (await ForumRepository.getInstance()
+              .loadUserFloors(startFloor: _listViewController.length()))
+          // Filter manually hidden floors
+          .filter((element) => !SettingsProvider.getInstance()
+              .hiddenMyReplies
+              .contains(element.floor_id)),
       ViewHistory() => (await ForumRepository.getInstance().loadHolesById(
                   SettingsProvider.getInstance()
                       .viewHistory
@@ -180,7 +183,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   Future<bool> _shareFloorAsText(OTFloor floor, int index) async {
     try {
-      await FlutterClipboard.copy(_renderFloorAsText(floor, index));
+      await Clipboard.setData(
+          ClipboardData(text: _renderFloorAsText(floor, index)));
     } catch (e) {
       return false;
     }
@@ -324,7 +328,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       }
     });
     try {
-      await FlutterClipboard.copy(shareText.toString());
+      await Clipboard.setData(ClipboardData(text: shareText.toString()));
       return true;
     } catch (e) {
       return false;
@@ -339,14 +343,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       _renderModel = Normal(hole);
 
       // Record view history
-      SettingsProvider.getInstance().viewHistory = [
-        hole.hole_id!,
-        // Limit the number of view history, and avoid duplicate entries
-        ...SettingsProvider.getInstance()
-            .viewHistory
-            .filter((id) => id != hole.hole_id!)
-            .take(SettingsProvider.MAX_VIEW_HISTORY - 1)
-      ];
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        SettingsProvider.getInstance().viewHistory = [
+          hole.hole_id!,
+          // Limit the number of view history, and avoid duplicate entries
+          ...SettingsProvider.getInstance()
+              .viewHistory
+              .filter((id) => id != hole.hole_id!)
+              .take(SettingsProvider.MAX_VIEW_HISTORY - 1)
+        ];
+      });
 
       // Update hole view count
       if (hole.hole_id != null) {
@@ -373,9 +379,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   /// Refresh the list view.
-  Future<void> refreshListView({bool scrollToEnd = false}) async {
+  Future<void> refreshListView(
+      {bool scrollToEnd = false, bool queueDataClear = true}) async {
     _allDataLoaded = false;
-    await _listViewController.notifyUpdate(queueDataClear: true);
+    await _listViewController.notifyUpdate(queueDataClear: queueDataClear);
 
     if (scrollToEnd) {
       setState(() {
@@ -457,6 +464,24 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               ),
             ),
         _ => null,
+      },
+      onDismissItem: switch (_renderModel) {
+        MyReplies() => (context, index, item) {
+            SettingsProvider.getInstance().hiddenMyReplies = [
+              item.floor_id!,
+              ...SettingsProvider.getInstance().hiddenMyReplies
+            ];
+            Noticing.showMaterialNotice(
+                context, S.of(context).hide_post_success);
+          },
+        _ => null
+      },
+      onConfirmDismissItem: switch (_renderModel) {
+        MyReplies() => (context, index, item) =>
+            Noticing.showConfirmationDialog(
+                context, S.of(context).hide_post_confirm,
+                isConfirmDestructive: true),
+        _ => null
       },
     );
 
@@ -546,7 +571,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 PopupMenuOption(
                   label: S.of(context).copy_hole_id,
                   onTap: (_) async {
-                    await FlutterClipboard.copy('#${hole.hole_id}');
+                    await Clipboard.setData(ClipboardData(text: '#${hole.hole_id}'));
                     if (context.mounted) {
                       Noticing.showMaterialNotice(
                           context, S.of(context).copy_hole_id_success);
@@ -587,11 +612,26 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               icon: Icon(Icons.delete),
               onPressed: () async {
                 if (await Noticing.showConfirmationDialog(
-                        context, S.of(context).are_you_sure,
+                        context, S.of(context).clear_history_confirm,
                         isConfirmDestructive: true) ==
                     true) {
                   SettingsProvider.getInstance().viewHistory = [];
-                  refreshListView();
+                  refreshListView(queueDataClear: false);
+                }
+              },
+            ),
+          if (_renderModel case MyReplies())
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: Icon(Icons.restore_page),
+              onPressed: () async {
+                if (await Noticing.showConfirmationDialog(
+                        context, S.of(context).restore_hidden_confirm,
+                        isConfirmDestructive: false) ==
+                    true) {
+                  SettingsProvider.getInstance().hiddenMyReplies = [];
+                  // Set `queueDataClear` to false to instantly clear the [ListView]
+                  refreshListView(queueDataClear: false);
                 }
               },
             )
@@ -637,7 +677,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   // Load all floors, in case we have to scroll to end or to a specific floor.
   Future<List<OTFloor>> _loadAllContent() async {
     final allFloors = await ForumRepository.getInstance()
-        .loadFloors((_renderModel as Normal).hole, startFloor: 0, length: 0);
+        .loadFloors((_renderModel as Normal).hole, offset: 0, size: 0);
 
     if (allFloors == null) {
       throw Exception("Failed to fetch all floors");
@@ -650,9 +690,25 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   Widget _buildFavoredActionButton() {
-    var notFavoredIcon = Icon(PlatformX.isMaterial(context)
-        ? Icons.star_outline
-        : CupertinoIcons.star);
+    final notFavoredIcon = IconWithNumberTextButton(
+      icon: PlatformX.isMaterial(context)
+          ? Icons.star_outline
+          : CupertinoIcons.star,
+      text: "${(_renderModel as Normal).hole.favorite_count}",
+    );
+
+    void toggleFavoredState() {
+      final normalModel = _renderModel as Normal;
+      if (normalModel.isFavored == null) return;
+      setState(() {
+        normalModel.isFavored = !normalModel.isFavored!;
+        final favorCnt = normalModel.hole.favorite_count;
+        if (favorCnt != null) {
+          normalModel.hole.favorite_count =
+              normalModel.isFavored! ? favorCnt + 1 : favorCnt - 1;
+        }
+      });
+    }
 
     return PlatformIconButton(
       padding: EdgeInsets.zero,
@@ -660,12 +716,21 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         future: (_renderModel as Normal).isHoleFavorite(),
         loadingBuilder: notFavoredIcon,
         successBuilder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-          bool? isFavored = snapshot.data;
-          return isFavored!
-              ? Icon(PlatformX.isMaterial(context)
-                  ? Icons.star
-                  : CupertinoIcons.star_fill)
-              : notFavoredIcon;
+          final normalModel = _renderModel as Normal;
+          final isFavored = snapshot.data!;
+          return isFavored
+              ? IconWithNumberTextButton(
+                  icon: PlatformX.isMaterial(context)
+                      ? Icons.star
+                      : CupertinoIcons.star_fill,
+                  text: "${(_renderModel as Normal).hole.favorite_count}",
+                )
+              : IconWithNumberTextButton(
+                  icon: PlatformX.isMaterial(context)
+                      ? Icons.star_outline
+                      : CupertinoIcons.star,
+                  text: "${(_renderModel as Normal).hole.favorite_count}",
+                );
         },
         errorBuilder: () => Icon(
           PlatformIcons(context).error,
@@ -675,7 +740,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       onPressed: () async {
         final normalModel = _renderModel as Normal;
         if (normalModel.isFavored == null) return;
-        setState(() => normalModel.isFavored = !normalModel.isFavored!);
+        toggleFavoredState();
         await ForumRepository.getInstance()
             .setFavorite(
                 normalModel.isFavored!
@@ -685,7 +750,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             .onError((dynamic error, stackTrace) {
           Noticing.showNotice(context, error.toString(),
               title: S.of(context).operation_failed, useSnackBar: false);
-          setState(() => normalModel.isFavored = !normalModel.isFavored!);
+          toggleFavoredState();
           return null;
         });
       },
@@ -694,9 +759,25 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   // TODO: refactor to reduce redundant code
   Widget _buildSubscribeActionButton() {
-    var notSubscribedIcon = Icon(PlatformX.isMaterial(context)
-        ? Icons.visibility_off
-        : CupertinoIcons.eye_slash);
+    final notSubscribedIcon = IconWithNumberTextButton(
+      icon: PlatformX.isMaterial(context)
+          ? Icons.visibility_off
+          : CupertinoIcons.eye_slash,
+      text: "${(_renderModel as Normal).hole.subscription_count}",
+    );
+
+    void toggleSubscribedState() {
+      final normalModel = _renderModel as Normal;
+      if (normalModel.isSubscribed == null) return;
+      setState(() {
+        normalModel.isSubscribed = !normalModel.isSubscribed!;
+        final subCnt = normalModel.hole.subscription_count;
+        if (subCnt != null) {
+          normalModel.hole.subscription_count =
+              normalModel.isSubscribed! ? subCnt + 1 : subCnt - 1;
+        }
+      });
+    }
 
     return PlatformIconButton(
       padding: EdgeInsets.zero,
@@ -704,12 +785,21 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         future: (_renderModel as Normal).isHoleSubscribed(),
         loadingBuilder: notSubscribedIcon,
         successBuilder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-          bool? isSubscribed = snapshot.data;
-          return isSubscribed!
-              ? Icon(PlatformX.isMaterial(context)
-                  ? Icons.visibility
-                  : CupertinoIcons.eye)
-              : notSubscribedIcon;
+          final normalModel = _renderModel as Normal;
+          final isSubscribed = snapshot.data!;
+          return isSubscribed
+              ? IconWithNumberTextButton(
+                  icon: PlatformX.isMaterial(context)
+                      ? Icons.visibility
+                      : CupertinoIcons.eye,
+                  text: "${(_renderModel as Normal).hole.subscription_count}",
+                )
+              : IconWithNumberTextButton(
+                  icon: PlatformX.isMaterial(context)
+                      ? Icons.visibility_off
+                      : CupertinoIcons.eye_slash,
+                  text: "${(_renderModel as Normal).hole.subscription_count}",
+                );
         },
         errorBuilder: () => Icon(
           PlatformIcons(context).error,
@@ -719,7 +809,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       onPressed: () async {
         final normalModel = _renderModel as Normal;
         if (normalModel.isSubscribed == null) return;
-        setState(() => normalModel.isSubscribed = !normalModel.isSubscribed!);
+        toggleSubscribedState();
         await ForumRepository.getInstance()
             .setSubscription(
                 normalModel.isSubscribed!
@@ -729,7 +819,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             .onError((dynamic error, stackTrace) {
           Noticing.showNotice(context, error.toString(),
               title: S.of(context).operation_failed, useSnackBar: false);
-          setState(() => normalModel.isSubscribed = !normalModel.isSubscribed!);
+          toggleSubscribedState();
           return null;
         });
       },
@@ -804,6 +894,24 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           isDestructive: true,
           menuContext: menuContext,
           child: const Text("隐藏/显示帖子"),
+        ),
+        PlatformContextMenuItem(
+          onPressed: () async {
+            bool? frozen = await Noticing.showConfirmationDialog(
+                context, "冻结或解冻帖子？",
+                confirmText: "冻结", cancelText: "解冻");
+            if (frozen != null) {
+              int? result = await ForumRepository.getInstance()
+                  .adminFrozeHole(e.hole_id, frozen);
+              if (result != null && result < 300 && mounted) {
+                Noticing.showMaterialNotice(
+                    context, S.of(context).operation_successful);
+              }
+            }
+          },
+          isDestructive: true,
+          menuContext: menuContext,
+          child: const Text("冻结/解冻帖子"),
         ),
         PlatformContextMenuItem(
           onPressed: () async {
@@ -1029,7 +1137,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           child: Text(postTimeStr),
           onPressed: () async {
-            await FlutterClipboard.copy(postTimeStr);
+            await Clipboard.setData(ClipboardData(text: postTimeStr));
             if (mounted && menuContext.mounted) {
               Noticing.showMaterialNotice(
                   context, S.of(menuContext).copy_success);
@@ -1045,8 +1153,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           menuContext: menuContext,
           child: Text(S.of(menuContext).copy),
           onPressed: () async {
-            await FlutterClipboard.copy(
-                renderText(e.filteredContent!, '', '', ''));
+            await Clipboard.setData(ClipboardData(text: renderText(e.filteredContent!, '', '', '')));
             if (mounted && menuContext.mounted) {
               Noticing.showMaterialNotice(
                   context, S.of(menuContext).copy_success);
@@ -1055,7 +1162,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       PlatformContextMenuItem(
         menuContext: menuContext,
         onPressed: () async {
-          FlutterClipboard.copy('##${e.floor_id}');
+          await Clipboard.setData(ClipboardData(text: '##${e.floor_id}'));
           if (mounted) {
             Noticing.showMaterialNotice(
                 context, S.of(context).copy_floor_id_success);
@@ -1233,7 +1340,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       List<OTFloor>? result = switch (_renderModel) {
         Normal(hole: var hole) => await ForumRepository.getInstance()
             .loadFloors(hole,
-                startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE),
+                offset: pageIndex * Constant.POST_COUNT_PER_PAGE),
         Search(keyword: var searchKeyword, :final dateRange, :final accurate) =>
           await ForumRepository.getInstance().loadSearchResults(searchKeyword,
               startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE,
@@ -1393,19 +1500,21 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 StatelessWidget smartRender(
     BuildContext context,
     String content,
+    bool translucentCard,
+    {bool preview = false,
     LinkTapCallback? onTapLink,
     ImageTapCallback? onTapImage,
-    bool translucentCard,
-    {bool preview = false}) {
+    ImageLongPressCallback? onLongPressImage}) {
   return PostRenderWidget(
     render: SettingsProvider.getInstance().isMarkdownRenderingEnabled
         ? kMarkdownRender
         : kPlainRender,
     content: preprocessContentForDisplay(content),
-    onTapImage: onTapImage,
-    onTapLink: onTapLink,
     hasBackgroundImage: translucentCard,
     isPreviewWidget: preview,
+    onTapImage: onTapImage,
+    onTapLink: onTapLink,
+    onLongPressImage: onLongPressImage,
   );
 }
 
@@ -1448,3 +1557,20 @@ class MyReplies extends RenderModel {}
 class ViewHistory extends RenderModel {}
 
 class PunishmentHistory extends RenderModel {}
+
+class IconWithNumberTextButton extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const IconWithNumberTextButton(
+      {super.key, required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) => Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 20),
+          Text(text, style: TextStyle(fontSize: 8))
+        ],
+      );
+}

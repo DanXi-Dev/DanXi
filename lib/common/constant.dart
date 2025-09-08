@@ -90,6 +90,9 @@ class Constant {
   static const String FAQ_URL =
       "https://danxi-dev.feishu.cn/wiki/wikcnrPPGDCiTODBYRkdwLlHH65";
 
+  static const String TERMS_AND_CONDITIONS_URL =
+      "https://danxi.fduhole.com/doc";
+  
   static const LINKIFY_THEME =
       TextStyle(color: Colors.blue, decoration: TextDecoration.none);
 

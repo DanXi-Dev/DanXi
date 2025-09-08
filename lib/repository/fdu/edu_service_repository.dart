@@ -240,8 +240,10 @@ class SemesterInfo {
         return "1";
       case "SPRING":
         return "2";
+      case "SUMMER":
+        return "3";
       default:
-        return "?"; // FIXME: currently JWGL only has AUTUMN and SPRING semesters. SUMMER & WINTER are not supported.
+        return "?";
     }
   }
 

@@ -17,10 +17,16 @@
 
 import 'dart:async';
 import 'dart:collection';
+import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dio/dio.dart';
 
 /// The number of how many requests we allow to be executed simultaneously.
-const _kQueueLengthLimit = 4;
+///
+/// @w568w (2025-09-01): Increased from 4 to 100 because we rely on interceptors
+/// (e.g. [WebVPNInterceptor]) to do much work, which will spawn internal dio
+/// requests. If we limit the number of concurrent requests too strictly, it
+/// will cause a soft deadlock.
+const _kQueueLengthLimit = 100;
 
 /// How many seconds the request can wait before it goes into the working queue
 /// regardless of the length of [_requestWorkingQueue] > [_kQueueLengthLimit].

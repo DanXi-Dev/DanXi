@@ -25,6 +25,7 @@ class PostRenderWidget extends StatelessWidget {
   final LinkTapCallback? onTapLink;
   final bool hasBackgroundImage;
   final bool isPreviewWidget;
+  final ImageLongPressCallback? onLongPressImage;
 
   const PostRenderWidget(
       {super.key,
@@ -33,9 +34,13 @@ class PostRenderWidget extends StatelessWidget {
       this.onTapImage,
       this.onTapLink,
       required this.hasBackgroundImage,
-      this.isPreviewWidget = false});
+      this.isPreviewWidget = false,
+      this.onLongPressImage});
 
   @override
   Widget build(BuildContext context) => render.call(context, content,
-      onTapImage, onTapLink, hasBackgroundImage, isPreviewWidget);
+      hasBackgroundImage, isPreviewWidget,
+      onTapImage: onTapImage,
+      onTapLink: onTapLink,
+      onLongPressImage: onLongPressImage);
 }

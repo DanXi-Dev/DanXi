@@ -167,6 +167,26 @@ class CustomInAppBrowser extends InAppBrowser {
             }
         }''';
 
+  String idLoginJavaScript(PersonInfo info) =>
+      r'''try{
+            const usernameInput = document.querySelectorAll('.el-input__inner')[0];
+            usernameInput.value = String.raw`''' +
+      info.id! +
+      r'''`;
+            usernameInput.dispatchEvent(new Event('input')); // Trigger the input event
+            
+            const passwordInput = document.querySelectorAll('.el-input__inner')[1];
+            passwordInput.value = String.raw`''' +
+      info.password! +
+      r'''`;
+            passwordInput.dispatchEvent(new Event('input')); // Trigger the input event
+
+            document.querySelector('.el-button.content_submit').click();
+        }
+        catch (e) {
+            window.alert("Danta: Failed to auto login UIS");
+        }''';
+
   @override
   Future<dynamic> onLoadStop(url) async {
     if (url
@@ -176,6 +196,10 @@ class CustomInAppBrowser extends InAppBrowser {
       Future.delayed(const Duration(milliseconds: 1000)).then((_) =>
           webViewController?.evaluateJavascript(
               source: uisLoginJavaScript(StateProvider.personInfo.value!)));
+    } else if (url?.toString().startsWith("https://id.fudan.edu.cn/") == true) {
+      Future.delayed(const Duration(milliseconds: 1000)).then((_) =>
+          webViewController?.evaluateJavascript(
+              source: idLoginJavaScript(StateProvider.personInfo.value!)));
     }
   }
 

@@ -50,8 +50,9 @@ class AutoBBSImage extends StatelessWidget {
   final String src;
   final double? maxWidth;
   final ImageTapCallback? onTapImage;
+  final ImageLongPressCallback? onLongPressImage;
 
-  const AutoBBSImage({super.key, required this.src, this.maxWidth, this.onTapImage});
+  const AutoBBSImage({super.key, required this.src, this.maxWidth, this.onTapImage, this.onLongPressImage});
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +91,9 @@ class AutoBBSImage extends StatelessWidget {
           ),
           onTap: () {
             if (onTapImage != null) onTapImage!(src, key ?? this);
+          },
+          onLongPress: () {
+            if (onLongPressImage != null) onLongPressImage!(src);
           },
         ),
       ),

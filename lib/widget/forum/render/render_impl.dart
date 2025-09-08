@@ -92,10 +92,11 @@ MarkdownStyleSheet _markdownStyleOverride(
 final kMarkdownRenderFactory = (double? defaultFontSize) =>
     (BuildContext context,
         String? content,
-        ImageTapCallback? onTapImage,
-        LinkTapCallback? onTapLink,
         bool translucentCard,
-        bool isPreviewWidget) {
+        bool isPreviewWidget,
+        {ImageTapCallback? onTapImage,
+        LinkTapCallback? onTapLink,
+        ImageLongPressCallback? onLongPressImage}) {
       double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
       final imageBuilder = (MarkdownImageConfig config) {
         String url = config.uri.toString();
@@ -120,7 +121,8 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
               key: UniqueKey(),
               src: url,
               maxWidth: imageWidth,
-              onTapImage: onTapImage),
+              onTapImage: onTapImage,
+              onLongPressImage: onLongPressImage),
         );
       };
 
@@ -154,10 +156,11 @@ final BaseRender kMarkdownRender = kMarkdownRenderFactory(kFontSize);
 
 final BaseRender kPlainRender = (BuildContext context,
     String? content,
-    ImageTapCallback? onTapImage,
-    LinkTapCallback? onTapLink,
     bool translucentCard,
-    bool isPreviewWidget) {
+    bool isPreviewWidget,
+    {ImageTapCallback? onTapImage,
+    LinkTapCallback? onTapLink,
+    ImageLongPressCallback? onLongPressImage}) {
   return Column(
     mainAxisSize: MainAxisSize.min,
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,10 +170,11 @@ final BaseRender kPlainRender = (BuildContext context,
 
 final BaseRender kMarkdownSelectorRender = (BuildContext context,
     String? content,
-    ImageTapCallback? onTapImage,
-    LinkTapCallback? onTapLink,
     bool translucentCard,
-    bool isPreviewWidget) {
+    bool isPreviewWidget,
+    {ImageTapCallback? onTapImage,
+    LinkTapCallback? onTapLink,
+    ImageLongPressCallback? onLongPressImage}) {
   return SelectionArea(
     child: Markdown(
       softLineBreak: true,

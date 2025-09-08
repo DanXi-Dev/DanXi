@@ -20,7 +20,6 @@ import 'dart:async';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/bus_repository.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -117,12 +116,12 @@ class BusPageState extends State<BusPage> {
     super.initState();
     if (widget.arguments!['dataIsHoliday']) {
       _busListWeekday = LazyFuture.pack(FudanBusRepository.getInstance()
-          .loadBusList(StateProvider.personInfo.value, holiday: false));
+          .loadBusList(holiday: false));
       _busListHolidayLoaded = widget.arguments!['busList'];
       _holidaySliding = 1;
     } else {
       _busListHoliday = LazyFuture.pack(FudanBusRepository.getInstance()
-          .loadBusList(StateProvider.personInfo.value, holiday: true));
+          .loadBusList(holiday: true));
       _busListWeekdayLoaded = widget.arguments!['busList'];
       _holidaySliding = 0;
     }

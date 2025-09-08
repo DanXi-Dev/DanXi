@@ -17,12 +17,13 @@
 
 import 'dart:io';
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/forum/jwt.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
+import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/cupertino.dart';
 
 /// An interceptor that refresh the jwt token automatically.
@@ -37,8 +38,8 @@ class JWTInterceptor extends QueuedInterceptor {
   final Function? tokenSetter;
 
   JWTInterceptor(this.refreshUrl, this.tokenGetter, [this.tokenSetter]) {
-    /// Add global cookies, since to make [_dio] compatible with webvpn
-    _dio.interceptors.add(CookieManager(WebvpnProxy.webvpnCookieJar));
+    _dio.interceptors.add(UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
+    _dio.interceptors.add(WebVPNInterceptor());
   }
 
   static RequestOptions _rewriteRequestOptionsWithToken(

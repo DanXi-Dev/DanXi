@@ -106,19 +106,6 @@ class AnnouncementRepository {
     return announcements;
   }
 
-  TimeTableExtra? getStartDates() {
-    if (_tomlCache == null) {
-      return null;
-    }
-
-    final fduUg = _tomlCache!['semester_start_date']
-        .entries
-        .map<TimeTableStartTimeItem>(
-            (entry) => TimeTableStartTimeItem(entry.key, entry.value))
-        .toList();
-    return TimeTableExtra(fduUg);
-  }
-
   String? getUserAgent() {
     if (_tomlCache == null) {
       return null;

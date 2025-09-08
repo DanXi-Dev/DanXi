@@ -17,9 +17,7 @@
 
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
-import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/data_center_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -42,7 +40,6 @@ class CardCrowdData extends StatefulWidget {
 }
 
 class CardCrowdDataState extends State<CardCrowdData> {
-  PersonInfo? _personInfo;
   Map<String, TrafficInfo>? _trafficInfo;
   Campus? _selectItem = Campus.NONE;
   int? _sliding;
@@ -50,7 +47,6 @@ class CardCrowdDataState extends State<CardCrowdData> {
   @override
   void initState() {
     super.initState();
-    _personInfo = StateProvider.personInfo.value;
     _selectItem = SettingsProvider.getInstance().campus;
     _sliding = _selectItem!.index;
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -64,15 +60,16 @@ class CardCrowdDataState extends State<CardCrowdData> {
       _selectItem = e;
       _trafficInfo = null;
     });
-    _trafficInfo = await DataCenterRepository.getInstance()
-        .getCrowdednessInfo(_personInfo, _selectItem!.index)
-        .catchError((e) {
+    try {
+      _trafficInfo = await DataCenterRepository.getInstance()
+          .getCrowdednessInfo(_selectItem!.index);
+    } catch (e) {
       // If it's not time for a meal
       if (e is UnsuitableTimeException) {
+        if (!mounted) return;
         Noticing.showNotice(context, S.of(context).out_of_dining_time);
       }
-      return null;
-    });
+    }
     refreshSelf();
   }
 

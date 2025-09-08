@@ -140,6 +140,7 @@ class ForumRepository extends BaseRepositoryWithDio {
             SettingsProvider.getInstance().forumToken = token));
     dio.interceptors.add(
         UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
+    dio.interceptors.add(WebVPNInterceptor());
   }
 
   /// A "minimal" initialization of the provider.
@@ -368,7 +369,6 @@ class ForumRepository extends BaseRepositoryWithDio {
     return response.data?.map((e) => OTHole.fromJson(e)).toList();
   }
 
-  // NEVER USED
   Future<OTHole?> loadHoleById(int holeId) async {
     final options = RequestOptions(
         path: "$_BASE_URL/holes/$holeId", method: "GET", headers: _tokenHeader);
@@ -415,16 +415,26 @@ class ForumRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<OTFloor>?> loadFloors(OTHole post,
-      {int startFloor = 0, int length = Constant.POST_COUNT_PER_PAGE}) async {
-    final options = RequestOptions(
-        path: "$_BASE_URL/floors",
-        method: "GET",
-        queryParameters: {
-          "start_floor": startFloor,
-          "hole_id": post.hole_id,
-          "length": length
-        },
-        headers: _tokenHeader);
+      {int offset = 0, int size = Constant.POST_COUNT_PER_PAGE}) async {
+    final loadsAllFloors = offset == 0 && size == 0;
+    final RequestOptions options;
+    if (loadsAllFloors) {
+      options = RequestOptions(
+          path: "$_BASE_URL/floors",
+          method: "GET",
+          queryParameters: {
+            "start_floor": offset,
+            "length": size,
+            "hole_id": post.hole_id
+          },
+          headers: _tokenHeader);
+    } else {
+      options = RequestOptions(
+          path: "$_BASE_URL/holes/${post.hole_id}/floors",
+          method: "GET",
+          queryParameters: {"offset": offset, "size": size},
+          headers: _tokenHeader);
+    }
     final Response<List<dynamic>> response =
         await WebvpnProxy.requestWithProxy(dio, options);
     final floors = response.data?.map((e) => OTFloor.fromJson(e)).toList();
@@ -442,7 +452,7 @@ class ForumRepository extends BaseRepositoryWithDio {
     final options = RequestOptions(
         path: "$_BASE_URL/users/me/floors",
         method: "GET",
-        queryParameters: {"offset": startFloor, "size": length},
+        queryParameters: {"offset": startFloor, "size": length, "sort": "desc"},
         headers: _tokenHeader);
     final Response<List<dynamic>> response =
         await WebvpnProxy.requestWithProxy(dio, options);
@@ -490,10 +500,9 @@ class ForumRepository extends BaseRepositoryWithDio {
     if (tags == null || tags.isEmpty) tags = [const OTTag(0, 0, KEY_NO_TAG)];
     // Suppose user is logged in. He should be.
     final options = RequestOptions(
-        path: "$_BASE_URL/holes",
+        path: "$_BASE_URL/divisions/${divisionId}/holes",
         method: "POST",
         data: {
-          "division_id": divisionId,
           "content": content,
           "tags": tags,
         },
@@ -526,11 +535,10 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   Future<int?> newFloor(int? discussionId, String content) async {
     final options = RequestOptions(
-        path: "$_BASE_URL/floors",
+        path: "$_BASE_URL/holes/$discussionId/floors",
         method: "POST",
         data: {
           "content": content,
-          "hole_id": discussionId,
           //"mention": findMention(content)
         },
         headers: _tokenHeader);
@@ -915,6 +923,15 @@ class ForumRepository extends BaseRepositoryWithDio {
         path: "$_BASE_URL/holes/$holeId/_webvpn",
         method: "PATCH",
         data: {"unhidden": true},
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
+  }
+
+  Future<int?> adminFrozeHole(int? holeId, bool frozen) async {
+    final options = RequestOptions(
+        path: "$_BASE_URL/holes/$holeId/_webvpn",
+        method: "PATCH",
+        data: {"frozen": frozen},
         headers: _tokenHeader);
     return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }

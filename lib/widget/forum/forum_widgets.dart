@@ -35,6 +35,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/watermark.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/widget/forum/render/base_render.dart';
 import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
@@ -192,6 +193,13 @@ class OTHoleWidget extends StatelessWidget {
                                   color: Theme.of(context).colorScheme.primary,
                                   label: S.of(context).hole_locked,
                                 )
+                              ],
+                              if (postElement.frozen == true) ...[
+                                const SizedBox(width: 4),
+                                LeadingChip(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  label: S.of(context).hole_frozen,
+                                )
                               ]
                             ],
                           ),
@@ -238,8 +246,11 @@ class OTHoleWidget extends StatelessWidget {
                       ]),
                     ]),
               ]),
-              onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
-                  arguments: {"post": postElement})),
+              onTap: () { 
+                HapticFeedbackUtil.light();
+                smartNavigatorPush(context, "/bbs/postDetail",
+                  arguments: {"post": postElement});
+                  }),
         ],
       ),
     );
@@ -476,6 +487,16 @@ class OTFloorWidget extends StatelessWidget {
                           label: S.of(context).hole_locked,
                         ),
                       ],
+                      // Show frozen tag if the hole is frozen and this is the first floor
+                      if (parentHole?.frozen == true &&
+                          floor.floor_id ==
+                              parentHole?.floors?.first_floor?.floor_id) ...[
+                        const SizedBox(width: 4),
+                        LeadingChip(
+                          color: Theme.of(context).colorScheme.primary,
+                          label: S.of(context).hole_frozen,
+                        ),
+                      ],
                       // Show pinned tag if this hole is in the pinned list and this is the first floor
                       if (isPinned &&
                           floor.floor_id ==
@@ -514,9 +535,9 @@ class OTFloorWidget extends StatelessWidget {
                     : smartRender(
                         context,
                         floor.filteredContent ?? S.of(context).fatal_error,
-                        onLinkTap,
-                        onTapImage ?? defaultOnImageTap,
-                        hasBackgroundImage)),
+                        hasBackgroundImage,
+                        onTapLink: onLinkTap,
+                        onTapImage: onTapImage ?? defaultOnImageTap)),
             if (showBottomBar) ...[
               const SizedBox(height: 5),
               OTFloorWidgetBottomBar(floor: floor, index: index),
@@ -527,7 +548,10 @@ class OTFloorWidget extends StatelessWidget {
     );
 
     final card = GestureDetector(
-      onLongPress: onLongPress,
+      onLongPress: onLongPress == null ? null : () {
+        HapticFeedbackUtil.medium();
+        onLongPress?.call();
+      },
       child: Card(
         color: isInMention && PlatformX.isCupertino(context)
             ? Theme.of(context).dividerColor.withValues(alpha: 0.05)
@@ -887,6 +911,7 @@ class OTFloorToolBarState extends State<OTFloorToolBar> {
         OTFloorWidgetBottomBarButton(
           text: "${floor.like}",
           onTap: () async {
+            HapticFeedbackUtil.light();
             try {
               floor.liked ??= false;
               setState(() {
@@ -911,6 +936,7 @@ class OTFloorToolBarState extends State<OTFloorToolBar> {
         OTFloorWidgetBottomBarButton(
           text: "${floor.dislike}",
           onTap: () async {
+            HapticFeedbackUtil.light();
             try {
               floor.disliked ??= false;
               setState(() {

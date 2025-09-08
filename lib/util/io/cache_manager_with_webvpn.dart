@@ -27,7 +27,7 @@ class HttpFileServiceWithWebvpn extends FileService {
   final Dio _dio = DioUtils.newDioWithProxy();
 
   HttpFileServiceWithWebvpn() {
-    _dio.interceptors.add(CookieManager(WebvpnProxy.webvpnCookieJar));
+    _dio.interceptors.add(WebVPNInterceptor());
   }
 
   @override

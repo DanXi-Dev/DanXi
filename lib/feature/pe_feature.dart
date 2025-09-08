@@ -18,8 +18,6 @@
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/pe_repository.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -28,7 +26,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PEFeature extends Feature {
-  PersonInfo? _info;
   List<ExerciseObject>? _exercises;
 
   /// Status of the request.
@@ -37,8 +34,7 @@ class PEFeature extends Feature {
   void _loadExercises() async {
     _status = ConnectionStatus.CONNECTING;
     try {
-      _exercises =
-          await FudanPERepository.getInstance().loadExerciseRecords(_info);
+      _exercises = await FudanPERepository.getInstance().loadExerciseRecords();
       _status = ConnectionStatus.DONE;
     } catch (error) {
       _status = ConnectionStatus.FAILED;
@@ -48,8 +44,6 @@ class PEFeature extends Feature {
 
   @override
   void buildFeature([Map<String, dynamic>? arguments]) {
-    _info = StateProvider.personInfo.value;
-
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.

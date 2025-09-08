@@ -21,9 +21,9 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/announcement.dart';
-import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/model/person.dart';
+import 'package:dan_xi/page/login_page.dart';
 import 'package:dan_xi/page/platform_subpage.dart';
 import 'package:dan_xi/page/subpage_danke.dart';
 import 'package:dan_xi/page/subpage_dashboard.dart';
@@ -33,7 +33,8 @@ import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
-import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/repository/fdu/uis_login_tool.dart' as uis;
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart' as neo;
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/test/test.dart';
 import 'package:dan_xi/util/browser_util.dart';
@@ -43,7 +44,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
-import 'package:dan_xi/util/webvpn_proxy.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/widget/dialogs/login_dialog.dart';
 import 'package:dan_xi/widget/dialogs/qr_code_dialog.dart';
 import 'package:dan_xi/widget/forum/post_render.dart';
@@ -91,14 +92,14 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// Listener to the failure of logging in caused by different reasons.
   ///
   /// Open up a dialog to request user to log in manually in the browser.
-  static final StateStreamListener<CaptchaNeededException>
-      _captchaSubscription = StateStreamListener();
-  static final StateStreamListener<CredentialsInvalidException>
-      _credentialsInvalidSubscription = StateStreamListener();
+  final StateStreamListener<dynamic> _captchaSubscription =
+      StateStreamListener();
+  final StateStreamListener<dynamic> _credentialsInvalidSubscription =
+      StateStreamListener();
 
   /// Listener to the url scheme.
   /// debounced to avoid duplicated events.
-  static final StateStreamListener<Uri?> _uniLinksSubscription =
+  final StateStreamListener<Uri?> _uniLinksSubscription =
       StateStreamListener();
 
   /// If we need to send the QR code to iWatch now.
@@ -122,15 +123,16 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// It's usually called when user changes his account.
   void _rebuildPage() {
     _lastRefreshTime = DateTime.now();
+    PersonInfo? info = StateProvider.personInfo.value;
     _subpage = [
       // Don't show Dashboard in visitor mode
-      if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
+      if (info != null)
         HomeSubpage(key: dashboardPageKey),
       if (!SettingsProvider.getInstance().hideHole)
         ForumSubpage(key: forumPageKey),
-      // Don't show Timetable in visitor mode
       DankeSubPage(key: dankePageKey),
-      if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
+      // Don't show Timetable in visitor mode
+      if (info != null)
         TimetableSubPage(key: timetablePageKey),
     ];
   }
@@ -138,7 +140,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    StateProvider.isLoggedIn.removeListener(_loginListener);
     _captchaSubscription.cancel();
+    _credentialsInvalidSubscription.cancel();
     _uniLinksSubscription.cancel();
     screenListener?.dispose();
     super.dispose();
@@ -230,7 +234,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           (value) => _loadAnnouncement().catchError((ignored) {}),
           onError: (ignored) {});
       _loadUserAgent().catchError((ignored) {});
-      _loadStartDate().catchError((ignored) {});
       _loadCelebration().catchError((ignored, st) {});
     }, onError: (e) {
       _dealWithBmobError();
@@ -432,27 +435,40 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         forcePushOnMainNavigator: true);
   }
 
+  void _loginListener() {
+    _rebuildPage();
+    _subpage[_pageIndex.value].onFirstShownAsHomepage(context);
+    refreshSelf();
+  }
+
   @override
   void initState() {
     super.initState();
+
+    _loadPersonInfo();
+    _rebuildPage();
+    _subpage[_pageIndex.value].onFirstShownAsHomepage(context);
+
     // Refresh the page when account changes.
-    StateProvider.personInfo.addListener(() {
-      if (StateProvider.personInfo.value != null) {
-        _rebuildPage();
-        refreshSelf();
-      }
-    });
+    StateProvider.isLoggedIn.addListener(_loginListener);
+
     initSystemTray().catchError((ignored) {});
     WidgetsBinding.instance.addObserver(this);
 
     _captchaSubscription.bindOnlyInvalid(
         Constant.eventBus
-            .on<CaptchaNeededException>()
+            .on()
+            .where((e) =>
+                e is uis.CaptchaNeededException ||
+                e is neo.CaptchaNeededException)
             .listen((_) => _dealWithCaptchaNeededException()),
         hashCode);
     _credentialsInvalidSubscription.bindOnlyInvalid(
         Constant.eventBus
-            .on<CredentialsInvalidException>()
+            .on()
+            .where((e) =>
+                e is uis.CredentialsInvalidException ||
+                e is neo.CredentialsInvalidException)
             .listen((_) => _dealWithCredentialsInvalidException()),
         hashCode);
     _initReceiveIntents();
@@ -465,7 +481,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       quickActions.initialize((shortcutType) {
         if (shortcutType == 'action_qr_code' &&
             StateProvider.personInfo.value != null) {
-          QRHelper.showQRCode(context, StateProvider.personInfo.value);
+          QRHelper.showQRCode(context);
         }
       });
     }
@@ -596,60 +612,26 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       Noticing.showNotice(context, S.of(context).screenshot_warning,
           title: S.of(context).screenshot_warning_title, useSnackBar: false);
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // We have to load personInfo after [initState] and [build], since it may pop up a dialog,
-    // which is not allowed in both methods. It is because that the widget's reference to its inherited widget hasn't been changed.
-    // Also, otherwise it will call [setState] before the frame is completed.
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => _loadPersonInfoOrLogin());
-  }
-
   /// Load persistent data (e.g. user name, password, etc.) from the local storage.
-  ///
-  /// If user hasn't logged in before, request him to do so.
-  void _loadPersonInfoOrLogin() {
-    /// Register person info at [WebvpnProxy] to enable webvpn services to use it
-    WebvpnProxy.bindPersonInfo(StateProvider.personInfo);
-
+  /// Since it does not pop login dialog anymore, it is safe to call it in [initState].
+  void _loadPersonInfo() {
     var preferences = SettingsProvider.getInstance().preferences;
-
     if (PersonInfo.verifySharedPreferences(preferences!)) {
       StateProvider.personInfo.value =
           PersonInfo.fromSharedPreferences(preferences);
       TestLifeCycle.onStart(context);
-    } else {
-      LoginDialog.showLoginDialog(
-          context, preferences, StateProvider.personInfo, false);
     }
-  }
 
-  /// Show an empty container, if no person info is set.
-  Widget _buildDummyBody(Widget title) => PlatformScaffold(
-        iosContentBottomPadding: false,
-        iosContentPadding: true,
-        appBar: PlatformAppBar(title: title),
-        body: Column(children: [
-          Card(
-            child: ListTile(
-              leading: Icon(PlatformIcons(context).accountCircle),
-              title: Text(S.of(context).login),
-              onTap: () => LoginDialog.showLoginDialog(
-                  context,
-                  SettingsProvider.getInstance().preferences,
-                  StateProvider.personInfo,
-                  false),
-            ),
-          )
-        ]),
-      );
+    StateProvider.isLoggedIn.value = SettingsProvider.getInstance().isLoggedIn;
+  }
 
   Widget _buildBody(Widget title) {
     // Show debug button for [Dio].
     if (PlatformX.isDebugMode(SettingsProvider.getInstance().preferences)) {
       showDebugBtn(context, btnSize: 50);
     }
+
+    PersonInfo? info = StateProvider.personInfo.value;
 
     return MultiProvider(
       providers: [ValueListenableProvider.value(value: _pageIndex)],
@@ -668,7 +650,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             bottomNavBar: PlatformNavBarM3(
               items: [
                 // Don't show Dashboard in visitor mode
-                if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
+                if (info != null)
                   BottomNavigationBarItem(
                     icon: PlatformX.isMaterial(context)
                         ? const Icon(Icons.dashboard)
@@ -689,23 +671,29 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   label: S.of(context).curriculum,
                 ),
                 // Don't show Timetable in visitor mode
-                if (StateProvider.personInfo.value?.group != UserGroup.VISITOR)
+                if (info != null)
                   BottomNavigationBarItem(
                     icon: PlatformX.isMaterial(context)
                         ? const Icon(Icons.calendar_today)
                         : const Icon(CupertinoIcons.calendar),
                     label: S.of(context).timetable,
                   ),
-                // BottomNavigationBarItem(
-                //   icon: PlatformX.isMaterial(context)
-                //       ? const Icon(Icons.settings)
-                //       : const Icon(CupertinoIcons.gear_alt),
-                //   label: S.of(context).settings,
-                // ),
+                if (info == null)
+                  BottomNavigationBarItem(
+                    icon: PlatformX.isMaterial(context)
+                        ? const Icon(Icons.settings)
+                        : const Icon(CupertinoIcons.gear_alt),
+                    label: S.of(context).settings,
+                  ),
               ],
               currentIndex: pageIndex,
               itemChanged: (index) {
+                if (info == null && index >= _subpage.length) {
+                  smartNavigatorPush(context, '/settings');
+                  return;
+                }
                 if (index != pageIndex) {
+                  HapticFeedbackUtil.medium();
                   // Dispatch [SubpageViewState] events.
                   _subpage[pageIndex]
                       .onViewStateChanged(context, SubpageViewState.INVISIBLE);
@@ -728,14 +716,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     Widget title = _subpage.isEmpty
         ? Text(S.of(context).app_name)
         : _subpage[_pageIndex.value].title.call(context);
-    return StateProvider.personInfo.value == null || _subpage.isEmpty
-        ? _buildDummyBody(title)
+    return !StateProvider.isLoggedIn.value || _subpage.isEmpty
+        ? LoginPage()
         : _buildBody(title);
   }
 
   Future<void> _loadUpdate() async {
-    //We don't need to check for update on iOS platform.
-    if (PlatformX.isIOS) return;
     final UpdateInfo? updateInfo =
         AnnouncementRepository.getInstance().checkVersion();
     if (updateInfo == null) {
@@ -813,16 +799,6 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (userAgent != null) {
       SettingsProvider.getInstance().customUserAgent =
           StateProvider.onlineUserAgent = userAgent;
-    }
-  }
-
-  Future<void> _loadStartDate() async {
-    TimeTableExtra? startDateData;
-    try {
-      startDateData = AnnouncementRepository.getInstance().getStartDates();
-    } catch (_) {}
-    if (startDateData != null) {
-      SettingsProvider.getInstance().semesterStartDates = startDateData;
     }
   }
 
