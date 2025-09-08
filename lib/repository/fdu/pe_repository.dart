@@ -15,16 +15,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
-import 'package:dan_xi/util/retrier.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as dom;
 
 class FudanPERepository extends BaseRepositoryWithDio {
-  static const String _LOGIN_URL =
-      "https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Ftac.fudan.edu.cn%2Fthirds%2Ftjb.act%3Fredir%3DsportScore";
   static const String _INFO_URL =
       "https://fdtyjw.fudan.edu.cn/sportScore/stScore.aspx";
 
@@ -34,57 +30,49 @@ class FudanPERepository extends BaseRepositoryWithDio {
 
   factory FudanPERepository.getInstance() => _instance;
 
-  Future<List<ExerciseObject>?> loadExerciseRecords(PersonInfo? info) =>
-      Retrier.runAsyncWithRetry(() => _loadExerciseRecords(info));
+  Future<List<ExerciseObject>> loadExerciseRecords() async {
+    final options = RequestOptions(
+      method: "GET",
+      path: _INFO_URL,
+    );
+    return FudanSession.request(options, type: FudanLoginType.UISLegacy, (rep) {
+      final List<ExerciseObject> items = [];
+      final BeautifulSoup soup = BeautifulSoup(rep.data!);
+      final Iterable<dom.Element> tableLines = soup
+          .findAll(
+              "#pAll > table > tbody > tr:nth-child(6) > td > table > tbody > tr")
+          .map((e) => e.element!);
 
-  Future<List<ExerciseObject>?> _loadExerciseRecords(PersonInfo? info) async {
-    // PE system request a token from UIS to log in.
-    String token = "";
-    await UISLoginTool.loginUIS(dio, _LOGIN_URL, cookieJar!, info)
-        .catchError((e) {
-      if (e is DioException && e.type == DioExceptionType.badResponse) {
-        String url = e.response!.requestOptions.path;
-        token = Uri.tryParse(url)!.queryParameters['token']!;
+      final Iterable<dom.Element> peScoreLines = soup
+          .findAll(
+              "#pAll > table > tbody > tr:nth-child(26) > td > table > tbody > tr > td")
+          .map((e) => e.element!);
+
+      if (tableLines.isEmpty) {
+        throw "Unable to get the data";
       }
-      return null;
+
+      for (var line in tableLines) {
+        items.addAll(ExerciseItem.fromHtml(line));
+      }
+      int i = 0;
+      List<String> peInfo = [];
+      for (var line in peScoreLines) {
+        i++;
+        if (i == 1) continue;
+        if (i == 6) {
+          i = 0;
+          continue;
+        }
+        peInfo.add(line.text);
+        if (i == 5) {
+          items.add(ExerciseRecord.fromHtml(
+              peInfo[0], peInfo[1], peInfo[2], peInfo[3]));
+          peInfo.clear();
+        }
+      }
+      return items;
     });
-    final List<ExerciseObject> items = [];
-    final Response<String> r = await dio.get("$_INFO_URL?token=$token");
-    final BeautifulSoup soup = BeautifulSoup(r.data!);
-    final Iterable<dom.Element> tableLines = soup
-        .findAll(
-            "#pAll > table > tbody > tr:nth-child(6) > td > table > tbody > tr")
-        .map((e) => e.element!);
-
-    final Iterable<dom.Element> peScoreLines = soup
-        .findAll(
-            "#pAll > table > tbody > tr:nth-child(26) > td > table > tbody > tr > td")
-        .map((e) => e.element!);
-
-    if (tableLines.isEmpty) {
-      throw "Unable to get the data";
-    }
-
-    for (var line in tableLines) {
-      items.addAll(ExerciseItem.fromHtml(line));
-    }
-    int i = 0;
-    List<String> peInfo = [];
-    for (var line in peScoreLines) {
-      i++;
-      if (i == 1) continue;
-      if (i == 6) {
-        i = 0;
-        continue;
-      }
-      peInfo.add(line.text);
-      if (i == 5) {
-        items.add(ExerciseRecord.fromHtml(
-            peInfo[0], peInfo[1], peInfo[2], peInfo[3]));
-        peInfo.clear();
-      }
-    }
-    return items;
   }
 
   @override
