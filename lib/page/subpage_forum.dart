@@ -37,6 +37,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/widget/forum/auto_banner.dart';
 import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:dan_xi/widget/forum/login_widgets.dart';
@@ -888,8 +889,11 @@ Widget buildForumTopBar() => Selector<ForumProvider, bool>(
                     : EdgeInsets.zero,
                 child: PlatformIconButton(
                   icon: Icon(PlatformIcons(context).search),
-                  onPressed: () => smartNavigatorPush(context, '/bbs/search',
-                      forcePushOnMainNavigator: true),
+                  onPressed: () { 
+                    HapticFeedbackUtil.light();
+                    smartNavigatorPush(context, '/bbs/search',
+                      forcePushOnMainNavigator: true);
+                      },
                 ),
               ),
               const OTTitle()

@@ -544,6 +544,8 @@
   "select_date_range_far_past": "遠い過去",
   "select_date_range_now": "現在",
   "hole_force_deleted": "削除され",
+  "haptic_feedback": "触覚フィードバック",
+  "haptic_feedback_description": "操作時に振動フィードバックを提供",
   "identity_service": "統一アイデンティティ認証サービス",
   "login_undergraduate": "学部生ログイン",
   "login_postgraduate": "大学院生ログイン",
