@@ -60,15 +60,16 @@ class CardCrowdDataState extends State<CardCrowdData> {
       _selectItem = e;
       _trafficInfo = null;
     });
-    _trafficInfo = await DataCenterRepository.getInstance()
-        .getCrowdednessInfo(_selectItem!.index)
-        .catchError((e) {
+    try {
+      _trafficInfo = await DataCenterRepository.getInstance()
+          .getCrowdednessInfo(_selectItem!.index);
+    } catch (e) {
       // If it's not time for a meal
       if (e is UnsuitableTimeException) {
+        if (!mounted) return;
         Noticing.showNotice(context, S.of(context).out_of_dining_time);
       }
-      return null;
-    });
+    }
     refreshSelf();
   }
 

@@ -37,6 +37,7 @@ import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/util/win32/auto_start.dart'
     if (dart.library.html) 'package:dan_xi/util/win32/auto_start_stub.dart';
 import 'package:dan_xi/widget/dialogs/swatch_picker_dialog.dart';
@@ -440,6 +441,7 @@ class SettingsPageState extends State<SettingsPage> {
                             subtitle: Text(
                                 "${StateProvider.personInfo.value?.name ?? "???"} (${StateProvider.personInfo.value?.id ?? "???"})"),
                             onTap: () {
+                              HapticFeedbackUtil.medium();
                               showPlatformDialog(
                                 context: context,
                                 barrierDismissible: false,
@@ -463,6 +465,7 @@ class SettingsPageState extends State<SettingsPage> {
                                                   .error),
                                         ),
                                         onPressed: () {
+                                          HapticFeedbackUtil.heavy();
                                           Navigator.of(context).pop();
                                           _deleteAllDataAndExit();
                                         })
@@ -481,7 +484,9 @@ class SettingsPageState extends State<SettingsPage> {
                             subtitle: Text(SettingsProvider.getInstance()
                                 .campus
                                 .displayTitle(context)),
-                            onTap: () => showPlatformModalSheet(
+                            onTap: () {
+                              HapticFeedbackUtil.light();
+                              showPlatformModalSheet(
                                 context: context,
                                 builder: (BuildContext sheetContext) =>
                                     PlatformContextMenu(
@@ -489,7 +494,8 @@ class SettingsPageState extends State<SettingsPage> {
                                         cancelButton: CupertinoActionSheetAction(
                                                 child: Text(S.of(sheetContext).cancel),
                                                 onPressed: () =>
-                                                    Navigator.of(sheetContext).pop()))),
+                                                    Navigator.of(sheetContext).pop())));
+                              },
                           ),
                         ]),
                       ),
@@ -505,7 +511,9 @@ class SettingsPageState extends State<SettingsPage> {
                               subtitle: Text(SettingsProvider.getInstance()
                                   .language
                                   .displayTitle(context)),
-                              onTap: () => showPlatformModalSheet(
+                              onTap: () {
+                                HapticFeedbackUtil.light();
+                                showPlatformModalSheet(
                                   context: context,
                                   builder: (BuildContext sheetContext) =>
                                       PlatformContextMenu(
@@ -513,7 +521,8 @@ class SettingsPageState extends State<SettingsPage> {
                                           cancelButton: CupertinoActionSheetAction(
                                                   child: Text(S.of(sheetContext).cancel),
                                                   onPressed: () =>
-                                                      Navigator.of(sheetContext).pop()))),
+                                                      Navigator.of(sheetContext).pop())));
+                                                      },
                             ),
 
                             Selector<SettingsProvider, bool>(
@@ -528,6 +537,7 @@ class SettingsPageState extends State<SettingsPage> {
                                     const Icon(Icons.accessibility_new_rounded),
                                 value: value,
                                 onChanged: (bool value) {
+                                  HapticFeedbackUtil.selection();
                                   SettingsProvider.getInstance()
                                       .useAccessibilityColoring = value;
                                   forumPageKey.currentState?.setState(() {});
@@ -552,6 +562,7 @@ class SettingsPageState extends State<SettingsPage> {
                                   onTap: isFollowingSystemPalette
                                       ? null // Set onTap to null when disabled
                                       : () async {
+                                          HapticFeedbackUtil.light();
                                           int initialColor = context.read<SettingsProvider>().primarySwatch;
 
                                           MaterialColor? result =
@@ -585,6 +596,7 @@ class SettingsPageState extends State<SettingsPage> {
                                     secondary: const Icon(Icons.palette_outlined),
                                     value: followSystemPaletteValue,
                                     onChanged: (bool value) {
+                                      HapticFeedbackUtil.selection();
                                       context.read<SettingsProvider>().followSystemPalette = value;
                                     },
                                   );
@@ -599,7 +611,9 @@ class SettingsPageState extends State<SettingsPage> {
                                       .displayTitle(context) ??
                                   "null"),
                               leading: const Icon(Icons.brightness_4),
-                              onTap: () => showPlatformModalSheet(
+                              onTap: () {
+                                HapticFeedbackUtil.light();
+                                showPlatformModalSheet(
                                   context: context,
                                   builder: (BuildContext sheetContext) =>
                                       PlatformContextMenu(
@@ -607,7 +621,8 @@ class SettingsPageState extends State<SettingsPage> {
                                           cancelButton: CupertinoActionSheetAction(
                                                   child: Text(S.of(sheetContext).cancel),
                                                   onPressed: () =>
-                                                  Navigator.of(sheetContext).pop()))),
+                                                  Navigator.of(sheetContext).pop())));
+                                                  },
                             ),
                             ListTile(
                               title: Text(S.of(context).proxy_setting),
@@ -616,15 +631,18 @@ class SettingsPageState extends State<SettingsPage> {
                                           (s) => s.proxy) ??
                                       S.of(context).proxy_setting_unset),
                               leading: const Icon(Icons.network_ping),
-                              onTap: () => showPlatformModalSheet(
-                                  context: context,
-                                  builder: (BuildContext sheetContext) =>
-                                      PlatformContextMenu(
-                                          actions: _buildProxyList(sheetContext),
-                                          cancelButton: CupertinoActionSheetAction(
-                                              child: Text(S.of(sheetContext).cancel),
-                                              onPressed: () =>
-                                                  Navigator.of(sheetContext).pop()))),
+                              onTap: () {
+                                HapticFeedbackUtil.light();
+                                showPlatformModalSheet(
+                                    context: context,
+                                    builder: (BuildContext sheetContext) =>
+                                        PlatformContextMenu(
+                                            actions: _buildProxyList(sheetContext),
+                                            cancelButton: CupertinoActionSheetAction(
+                                                child: Text(S.of(sheetContext).cancel),
+                                                onPressed: () =>
+                                                    Navigator.of(sheetContext).pop())));
+                              },
                               enabled: !PlatformX.isWeb,
                             ),
                             if (context.select<SettingsProvider, bool>(
@@ -636,10 +654,28 @@ class SettingsPageState extends State<SettingsPage> {
                                     .of(context)
                                     .show_hidden_notifications_description),
                                 leading: const Icon(Icons.notifications_off),
-                                onTap: () => context
+                                onTap: () {
+                                      HapticFeedbackUtil.light();
+                                      context
                                         .read<SettingsProvider>()
-                                        .hiddenNotifications = [],
+                                        .hiddenNotifications = [];
+                                      }
                               ),
+                            SwitchListTile.adaptive(
+                              title: Text(S.of(context).haptic_feedback),
+                              subtitle: Text(S.of(context).haptic_feedback_description),
+                              secondary: PlatformX.isMaterial(context)
+                                  ? const Icon(Icons.vibration)
+                                  : const Icon(CupertinoIcons.hand_raised),
+                              value: context.select<SettingsProvider, bool>(
+                                  (s) => s.hapticFeedbackEnabled),
+                              onChanged: (bool value) {
+                                context.read<SettingsProvider>().hapticFeedbackEnabled = value;
+                                if (value) {
+                                  HapticFeedback.selectionClick();
+                                }
+                              },
+                            ),
                             ValueListenableBuilder<PersonInfo?>(
                               valueListenable: StateProvider.personInfo,
                               builder: (context, personInfo, __) {
@@ -647,8 +683,7 @@ class SettingsPageState extends State<SettingsPage> {
                                 return SwitchListTile.adaptive(
                                   title: Text(S.of(context).use_webvpn_title),
                                   secondary: const Icon(Icons.network_cell),
-                                  subtitle: Text(
-                                      S.of(context).use_webvpn_description),
+                                  subtitle: Text(S.of(context).use_webvpn_description),
                                   value: isVisitor
                                       ? false
                                       : context.select<SettingsProvider, bool>(
@@ -656,9 +691,8 @@ class SettingsPageState extends State<SettingsPage> {
                                   onChanged: isVisitor
                                       ? null
                                       : (bool value) async {
-                                          context
-                                              .read<SettingsProvider>()
-                                              .useWebvpn = value;
+                                          HapticFeedbackUtil.selection();
+                                          context.read<SettingsProvider>().useWebvpn = value;
                                         },
                                 );
                               },
@@ -794,6 +828,7 @@ class SettingsPageState extends State<SettingsPage> {
                             snapshot.data!.config!.show_folded!)
                         .displayTitle(context)!),
                     onTap: () {
+                      HapticFeedbackUtil.light();
                       showPlatformModalSheet(
                           context: context,
                           builder: (BuildContext sheetContext) =>
@@ -812,7 +847,10 @@ class SettingsPageState extends State<SettingsPage> {
                         ? const Icon(Icons.hide_image)
                         : const Icon(CupertinoIcons.eye_slash),
                     subtitle: Text(S.of(context).fatal_error),
-                    onTap: () => setState(() {}),
+                    onTap: () {
+                      HapticFeedbackUtil.light();
+                      setState(() {});
+                    }
                   ),
                   loadingBuilder: (context) => ListTile(
                     title: Text(S.of(context).forum_nsfw_behavior),
@@ -820,7 +858,10 @@ class SettingsPageState extends State<SettingsPage> {
                         ? const Icon(Icons.hide_image)
                         : const Icon(CupertinoIcons.eye_slash),
                     subtitle: Text(S.of(context).loading),
-                    onTap: () => setState(() {}),
+                    onTap: () {
+                      HapticFeedbackUtil.light();
+                      setState(() {});
+                    }
                   ),
                 ),
                 OTNotificationSettingsTile(onSettingsUpdate: () => setState(() {})),
@@ -831,9 +872,11 @@ class SettingsPageState extends State<SettingsPage> {
                           subtitle:
                               Text(S.of(context).forum_show_banner_description),
                           value: value,
-                          onChanged: (bool value) =>
-                              SettingsProvider.getInstance().isBannerEnabled =
-                                  value,
+                          onChanged: (bool value) {
+                            HapticFeedbackUtil.light();
+                            SettingsProvider.getInstance().isBannerEnabled =
+                                  value;
+                                  },
                         ),
                     selector: (_, model) => model.isBannerEnabled),
                 Selector<SettingsProvider, bool>(
@@ -844,6 +887,7 @@ class SettingsPageState extends State<SettingsPage> {
                               Text(S.of(context).forum_clean_mode_description),
                           value: value,
                           onChanged: (bool value) {
+                            HapticFeedbackUtil.light();
                             if (value) {
                               _showCleanModeGuideDialog();
                             }
@@ -879,15 +923,19 @@ class SettingsPageState extends State<SettingsPage> {
                     title: Text(S.of(context).recommended_tags),
                     leading: const Icon(Icons.recommend),
                     subtitle: Text(S.of(context).unavailable),
-                    onTap: () => Noticing.showModalNotice(context,
+                    onTap: () {
+                      HapticFeedbackUtil.light();
+                      Noticing.showModalNotice(context,
                         title: S.of(context).recommended_tags,
-                        message: S.of(context).recommended_tags_description),
+                        message: S.of(context).recommended_tags_description);
+                        },
                   ),
                 ListTile(
                   leading: Icon(PlatformIcons(context).tag),
                   title: Text(S.of(context).forum_hidden_tags),
                   subtitle: Text(S.of(context).forum_hidden_tags_description),
                   onTap: () async {
+                    HapticFeedbackUtil.light();
                     await smartNavigatorPush(context, '/bbs/tags/blocklist');
                     forumPageKey.currentState?.setState(() {});
                   },
@@ -897,6 +945,7 @@ class SettingsPageState extends State<SettingsPage> {
                   title: Text(S.of(context).background_image),
                   subtitle: Text(S.of(context).background_image_description),
                   onTap: () async {
+                    HapticFeedbackUtil.light();
                     if (SettingsProvider.getInstance().backgroundImagePath ==
                         null) {
                       final ImagePickerProxy picker =
@@ -938,6 +987,7 @@ class SettingsPageState extends State<SettingsPage> {
                   subtitle: Text(_clearCacheSubtitle ??
                       S.of(context).clear_cache_description),
                   onTap: () async {
+                    HapticFeedbackUtil.light();
                     await DefaultCacheManagerWithWebvpn().emptyCache();
                     setState(() {
                       _clearCacheSubtitle = S.of(context).cache_cleared;
@@ -951,6 +1001,7 @@ class SettingsPageState extends State<SettingsPage> {
                       subtitle: const Text(
                           "[WARNING: DEBUG FEATURE] Disable Markdown Rendering"),
                       onTap: () {
+                        HapticFeedbackUtil.light();
                         SettingsProvider.getInstance()
                                 .isMarkdownRenderingEnabled =
                             !SettingsProvider.getInstance()
@@ -959,35 +1010,50 @@ class SettingsPageState extends State<SettingsPage> {
                 ListTile(
                   leading: nil,
                   title: Text(S.of(context).modify_password),
-                  onTap: () => BrowserUtil.openUrl(
-                      Constant.FORUM_FORGOT_PASSWORD_URL, context),
+                  onTap: () {
+                    HapticFeedbackUtil.light();
+                    BrowserUtil.openUrl(
+                      Constant.FORUM_FORGOT_PASSWORD_URL, context);
+                      }
                 ),
                 ListTile(
                   leading: nil,
                   title: Text(S.of(context).list_my_posts),
-                  onTap: () => smartNavigatorPush(context, '/bbs/discussions',
+                  onTap: () {
+                    HapticFeedbackUtil.light();
+                    smartNavigatorPush(context, '/bbs/discussions',
                       arguments: {'showFilterByMe': true},
-                      forcePushOnMainNavigator: true),
+                      forcePushOnMainNavigator: true);
+                      }
                 ),
                 ListTile(
                   leading: nil,
                   title: Text(S.of(context).list_my_replies),
-                  onTap: () => smartNavigatorPush(context, '/bbs/postDetail',
+                  onTap: () {
+                    HapticFeedbackUtil.light();
+                    smartNavigatorPush(context, '/bbs/postDetail',
                       arguments: {'myReplies': true},
-                      forcePushOnMainNavigator: true),
+                      forcePushOnMainNavigator: true);
+                      }
                 ),
                 ListTile(
                   leading: nil,
                   title: Text(S.of(context).list_view_history),
-                  onTap: () => smartNavigatorPush(context, '/bbs/postDetail',
+                  onTap: () {
+                    HapticFeedbackUtil.light();
+                    smartNavigatorPush(context, '/bbs/postDetail',
                       arguments: {'viewHistory': true},
-                      forcePushOnMainNavigator: true),
+                      forcePushOnMainNavigator: true);
+                      }
                 ),
                 ListTile(
                   leading: nil,
                   title: Text(S.of(context).list_my_punishments),
-                  onTap: () => smartNavigatorPush(context, "/bbs/postDetail",
-                      arguments: {"punishmentHistory": true}),
+                  onTap: () {
+                    HapticFeedbackUtil.light();
+                    smartNavigatorPush(context, "/bbs/postDetail",
+                      arguments: {"punishmentHistory": true});
+                      }
                 ),
               ],
               ListTile(
@@ -1005,6 +1071,7 @@ class SettingsPageState extends State<SettingsPage> {
                       ),
                 onTap: () async {
                   if (!context.read<ForumProvider>().isUserInitialized) {
+                    HapticFeedbackUtil.light();
                     if (SettingsProvider.getInstance().forumToken == null) {
                       Noticing.showNotice(
                           context, S.of(context).login_from_forum_page,
@@ -1014,11 +1081,14 @@ class SettingsPageState extends State<SettingsPage> {
                       onLogout();
                       setState(() {});
                     }
-                  } else if (await Noticing.showConfirmationDialog(
+                  } else {
+                    HapticFeedbackUtil.medium();
+                    if (await Noticing.showConfirmationDialog(
                           context, S.of(context).logout_forum,
                           title: S.of(context).logout,
                           isConfirmDestructive: true) ==
                       true) {
+                        HapticFeedbackUtil.heavy();
                     if (!mounted) return;
                     ProgressFuture progressDialog = showProgressDialog(
                         loadingText: S.of(context).logout, context: context);
@@ -1031,6 +1101,7 @@ class SettingsPageState extends State<SettingsPage> {
                           .notifyUpdate();
                     } finally {
                       progressDialog.dismiss(showAnim: false);
+                    }
                     }
                   }
                 },
@@ -1102,7 +1173,10 @@ class SettingsPageState extends State<SettingsPage> {
                           fit: BoxFit.fill, image: AssetImage(e.imageUrl)))),
               title: Text(e.name),
               //subtitle: Text(e.description),
-              onTap: () => BrowserUtil.openUrl(e.url, context),
+              onTap: () {
+                HapticFeedbackUtil.light();
+                BrowserUtil.openUrl(e.url, context);
+                }
             ))
         .toList();
     return Card(
@@ -1172,7 +1246,10 @@ class SettingsPageState extends State<SettingsPage> {
                         render: kMarkdownRenderFactory(null),
                         content: S.of(context).acknowledgements_markdown,
                         hasBackgroundImage: false,
-                        onTapLink: (url) => BrowserUtil.openUrl(url!, null),
+                        onTapLink: (url) {
+                          HapticFeedbackUtil.light();
+                          BrowserUtil.openUrl(url!, null);
+                          }
                       ),
 
                       const SizedBox(height: 16),
@@ -1226,6 +1303,7 @@ class SettingsPageState extends State<SettingsPage> {
                         return TextButton(
                           child: Text(S.of(context).rate),
                           onPressed: () {
+                            HapticFeedbackUtil.light();
                             inAppReview.openStoreListing(
                               appStoreId: Constant.APPSTORE_APPID,
                             );
@@ -1238,6 +1316,7 @@ class SettingsPageState extends State<SettingsPage> {
                     TextButton(
                       child: Text(S.of(context).contact_us),
                       onPressed: () async {
+                        HapticFeedbackUtil.light();
                         bool? sendEmail = await Noticing.showConfirmationDialog(
                             context,
                             S
@@ -1262,6 +1341,7 @@ class SettingsPageState extends State<SettingsPage> {
                     TextButton(
                       child: Text(S.of(context).project_page),
                       onPressed: () {
+                        HapticFeedbackUtil.light();
                         BrowserUtil.openUrl(S.of(context).project_url, context);
                       },
                     ),
@@ -1269,6 +1349,7 @@ class SettingsPageState extends State<SettingsPage> {
                     TextButton(
                       child: Text(S.of(context).diagnostic_information),
                       onPressed: () {
+                        HapticFeedbackUtil.light();
                         smartNavigatorPush(context, "/diagnose");
                       },
                     ),

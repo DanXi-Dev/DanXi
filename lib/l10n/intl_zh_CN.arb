@@ -560,6 +560,8 @@
   "select_date_range_far_past": "遥远的过去",
   "select_date_range_now": "现在",
   "hole_force_deleted": "已删除",
+  "haptic_feedback": "触觉反馈",
+  "haptic_feedback_description": "在操作时提供震动反馈",
   "identity_service": "统一身份认证服务",
   "login_undergraduate": "本科生登录",
   "login_postgraduate": "研究生登录",
