@@ -143,6 +143,12 @@ class OTTitle extends StatelessWidget {
             (value) => value.divisionCache);
     OTDivision? division = context
         .select<ForumProvider, OTDivision?>((value) => value.currentDivision);
+
+    if (division?.division_id == OTDivision.HOME_PAGE_DIVISION_ID) {
+      division!.name = "主页";
+      division.description = "展示所有板块";
+    }
+
     int currentIndex = 0;
     if (division != null) {
       currentIndex = divisions.indexOf(division);
@@ -370,7 +376,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     if (!context.read<ForumProvider>().isUserInitialized) {
       await ForumRepository.getInstance().initializeRepo();
       context.read<ForumProvider>().currentDivisionId =
-          ForumRepository.getInstance().getDivisions().firstOrNull?.division_id;
+          OTDivision.HOME_PAGE_DIVISION_ID;
     }
 
     bool answered =

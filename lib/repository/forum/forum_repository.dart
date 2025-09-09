@@ -289,7 +289,7 @@ class ForumRepository extends BaseRepositoryWithDio {
         await WebvpnProxy.requestWithProxy(dio, options);
     final result = response.data?.map((e) => OTDivision.fromJson(e)).toList();
     if (result != null) {
-      provider.divisionCache = result;
+      provider.divisionCache = [OTDivision.home_page_division, ...result];
     }
     return provider.divisionCache.isNotEmpty ? provider.divisionCache : null;
   }
@@ -309,6 +309,10 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   Future<OTDivision?> loadSpecificDivision(int divisionId,
       {bool useCache = true}) async {
+    if (divisionId == OTDivision.HOME_PAGE_DIVISION_ID) {
+      return OTDivision.home_page_division;
+    }
+
     if (useCache) {
       try {
         final OTDivision cached = provider.divisionCache
@@ -335,17 +339,31 @@ class ForumRepository extends BaseRepositoryWithDio {
       String? tag,
       SortOrder? sortOrder}) async {
     sortOrder ??= SortOrder.LAST_REPLIED;
-    final options = RequestOptions(
-        path: "$_BASE_URL/holes",
-        method: "GET",
-        queryParameters: {
-          "start_time": startTime.toUtc().toIso8601String(),
-          "division_id": divisionId ?? 0, // 0 = don't filter by division
-          "length": length,
-          "tag": tag,
-          "order": sortOrder.getInternalString()
-        },
-        headers: _tokenHeader);
+
+    RequestOptions options;
+    if (divisionId == OTDivision.HOME_PAGE_DIVISION_ID) {
+      options = RequestOptions(
+          path: "$_BASE_URL/holes/_homepage",
+          method: "GET",
+          queryParameters: {
+            "offset": startTime.toUtc().toIso8601String(),
+            "size": length,
+            "order": sortOrder.getInternalString()
+          },
+          headers: _tokenHeader);
+    } else {
+      options = RequestOptions(
+          path: "$_BASE_URL/holes",
+          method: "GET",
+          queryParameters: {
+            "start_time": startTime.toUtc().toIso8601String(),
+            "division_id": divisionId ?? 0, // 0 = don't filter by division
+            "length": length,
+            "tag": tag,
+            "order": sortOrder.getInternalString()
+          },
+          headers: _tokenHeader);
+    }
 
     final Response<List<dynamic>> response =
         await WebvpnProxy.requestWithProxy(dio, options);
