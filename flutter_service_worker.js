@@ -95,9 +95,9 @@ const RESOURCES = {"canvaskit/skwasm.js": "1ef3ea3a0fec4569e5d531da25f34095",
 "assets/packages/flutter_math_fork/lib/katex_fonts/fonts/KaTeX_SansSerif-Bold.ttf": "ad0a28f28f736cf4c121bcb0e719b88a",
 "assets/packages/flutter_math_fork/lib/katex_fonts/fonts/KaTeX_Fraktur-Regular.ttf": "dede6f2c7dad4402fa205644391b3a94",
 "assets/packages/flutter_inappwebview_web/assets/web/web_support.js": "509ae636cfdd93e49b5a6eaf0f06d79f",
-"flutter_bootstrap.js": "a651d22054a54a7b25024f51841c7b24",
-"index.html": "046e7700886b2077dc0dc77b82b976f0",
-"/": "046e7700886b2077dc0dc77b82b976f0"};
+"flutter_bootstrap.js": "f2a4e25b9c6ac4542834710d6652a14b",
+"index.html": "af96a4216fe9f413536a0f5f352962b0",
+"/": "af96a4216fe9f413536a0f5f352962b0"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",
