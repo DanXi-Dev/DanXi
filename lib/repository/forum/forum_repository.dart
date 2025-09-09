@@ -500,7 +500,7 @@ class ForumRepository extends BaseRepositoryWithDio {
     if (tags == null || tags.isEmpty) tags = [const OTTag(0, 0, KEY_NO_TAG)];
     // Suppose user is logged in. He should be.
     final options = RequestOptions(
-        path: "$_BASE_URL/divisions/${divisionId}/holes",
+        path: "$_BASE_URL/divisions/$divisionId/holes",
         method: "POST",
         data: {
           "content": content,
