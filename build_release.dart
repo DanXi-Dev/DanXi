@@ -69,8 +69,8 @@ void main(List<String> arguments) async {
     gitHash = head.sha.substring(0, 7);
   } else {
     print(
-        'This script must be run in a directory containing a git repository.');
-    exit(1);
+        'Warning: This script should be run in a directory containing a git repository. The git hash will be set to "???".');
+    gitHash = '???';
   }
 
   print('Start building...');
