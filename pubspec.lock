@@ -720,10 +720,11 @@ packages:
   flutter_js:
     dependency: "direct main"
     description:
-      name: flutter_js
-      sha256: a04966b102967891ee4947d6e52b450676f16204876ba936e394008ca26db04b
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "82eb46ac02f80ffb62c155ce014081bfbb42122b"
+      url: "https://github.com/lmdevstudio/flutter_js.git"
+    source: git
     version: "0.8.5"
   flutter_keyboard_visibility:
     dependency: transitive
