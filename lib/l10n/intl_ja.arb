@@ -568,5 +568,6 @@
   "export_log_exporting": "ログをエクスポート中…",
   "export_log_to_path": "ログファイルは一時ファイルにエクスポートされました：{path}。開発者に送信してください。",
   "export_log_success": "エクスポートに成功しました",
-  "hole_frozen": "凍結"
+  "hole_frozen": "凍結",
+  "dorm_electricity_history": "履歴"
 }

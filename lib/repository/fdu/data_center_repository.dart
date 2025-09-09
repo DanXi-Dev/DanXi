@@ -36,6 +36,8 @@ class DataCenterRepository extends BaseRepositoryWithDio {
       "https://my.fudan.edu.cn/list/bks_xx_cj";
   static const String CARD_DETAIL_URL =
       "https://my.fudan.edu.cn/data_tables/ykt_xx.json";
+  static const String ELECTRICITY_HISTORY_URL =
+      "https://my.fudan.edu.cn/data_tables/ykt_xszsqyydqk.json";
 
   DataCenterRepository._();
 
@@ -162,6 +164,26 @@ class DataCenterRepository extends BaseRepositoryWithDio {
     });
   }
 
+  Future<List<ElectricityHistoryItem>> getElectricityHistory(
+      int offset, int size) {
+    final options = RequestOptions(
+        method: "POST",
+        path: ELECTRICITY_HISTORY_URL,
+        responseType: ResponseType.json,
+        data: FormData.fromMap({
+          "draw": 2,
+          "start": offset,
+          "length": size,
+        }));
+    return FudanSession.request(options, (req) {
+      final data = req.data as Map<String, dynamic>;
+      return data["data"]
+          .map<ElectricityHistoryItem>(
+              (e) => ElectricityHistoryItem.fromList(List<String>.from(e)))
+          .toList();
+    });
+  }
+
   @override
   String get linkHost => "fudan.edu.cn";
 }
@@ -195,4 +217,22 @@ class TrafficInfo {
   int max;
 
   TrafficInfo(this.current, this.max);
+}
+
+class ElectricityHistoryItem {
+  /// Dorm name, e.g. "邯郸/15号楼/1501"
+  String dormName;
+
+  /// Date of the record, e.g. "2024-06-01"
+  String date;
+
+  /// Amount of electricity used in kWh, e.g. "1.5"
+  String amount;
+
+  ElectricityHistoryItem(this.dormName, this.date, this.amount);
+
+  factory ElectricityHistoryItem.fromList(List<String> elements) {
+    return ElectricityHistoryItem(
+        elements[0].trim(), elements[1].trim(), elements[2].trim());
+  }
 }

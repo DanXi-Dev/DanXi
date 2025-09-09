@@ -580,5 +580,6 @@
   "export_log_exporting": "导出日志中…",
   "export_log_to_path": "日志文件已导出到临时文件：{path}，请自行处理该文件。",
   "export_log_success": "导出成功",
-  "hole_frozen": "已冻结"
+  "hole_frozen": "已冻结",
+  "dorm_electricity_history": "历史用电"
 }
