@@ -17,6 +17,7 @@
 
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
