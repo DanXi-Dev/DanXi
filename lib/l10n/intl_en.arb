@@ -586,5 +586,6 @@
   "export_log_exporting": "Exporting logs…",
   "export_log_to_path": "Log file has been exported to a temporary file: {path}. Please send this file to a developer.",
   "export_log_success": "Export successful",
-  "hole_frozen": "Frozen"
+  "hole_frozen": "Frozen",
+  "dorm_electricity_history": "Usage History"
 }

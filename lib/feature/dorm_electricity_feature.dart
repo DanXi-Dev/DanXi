@@ -287,7 +287,7 @@ class DormElectricityModalSheet extends HookConsumerWidget {
           subtitle: Text(detailText),
         ),
         ListTile(
-            title: Text("历史用电"),
+            title: Text(S.of(context).dorm_electricity_history),
             trailing: PlatformIconButton(
               icon: history.isLoading
                   ? AnimatedBuilder(
