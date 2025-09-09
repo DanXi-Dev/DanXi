@@ -15,15 +15,27 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:math';
+
+import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/repository/fdu/data_center_repository.dart';
 import 'package:dan_xi/repository/fdu/dorm_repository.dart';
-import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/feature_item/feature_progress_indicator.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'dorm_electricity_feature.g.dart';
 
 /// Every feature should extends [Feature]. You may find
 /// `lib/feature/base_feature.dart` helpful.
@@ -137,10 +149,15 @@ class DormElectricityFeature extends Feature {
   @override
   void onTap() {
     if (_status == ConnectionStatus.DONE) {
-      final String body =
-          '${_electricity?.dormName}\n${S.of(context!).dorm_electricity_subtitle(_electricity!.available, _electricity!.used)}\n\n${S.of(context!).last_updated(_electricity!.updateTime.toString())}';
-      Noticing.showModalNotice(context!,
-          message: body, title: S.of(context!).dorm_electricity);
+      final content =
+          DormElectricityModalSheet(currentElectricity: _electricity!);
+      final Widget body;
+      if (PlatformX.isCupertino(context!)) {
+        body = SafeArea(child: Card(child: content));
+      } else {
+        body = SafeArea(child: content);
+      }
+      showPlatformModalSheet(context: context!, builder: (_) => body);
     } else {
       refreshData();
     }
@@ -148,4 +165,150 @@ class DormElectricityFeature extends Feature {
 
   @override
   bool get clickable => true;
+}
+
+// keepAlive: make the data persistent even if the sheet is closed.
+@Riverpod(keepAlive: true)
+Future<List<ElectricityHistoryItem>> electricityHistory(
+    Ref ref, int offset, int size) async {
+  return await DataCenterRepository.getInstance()
+      .getElectricityHistory(offset, size);
+}
+
+class DormElectricityModalSheet extends HookConsumerWidget {
+  final ElectricityItem currentElectricity;
+
+  const DormElectricityModalSheet(
+      {super.key, required this.currentElectricity});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final history = ref.watch(electricityHistoryProvider(0, 30));
+
+    final Widget chart;
+    switch (history) {
+      case AsyncData(:final value):
+        if (value.isEmpty) {
+          chart = Text(S.of(context).no_data);
+        } else {
+          final ascendingValue = value.reversed.toList();
+          final spots = ascendingValue
+              .mapIndexed((index, e) =>
+                  FlSpot(index.toDouble(), double.parse(e.amount)))
+              .toList();
+          chart = LineChart(
+            LineChartData(
+              lineBarsData: [
+                LineChartBarData(
+                  spots: spots,
+                  isCurved: true,
+                  color: Theme.of(context).colorScheme.primary,
+                  dotData: FlDotData(show: false),
+                ),
+              ],
+              titlesData: FlTitlesData(
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    interval: 5,
+                    getTitlesWidget: (value, meta) {
+                      final index = value.toInt();
+                      if (index < 0 || index >= ascendingValue.length) {
+                        return const SizedBox.shrink();
+                      }
+                      final date = ascendingValue[index].date;
+                      final parsedDate = DateTime.parse(date);
+                      final formatter = DateFormat("MM/dd");
+                      final formattedDate = formatter.format(parsedDate);
+                      return SideTitleWidget(
+                        meta: meta,
+                        child: Text(formattedDate,
+                            style: const TextStyle(fontSize: 10)),
+                      );
+                    },
+                  ),
+                ),
+                leftTitles: AxisTitles(
+                  axisNameWidget: Text("kWh"),
+                  sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 5,
+                      getTitlesWidget: (_, meta) {
+                        return Text(
+                          meta.formattedValue,
+                          style: const TextStyle(fontSize: 10),
+                          textAlign: TextAlign.end,
+                        );
+                      }),
+                ),
+                // remove right and top titles
+                rightTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (_, __) => const SizedBox.shrink())),
+                topTitles:
+                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              ),
+              gridData: FlGridData(show: true, horizontalInterval: 5),
+              lineTouchData: LineTouchData(
+                  touchTooltipData: LineTouchTooltipData(
+                getTooltipColor: (_) =>
+                    Theme.of(context).colorScheme.primaryContainer,
+              )),
+              minY: 0,
+            ),
+          );
+        }
+      case AsyncError(:final error, :final stackTrace):
+        chart = ErrorPageWidget.buildWidget(context, error,
+            stackTrace: stackTrace,
+            onTap: () => ref.invalidate(electricityHistoryProvider(0, 30)));
+      case _:
+        chart = Center(child: PlatformCircularProgressIndicator());
+    }
+
+    var detailText =
+        "${currentElectricity.dormName}\n${S.of(context).dorm_electricity_subtitle(currentElectricity.available, currentElectricity.used)}";
+    if (currentElectricity.updateTime.isNotEmpty) {
+      detailText +=
+          "\n${S.of(context).last_updated(currentElectricity.updateTime)}";
+    }
+
+    const refreshIcon = Icon(Icons.refresh);
+    final rotatingAnimation =
+    useAnimationController(duration: const Duration(seconds: 1))
+      ..repeat();
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          title: Text(S.of(context).dorm_electricity),
+          subtitle: Text(detailText),
+        ),
+        ListTile(
+            title: Text("历史用电"),
+            trailing: PlatformIconButton(
+              icon: history.isLoading
+                  ? AnimatedBuilder(
+                      animation: rotatingAnimation,
+                      builder: (context, child) => Transform.rotate(
+                          angle: rotatingAnimation.value * 2 * pi,
+                          child: child),
+                      child: refreshIcon,
+                    )
+                  : refreshIcon,
+              onPressed: history.isLoading
+                  ? null
+                  : () => ref.invalidate(electricityHistoryProvider(0, 30)),
+            )),
+        ConstrainedBox(
+            constraints: BoxConstraints.loose(Size.fromHeight(200)),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: chart,
+            ))
+      ],
+    );
+  }
 }
