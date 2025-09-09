@@ -17,13 +17,13 @@
 
 import 'dart:math';
 
-import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/fdu/data_center_repository.dart';
 import 'package:dan_xi/repository/fdu/dorm_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/feature_item/feature_progress_indicator.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -217,9 +217,10 @@ class DormElectricityModalSheet extends HookConsumerWidget {
                         return const SizedBox.shrink();
                       }
                       final date = ascendingValue[index].date;
-                      final parsedDate = DateTime.parse(date);
+                      final parsedDate = DateTime.tryParse(date);
                       final formatter = DateFormat("MM/dd");
-                      final formattedDate = formatter.format(parsedDate);
+                      final formattedDate =
+                          parsedDate.apply(formatter.format) ?? "??/??";
                       return SideTitleWidget(
                         meta: meta,
                         child: Text(formattedDate,
@@ -276,8 +277,7 @@ class DormElectricityModalSheet extends HookConsumerWidget {
 
     const refreshIcon = Icon(Icons.refresh);
     final rotatingAnimation =
-    useAnimationController(duration: const Duration(seconds: 1))
-      ..repeat();
+        useAnimationController(duration: const Duration(seconds: 1))..repeat();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
