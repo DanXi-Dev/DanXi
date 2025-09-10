@@ -54,18 +54,20 @@ dmg 硬盘映像，挂载拷贝即可。
 
 ### Arch Linux
 
-从 [AUR](https://aur.archlinux.org/danxi-git.git) 或 [archlinuxcn](https://github.com/archlinuxcn/repo/tree/master/archlinuxcn/danxi-git) 安装。
+从 [AUR](https://aur.archlinux.org) 或 [archlinuxcn](https://github.com/archlinuxcn/repo) 安装。
 
 #### AUR
 
 ```shell
-[yay/paru] -S danxi-git
+[yay/paru] -S danxi # 最新稳定版
+[yay/paru] -S danxi-git # 最新 Git 版
 ```
 
 #### archlinuxcn
 
 ```shell
-sudo pacman -S danxi-git
+sudo pacman -S danxi # 最新稳定版
+sudo pacman -S danxi-git # 最新 Git 版
 ```
 
 ### 其他 Linux 发行版
