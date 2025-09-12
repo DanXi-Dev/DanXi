@@ -19,6 +19,7 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/celebration.dart';
+import 'package:dan_xi/model/remote_sticker.dart';
 import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
@@ -37,10 +38,16 @@ class AnnouncementRepository {
 
   factory AnnouncementRepository.getInstance() => _instance;
   Map<String, dynamic>? _tomlCache;
+  Dio? _dio;
+
+  /// Get cached HTTP client with lazy initialization
+  Dio get _httpClient {
+    _dio ??= DioUtils.newDioWithProxy();
+    return _dio!;
+  }
 
   Future<bool?> loadAnnouncements() async {
-    final Response<dynamic> response =
-        await DioUtils.newDioWithProxy().get(_URL);
+    final Response<dynamic> response = await _httpClient.get(_URL);
     _tomlCache = TomlDocument.parse(response.data).toMap();
     return _tomlCache?.isNotEmpty ?? false;
   }
@@ -172,6 +179,20 @@ class AnnouncementRepository {
     }
 
     return _tomlCache!['highlight_tag_ids'].cast<int>();
+  }
+
+  /// Get all available stickers from TOML configuration
+  Future<List<RemoteSticker>> getAvailableStickers() async {
+    // Ensure announcements are loaded first
+    if (_tomlCache == null) {
+      await loadAnnouncements();
+    }
+
+    // Get stickers from TOML
+    final stickerList = _tomlCache!['sticker'] as List?;
+    return stickerList != null
+        ? stickerList.map((data) => RemoteSticker.fromToml(data as Map<String, dynamic>)).toList()
+        : <RemoteSticker>[];
   }
 }
 

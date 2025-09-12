@@ -15,39 +15,32 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-enum Stickers {
-  dx_angry,
-  dx_call,
-  dx_cate,
-  dx_dying,
-  dx_egg,
-  dx_fright,
-  dx_heart,
-  dx_hug,
-  dx_overwhelm,
-  dx_roll,
-  dx_roped,
-  dx_sleep,
-  dx_swim,
-  dx_thrill,
-  dx_touch_fish,
-  dx_twin,
-  dx_kiss,
-  dx_onlooker,
-  dx_craving,
-  dx_caught,
-  dx_worn,
-  dx_murderous,
-  dx_confused,
-  dx_like;
-}
+import 'package:json_annotation/json_annotation.dart';
 
-String? getStickerAssetPath(String stickerName) {
-  try {
-    Stickers sticker =
-        Stickers.values.firstWhere((e) => e.name.toString() == stickerName);
-    return "assets/graphics/stickers/${sticker.name}.webp";
-  } catch (error) {
-    return null;
+part 'remote_sticker.g.dart';
+
+@JsonSerializable()
+class RemoteSticker {
+  final String id;
+  final String url;
+  final String sha256;
+
+  RemoteSticker({
+    required this.id,
+    required this.url,
+    required this.sha256,
+  });
+
+  factory RemoteSticker.fromJson(Map<String, dynamic> json) =>
+      _$RemoteStickerFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RemoteStickerToJson(this);
+
+  factory RemoteSticker.fromToml(Map<String, dynamic> tomlData) {
+    return RemoteSticker(
+      id: tomlData['id'] as String,
+      url: tomlData['url'] as String,
+      sha256: tomlData['sha256'] as String,
+    );
   }
 }
