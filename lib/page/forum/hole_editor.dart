@@ -36,7 +36,6 @@ import 'package:dan_xi/util/forum/editor_object.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/sticker_download_manager.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart' hide Consumer;
 import 'package:dan_xi/widget/dialogs/care_dialog.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
