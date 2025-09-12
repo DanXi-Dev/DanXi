@@ -499,7 +499,7 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Retry',
+                                S.of(context).retry,
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.error,
                                   fontSize: 10,
