@@ -15,10 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:io';
-import 'dart:typed_data';
-import 'package:beautiful_soup_dart/beautiful_soup.dart';
-import 'package:crypto/crypto.dart';
+ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/celebration.dart';
@@ -27,7 +24,6 @@ import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dio/dio.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:toml/toml.dart';
 
@@ -42,13 +38,12 @@ class AnnouncementRepository {
 
   factory AnnouncementRepository.getInstance() => _instance;
   Map<String, dynamic>? _tomlCache;
-  String? _remoteStickerCacheDir;
-  Dio? _cachedHttpClient;
+  Dio? _dio;
 
   /// Get cached HTTP client with lazy initialization
   Dio get _httpClient {
-    _cachedHttpClient ??= DioUtils.newDioWithProxy();
-    return _cachedHttpClient!;
+    _dio ??= DioUtils.newDioWithProxy();
+    return _dio!;
   }
 
   Future<bool?> loadAnnouncements() async {
@@ -186,128 +181,8 @@ class AnnouncementRepository {
     return _tomlCache!['highlight_tag_ids'].cast<int>();
   }
 
-  // Cloud Sticker Methods
-  Future<String> get _stickerCacheDir async {
-    if (_remoteStickerCacheDir != null) return _remoteStickerCacheDir!;
-    final dir = await getApplicationCacheDirectory();
-    _remoteStickerCacheDir = "${dir.path}/remote_stickers";
-    await Directory(_remoteStickerCacheDir!).create(recursive: true);
-    return _remoteStickerCacheDir!;
-  }
-
-
-
-  Future<List<String>> getCachedStickerIds() async {
-    final cacheDir = await _stickerCacheDir;
-    final directory = Directory(cacheDir);
-
-    if (!await directory.exists()) {
-      return [];
-    }
-
-    final entities = await directory.list().toList();
-    return entities
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.webp'))
-        .map((file) {
-      final fileName = file.path.split(Platform.pathSeparator).last;
-      return fileName.substring(
-          0, fileName.length - 5); // Remove .webp extension
-    }).toList();
-  }
-
-  Future<String?> getStickerFilePath(String stickerId) async {
-    final cacheDir = await _stickerCacheDir;
-    final file = File("$cacheDir/$stickerId.webp");
-    return await file.exists() ? file.path : null;
-  }
-
-  Future<String> _calculateSha256(Uint8List data) async {
-    final digest = sha256.convert(data);
-    return digest.toString();
-  }
-
-  Future<bool> _validateStickerFile(
-      String filePath, String expectedSha256) async {
-    try {
-      final file = File(filePath);
-      if (!await file.exists()) return false;
-
-      final data = await file.readAsBytes();
-      final actualSha256 = await _calculateSha256(data);
-      return actualSha256 == expectedSha256;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  Future<bool> _downloadAndValidateSticker(RemoteSticker sticker) async {
-    try {
-      final response = await _httpClient.get<Uint8List>(
-        sticker.url,
-        options: Options(responseType: ResponseType.bytes),
-      );
-
-      if (response.data == null) return false;
-
-      final actualSha256 = await _calculateSha256(response.data!);
-      if (actualSha256 != sticker.sha256) {
-        return false;
-      }
-
-      final cacheDir = await _stickerCacheDir;
-      final file = File("$cacheDir/${sticker.id}.webp");
-      await file.writeAsBytes(response.data!);
-
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Public method to download and validate a single sticker
-  Future<bool> downloadAndValidateSticker(RemoteSticker sticker) async {
-    return await _downloadAndValidateSticker(sticker);
-  }
-
-  Future<List<RemoteSticker>> syncStickers() async {
-    try {
-      // Ensure announcements are loaded first
-      if (_tomlCache == null) {
-        await loadAnnouncements();
-      }
-
-      // Get stickers from TOML
-      final stickerList = _tomlCache!['sticker'] as List?;
-      final networkStickers = stickerList != null
-          ? stickerList.map((data) => RemoteSticker.fromToml(data as Map<String, dynamic>)).toList()
-          : <RemoteSticker>[];
-      
-      if (networkStickers.isEmpty) {
-        return [];
-      }
-
-      for (final networkSticker in networkStickers) {
-        final filePath = await getStickerFilePath(networkSticker.id);
-
-        // Download if not cached or if validation fails
-        if (filePath == null ||
-            !await _validateStickerFile(filePath, networkSticker.sha256)) {
-          await _downloadAndValidateSticker(networkSticker);
-        }
-      }
-
-      return networkStickers;
-    } catch (e) {
-      final stickerList = _tomlCache?['sticker'] as List?;
-      return stickerList != null
-          ? stickerList.map((data) => RemoteSticker.fromToml(data as Map<String, dynamic>)).toList()
-          : <RemoteSticker>[];
-    }
-  }
-
-  /// Get all network stickers from TOML, regardless of cache status
-  Future<List<RemoteSticker>> getAllNetworkStickers() async {
+  /// Get all available stickers from TOML configuration
+  Future<List<RemoteSticker>> getAvailableStickers() async {
     // Ensure announcements are loaded first
     if (_tomlCache == null) {
       await loadAnnouncements();
@@ -318,11 +193,6 @@ class AnnouncementRepository {
     return stickerList != null
         ? stickerList.map((data) => RemoteSticker.fromToml(data as Map<String, dynamic>)).toList()
         : <RemoteSticker>[];
-  }
-
-  Future<List<RemoteSticker>> getAvailableStickers() async {
-    // Return all network stickers to allow background downloading
-    return await getAllNetworkStickers();
   }
 }
 

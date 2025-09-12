@@ -16,10 +16,7 @@
  */
 
 import 'package:dan_xi/model/person.dart';
-import 'package:dan_xi/model/remote_sticker.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
-import 'package:dan_xi/repository/app/announcement_repository.dart';
-import 'package:dan_xi/util/sticker_download_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
@@ -39,42 +36,6 @@ class StateProvider {
 
   static String? onlineUserAgent;
 
-  /// Available stickers loaded from the server.
-  static final ValueNotifier<List<RemoteSticker>?> availableStickers = ValueNotifier(null);
-  static final ValueNotifier<bool> stickersLoading = ValueNotifier(false);
-  static final ValueNotifier<dynamic> stickersError = ValueNotifier(null);
-
-  /// Load available stickers from the server.
-  static Future<void> loadAvailableStickers() async {
-    if (stickersLoading.value) return; // Prevent duplicate loading
-    
-    stickersLoading.value = true;
-    stickersError.value = null;
-    
-    try {
-      final stickers = await AnnouncementRepository.getInstance().getAvailableStickers();
-      availableStickers.value = stickers;
-      
-      // Register all stickers with the download manager for background downloading
-      final downloadManager = StickerDownloadManager.instance;
-      for (final sticker in stickers) {
-        downloadManager.registerSticker(sticker);
-      }
-      
-      // Start background downloads for all stickers that aren't already downloaded
-      downloadManager.downloadAllStickers();
-    } catch (error) {
-      stickersError.value = error;
-    } finally {
-      stickersLoading.value = false;
-    }
-  }
-
-  /// Refresh available stickers.
-  static Future<void> refreshAvailableStickers() async {
-    availableStickers.value = null;
-    await loadAvailableStickers();
-  }
 
   static void initialize(BuildContext context) {
     ForumProvider provider = context.read<ForumProvider>();
@@ -84,13 +45,5 @@ class StateProvider {
     isForeground = true;
     needScreenshotWarning = showingScreenshotWarning = false;
     provider.editorCache.clear();
-    
-    // Reset sticker state
-    availableStickers.value = null;
-    stickersLoading.value = false;
-    stickersError.value = null;
-    
-    // Clear download manager state
-    StickerDownloadManager.instance.clearAllState();
   }
 }

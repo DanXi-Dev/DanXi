@@ -16,11 +16,9 @@
  */
 
 import 'dart:io';
-import 'package:dan_xi/model/sticker_download_state.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/sticker_download_manager.dart';
-import 'package:dan_xi/util/stickers.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/forum/auto_bbs_image.dart';
 import 'package:dan_xi/widget/forum/forum_widgets.dart';
@@ -32,6 +30,7 @@ import 'package:flutter_highlighting/themes/atom-one-light.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:highlighting/languages/all.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:nil/nil.dart';
 
@@ -109,31 +108,33 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
           url = url.replaceFirst("danxi_", "dx_");
         }
         if (url.startsWith("dx_")) {
-          return ValueListenableBuilder(
-            valueListenable: StickerDownloadManager.instance.getStickerStateNotifier(url),
-            builder: (context, stickerState, child) {
-              switch (stickerState) {
-                case StickerNotDownloaded():
-                  // Trigger download and show loading
-                  getStickerPath(url);
-                  return const SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: Center(
-                      child: CircularProgressIndicator(),
+          return HookConsumer(
+            builder: (context, ref, child) {
+              final sticker = ref.watch(stickerFilePathProvider(url));
+              return sticker.when(
+                loading: () => const SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: Center(
+                    child: Icon(
+                      Icons.refresh,
+                      color: Colors.grey,
+                      size: 24,
                     ),
-                  );
-                
-                case StickerDownloading():
-                  return const SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: Center(
-                      child: CircularProgressIndicator(),
+                  ),
+                ),
+                error: (error, stackTrace) => SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: Center(
+                    child: Icon(
+                      Icons.error_outline,
+                      color: Theme.of(context).colorScheme.error,
+                      size: 24,
                     ),
-                  );
-                
-                case StickerDownloaded(filePath: final filePath):
+                  ),
+                ),
+                data: (filePath) {
                   return Image.file(
                     File(filePath),
                     width: 50,
@@ -152,20 +153,8 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
                       );
                     },
                   );
-                
-                case StickerDownloadFailed():
-                  return const SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: Center(
-                      child: Icon(
-                        Icons.error_outline,
-                        color: Colors.grey,
-                        size: 24,
-                      ),
-                    ),
-                  );
-              }
+                },
+              );
             },
           );
         }
