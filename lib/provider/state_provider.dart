@@ -36,7 +36,6 @@ class StateProvider {
 
   static String? onlineUserAgent;
 
-
   static void initialize(BuildContext context) {
     ForumProvider provider = context.read<ForumProvider>();
     provider.currentDivisionId = null;

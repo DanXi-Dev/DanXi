@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
- import 'package:beautiful_soup_dart/beautiful_soup.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
 import 'package:dan_xi/model/announcement.dart';
 import 'package:dan_xi/model/celebration.dart';
