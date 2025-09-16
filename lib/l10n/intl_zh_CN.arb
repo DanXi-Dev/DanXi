@@ -413,6 +413,7 @@
   "settings": "设置",
   "share": "分享",
   "share_as_ics": "导出为 ICS",
+  "share_as_csv": "导出为可供 WakeUp 课程表导入的 CSV 文件",
   "show": "显示",
   "show_all": "显示全部",
   "show_all_replies": "查看全部",

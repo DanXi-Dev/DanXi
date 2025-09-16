@@ -419,6 +419,7 @@
   "settings": "Settings",
   "share": "Share",
   "share_as_ics": "Export as ICS",
+  "share_as_csv": "Export as CSV file compatible with WakeUp Timetable import",
   "show": "Show",
   "show_all": "Show All",
   "show_all_replies": "Show All",

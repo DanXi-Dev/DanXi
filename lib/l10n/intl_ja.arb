@@ -411,6 +411,7 @@
   "settings": "設定",
   "share": "シェア",
   "share_as_ics": "ICSとしてエクスポート",
+  "share_as_csv": "WakeUp時間割にインポート可能なCSVファイルとしてエクスポート",
   "show": "表示",
   "show_all": "すべて表示",
   "show_all_replies": "すべて表示",

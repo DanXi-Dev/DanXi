@@ -56,6 +56,76 @@ class ICSConverter extends TimetableConverter {
   String get mimeType => "text/calendar";
 }
 
+class CSVConverter extends TimetableConverter {
+  void addCourse(int weekDay, int startSlot, int endSlot, Course course,
+      StringBuffer csv) {
+    String courseName = course.courseName ?? '无';
+    String teacher = course.teacherNames?.join('、') ?? '无';
+    String room = course.roomName ?? '无';
+    String weeks = course.availableWeeks?.join('、') ?? '';
+    weekDay += 1; // Change to 1-7
+    startSlot += 1; // Change to 1-12
+    endSlot += 1; // Change to 1-12
+    csv.writeln(
+        "$courseName,$weekDay,$startSlot,$endSlot,$teacher,$room,$weeks");
+  }
+
+  /// Convert [table] to .csv format string
+  @override
+  String convertTo(TimeTable? table) {
+    StringBuffer csv = StringBuffer();
+    csv.writeln("课程名称,星期,开始节数,结束节数,老师,地点,周数");
+    for (Course course in table!.courses!) {
+      // Sort by weekDay first, then by slot
+      course.times!.sort((a, b) {
+        if (a.weekDay != b.weekDay) {
+          return a.weekDay.compareTo(b.weekDay);
+        }
+        return a.slot.compareTo(b.slot);
+      });
+
+      int? currentDay;
+      int? startSlot;
+      int? prevSlot;
+
+      for (var t in course.times!) {
+        if (currentDay == null) {
+          // First entry initialization
+          currentDay = t.weekDay;
+          startSlot = t.slot;
+          prevSlot = t.slot;
+        } else if (t.weekDay != currentDay) {
+          // Switched to a new day, close the previous day’s block
+          addCourse(currentDay, startSlot!, prevSlot!, course, csv);
+          currentDay = t.weekDay;
+          startSlot = t.slot;
+          prevSlot = t.slot;
+        } else if (t.slot == prevSlot! + 1) {
+          // Consecutive slot, extend the current block
+          prevSlot = t.slot;
+        } else {
+          // Not consecutive, close the current block and start a new one
+          addCourse(currentDay, startSlot!, prevSlot, course, csv);
+          startSlot = t.slot;
+          prevSlot = t.slot;
+        }
+      }
+
+      // Close the last block if any
+      if (currentDay != null) {
+        addCourse(currentDay, startSlot!, prevSlot!, course, csv);
+      }
+    }
+    return csv.toString();
+  }
+
+  @override
+  String get fileName => "timetable.csv";
+
+  @override
+  String get mimeType => "text/csv";
+}
+
 /*
 class CalendarImporter extends TimetableConverter {
   /// Import [table] directly into system calendar without exporting any files.

@@ -283,7 +283,10 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     }
     super.initState();
     _setContent();
-    converters = {S.current.share_as_ics: ICSConverter()};
+    converters = {
+      S.current.share_as_ics: ICSConverter(),
+      S.current.share_as_csv: CSVConverter()
+    };
     _shareSubscription.bindOnlyInvalid(
         Constant.eventBus.on<ShareTimetableEvent>().listen((_) {
           if (_table == null) return;
