@@ -52,10 +52,9 @@ class AutoBannerState extends State<AutoBanner> {
   void Function(bool)? onExpand;
   List<BannerExtra?>? list;
 
-  Map<String, String> placeholderList = {
-    "{danta_access_token}":
-        SettingsProvider.getInstance().forumToken?.access ?? ""
-  };
+  static final Map<String, String Function()> placeholderList = Map.unmodifiable({
+    "{danta_access_token}": () => SettingsProvider.getInstance().forumToken?.access ?? ""
+  });
 
   @override
   void initState() {
@@ -77,7 +76,7 @@ class AutoBannerState extends State<AutoBanner> {
     return true;
   }
 
-  String replacePlaceholders(String action, Map<String, String> placeholderList) {
+  String replacePlaceholders(String action, Map<String, String Function()> placeholderList) {
     if (action.isEmpty || placeholderList.isEmpty) {
       return action;
     }
@@ -87,7 +86,8 @@ class AutoBannerState extends State<AutoBanner> {
 
     return action.replaceAllMapped(regex, (match) {
       final placeholder = match.group(0)!;
-      return placeholderList[placeholder] ?? placeholder;
+      final value = placeholderList[placeholder]?.call() ?? placeholder;
+      return Uri.encodeComponent(value);
     });
   }
 
