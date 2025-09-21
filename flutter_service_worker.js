@@ -18,7 +18,7 @@ const RESOURCES = {"canvaskit/skwasm.js": "1ef3ea3a0fec4569e5d531da25f34095",
 "favicon.webp": "5d8a19c576a1ba2a24af3b99f340237d",
 "flutter.js": "888483df48293866f9f41d3d9274a779",
 "manifest.json": "012d91b9edf492757ddf24dd1b15d03e",
-"main.dart.js": "8fb06bb4d7dd1d3723c3c715335eb213",
+"main.dart.js": "0cc0190b00a0d6b48a4bd8964472cf63",
 "version.json": "3ac35de81d647f650b6f3a674887919c",
 "assets/NOTICES": "715996fc7119ca474fbd3f00c6913814",
 "assets/fonts/MaterialIcons-Regular.otf": "4b3e2c198761cc0ff43b22148efde931",
@@ -71,9 +71,9 @@ const RESOURCES = {"canvaskit/skwasm.js": "1ef3ea3a0fec4569e5d531da25f34095",
 "assets/packages/flutter_math_fork/lib/katex_fonts/fonts/KaTeX_SansSerif-Bold.ttf": "ad0a28f28f736cf4c121bcb0e719b88a",
 "assets/packages/flutter_math_fork/lib/katex_fonts/fonts/KaTeX_Fraktur-Regular.ttf": "dede6f2c7dad4402fa205644391b3a94",
 "assets/packages/flutter_inappwebview_web/assets/web/web_support.js": "509ae636cfdd93e49b5a6eaf0f06d79f",
-"flutter_bootstrap.js": "e2779bbcb28adc29a3cb4b854598b453",
-"index.html": "6a32024ea372a827d227e7af9b45a2a6",
-"/": "6a32024ea372a827d227e7af9b45a2a6"};
+"flutter_bootstrap.js": "ee9d99b912dd31afa18e3c4dca26a022",
+"index.html": "2fbea90ef96c4ebb0ea8e70da3caf6b7",
+"/": "2fbea90ef96c4ebb0ea8e70da3caf6b7"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",
