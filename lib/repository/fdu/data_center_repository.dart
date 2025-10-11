@@ -179,7 +179,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
       final data = req.data as Map<String, dynamic>;
       return data["data"]
           .map<ElectricityHistoryItem>(
-              (e) => ElectricityHistoryItem.fromList(List<String>.from(e)))
+              (e) => ElectricityHistoryItem.fromList(List.from(e).map((item) => item.toString()).toList()))
           .toList();
     });
   }
@@ -233,6 +233,6 @@ class ElectricityHistoryItem {
 
   factory ElectricityHistoryItem.fromList(List<String> elements) {
     return ElectricityHistoryItem(
-        elements[0].trim(), elements[1].trim(), elements[2].trim());
+        elements[1].trim(), elements[0].trim(), elements[2].trim());
   }
 }
