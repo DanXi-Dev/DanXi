@@ -239,8 +239,32 @@ class FudanAuthenticationAPIV2 {
 
   static Future<Response<dynamic>> authenticate(
       PersonInfo info, Uri serviceUrl, String? serviceRequestMethod) async {
-    final Response<dynamic> firstResponse = await FudanSession.dio
-        .requestUri(serviceUrl, options: Options(method: serviceRequestMethod));
+    Response<dynamic> firstResponse;
+    try {
+      firstResponse = await FudanSession.dio
+          .requestUri(
+          serviceUrl, options: Options(method: serviceRequestMethod));
+    } on DioException catch (e) {
+      if (e.type != DioExceptionType.badResponse) {
+        // If the error is not due to a bad response (e.g. 404), rethrow
+        rethrow;
+      }
+      // From here on, we only consider badResponse errors (e.g. 404)
+      if ((serviceRequestMethod ?? "GET") == "GET") {
+        // If the original request is a GET request, we should not get a bad response
+        // from the target service, rethrow
+        rethrow;
+      }
+      // else, we are getting a bad response from the target service while doing a POST (etc.),
+      // which may indicate wrong HTTP method (GET), which is not a problem of authentication.
+      // Ignore and suppose the fetch is successful.
+      final rep = e.response;
+      if (rep == null) {
+        // If there's no response at all, rethrow
+        rethrow;
+      }
+      firstResponse = rep;
+    }
     // already redirected to the target service, return the response
     if (firstResponse.realUri.host == serviceUrl.host) {
       return firstResponse;
@@ -275,18 +299,13 @@ class FudanAuthenticationAPIV2 {
         // If the final redirect is not to the target service, rethrow
         rethrow;
       }
+      // Above code (getting [firstResponse]) has explained these conditions
       if (e.type != DioExceptionType.badResponse) {
-        // If the error is not due to a bad response (e.g. 404), rethrow
         rethrow;
       }
       if ((serviceRequestMethod ?? "GET") == "GET") {
-        // If the original request is a GET request, we should not get a bad response
-        // from the target service, rethrow
         rethrow;
       }
-      // else, we are getting a bad response from the target service,
-      // which may indicate wrong method (GET/POST), which is not a problem of authentication.
-      // Ignore and suppose the login is successful.
       return e.response!;
     }
 
