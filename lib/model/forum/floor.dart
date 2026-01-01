@@ -49,12 +49,13 @@ class OTFloor {
 
   /// Generate an empty BBSPost for special sakes.
   factory OTFloor.dummy() =>
-      OTFloor(-1, -1, '', '', '', '', false, [], 0, false, false, [], 0, false);
+      OTFloor(-1, -1, '', '', '', '', false, [], 0, 0, false, false, [], 0,
+          false);
 
   factory OTFloor.special(String title, String content,
           [int? holeId, int? floorId]) =>
       OTFloor(floorId ?? 0, holeId ?? 0, content, title, '', '', false, [], 0,
-          false, false, [], 0, false);
+          0, false, false, [], 0, false);
 
   factory OTFloor.onlyId(int floorId) => OTFloor.special('', '', null, floorId);
 
@@ -74,6 +75,7 @@ class OTFloor {
       this.time_updated,
       this.deleted,
       this.fold,
+      this.modified,
       this.like,
       this.is_me,
       this.liked,
@@ -108,6 +110,7 @@ class OTFloor {
       deleted ?? this.deleted,
       fold ?? this.fold,
       modified ?? this.modified,
+      like ?? this.like,
       is_me ?? this.is_me,
       liked ?? this.liked,
       mention ?? this.mention,
