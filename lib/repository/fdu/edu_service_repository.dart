@@ -27,6 +27,8 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'neo_login_tool.dart';
+
 class EduServiceRepository extends BaseRepositoryWithDio {
   static const String EXAM_TABLE_LOGIN_URL =
       'https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fjwfw.fudan.edu.cn%2Feams%2FstdExamTable%21examTable.action';
@@ -41,6 +43,11 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   static const String SEMESTER_DATA_URL =
       "https://jwfw.fudan.edu.cn/eams/dataQuery.action";
+
+  static String getCourseTableUrl(String semesterId) =>
+      'https://fdjwgl.fudan.edu.cn/student/for-std/course-table/semester/$semesterId/print-data';
+  static String getExamArrangeUrl(String studentId) =>
+      'https://fdjwgl.fudan.edu.cn/student/for-std/exam-arrange/info/$studentId';
 
   static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
   static const String KEY_TIMETABLE_CACHE = "timetable";
@@ -69,12 +76,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   factory EduServiceRepository.getInstance() => _instance;
 
-  Future<List<Exam>> loadExamListRemotely(PersonInfo? info,
-          {String? semesterId}) =>
-      UISLoginTool.tryAsyncWithAuth(dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info,
-          () => _loadExamList(semesterId: semesterId),
-          isFatalError: (e) =>
-              e is SemesterNoExamException || e is ClickTooFastException);
+  Future<List<Exam>> loadExamListRemotely() => _loadExamList();
 
   Future<String?> get semesterIdFromCookie async =>
       (await cookieJar!.loadForRequest(Uri.parse(HOST)))
@@ -82,35 +84,151 @@ class EduServiceRepository extends BaseRepositoryWithDio {
               orElse: () => Cookie("semester.id", ""))
           .value;
 
-  Future<List<Exam>> _loadExamList({String? semesterId}) async {
-    String? oldSemesterId = await semesterIdFromCookie;
-    // Set the semester id
-    if (semesterId != null) {
-      cookieJar?.saveFromResponse(
-          Uri.parse(HOST), [Cookie("semester.id", semesterId)]);
-    }
-    final Response<String> r = await dio.get(EXAM_TABLE_URL,
-        options: Options(headers: Map.of(_JWFW_HEADER)));
+  /// Get user's exam list
+  ///
+  /// ## API Detail
+  ///
+  /// This API uses the neo authentication to fetch exam information from the new endpoint.
+  /// The new endpoint returns HTML with an exam table.
+  ///
+  /// - Returns: A list of ``Exam``, including both finished and upcoming exams
+  ///
+  /// Exam status:
+  /// - Exams with class "finished hide" are completed exams
+  /// - Exams with class "unfinished" are upcoming/pending exams
+  ///
+  /// ## Example HTML Response:
+  /// ```html
+  /// <tr data-finished="false" class="unfinished">
+  ///     <td>
+  ///         <div class="time">2026-01-04 08:30~10:30</div>
+  ///         <div>
+  ///             <span>邯郸校区</span>
+  ///             <span>H邯郸校区第六教学楼</span>
+  ///             <span>H6506</span>
+  ///         </div>
+  ///     </td>
+  ///     <td>
+  ///         <div>
+  ///             <span>数字集成电路设计原理(H) </span>
+  ///             <span>ICSE30021h.01 </span>
+  ///             <span>（闭卷） </span>
+  ///         </div>
+  ///         <div>
+  ///             <span class="tag-span type2">期末</span>
+  ///         </div>
+  ///     </td>
+  ///     <td>请携带学生证或一卡通，待考试时核查。</td>
+  ///     <td>未结束</td>
+  /// </tr>
+  /// <tr data-finished="true" class="finished hide">
+  ///     <td>
+  ///         <div class="time ">2025-11-11 13:00~15:00</div>
+  ///         <div>
+  ///             <span>邯郸校区</span>
+  ///             <span>H邯郸校区第二教学楼</span>
+  ///             <span>H2115</span>
+  ///         </div>
+  ///     </td>
+  ///     <td>
+  ///         <div>
+  ///             <span>半导体器件原理(H) </span>
+  ///             <span>ICSE30020h.01 </span>
+  ///             <span>（半开卷） </span>
+  ///         </div>
+  ///         <div>
+  ///             <span class="tag-span type1">期中</span>
+  ///         </div>
+  ///     </td>
+  ///     <td>请携带学生证或一卡通，待考试时核查。</td>
+  ///     <td>已结束</td>
+  /// </tr>
+  /// ```
+  Future<List<Exam>> _loadExamList() async {
+    final studentId = await _loadStudentId();
+    final options = RequestOptions(
+        method: "GET",
+        path: getExamArrangeUrl(studentId),
+    );
+    return FudanSession.request(options, (res) {
+      final exams = <Exam>[];
 
-    // Restore old semester id
-    if (oldSemesterId != null) {
-      cookieJar?.saveFromResponse(
-          Uri.parse(HOST), [Cookie("semester.id", oldSemesterId)]);
-    }
-    if (r.data!.contains(SEMESTER_NO_EXAM)) {
-      throw SemesterNoExamException();
-    } else if (r.data!.contains(TOO_FAST)) {
-      throw ClickTooFastException();
-    }
-    final BeautifulSoup soup = BeautifulSoup(r.data!);
-    final tableExists = soup.find("thead", class_: "gridhead") != null;
-    final tableBodyElement = soup.find("tbody");
-    if (tableExists && tableBodyElement == null) return [];
-    final dom.Element tableBody = tableBodyElement!.element!;
-    return tableBody
-        .getElementsByTagName("tr")
-        .map((e) => Exam.fromHtml(e))
-        .toList();
+      BeautifulSoup soup = BeautifulSoup(res.data!);
+      final elements = soup.findAll(
+        "table.exam-table tbody tr:not(.tr-empty):not([data-finished=\"true\"])",
+      );
+      for (final element in elements) {
+        final cells = element.findAll("td");
+        if (cells.length < 4) {
+          continue;
+        }
+
+        var courseId = "";
+        var course = "";
+        var type = "";
+        var method = "";
+        var date = "";
+        var time = "";
+        var location = "";
+        var note = "";
+
+        final firstCell = cells[0];
+        final timeDiv = firstCell.find("div.time");
+        final timeText = timeDiv?.text.trimAndNormalizeWhitespace();
+        if (timeText != null) {
+          final timeComponents = timeText.split(" ");
+          if (timeComponents.length >= 2) {
+            date = timeComponents[0];
+            time = timeComponents[1];
+          }
+
+          final spans = firstCell.findAll("span");
+          if (spans.length > 2) {
+            location = spans[2].text.trimAndNormalizeWhitespace();
+          }
+        }
+
+        // Course information
+        final secondCell = cells[1];
+        final firstDiv = secondCell.find("div");
+        final spans = firstDiv?.findAll("span");
+        if (spans != null && spans.length >= 3) {
+          course = spans[0].text.trimAndNormalizeWhitespace();
+          courseId = spans[1].text.trimAndNormalizeWhitespace();
+
+          final methodText = spans[2].text.trimAndNormalizeWhitespace();
+          if (methodText.startsWith("（") && methodText.endsWith("）")) {
+            method = methodText.substring(1, methodText.length - 1).trim();
+          }
+        }
+
+        // Exam type
+        final divs = secondCell.findAll("div");
+        if (divs.length >= 2) {
+          final typeSpan = divs[1].find("span");
+          final typeText = typeSpan?.text.trimAndNormalizeWhitespace();
+          if (typeText != null) {
+            type = typeText.trim();
+          }
+        }
+
+        note = cells[2].text.trimAndNormalizeWhitespace();
+
+        final exam = Exam(
+            courseId,
+            course,
+            type,
+            date,
+            time,
+            location,
+            method,
+            note,
+        );
+        exams.add(exam);
+      }
+
+      return exams;
+    });
   }
 
   Future<List<ExamScore>> loadExamScoreRemotely(PersonInfo? info,
@@ -182,6 +300,23 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     }
     if (sems.isEmpty) throw "Retrieval failed";
     return sems;
+  }
+
+  /// Get student ID from course table API
+  Future<String> _loadStudentId() async {
+    final semesterBundle = await TimeTableRepository.getInstance()
+        .loadSemestersForTimeTable();
+    final options = RequestOptions(
+        method: "GET",
+        path: getCourseTableUrl(semesterBundle.defaultSemesterId),
+    );
+    return FudanSession.request(options, (res) {
+      final Map<String, dynamic> data = res.data!;
+      final List<dynamic> vms = data["studentTableVms"];
+      final Map<String, dynamic> vm = vms[0];
+      final int id = vm["id"];
+      return id.toString();
+    });
   }
 
   /// JSON-Like Text: {aaaa:"asdasd"}

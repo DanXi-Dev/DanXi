@@ -56,9 +56,8 @@ Future<List<SemesterInfo>> semester(Ref ref) async {
 
 @riverpod
 Future<List<Exam>> exam(Ref ref, String semesterId) async {
-  return await EduServiceRepository.getInstance().loadExamListRemotely(
-      sp.StateProvider.personInfo.value,
-      semesterId: semesterId);
+  return await EduServiceRepository.getInstance()
+      .loadExamListRemotely();
 }
 
 @riverpod
