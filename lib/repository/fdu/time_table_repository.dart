@@ -16,13 +16,14 @@
  */
 
 import 'dart:convert';
+
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/util/io/cache.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dio/dio.dart';
@@ -57,17 +58,6 @@ class TimeTableRepository extends BaseRepositoryWithDio {
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
     }
-  }
-
-  /// Load all semesters and their start dates
-  Future<SemesterBundle> loadSemestersForTimeTable() async {
-    final options = RequestOptions(
-        method: "GET",
-        path: TIMETABLE_URL,
-    );
-    return FudanSession.request(options, (res) {
-      return _parseSemesters(res.data!);
-    });
   }
 
   /// Load TimeTable from FDU server.
@@ -167,6 +157,9 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     return SemesterInfoWithStartDate(
         defaultSemesterId, DateTime.tryParse(startDate!));
   }
+
+  SemesterBundle parseSemesters(String semesterHtml) =>
+      _parseSemesters(semesterHtml);
 
   /// Check if the timetable has been fetched before.
   bool hasCache() {

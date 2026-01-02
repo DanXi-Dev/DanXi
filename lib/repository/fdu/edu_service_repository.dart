@@ -15,15 +15,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
-import 'dart:ffi';
-import 'dart:io';
-
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/time_table_repository.dart';
-import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as dom;
@@ -31,21 +25,9 @@ import 'package:html/dom.dart' as dom;
 import 'neo_login_tool.dart';
 
 class EduServiceRepository extends BaseRepositoryWithDio {
-  static const String EXAM_TABLE_LOGIN_URL =
-      'https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fjwfw.fudan.edu.cn%2Feams%2FstdExamTable%21examTable.action';
-  static const String EXAM_TABLE_URL =
-      'https://jwfw.fudan.edu.cn/eams/stdExamTable!examTable.action';
-
-  static String kExamScoreUrl(String? semesterId) =>
-      'https://jwfw.fudan.edu.cn/eams/teach/grade/course/person!search.action?semesterId=$semesterId';
-
-  static const String GPA_URL =
-      "https://jwfw.fudan.edu.cn/eams/myActualGpa!search.action";
-
-  static const String SEMESTER_DATA_URL =
-      "https://jwfw.fudan.edu.cn/eams/dataQuery.action";
-
-  static String getCourseTableUrl(String semesterId) =>
+  static const String COURSE_TABLE_URL =
+      'https://fdjwgl.fudan.edu.cn/student/for-std/course-table';
+  static String getSemesterCourseTableUrl(String semesterId) =>
       'https://fdjwgl.fudan.edu.cn/student/for-std/course-table/semester/$semesterId/print-data';
   static String getExamArrangeUrl(String studentId) =>
       'https://fdjwgl.fudan.edu.cn/student/for-std/exam-arrange/info/$studentId';
@@ -60,24 +42,6 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   ) =>
       'https://fdjwgl.fudan.edu.cn/student/for-std/grade/my-gpa/search?studentAssoc=$studentId&grade=$grade&departmentAssoc=$dept&majorAssoc=';
 
-  static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
-  static const String KEY_TIMETABLE_CACHE = "timetable";
-  static const String ID_URL =
-      'https://jwfw.fudan.edu.cn/eams/courseTableForStd.action';
-  static const Map<String, String> _JWFW_HEADER = {
-    "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0",
-    "Accept": "text/xml",
-    "Accept-Language": "zh-CN,en-US;q=0.7,en;q=0.3",
-    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-    "Origin": "https://jwfw.fudan.edu.cn",
-    "Connection": "keep-alive",
-  };
-
-  /// Error patterns from EduService.
-  static const String SEMESTER_NO_EXAM = "当前学期未设置排考批次";
-  static const String TOO_FAST = "请不要过快点击";
-
   @override
   String get linkHost => "fudan.edu.cn";
 
@@ -87,13 +51,33 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   factory EduServiceRepository.getInstance() => _instance;
 
-  Future<List<Exam>> loadExamListRemotely() => _loadExamList();
+  /// Load all semesters and their start dates
+  Future<SemesterBundle> _loadSemesters() async {
+    final options = RequestOptions(
+      method: "GET",
+      path: COURSE_TABLE_URL,
+    );
+    return FudanSession.request(options, (res) {
+      return TimeTableRepository.getInstance()
+          .parseSemesters(res.data!);
+    });
+  }
 
-  Future<String?> get semesterIdFromCookie async =>
-      (await cookieJar!.loadForRequest(Uri.parse(HOST)))
-          .firstWhere((element) => element.name == "semester.id",
-              orElse: () => Cookie("semester.id", ""))
-          .value;
+  /// Get student ID from course table API
+  Future<String> _loadStudentId() async {
+    final semesterBundle = await _loadSemesters();
+    final options = RequestOptions(
+      method: "GET",
+      path: getSemesterCourseTableUrl(semesterBundle.defaultSemesterId),
+    );
+    return FudanSession.request(options, (res) {
+      final Map<String, dynamic> data = res.data!;
+      final List<dynamic> vms = data["studentTableVms"];
+      final Map<String, dynamic> vm = vms[0];
+      final int id = vm["id"];
+      return id.toString();
+    });
+  }
 
   /// Get user's exam list
   ///
@@ -158,8 +142,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   Future<List<Exam>> _loadExamList() async {
     final studentId = await _loadStudentId();
     final options = RequestOptions(
-        method: "GET",
-        path: getExamArrangeUrl(studentId),
+      method: "GET",
+      path: getExamArrangeUrl(studentId),
     );
     return FudanSession.request(options, (res) {
       final exams = <Exam>[];
@@ -226,14 +210,14 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         note = cells[2].text.trimAndNormalizeWhitespace();
 
         final exam = Exam(
-            courseId,
-            course,
-            type,
-            date,
-            time,
-            location,
-            method,
-            note,
+          courseId,
+          course,
+          type,
+          date,
+          time,
+          location,
+          method,
+          note,
         );
         exams.add(exam);
       }
@@ -242,14 +226,11 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  Future<List<ExamScore>> loadExamScoreRemotely(String semesterId) =>
-      _loadExamScore(semesterId);
-
   Future<List<ExamScore>> _loadExamScore(String semesterId) async {
     final studentId = await _loadStudentId();
     final options = RequestOptions(
-        method: "GET",
-        path: getGradeSheetUrl(studentId, semesterId),
+      method: "GET",
+      path: getGradeSheetUrl(studentId, semesterId),
     );
     return FudanSession.request(options, (res) {
       final Map<String, dynamic> data = res.data!;
@@ -262,12 +243,12 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       for (final gradeJson in grades) {
         final Map<String, dynamic> grade = gradeJson;
         final score = ExamScore(
-            grade["lessonCode"],
-            grade["courseName"],
-            grade["courseModuleTypeName"] ?? grade["courseType"] ?? "",
-            "",
-            grade["gaGrade"],
-            grade["gp"].toString(),
+          grade["lessonCode"],
+          grade["courseName"],
+          grade["courseModuleTypeName"] ?? grade["courseType"] ?? "",
+          "",
+          grade["gaGrade"],
+          grade["gp"].toString(),
         );
         scores.add(score);
       }
@@ -276,13 +257,11 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  Future<List<GPAListItem>> loadGPARemotely() => _loadGPA();
-
   Future<List<GPAListItem>> _loadGPA() async {
     final studentId = await _loadStudentId();
     final options = RequestOptions(
-        method: "GET",
-        path: getMyGpaSearchIndexUrl(studentId),
+      method: "GET",
+      path: getMyGpaSearchIndexUrl(studentId),
     );
     return FudanSession.request(options, (res) {
       final html = res.data!;
@@ -293,12 +272,12 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
       // get department GPA ranks
       final options = RequestOptions(
-          method: "GET",
-          path: getMyGpaSearchUrl(
-              studentId,
-              gradeMatch.group(1)!,
-              deptMatch.group(1)!,
-          ),
+        method: "GET",
+        path: getMyGpaSearchUrl(
+          studentId,
+          gradeMatch.group(1)!,
+          deptMatch.group(1)!,
+        ),
       );
       return FudanSession.request(options, (res) {
         final Map<String, dynamic> data = res.data;
@@ -320,14 +299,14 @@ class EduServiceRepository extends BaseRepositoryWithDio {
           //  }
           final Map<String, dynamic> rank = rankJson;
           final item = GPAListItem(
-              rank["name"],
-              rank["code"],
-              rank["gpa"].toString(),
-              rank["credit"].toString(),
-              rank["ranking"].toString(),
-              rank["grade"],
-              rank["major"],
-              rank["department"],
+            rank["name"],
+            rank["code"],
+            rank["gpa"].toString(),
+            rank["credit"].toString(),
+            rank["ranking"].toString(),
+            rank["grade"],
+            rank["major"],
+            rank["department"],
           );
           items.add(item);
         }
@@ -340,48 +319,17 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   /// Load the semesters id & name, etc.
   ///
   /// Returns an unpacked list of [SemesterInfo].
-  Future<List<SemesterInfo>> loadSemesters() =>
-      TimeTableRepository.getInstance().loadSemestersForTimeTable()
-          .then((semesterBundle) => semesterBundle.semesters);
+  Future<List<SemesterInfo>> loadSemestersRemotely() =>
+      _loadSemesters().then((semesterBundle) => semesterBundle.semesters);
 
-  Future<List<SemesterInfo>> _loadSemesters() async {
-    await dio.get(EXAM_TABLE_URL,
-        options: Options(headers: Map.of(_JWFW_HEADER)));
-    final Response<String> semesterResponse = await dio.post(SEMESTER_DATA_URL,
-        data: "dataType=semesterCalendar&empty=false",
-        options: Options(contentType: 'application/x-www-form-urlencoded'));
-    final BeautifulSoup soup = BeautifulSoup(semesterResponse.data!);
+  Future<List<Exam>> loadExamListRemotely() =>
+      _loadExamList();
 
-    final jsonText = _normalizeJson(soup.getText().trim());
-    final json = jsonDecode(jsonText);
-    final Map<String, dynamic> semesters = json['semesters'];
-    List<SemesterInfo> sems = [];
-    for (var element in semesters.values) {
-      if (element is List && element.isNotEmpty) {
-        var annualSemesters = element.map((e) => SemesterInfo.fromJson(e));
-        sems.addAll(annualSemesters);
-      }
-    }
-    if (sems.isEmpty) throw "Retrieval failed";
-    return sems;
-  }
+  Future<List<ExamScore>> loadExamScoreRemotely(String semesterId) =>
+      _loadExamScore(semesterId);
 
-  /// Get student ID from course table API
-  Future<String> _loadStudentId() async {
-    final semesterBundle = await TimeTableRepository.getInstance()
-        .loadSemestersForTimeTable();
-    final options = RequestOptions(
-        method: "GET",
-        path: getCourseTableUrl(semesterBundle.defaultSemesterId),
-    );
-    return FudanSession.request(options, (res) {
-        final Map<String, dynamic> data = res.data!;
-        final List<dynamic> vms = data["studentTableVms"];
-        final Map<String, dynamic> vm = vms[0];
-        final int id = vm["id"];
-        return id.toString();
-    });
-  }
+  Future<List<GPAListItem>> loadGPARemotely() =>
+      _loadGPA();
 
   /// JSON-Like Text: {aaaa:"asdasd"}
   /// Real JSON Text: {"aaaa":"asdasd"}
