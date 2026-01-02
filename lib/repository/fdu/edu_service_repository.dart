@@ -21,6 +21,7 @@ import 'dart:io';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
+import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dio/dio.dart';
@@ -157,10 +158,9 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   /// Load the semesters id & name, etc.
   ///
   /// Returns an unpacked list of [SemesterInfo].
-  Future<List<SemesterInfo>> loadSemesters(PersonInfo? info) =>
-      UISLoginTool.tryAsyncWithAuth(
-          dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info, () => _loadSemesters(),
-          retryTimes: 2);
+  Future<List<SemesterInfo>> loadSemesters() =>
+      TimeTableRepository.getInstance().loadSemestersForTimeTable()
+          .then((semesterBundle) => semesterBundle.semesters);
 
   Future<List<SemesterInfo>> _loadSemesters() async {
     await dio.get(EXAM_TABLE_URL,

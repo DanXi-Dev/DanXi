@@ -51,7 +51,7 @@ Future<List<GPAListItem>> gpa(Ref ref) async {
 @riverpod
 Future<List<SemesterInfo>> semester(Ref ref) async {
   return await EduServiceRepository.getInstance()
-      .loadSemesters(sp.StateProvider.personInfo.value);
+      .loadSemesters();
 }
 
 @riverpod
