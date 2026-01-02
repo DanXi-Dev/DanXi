@@ -104,8 +104,8 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   /// Load default semester id and start date from JWGL, then store start date in settings.
   Future<SemesterInfoWithStartDate> _loadDefaultSemesterInfo() async {
     final options = RequestOptions(
-      method: "GET",
-      path: TIMETABLE_URL,
+        method: "GET",
+        path: TIMETABLE_URL,
     );
     return FudanSession.request(options, (res) {
       return _parseDefaultSemesterInfo(res.data!);

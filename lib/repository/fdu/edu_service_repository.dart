@@ -247,9 +247,22 @@ class SemesterInfo {
     }
   }
 
+  /// Example:
+  ///
+  /// {
+  //    "startDate" : "2026-03-01",
+  //    "endDate" : "2026-07-04",
+  //    "name" : "2025-2026学年2学期",
+  //    "id" : 505
+  //  }
   factory SemesterInfo.fromCourseTableJson(Map<String, dynamic> json) {
-    return SemesterInfo(json['id'].toString(), json['schoolYear'],
-        seasonToName(json['season']));
+    final id = json["id"].toString();
+    final name = json["name"]!;
+    final nameRegex = RegExp("\\D*(\\d{4}-\\d{4})\\D+(\\d+)\\D*");
+    final nameMatch = nameRegex.firstMatch(name)!;
+    final schoolYear = nameMatch.group(1)!;
+    final season = nameMatch.group(2)!;
+    return SemesterInfo(id, schoolYear, season);
   }
 }
 
