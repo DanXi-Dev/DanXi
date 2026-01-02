@@ -62,8 +62,8 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   /// Load all semesters and their start dates
   Future<SemesterBundle> loadSemestersForTimeTable() async {
     final options = RequestOptions(
-      method: "GET",
-      path: TIMETABLE_URL,
+        method: "GET",
+        path: TIMETABLE_URL,
     );
     return FudanSession.request(options, (res) {
       return _parseSemesters(res.data!);
@@ -91,8 +91,9 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     SemesterInfoWithStartDate semesterInfo =
         await getAppropriateSemesterInfo(semesterId, startDate);
     final options = RequestOptions(
-      method: "GET",
-      path: TIMETABLE_DATA_URL.replaceAll("{sem_id}", semesterInfo.semesterId!),
+        method: "GET",
+        path: TIMETABLE_DATA_URL
+            .replaceAll("{sem_id}", semesterInfo.semesterId!),
     );
     return FudanSession.request(options, (res) {
       SettingsProvider.getInstance().timetableLastUpdated = DateTime.now();
@@ -122,10 +123,10 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     }
     final String semestersJsonText =
         semestersMatch.group(1)!.replaceAll('\'', '').replaceAll(r'\"', '"');
-    final semestersJson = jsonDecode(semestersJsonText);
+    final List<dynamic> semestersJson = jsonDecode(semestersJsonText);
     List<SemesterInfo> sems = [];
     List<TimeTableStartDateItem> startDates = [];
-    for (var element in semestersJson) {
+    for (var element in semestersJson.reversed) {
       if (element is Map<String, dynamic> && element.isNotEmpty) {
         var annualSemesters = SemesterInfo.fromCourseTableJson(element);
         sems.add(annualSemesters);
