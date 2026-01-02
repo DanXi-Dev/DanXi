@@ -48,6 +48,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       'https://fdjwgl.fudan.edu.cn/student/for-std/course-table/semester/$semesterId/print-data';
   static String getExamArrangeUrl(String studentId) =>
       'https://fdjwgl.fudan.edu.cn/student/for-std/exam-arrange/info/$studentId';
+  static String getGradeSheetUrl(String studentId, String semester) =>
+      'https://fdjwgl.fudan.edu.cn/student/for-std/grade/sheet/info/$studentId?semester=$semester';
 
   static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
   static const String KEY_TIMETABLE_CACHE = "timetable";
@@ -231,31 +233,38 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  Future<List<ExamScore>> loadExamScoreRemotely(PersonInfo? info,
-          {String? semesterId}) =>
-      UISLoginTool.tryAsyncWithAuth(dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info,
-          () => _loadExamScore(semesterId),
-          isFatalError: (e) =>
-              e is SemesterNoExamException || e is ClickTooFastException);
+  Future<List<ExamScore>> loadExamScoreRemotely(String semesterId) =>
+      _loadExamScore(semesterId);
 
-  Future<List<ExamScore>> _loadExamScore([String? semesterId]) async {
-    final Response<String> r = await dio.get(
-        kExamScoreUrl(semesterId ?? await semesterIdFromCookie),
-        options: Options(headers: Map.of(_JWFW_HEADER)));
-    if (r.data!.contains(SEMESTER_NO_EXAM)) {
-      throw SemesterNoExamException();
-    } else if (r.data!.contains(TOO_FAST)) {
-      throw ClickTooFastException();
-    }
-    final BeautifulSoup soup = BeautifulSoup(r.data!);
-    final tableExists = soup.find("thead", class_: "gridhead") != null;
-    final tableBodyElement = soup.find("tbody");
-    if (tableExists && tableBodyElement == null) return [];
-    final dom.Element tableBody = tableBodyElement!.element!;
-    return tableBody
-        .getElementsByTagName("tr")
-        .map((e) => ExamScore.fromEduServiceHtml(e))
-        .toList();
+  Future<List<ExamScore>> _loadExamScore(String semesterId) async {
+    final studentId = await _loadStudentId();
+    final options = RequestOptions(
+        method: "GET",
+        path: getGradeSheetUrl(studentId, semesterId),
+    );
+    return FudanSession.request(options, (res) {
+      final Map<String, dynamic> data = res.data!;
+      final Map<String, dynamic> semesterId2StudentGrades =
+      data["semesterId2studentGrades"];
+      final List<dynamic> grades =
+          semesterId2StudentGrades[semesterId] ?? [];
+
+      final scores = <ExamScore>[];
+      for (final gradeJson in grades) {
+        final Map<String, dynamic> grade = gradeJson;
+        final score = ExamScore(
+            grade["lessonCode"],
+            grade["courseName"],
+            grade["courseModuleTypeName"] ?? grade["courseType"] ?? "",
+            "",
+            grade["gaGrade"],
+            grade["gp"].toString(),
+        );
+        scores.add(score);
+      }
+
+      return scores;
+    });
   }
 
   Future<List<GPAListItem>> loadGPARemotely(PersonInfo? info) =>
