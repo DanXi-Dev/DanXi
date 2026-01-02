@@ -16,6 +16,7 @@
  */
 
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
@@ -50,6 +51,14 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       'https://fdjwgl.fudan.edu.cn/student/for-std/exam-arrange/info/$studentId';
   static String getGradeSheetUrl(String studentId, String semester) =>
       'https://fdjwgl.fudan.edu.cn/student/for-std/grade/sheet/info/$studentId?semester=$semester';
+  static String getMyGpaSearchIndexUrl(String studentId) =>
+      'https://fdjwgl.fudan.edu.cn/student/for-std/grade/my-gpa/search-index/$studentId';
+  static String getMyGpaSearchUrl(
+      String studentId,
+      String grade,
+      String dept,
+  ) =>
+      'https://fdjwgl.fudan.edu.cn/student/for-std/grade/my-gpa/search?studentAssoc=$studentId&grade=$grade&departmentAssoc=$dept&majorAssoc=';
 
   static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
   static const String KEY_TIMETABLE_CACHE = "timetable";
@@ -267,19 +276,65 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  Future<List<GPAListItem>> loadGPARemotely(PersonInfo? info) =>
-      UISLoginTool.tryAsyncWithAuth(
-          dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info, () => _loadGPA());
+  Future<List<GPAListItem>> loadGPARemotely() => _loadGPA();
 
   Future<List<GPAListItem>> _loadGPA() async {
-    final Response<String> r =
-        await dio.get(GPA_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
-    final BeautifulSoup soup = BeautifulSoup(r.data!);
-    final dom.Element tableBody = soup.find("tbody")!.element!;
-    return tableBody
-        .getElementsByTagName("tr")
-        .map((e) => GPAListItem.fromHtml(e))
-        .toList();
+    final studentId = await _loadStudentId();
+    final options = RequestOptions(
+        method: "GET",
+        path: getMyGpaSearchIndexUrl(studentId),
+    );
+    return FudanSession.request(options, (res) {
+      final html = res.data!;
+      final gradeRegex = RegExp("name=\"grade\"\\s+value=\"(\\d+)\"");
+      final gradeMatch = gradeRegex.firstMatch(html)!;
+      final deptRegex = RegExp("name=\"departmentAssoc\"\\s+value=\"(\\d+)\"");
+      final deptMatch = deptRegex.firstMatch(html)!;
+
+      // get department GPA ranks
+      final options = RequestOptions(
+          method: "GET",
+          path: getMyGpaSearchUrl(
+              studentId,
+              gradeMatch.group(1)!,
+              deptMatch.group(1)!,
+          ),
+      );
+      return FudanSession.request(options, (res) {
+        final Map<String, dynamic> data = res.data;
+        final List<dynamic> ranks = data["data"] ?? [];
+
+        final List<GPAListItem> items = [];
+        for (final rankJson in ranks) {
+          /// Example:
+          /// {
+          //    id: null,
+          //    code: ****, // The 11-digit student ID
+          //    name: ****,
+          //    grade: 2022,
+          //    major: 计算机科学与技术,
+          //    department: 计算与智能创新学院,
+          //    gpa: 3.96,
+          //    credit: 130,
+          //    ranking: 1
+          //  }
+          final Map<String, dynamic> rank = rankJson;
+          final item = GPAListItem(
+              rank["name"],
+              rank["code"],
+              rank["gpa"].toString(),
+              rank["credit"].toString(),
+              rank["ranking"].toString(),
+              rank["grade"],
+              rank["major"],
+              rank["department"],
+          );
+          items.add(item);
+        }
+
+        return items;
+      });
+    });
   }
 
   /// Load the semesters id & name, etc.
@@ -320,11 +375,11 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         path: getCourseTableUrl(semesterBundle.defaultSemesterId),
     );
     return FudanSession.request(options, (res) {
-      final Map<String, dynamic> data = res.data!;
-      final List<dynamic> vms = data["studentTableVms"];
-      final Map<String, dynamic> vm = vms[0];
-      final int id = vm["id"];
-      return id.toString();
+        final Map<String, dynamic> data = res.data!;
+        final List<dynamic> vms = data["studentTableVms"];
+        final Map<String, dynamic> vm = vms[0];
+        final int id = vm["id"];
+        return id.toString();
     });
   }
 

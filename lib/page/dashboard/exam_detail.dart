@@ -45,7 +45,7 @@ part 'exam_detail.g.dart';
 @riverpod
 Future<List<GPAListItem>> gpa(Ref ref) async {
   return await EduServiceRepository.getInstance()
-      .loadGPARemotely(sp.StateProvider.personInfo.value);
+      .loadGPARemotely();
 }
 
 @riverpod
