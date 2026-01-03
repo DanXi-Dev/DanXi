@@ -27,18 +27,23 @@ import 'neo_login_tool.dart';
 class EduServiceRepository extends BaseRepositoryWithDio {
   static const String COURSE_TABLE_URL =
       'https://fdjwgl.fudan.edu.cn/student/for-std/course-table';
+
   static String getSemesterCourseTableUrl(String semesterId) =>
       'https://fdjwgl.fudan.edu.cn/student/for-std/course-table/semester/$semesterId/print-data';
+
   static String getExamArrangeUrl(String studentId) =>
       'https://fdjwgl.fudan.edu.cn/student/for-std/exam-arrange/info/$studentId';
+
   static String getGradeSheetUrl(String studentId, String semester) =>
       'https://fdjwgl.fudan.edu.cn/student/for-std/grade/sheet/info/$studentId?semester=$semester';
+
   static String getMyGpaSearchIndexUrl(String studentId) =>
       'https://fdjwgl.fudan.edu.cn/student/for-std/grade/my-gpa/search-index/$studentId';
+
   static String getMyGpaSearchUrl(
-      String studentId,
-      String grade,
-      String dept,
+    String studentId,
+    String grade,
+    String dept,
   ) =>
       'https://fdjwgl.fudan.edu.cn/student/for-std/grade/my-gpa/search?studentAssoc=$studentId&grade=$grade&departmentAssoc=$dept&majorAssoc=';
 
@@ -52,16 +57,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   factory EduServiceRepository.getInstance() => _instance;
 
   /// Load all semesters and their start dates
-  Future<SemesterBundle> _loadSemesters() async {
-    final options = RequestOptions(
-      method: "GET",
-      path: COURSE_TABLE_URL,
-    );
-    return FudanSession.request(options, (res) {
-      return TimeTableRepository.getInstance()
-          .parseSemesters(res.data!);
-    });
-  }
+  Future<SemesterBundle> _loadSemesters() =>
+      TimeTableRepository.getInstance().loadSemestersForTimeTable();
 
   /// Get student ID from course table API
   Future<String> _loadStudentId() async {
@@ -235,9 +232,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     return FudanSession.request(options, (res) {
       final Map<String, dynamic> data = res.data!;
       final Map<String, dynamic> semesterId2StudentGrades =
-      data["semesterId2studentGrades"];
-      final List<dynamic> grades =
-          semesterId2StudentGrades[semesterId] ?? [];
+          data["semesterId2studentGrades"];
+      final List<dynamic> grades = semesterId2StudentGrades[semesterId] ?? [];
 
       final scores = <ExamScore>[];
       for (final gradeJson in grades) {
@@ -316,20 +312,17 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  /// Load the semesters id & name, etc.
+  /// Load all semesters and their start dates, etc.
   ///
-  /// Returns an unpacked list of [SemesterInfo].
-  Future<List<SemesterInfo>> loadSemestersRemotely() =>
-      _loadSemesters().then((semesterBundle) => semesterBundle.semesters);
+  /// Returns a [SemesterBundle].
+  Future<SemesterBundle> loadSemestersRemotely() => _loadSemesters();
 
-  Future<List<Exam>> loadExamListRemotely() =>
-      _loadExamList();
+  Future<List<Exam>> loadExamListRemotely() => _loadExamList();
 
   Future<List<ExamScore>> loadExamScoreRemotely(String semesterId) =>
       _loadExamScore(semesterId);
 
-  Future<List<GPAListItem>> loadGPARemotely() =>
-      _loadGPA();
+  Future<List<GPAListItem>> loadGPARemotely() => _loadGPA();
 
   /// JSON-Like Text: {aaaa:"asdasd"}
   /// Real JSON Text: {"aaaa":"asdasd"}

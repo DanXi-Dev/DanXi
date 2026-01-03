@@ -44,20 +44,18 @@ part 'exam_detail.g.dart';
 
 @riverpod
 Future<List<GPAListItem>> gpa(Ref ref) async {
-  return await EduServiceRepository.getInstance()
-      .loadGPARemotely();
+  return await EduServiceRepository.getInstance().loadGPARemotely();
 }
 
 @riverpod
 Future<List<SemesterInfo>> semester(Ref ref) async {
-  return await EduServiceRepository.getInstance()
-      .loadSemestersRemotely();
+  return (await EduServiceRepository.getInstance().loadSemestersRemotely())
+      .semesters;
 }
 
 @riverpod
 Future<List<Exam>> exam(Ref ref, String semesterId) async {
-  return await EduServiceRepository.getInstance()
-      .loadExamListRemotely();
+  return await EduServiceRepository.getInstance().loadExamListRemotely();
 }
 
 @riverpod
@@ -190,8 +188,8 @@ class ExamList extends HookConsumerWidget {
       // There are some exams in this semester, but no score has been published
       case (AsyncData(value: final exams), AsyncError(error: final scoreError))
           when scoreError is RangeError:
-        body = ListView(
-            children: _getListWidgetsHybrid(context, ref, exams, []));
+        body =
+            ListView(children: _getListWidgetsHybrid(context, ref, exams, []));
       // There is no exam in this semester, but never mind, we are still loading scores
       case (AsyncError(:final error), AsyncLoading())
           when error is SemesterNoExamException:

@@ -60,6 +60,17 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     }
   }
 
+  /// Load all semesters and their start dates
+  Future<SemesterBundle> loadSemestersForTimeTable() async {
+    final options = RequestOptions(
+      method: "GET",
+      path: TIMETABLE_URL,
+    );
+    return FudanSession.request(options, (res) {
+      return _parseSemesters(res.data!);
+    });
+  }
+
   /// Load TimeTable from FDU server.
   Future<TimeTable?> _loadTimeTableRemotely(
       String? semesterId, String? startDate) async {
@@ -81,9 +92,8 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     SemesterInfoWithStartDate semesterInfo =
         await getAppropriateSemesterInfo(semesterId, startDate);
     final options = RequestOptions(
-        method: "GET",
-        path: TIMETABLE_DATA_URL
-            .replaceAll("{sem_id}", semesterInfo.semesterId!),
+      method: "GET",
+      path: TIMETABLE_DATA_URL.replaceAll("{sem_id}", semesterInfo.semesterId!),
     );
     return FudanSession.request(options, (res) {
       SettingsProvider.getInstance().timetableLastUpdated = DateTime.now();
@@ -95,8 +105,8 @@ class TimeTableRepository extends BaseRepositoryWithDio {
   /// Load default semester id and start date from JWGL, then store start date in settings.
   Future<SemesterInfoWithStartDate> _loadDefaultSemesterInfo() async {
     final options = RequestOptions(
-        method: "GET",
-        path: TIMETABLE_URL,
+      method: "GET",
+      path: TIMETABLE_URL,
     );
     return FudanSession.request(options, (res) {
       return _parseDefaultSemesterInfo(res.data!);
