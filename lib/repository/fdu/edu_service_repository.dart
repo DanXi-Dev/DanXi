@@ -76,9 +76,13 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       final Map<String, dynamic> data = res.data!;
       final List<dynamic> vms = data["studentTableVms"];
       final Map<String, dynamic> vm = vms[0];
-      final int id = vm["id"];
-      _cachedStudentId = id.toString();
-      return id.toString();
+      // Intentionally typed as int to fail fast if backend changes the schema.
+      // If it was `final int = vm["id"].toString;`, it would be hard to catch
+      // the bug.
+      final int idInt = vm["id"];
+      final id = idInt.toString();
+      _cachedStudentId = id;
+      return id;
     });
   }
 
@@ -167,9 +171,9 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         }
 
         var courseId = "";
-        var course = "";
+        var courseName = "";
         var type = "";
-        var method = "";
+        var category = "";
         var date = "";
         var time = "";
         var location = "";
@@ -196,12 +200,13 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         final firstDiv = secondCell.find("div");
         final spans = firstDiv?.findAll("span");
         if (spans != null && spans.length >= 3) {
-          course = spans[0].text.trimAndNormalizeWhitespace();
+          courseName = spans[0].text.trimAndNormalizeWhitespace();
           courseId = spans[1].text.trimAndNormalizeWhitespace();
 
-          final methodText = spans[2].text.trimAndNormalizeWhitespace();
-          if (methodText.startsWith("（") && methodText.endsWith("）")) {
-            method = methodText.substring(1, methodText.length - 1).trim();
+          final categoryText = spans[2].text.trimAndNormalizeWhitespace();
+          if (categoryText.startsWith("（") && categoryText.endsWith("）")) {
+            category =
+                categoryText.substring(1, categoryText.length - 1).trim();
           }
         }
 
@@ -219,12 +224,12 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
         final exam = Exam(
           courseId,
-          course,
+          courseName,
           type,
           date,
           time,
           location,
-          method,
+          category,
           note,
         );
         exams.add(exam);
@@ -244,18 +249,25 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       final Map<String, dynamic> data = res.data!;
       final Map<String, dynamic> semesterId2StudentGrades =
           data["semesterId2studentGrades"];
-      final List<dynamic> grades = semesterId2StudentGrades[semesterId] ?? [];
+      final List<dynamic> grades =
+          semesterId2StudentGrades[semesterId] ?? const [];
 
       final scores = <ExamScore>[];
       for (final gradeJson in grades) {
         final Map<String, dynamic> grade = gradeJson;
+        final String lessonCode = grade["lessonCode"];
+        final String courseName = grade["courseName"];
+        final String? courseModuleTypeName = grade["courseModuleTypeName"];
+        final String? courseType = grade["courseType"];
+        final String gaGrade = grade["gaGrade"];
+        final num gp = grade["gp"];
         final score = ExamScore(
-          grade["lessonCode"],
-          grade["courseName"],
-          grade["courseModuleTypeName"] ?? grade["courseType"] ?? "",
+          lessonCode,
+          courseName,
+          courseModuleTypeName ?? courseType ?? "",
           "",
-          grade["gaGrade"],
-          grade["gp"].toString(),
+          gaGrade,
+          gp.toString(),
         );
         scores.add(score);
       }
@@ -274,23 +286,21 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       final html = res.data!;
       final gradeRegex = RegExp("name=\"grade\"\\s+value=\"(\\d+)\"");
       final gradeMatch = gradeRegex.firstMatch(html)!;
+      final gradeStr = gradeMatch.group(1)!;
       final deptRegex = RegExp("name=\"departmentAssoc\"\\s+value=\"(\\d+)\"");
       final deptMatch = deptRegex.firstMatch(html)!;
+      final deptStr = deptMatch.group(1)!;
 
       // get department GPA ranks
       final options = RequestOptions(
         method: "GET",
-        path: getMyGpaSearchUrl(
-          studentId,
-          gradeMatch.group(1)!,
-          deptMatch.group(1)!,
-        ),
+        path: getMyGpaSearchUrl(studentId, gradeStr, deptStr),
       );
       return FudanSession.request(options, (res) {
         final Map<String, dynamic> data = res.data;
         final List<dynamic> ranks = data["data"] ?? [];
 
-        final List<GPAListItem> items = [];
+        final List<GPAListItem> gpaListItems = [];
         for (final rankJson in ranks) {
           /// Example:
           /// {
@@ -305,20 +315,29 @@ class EduServiceRepository extends BaseRepositoryWithDio {
           //    ranking: 1
           //  }
           final Map<String, dynamic> rank = rankJson;
+          final String name = rank["name"];
+          final String code = rank["code"];
+          final num gpa = rank["gpa"];
+          // Some courses have credit of 0.5.
+          final num credit = rank["credit"];
+          final int ranking = rank["ranking"];
+          final String grade = rank["grade"];
+          final String major = rank["major"];
+          final String department = rank["department"];
           final item = GPAListItem(
-            rank["name"],
-            rank["code"],
-            rank["gpa"].toString(),
-            rank["credit"].toString(),
-            rank["ranking"].toString(),
-            rank["grade"],
-            rank["major"],
-            rank["department"],
+            name,
+            code,
+            gpa.toString(),
+            credit.toString(),
+            ranking.toString(),
+            grade,
+            major,
+            department,
           );
-          items.add(item);
+          gpaListItems.add(item);
         }
 
-        return items;
+        return gpaListItems;
       });
     });
   }
