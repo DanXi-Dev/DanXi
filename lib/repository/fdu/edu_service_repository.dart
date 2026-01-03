@@ -159,7 +159,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     return FudanSession.request(options, (res) {
       final exams = <Exam>[];
 
-      BeautifulSoup soup = BeautifulSoup(res.data!);
+      final soup = BeautifulSoup(res.data!);
       // Use this selector to filter out finished exams.
       final elements = soup.findAll(
         "table.exam-table tbody tr:not(.tr-empty):not([data-finished=\"true\"])",
@@ -283,18 +283,16 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       path: getMyGpaSearchIndexUrl(studentId),
     );
     return FudanSession.request(options, (res) {
-      final html = res.data!;
-      final gradeRegex = RegExp("name=\"grade\"\\s+value=\"(\\d+)\"");
-      final gradeMatch = gradeRegex.firstMatch(html)!;
-      final gradeStr = gradeMatch.group(1)!;
-      final deptRegex = RegExp("name=\"departmentAssoc\"\\s+value=\"(\\d+)\"");
-      final deptMatch = deptRegex.firstMatch(html)!;
-      final deptStr = deptMatch.group(1)!;
+      final soup = BeautifulSoup(res.data!);
+      final gradeYearElement = soup.find("input[name=\"grade\"]")!;
+      final gradeYear = gradeYearElement.attributes["value"]!;
+      final deptAssocElement = soup.find("input[name=\"departmentAssoc\"]")!;
+      final deptAssoc = deptAssocElement.attributes["value"]!;
 
       // get department GPA ranks
       final options = RequestOptions(
         method: "GET",
-        path: getMyGpaSearchUrl(studentId, gradeStr, deptStr),
+        path: getMyGpaSearchUrl(studentId, gradeYear, deptAssoc),
       );
       return FudanSession.request(options, (res) {
         final Map<String, dynamic> data = res.data;
