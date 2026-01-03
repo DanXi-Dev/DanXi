@@ -74,6 +74,22 @@ class GpaNotifier extends _$GpaNotifier {
 }
 
 @riverpod
+GPAListItem? userGpa(Ref ref) {
+  final gpa = ref.watch(gpaProvider);
+  final userId = sp.StateProvider.personInfo.value?.id;
+  if (userId == null) {
+    return null;
+  }
+
+  return gpa.maybeWhen(
+    data: (gpaList) =>
+        gpaList.firstWhereOrNull((element) => element.id == userId),
+    // If we cannot find such an element, we will just return null.
+    orElse: () => null,
+  );
+}
+
+@riverpod
 Future<List<SemesterInfo>> semester(Ref ref) async {
   return (await EduServiceRepository.getInstance().loadSemesters()).semesters;
 }
@@ -324,12 +340,7 @@ class ExamList extends HookConsumerWidget {
 
   Widget _buildGPACard(BuildContext context, WidgetRef ref) {
     final gpa = ref.watch(gpaProvider);
-    final userGPA = switch (gpa) {
-      AsyncData(value: final gpaList) => gpaList.firstWhereOrNull(
-          (element) => element.id == sp.StateProvider.personInfo.value!.id),
-      // If we cannot find such an element, we will just return null.
-      _ => null,
-    };
+    final userGPA = ref.watch(userGpaProvider);
     return Card(
       color: PlatformX.backgroundAccentColor(context),
       child: ListTile(
