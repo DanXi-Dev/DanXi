@@ -17,6 +17,7 @@
 
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/state_provider.dart' as sp;
 import 'package:dan_xi/repository/fdu/data_center_repository.dart';
@@ -42,9 +43,34 @@ import 'package:share_plus/share_plus.dart';
 
 part 'exam_detail.g.dart';
 
-@riverpod
-Future<List<GPAListItem>> gpa(Ref ref) async {
-  return await EduServiceRepository.getInstance().loadGPA();
+// To preserve GPA data across semesters switches, we need `keepAlive: true`.
+// To control the behaviour of dropping previous GPA data when quit and re-enter
+// the `ExamList`, we need a notifier.
+//
+// Using `GpaNotifier` instead of `GPANotifier` avoids generating the awkward
+// provider name `gPANotifierProvider`.
+@Riverpod(keepAlive: true)
+class GpaNotifier extends _$GpaNotifier {
+  @override
+  Future<List<GPAListItem>> build() async {
+    return await _load();
+  }
+
+  Future<List<GPAListItem>> _load() =>
+      EduServiceRepository.getInstance().loadGPA();
+
+  Future<bool> reload() async {
+    if (state.isLoading) {
+      return false;
+    }
+
+    // `Riverpod(keepAlive: true)` doesn't set the state to loading by default,
+    // so we are setting it manually.
+    state = AsyncValue.loading();
+    final data = await _load();
+    state = AsyncValue.data(data);
+    return true;
+  }
 }
 
 @riverpod
@@ -127,6 +153,14 @@ class ExamList extends HookConsumerWidget {
     final semesters = ref.watch(semesterProvider);
     final currentSemesterIndex = useState<int?>(null);
     final currentExamRef = useState<List<Exam>?>(null);
+
+    useEffect(() {
+      // Setting the state requires widgets to be stable.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(gpaProvider.notifier).reload();
+      });
+      return null;
+    }, const []);
 
     return PlatformScaffold(
         iosContentBottomPadding: false,
@@ -290,15 +324,12 @@ class ExamList extends HookConsumerWidget {
 
   Widget _buildGPACard(BuildContext context, WidgetRef ref) {
     final gpa = ref.watch(gpaProvider);
-    GPAListItem? userGPA;
-    if (gpa case AsyncData(value: final gpaList)) {
-      try {
-        userGPA = gpaList.firstWhere(
-            (element) => element.id == sp.StateProvider.personInfo.value!.id);
-      } catch (_) {
-        // If we cannot find such an element, we will just return null.
-      }
-    }
+    final userGPA = switch (gpa) {
+      AsyncData(value: final gpaList) => gpaList.firstWhereOrNull(
+          (element) => element.id == sp.StateProvider.personInfo.value!.id),
+      // If we cannot find such an element, we will just return null.
+      _ => null,
+    };
     return Card(
       color: PlatformX.backgroundAccentColor(context),
       child: ListTile(
