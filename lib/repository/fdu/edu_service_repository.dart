@@ -56,12 +56,17 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   factory EduServiceRepository.getInstance() => _instance;
 
+  String? _cachedStudentId;
+
   /// Load all semesters and their start dates
   Future<SemesterBundle> _loadSemesters() =>
       TimeTableRepository.getInstance().loadSemestersForTimeTable();
 
   /// Get student ID from course table API
   Future<String> _loadStudentId() async {
+    if (_cachedStudentId != null) {
+      return _cachedStudentId!;
+    }
     final semesterBundle = await _loadSemesters();
     final options = RequestOptions(
       method: "GET",
@@ -72,6 +77,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       final List<dynamic> vms = data["studentTableVms"];
       final Map<String, dynamic> vm = vms[0];
       final int id = vm["id"];
+      _cachedStudentId = id.toString();
       return id.toString();
     });
   }
@@ -136,8 +142,12 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   ///     <td>已结束</td>
   /// </tr>
   /// ```
-  Future<List<Exam>> _loadExamList() async {
+  Future<List<Exam>> _loadExamList(String semesterId) async {
     final studentId = await _loadStudentId();
+    final semesterBundle = await _loadSemesters();
+    if (semesterBundle.defaultSemesterId != semesterId) {
+      return const [];
+    }
     final options = RequestOptions(
       method: "GET",
       path: getExamArrangeUrl(studentId),
@@ -146,6 +156,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       final exams = <Exam>[];
 
       BeautifulSoup soup = BeautifulSoup(res.data!);
+      // Use this selector to filter out finished exams.
       final elements = soup.findAll(
         "table.exam-table tbody tr:not(.tr-empty):not([data-finished=\"true\"])",
       );
@@ -317,7 +328,13 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   /// Returns a [SemesterBundle].
   Future<SemesterBundle> loadSemestersRemotely() => _loadSemesters();
 
-  Future<List<Exam>> loadExamListRemotely() => _loadExamList();
+  /// The new API contains no semester ID. It returns a list of exams in the
+  /// latest semester.
+  ///
+  /// To be consistent with the former version of this method, we assume
+  /// semesters before the latest one contain no exams.
+  Future<List<Exam>> loadExamListRemotely(String semesterId) =>
+      _loadExamList(semesterId);
 
   Future<List<ExamScore>> loadExamScoreRemotely(String semesterId) =>
       _loadExamScore(semesterId);

@@ -55,7 +55,8 @@ Future<List<SemesterInfo>> semester(Ref ref) async {
 
 @riverpod
 Future<List<Exam>> exam(Ref ref, String semesterId) async {
-  return await EduServiceRepository.getInstance().loadExamListRemotely();
+  return await EduServiceRepository.getInstance()
+      .loadExamListRemotely(semesterId);
 }
 
 @riverpod
@@ -164,9 +165,10 @@ class ExamList extends HookConsumerWidget {
     final currentSemesterIndexValue =
         currentSemesterIndex.value ?? semesters.length - 3;
     final currentSemester = semesters[currentSemesterIndexValue];
+    final semesterId = currentSemester.semesterId!;
 
-    final currentExamProvider = examProvider(currentSemester.semesterId!);
-    final currentScoreProvider = examScoreProvider(currentSemester.semesterId!);
+    final currentExamProvider = examProvider(semesterId);
+    final currentScoreProvider = examScoreProvider(semesterId);
     final exams = ref.watch(currentExamProvider);
     final scores = ref.watch(currentScoreProvider);
 
@@ -176,11 +178,11 @@ class ExamList extends HookConsumerWidget {
     }
 
     Widget body;
-    List<Exam>? examList;
+    List<Exam>? providedExams;
     switch ((exams, scores)) {
       // Both exams and scores are available
       case (AsyncData(value: final exams), AsyncData(value: final scores)):
-        examList = exams;
+        providedExams = exams;
         body = exams.isEmpty
             ? _buildGradeLayout(context, ref, scores)
             : ListView(
@@ -188,8 +190,8 @@ class ExamList extends HookConsumerWidget {
       // There are some exams in this semester, but no score has been published
       case (AsyncData(value: final exams), AsyncError(error: final scoreError))
           when scoreError is RangeError:
-        body =
-            ListView(children: _getListWidgetsHybrid(context, ref, exams, []));
+        body = ListView(
+            children: _getListWidgetsHybrid(context, ref, exams, const []));
       // There is no exam in this semester, but never mind, we are still loading scores
       case (AsyncError(:final error), AsyncLoading())
           when error is SemesterNoExamException:
@@ -231,7 +233,7 @@ class ExamList extends HookConsumerWidget {
       default:
         body = Center(child: PlatformCircularProgressIndicator());
     }
-    currentExamRef?.value = examList;
+    currentExamRef?.value = providedExams;
 
     final List<Widget> mainWidgets = [
       Row(
