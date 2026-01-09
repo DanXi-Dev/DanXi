@@ -56,17 +56,36 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   factory EduServiceRepository.getInstance() => _instance;
 
-  String? _cachedStudentId;
-
   /// Load all semesters and their start dates
   Future<SemesterBundle> _loadSemesters() =>
       TimeTableRepository.getInstance().loadSemestersForTimeTable();
 
+  String? _cachedStudentId;
+  Future<String>? _loadingStudentIdFuture;
+
+  /// Memorizes the in-flight request to avoid duplicate concurrent network
+  /// calls.
+  Future<String> _loadStudentIdCached() {
+    final cachedStudentId = _cachedStudentId;
+    if (cachedStudentId != null) {
+      return Future.value(cachedStudentId);
+    }
+    final loadingFuture = _loadingStudentIdFuture;
+    if (loadingFuture != null) {
+      return loadingFuture;
+    }
+    final newLoadingFuture = _loadStudentId();
+    _loadingStudentIdFuture = newLoadingFuture;
+    return newLoadingFuture.then((studentId) {
+      _cachedStudentId = studentId;
+      return studentId;
+    }).whenComplete(() {
+      _loadingStudentIdFuture = null;
+    });
+  }
+
   /// Get student ID from course table API
   Future<String> _loadStudentId() async {
-    if (_cachedStudentId != null) {
-      return _cachedStudentId!;
-    }
     final semesterBundle = await _loadSemesters();
     final options = RequestOptions(
       method: "GET",
@@ -81,7 +100,6 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       // the bug.
       final int idInt = vm["id"];
       final id = idInt.toString();
-      _cachedStudentId = id;
       return id;
     });
   }
@@ -147,7 +165,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   /// </tr>
   /// ```
   Future<List<Exam>> _loadExamList(String semesterId) async {
-    final studentId = await _loadStudentId();
+    final studentId = await _loadStudentIdCached();
     final semesterBundle = await _loadSemesters();
     if (semesterBundle.defaultSemesterId != semesterId) {
       return const [];
@@ -240,7 +258,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<ExamScore>> _loadExamScore(String semesterId) async {
-    final studentId = await _loadStudentId();
+    final studentId = await _loadStudentIdCached();
     final options = RequestOptions(
       method: "GET",
       path: getGradeSheetUrl(studentId, semesterId),
@@ -278,7 +296,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   }
 
   Future<List<GPAListItem>> _loadGPA() async {
-    final studentId = await _loadStudentId();
+    final studentId = await _loadStudentIdCached();
     final options = RequestOptions(
       method: "GET",
       path: getMyGpaSearchIndexUrl(studentId),
