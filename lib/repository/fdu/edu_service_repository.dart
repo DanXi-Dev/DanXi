@@ -56,8 +56,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   factory EduServiceRepository.getInstance() => _instance;
 
-  /// Load all semesters and their start dates
-  Future<SemesterBundle> _loadSemesters() =>
+  /// Load all semesters and their start dates, etc.
+  ///
+  /// Returns a [SemesterBundle].
+  Future<SemesterBundle> loadSemesters() =>
       TimeTableRepository.getInstance().loadSemestersForTimeTable();
 
   String? _cachedStudentId;
@@ -65,7 +67,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   /// Memorizes the in-flight request to avoid duplicate concurrent network
   /// calls.
-  Future<String> _loadStudentIdCached() {
+  Future<String> loadStudentIdCached() {
     final cachedStudentId = _cachedStudentId;
     if (cachedStudentId != null) {
       return Future.value(cachedStudentId);
@@ -74,7 +76,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     if (loadingFuture != null) {
       return loadingFuture;
     }
-    final newLoadingFuture = _loadStudentId();
+    final newLoadingFuture = loadStudentId();
     _loadingStudentIdFuture = newLoadingFuture;
     return newLoadingFuture.then((studentId) {
       _cachedStudentId = studentId;
@@ -85,8 +87,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   }
 
   /// Get student ID from course table API
-  Future<String> _loadStudentId() async {
-    final semesterBundle = await _loadSemesters();
+  Future<String> loadStudentId() async {
+    final semesterBundle = await loadSemesters();
     final options = RequestOptions(
       method: "GET",
       path: getSemesterCourseTableUrl(semesterBundle.defaultSemesterId),
@@ -164,11 +166,11 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   ///     <td>已结束</td>
   /// </tr>
   /// ```
-  Future<List<Exam>> _loadExamList(String semesterId) async {
-    final studentId = await _loadStudentIdCached();
-    final semesterBundle = await _loadSemesters();
+  Future<List<Exam>> loadExamList(String semesterId) async {
+    final studentId = await loadStudentIdCached();
+    final semesterBundle = await loadSemesters();
     if (semesterBundle.defaultSemesterId != semesterId) {
-      return const [];
+      throw SemesterNoExamException();
     }
     final options = RequestOptions(
       method: "GET",
@@ -257,8 +259,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  Future<List<ExamScore>> _loadExamScore(String semesterId) async {
-    final studentId = await _loadStudentIdCached();
+  Future<List<ExamScore>> loadExamScore(String semesterId) async {
+    final studentId = await loadStudentIdCached();
     final options = RequestOptions(
       method: "GET",
       path: getGradeSheetUrl(studentId, semesterId),
@@ -295,8 +297,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  Future<List<GPAListItem>> _loadGPA() async {
-    final studentId = await _loadStudentIdCached();
+  Future<List<GPAListItem>> loadGPA() async {
+    final studentId = await loadStudentIdCached();
     final options = RequestOptions(
       method: "GET",
       path: getMyGpaSearchIndexUrl(studentId),
@@ -358,24 +360,6 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       });
     });
   }
-
-  /// Load all semesters and their start dates, etc.
-  ///
-  /// Returns a [SemesterBundle].
-  Future<SemesterBundle> loadSemestersRemotely() => _loadSemesters();
-
-  /// The new API contains no semester ID. It returns a list of exams in the
-  /// latest semester.
-  ///
-  /// To be consistent with the former version of this method, we assume
-  /// semesters before the latest one contain no exams.
-  Future<List<Exam>> loadExamListRemotely(String semesterId) =>
-      _loadExamList(semesterId);
-
-  Future<List<ExamScore>> loadExamScoreRemotely(String semesterId) =>
-      _loadExamScore(semesterId);
-
-  Future<List<GPAListItem>> loadGPARemotely() => _loadGPA();
 
   /// JSON-Like Text: {aaaa:"asdasd"}
   /// Real JSON Text: {"aaaa":"asdasd"}
@@ -471,19 +455,6 @@ class Exam {
 
   Exam(this.id, this.name, this.type, this.date, this.time, this.location,
       this.testCategory, this.note);
-
-  factory Exam.fromHtml(dom.Element html) {
-    List<dom.Element> elements = html.getElementsByTagName("td");
-    return Exam(
-        elements[0].text.trim(),
-        elements[2].text.trim(),
-        elements[3].text.trim(),
-        elements[4].text.trim(),
-        elements[5].text.trim(),
-        elements[6].text.trim(),
-        elements[7].text.trim(),
-        elements[8].text.trim());
-  }
 }
 
 class ExamScore {
@@ -495,17 +466,6 @@ class ExamScore {
   final String? score;
 
   ExamScore(this.id, this.name, this.type, this.credit, this.level, this.score);
-
-  factory ExamScore.fromEduServiceHtml(dom.Element html) {
-    List<dom.Element> elements = html.getElementsByTagName("td");
-    return ExamScore(
-        elements[2].text.trim(),
-        elements[3].text.trim(),
-        elements[4].text.trim(),
-        elements[5].text.trim(),
-        elements[6].text.trim(),
-        elements[7].text.trim());
-  }
 
   /// NOTE: Result's [type] is year + semester(e.g. "2020-2021 2"),
   /// and [id] doesn't contain the last 2 digits.
@@ -533,19 +493,6 @@ class GPAListItem {
 
   GPAListItem(this.name, this.id, this.gpa, this.credits, this.rank, this.year,
       this.major, this.college);
-
-  factory GPAListItem.fromHtml(dom.Element html) {
-    List<dom.Element> elements = html.getElementsByTagName("td");
-    return GPAListItem(
-        elements[1].text,
-        elements[0].text,
-        elements[5].text,
-        elements[6].text,
-        elements[7].text,
-        elements[2].text,
-        elements[3].text,
-        elements[4].text);
-  }
 }
 
 class SemesterNoExamException implements Exception {}

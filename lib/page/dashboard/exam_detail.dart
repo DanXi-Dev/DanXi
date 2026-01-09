@@ -44,25 +44,22 @@ part 'exam_detail.g.dart';
 
 @riverpod
 Future<List<GPAListItem>> gpa(Ref ref) async {
-  return await EduServiceRepository.getInstance().loadGPARemotely();
+  return await EduServiceRepository.getInstance().loadGPA();
 }
 
 @riverpod
 Future<List<SemesterInfo>> semester(Ref ref) async {
-  return (await EduServiceRepository.getInstance().loadSemestersRemotely())
-      .semesters;
+  return (await EduServiceRepository.getInstance().loadSemesters()).semesters;
 }
 
 @riverpod
 Future<List<Exam>> exam(Ref ref, String semesterId) async {
-  return await EduServiceRepository.getInstance()
-      .loadExamListRemotely(semesterId);
+  return await EduServiceRepository.getInstance().loadExamList(semesterId);
 }
 
 @riverpod
 Future<List<ExamScore>> examScore(Ref ref, String semesterId) async {
-  return await EduServiceRepository.getInstance()
-      .loadExamScoreRemotely(semesterId);
+  return await EduServiceRepository.getInstance().loadExamScore(semesterId);
 }
 
 @riverpod

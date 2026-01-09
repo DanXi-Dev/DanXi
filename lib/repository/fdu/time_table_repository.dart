@@ -168,9 +168,6 @@ class TimeTableRepository extends BaseRepositoryWithDio {
         defaultSemesterId, DateTime.tryParse(startDate!));
   }
 
-  SemesterBundle parseSemesters(String semesterHtml) =>
-      _parseSemesters(semesterHtml);
-
   /// Check if the timetable has been fetched before.
   bool hasCache() {
     XSharedPreferences preferences =
