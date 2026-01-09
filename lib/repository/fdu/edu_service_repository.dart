@@ -260,14 +260,15 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         final String? courseModuleTypeName = grade["courseModuleTypeName"];
         final String? courseType = grade["courseType"];
         final String gaGrade = grade["gaGrade"];
-        final num gp = grade["gp"];
+        // PNP courses have no GP.
+        final num? gp = grade["gp"];
         final score = ExamScore(
           lessonCode,
           courseName,
           courseModuleTypeName ?? courseType ?? "",
           "",
           gaGrade,
-          gp.toString(),
+          gp?.toString() ?? "",
         );
         scores.add(score);
       }
