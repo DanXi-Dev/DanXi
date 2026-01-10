@@ -231,14 +231,12 @@ class ExamList extends HookConsumerWidget {
       case (AsyncData(value: final exams), AsyncData(value: final scores)):
         providedExams = exams;
         body = exams.isEmpty
-            ? _buildGradeLayout(context, ref, scores)
-            : ListView(
-                children: _getListWidgetsHybrid(context, ref, exams, scores));
+            ? _buildGradeLayout(context, ref, scores, semesterId)
+            : _buildHybridLayout(context, ref, exams, scores, semesterId);
       // There are some exams in this semester, but no score has been published
       case (AsyncData(value: final exams), AsyncError(error: final scoreError))
           when scoreError is RangeError:
-        body = ListView(
-            children: _getListWidgetsHybrid(context, ref, exams, const []));
+        body = _buildHybridLayout(context, ref, exams, const [], semesterId);
       // There is no exam in this semester, but never mind, we are still loading scores
       case (AsyncError(:final error), AsyncLoading())
           when error is SemesterNoExamException:
@@ -246,7 +244,7 @@ class ExamList extends HookConsumerWidget {
       // There is no exam in this semester, but we indeed have scores!
       case (AsyncError(:final error), AsyncData(value: final scores))
           when error is SemesterNoExamException:
-        body = _buildGradeLayout(context, ref, scores);
+        body = _buildGradeLayout(context, ref, scores, semesterId);
       // There is no exam in this semester, and no scores have been published
       case (
             AsyncError(error: final examError),
@@ -313,7 +311,7 @@ class ExamList extends HookConsumerWidget {
     final scores = ref.watch(examScoreFromDataCenterProvider);
     switch (scores) {
       case AsyncData(value: final data):
-        return _buildGradeLayout(context, ref, data, isFallback: true);
+        return _buildGradeLayout(context, ref, data, null, isFallback: true);
       case AsyncError(:final error, :final stackTrace):
         return ErrorPageWidget(
           errorMessage:
@@ -328,15 +326,38 @@ class ExamList extends HookConsumerWidget {
     }
   }
 
-  Widget _buildGradeLayout(
-          BuildContext context, WidgetRef ref, List<ExamScore> examScores,
+  Widget _buildRefreshableListView(BuildContext context, WidgetRef ref,
+          List<Widget> widgets, String? semesterId,
           {bool isFallback = false}) =>
       WithScrollbar(
           controller: PrimaryScrollController.of(context),
-          child: ListView(
-              primary: true,
-              children: _getListWidgetsGrade(context, ref, examScores,
-                  isFallback: isFallback)));
+          child: RefreshIndicator(
+              edgeOffset: MediaQuery.of(context).padding.top,
+              color: Theme.of(context).colorScheme.secondary,
+              backgroundColor: DialogTheme.of(context).backgroundColor,
+              onRefresh: () =>
+                  _refreshAll(ref, semesterId, isFallback: isFallback),
+              child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: widgets)));
+
+  Widget _buildGradeLayout(BuildContext context, WidgetRef ref,
+          List<ExamScore> examScores, String? semesterId,
+          {bool isFallback = false}) =>
+      _buildRefreshableListView(
+          context,
+          ref,
+          _getListWidgetsGrade(context, ref, examScores,
+              isFallback: isFallback),
+          semesterId,
+          isFallback: isFallback);
+
+  Widget _buildHybridLayout(BuildContext context, WidgetRef ref,
+          List<Exam> exams, List<ExamScore> scores, String? semesterId,
+          {bool isFallback = false}) =>
+      _buildRefreshableListView(context, ref,
+          _getListWidgetsHybrid(context, ref, exams, scores), semesterId,
+          isFallback: isFallback);
 
   Widget _buildGpaCard(BuildContext context, WidgetRef ref) {
     final gpa = ref.watch(gpaProvider);
@@ -562,5 +583,21 @@ class ExamList extends HookConsumerWidget {
       }
     }
     return widgets + secondaryWidgets;
+  }
+
+  Future<void> _refreshAll(WidgetRef ref, String? semesterId,
+      {bool isFallback = false}) async {
+    await ref.read(gpaProvider.notifier).reload();
+
+    ref.invalidate(semesterProvider);
+
+    if (semesterId != null) {
+      ref.invalidate(examProvider(semesterId));
+      ref.invalidate(examScoreProvider(semesterId));
+    }
+
+    if (isFallback) {
+      ref.invalidate(examScoreFromDataCenterProvider);
+    }
   }
 }
