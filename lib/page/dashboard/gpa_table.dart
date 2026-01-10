@@ -31,7 +31,7 @@ class GpaTablePage extends StatefulWidget {
 }
 
 class GpaTablePageState extends State<GpaTablePage> {
-  List<GPAListItem>? gpaList;
+  List<GpaListItem>? gpaList;
   static const String NAME_HIDDEN = "****";
 
   @override

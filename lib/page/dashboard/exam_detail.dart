@@ -52,12 +52,12 @@ part 'exam_detail.g.dart';
 @Riverpod(keepAlive: true)
 class GpaNotifier extends _$GpaNotifier {
   @override
-  Future<List<GPAListItem>> build() async {
+  Future<List<GpaListItem>> build() async {
     return await _load();
   }
 
-  Future<List<GPAListItem>> _load() =>
-      EduServiceRepository.getInstance().loadGPA();
+  Future<List<GpaListItem>> _load() =>
+      EduServiceRepository.getInstance().loadGpa();
 
   Future<bool> reload() async {
     if (state.isLoading) {
@@ -74,7 +74,7 @@ class GpaNotifier extends _$GpaNotifier {
 }
 
 @riverpod
-GPAListItem? userGpa(Ref ref) {
+GpaListItem? userGpa(Ref ref) {
   final gpa = ref.watch(gpaProvider);
   final userId = sp.StateProvider.personInfo.value?.id;
   if (userId == null) {
@@ -338,9 +338,9 @@ class ExamList extends HookConsumerWidget {
               children: _getListWidgetsGrade(context, ref, examScores,
                   isFallback: isFallback)));
 
-  Widget _buildGPACard(BuildContext context, WidgetRef ref) {
+  Widget _buildGpaCard(BuildContext context, WidgetRef ref) {
     final gpa = ref.watch(gpaProvider);
-    final userGPA = ref.watch(userGpaProvider);
+    final userGpa = ref.watch(userGpaProvider);
     return Card(
       color: PlatformX.backgroundAccentColor(context),
       child: ListTile(
@@ -351,7 +351,7 @@ class ExamList extends HookConsumerWidget {
         ),
         trailing: switch (gpa) {
           AsyncData() => Text(
-              userGPA?.gpa ?? "N/A",
+              userGpa?.gpa ?? "N/A",
               textScaler: TextScaler.linear(1.25),
               style: const TextStyle(color: Colors.white),
             ),
@@ -361,7 +361,7 @@ class ExamList extends HookConsumerWidget {
         subtitle: switch (gpa) {
           AsyncData() => Text(
               S.of(context).your_gpa_subtitle(
-                  userGPA?.rank ?? "N/A", userGPA?.credits ?? "N/A"),
+                  userGpa?.rank ?? "N/A", userGpa?.credits ?? "N/A"),
               style: TextStyle(color: Colors.white)),
           AsyncError() => nil,
           _ => Text(S.of(context).loading),
@@ -395,7 +395,7 @@ class ExamList extends HookConsumerWidget {
     if (isFallback) {
       widgets.add(buildLimitedCard());
     } else {
-      widgets.add(_buildGPACard(context, ref));
+      widgets.add(_buildGpaCard(context, ref));
     }
     for (var value in scores) {
       widgets.add(_buildCardGrade(value, context));
@@ -538,7 +538,7 @@ class ExamList extends HookConsumerWidget {
           Expanded(child: Divider(color: color)),
         ]));
 
-    List<Widget> widgets = [_buildGPACard(context, ref)];
+    List<Widget> widgets = [_buildGpaCard(context, ref)];
     List<Widget> secondaryWidgets = [
       buildDividerWithText(S.of(context).other_types_exam,
           Theme.of(context).textTheme.bodyLarge!.color)
