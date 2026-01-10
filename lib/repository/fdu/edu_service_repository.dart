@@ -177,13 +177,13 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       path: getExamArrangeUrl(studentId),
     );
     return FudanSession.request(options, (res) {
-      final exams = <Exam>[];
-
       final soup = BeautifulSoup(res.data!);
       // Use this selector to filter out finished exams.
       final elements = soup.findAll(
         "table.exam-table tbody tr:not(.tr-empty):not([data-finished=\"true\"])",
       );
+
+      final exams = <Exam>[];
       for (final element in elements) {
         final cells = element.findAll("td");
         if (cells.length < 4) {
@@ -299,65 +299,68 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   Future<List<GPAListItem>> loadGPA() async {
     final studentId = await loadStudentIdCached();
-    final options = RequestOptions(
+    final searchIndexOptions = RequestOptions(
       method: "GET",
       path: getMyGpaSearchIndexUrl(studentId),
     );
-    return FudanSession.request(options, (res) {
+    final (gradeYear, deptAssoc) =
+        await FudanSession.request(searchIndexOptions, (res) {
       final soup = BeautifulSoup(res.data!);
       final gradeYearElement = soup.find("input[name=\"grade\"]")!;
       final gradeYear = gradeYearElement.attributes["value"]!;
       final deptAssocElement = soup.find("input[name=\"departmentAssoc\"]")!;
       final deptAssoc = deptAssocElement.attributes["value"]!;
 
-      // get department GPA ranks
-      final options = RequestOptions(
-        method: "GET",
-        path: getMyGpaSearchUrl(studentId, gradeYear, deptAssoc),
-      );
-      return FudanSession.request(options, (res) {
-        final Map<String, dynamic> data = res.data;
-        final List<dynamic> ranks = data["data"] ?? [];
+      return (gradeYear, deptAssoc);
+    });
 
-        final List<GPAListItem> gpaListItems = [];
-        for (final rankJson in ranks) {
-          /// Example:
-          /// {
-          //    id: null,
-          //    code: ****, // The 11-digit student ID
-          //    name: ****,
-          //    grade: 2022,
-          //    major: 计算机科学与技术,
-          //    department: 计算与智能创新学院,
-          //    gpa: 3.96,
-          //    credit: 130,
-          //    ranking: 1
-          //  }
-          final Map<String, dynamic> rank = rankJson;
-          final String name = rank["name"];
-          final String code = rank["code"];
-          final num gpa = rank["gpa"];
-          // Some courses have credit of 0.5.
-          final num credit = rank["credit"];
-          final int ranking = rank["ranking"];
-          final String grade = rank["grade"];
-          final String major = rank["major"];
-          final String department = rank["department"];
-          final item = GPAListItem(
-            name,
-            code,
-            gpa.toString(),
-            credit.toString(),
-            ranking.toString(),
-            grade,
-            major,
-            department,
-          );
-          gpaListItems.add(item);
-        }
+    // get department GPA ranks
+    final searchOptions = RequestOptions(
+      method: "GET",
+      path: getMyGpaSearchUrl(studentId, gradeYear, deptAssoc),
+    );
+    return FudanSession.request(searchOptions, (res) {
+      final Map<String, dynamic> data = res.data;
+      final List<dynamic> ranks = data["data"] ?? [];
 
-        return gpaListItems;
-      });
+      final List<GPAListItem> gpaListItems = [];
+      for (final rankJson in ranks) {
+        /// Example:
+        /// {
+        //    id: null,
+        //    code: ****, // The 11-digit student ID
+        //    name: ****,
+        //    grade: 2022,
+        //    major: 计算机科学与技术,
+        //    department: 计算与智能创新学院,
+        //    gpa: 3.96,
+        //    credit: 130,
+        //    ranking: 1
+        //  }
+        final Map<String, dynamic> rank = rankJson;
+        final String name = rank["name"];
+        final String code = rank["code"];
+        final num gpa = rank["gpa"];
+        // Some courses have credit of 0.5.
+        final num credit = rank["credit"];
+        final int ranking = rank["ranking"];
+        final String grade = rank["grade"];
+        final String major = rank["major"];
+        final String department = rank["department"];
+        final item = GPAListItem(
+          name,
+          code,
+          gpa.toString(),
+          credit.toString(),
+          ranking.toString(),
+          grade,
+          major,
+          department,
+        );
+        gpaListItems.add(item);
+      }
+
+      return gpaListItems;
     });
   }
 
