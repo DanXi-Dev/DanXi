@@ -28,16 +28,13 @@ import 'package:flutter/material.dart';
 class PEFeature extends Feature {
   List<ExerciseObject>? _exercises;
 
-  /// Status of the request.
-  ConnectionStatus _status = ConnectionStatus.NONE;
-
   void _loadExercises() async {
-    _status = ConnectionStatus.CONNECTING;
+    status = const ConnectionConnecting();
     try {
       _exercises = await FudanPERepository.getInstance().loadExerciseRecords();
-      _status = ConnectionStatus.DONE;
-    } catch (error) {
-      _status = ConnectionStatus.FAILED;
+      status = const ConnectionDone();
+    } catch (error, stackTrace) {
+      status = ConnectionFailed(error, stackTrace);
     }
     notifyUpdate();
   }
@@ -47,7 +44,7 @@ class PEFeature extends Feature {
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
-    if (_status == ConnectionStatus.NONE) {
+    if (status is ConnectionNone) {
       _exercises = null;
       _loadExercises();
     }
@@ -58,11 +55,11 @@ class PEFeature extends Feature {
 
   @override
   String get subTitle {
-    switch (_status) {
-      case ConnectionStatus.NONE:
-      case ConnectionStatus.CONNECTING:
+    switch (status) {
+      case ConnectionNone():
+      case ConnectionConnecting():
         return S.of(context!).loading;
-      case ConnectionStatus.DONE:
+      case ConnectionDone():
         if (_exercises!.isEmpty) {
           return S.of(context!).no_data;
         } else {
@@ -116,15 +113,15 @@ class PEFeature extends Feature {
           }
           return "早锻: ${exerciseCategory[0]} 必锻: ${exerciseCategory[1]} 选锻: ${exerciseCategory[2]}";
         }
-      case ConnectionStatus.FAILED:
-      case ConnectionStatus.FATAL_ERROR:
+      case ConnectionFailed():
+      case ConnectionFatalError():
         return S.of(context!).failed;
     }
   }
 
   @override
   Widget? get trailing {
-    if (_status == ConnectionStatus.CONNECTING) {
+    if (status is ConnectionConnecting) {
       return const FeatureProgressIndicator();
     }
     return null;
@@ -136,7 +133,7 @@ class PEFeature extends Feature {
       : const Icon(CupertinoIcons.sun_max);
 
   void refreshData() {
-    _status = ConnectionStatus.NONE;
+    status = const ConnectionNone();
     notifyUpdate();
   }
 

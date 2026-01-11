@@ -15,10 +15,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/haptic_feedback_util.dart';
+import 'package:dan_xi/util/noticing.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:flutter/material.dart';
 
 /// A simple implementation of [FeatureContainerState] to show the feature as a [ListTile].
@@ -44,6 +46,18 @@ class FeatureListItemState extends State<FeatureListItem>
   void didUpdateWidget(covariant FeatureListItem oldWidget) {
     super.didUpdateWidget(oldWidget);
     loadWidget = !widget.feature.loadOnTap;
+  }
+
+  /// Handle long press event by showing error dialog if the feature is in error status
+  void onLongPressHandler() {
+    switch (widget.feature.status) {
+      case ConnectionFailed(:final error, :final stackTrace):
+      case ConnectionFatalError(:final error, :final stackTrace):
+        HapticFeedbackUtil.medium();
+        Noticing.showErrorDialog(context, error, trace: stackTrace);
+      default:
+        break;
+    }
   }
 
   @override
@@ -74,6 +88,7 @@ class FeatureListItemState extends State<FeatureListItem>
           HapticFeedbackUtil.light();
           widget.feature.onTap.call();
         },
+        onLongPress: onLongPressHandler,
       );
       widget.feature.onEvent(FeatureEvent.CREATE);
       return tile;
@@ -91,11 +106,13 @@ class FeatureListItemState extends State<FeatureListItem>
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(S.of(context).tap_to_view),
-        onTap: () { 
+        onTap: () {
           HapticFeedbackUtil.light();
           setState(() {
-          loadWidget = true;
-        });}
+            loadWidget = true;
+          });
+        },
+        onLongPress: onLongPressHandler,
       );
     }
   }

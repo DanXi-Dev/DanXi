@@ -34,19 +34,16 @@ class DiningHallCrowdednessFeature extends Feature {
   String? _leastCrowdedCanteen;
   String? _mostCrowdedCanteen;
 
-  /// Status of the request.
-  ConnectionStatus _status = ConnectionStatus.NONE;
-
   Future<void> _loadCrowdednessSummary() async {
     Campus preferredCampus = SettingsProvider.getInstance().campus;
     try {
       _trafficInfo = await DataCenterRepository.getInstance()
           .getCrowdednessInfo(preferredCampus.index);
       generateSummary(preferredCampus);
-    } on UnsuitableTimeException {
-      _status = ConnectionStatus.FATAL_ERROR;
-    } catch (e) {
-      _status = ConnectionStatus.FAILED;
+    } on UnsuitableTimeException catch (error, stackTrace) {
+      status = ConnectionFatalError(error, stackTrace);
+    } catch (error, stackTrace) {
+      status = ConnectionFailed(error, stackTrace);
     }
     notifyUpdate();
   }
@@ -152,9 +149,9 @@ class DiningHallCrowdednessFeature extends Feature {
             (element) => crowdedness[element] == crowdedness.values.reduce(min),
             orElse: () => 'null');
       }
-      _status = ConnectionStatus.DONE;
+      status = const ConnectionDone();
     } else {
-      _status = ConnectionStatus.FAILED;
+      status = const ConnectionFailed('No data');
     }
   }
 
@@ -163,8 +160,8 @@ class DiningHallCrowdednessFeature extends Feature {
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
-    if (_status == ConnectionStatus.NONE) {
-      _status = ConnectionStatus.CONNECTING;
+    if (status is ConnectionNone) {
+      status = const ConnectionConnecting();
       _trafficInfo = null;
       _mostCrowdedCanteen = "";
       _leastCrowdedCanteen = "";
@@ -177,26 +174,26 @@ class DiningHallCrowdednessFeature extends Feature {
 
   @override
   String get subTitle {
-    switch (_status) {
-      case ConnectionStatus.NONE:
-      case ConnectionStatus.CONNECTING:
+    switch (status) {
+      case ConnectionNone():
+      case ConnectionConnecting():
         return S.of(context!).loading;
-      case ConnectionStatus.DONE:
+      case ConnectionDone():
         if (_mostCrowdedCanteen != null && _leastCrowdedCanteen != null) {
           return S.of(context!).most_least_crowded_canteen(
               _mostCrowdedCanteen!, _leastCrowdedCanteen!);
         }
         return '';
-      case ConnectionStatus.FAILED:
+      case ConnectionFailed():
         return S.of(context!).failed;
-      case ConnectionStatus.FATAL_ERROR:
+      case ConnectionFatalError():
         return S.of(context!).out_of_dining_time;
     }
   }
 
   @override
   Wrap? get customSubtitle {
-    if (_status == ConnectionStatus.DONE) {
+    if (status is ConnectionDone) {
       return Wrap(
         children: [
           SmallTag(
@@ -239,14 +236,14 @@ class DiningHallCrowdednessFeature extends Feature {
 
   @override
   Widget? get trailing {
-    if (_status == ConnectionStatus.CONNECTING) {
+    if (status is ConnectionConnecting) {
       return const FeatureProgressIndicator();
     }
     return null;
   }
 
   void refreshData() {
-    _status = ConnectionStatus.NONE;
+    status = const ConnectionNone();
     notifyUpdate();
   }
 

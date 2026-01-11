@@ -32,17 +32,14 @@ class FudanLibraryCrowdednessFeature extends Feature {
   /// The numbers of each library visitors at the moment.
   Map<String, String>? _libraryCrowdedness;
 
-  /// Status of the request.
-  ConnectionStatus _status = ConnectionStatus.NONE;
-
   void _loadLibraryCrowdedness() async {
-    _status = ConnectionStatus.CONNECTING;
+    status = const ConnectionConnecting();
     try {
       _libraryCrowdedness =
           await FudanLibraryRepository.getInstance().getLibraryRawData();
-      _status = ConnectionStatus.DONE;
-    } catch (error) {
-      _status = ConnectionStatus.FAILED;
+      status = const ConnectionDone();
+    } catch (error, stackTrace) {
+      status = ConnectionFailed(error, stackTrace);
     }
     notifyUpdate();
   }
@@ -52,7 +49,7 @@ class FudanLibraryCrowdednessFeature extends Feature {
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
-    if (_status == ConnectionStatus.NONE) {
+    if (status is ConnectionNone) {
       _libraryCrowdedness = null;
       _loadLibraryCrowdedness();
     }
@@ -71,25 +68,25 @@ class FudanLibraryCrowdednessFeature extends Feature {
 
   @override
   String get subTitle {
-    switch (_status) {
-      case ConnectionStatus.NONE:
-      case ConnectionStatus.CONNECTING:
+    switch (status) {
+      case ConnectionNone():
+      case ConnectionConnecting():
         return S.of(context!).loading;
-      case ConnectionStatus.DONE:
+      case ConnectionDone():
         if (_libraryCrowdedness!.isEmpty) {
           return S.of(context!).no_data;
         } else {
           return _resultText.join(" ");
         }
-      case ConnectionStatus.FAILED:
-      case ConnectionStatus.FATAL_ERROR:
+      case ConnectionFailed():
+      case ConnectionFatalError():
         return S.of(context!).failed;
     }
   }
 
   @override
   Widget? get trailing {
-    if (_status == ConnectionStatus.CONNECTING) {
+    if (status is ConnectionConnecting) {
       return const FeatureProgressIndicator();
     }
     return null;
@@ -101,7 +98,7 @@ class FudanLibraryCrowdednessFeature extends Feature {
       : const Icon(CupertinoIcons.book);
 
   void refreshData() {
-    _status = ConnectionStatus.NONE;
+    status = const ConnectionNone();
     notifyUpdate();
   }
 

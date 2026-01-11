@@ -20,6 +20,7 @@ import 'dart:math';
 
 import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/common/pubspec.yaml.g.dart';
+import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/dashboard_card.dart';
@@ -664,5 +665,36 @@ extension LanguageEx on Language? {
   }
 }
 
-/// Define a set of possible connection status.
-enum ConnectionStatus { NONE, CONNECTING, DONE, FAILED, FATAL_ERROR }
+/// Define a set of possible connection status in feature.
+///
+/// Only used by features right now.
+///
+/// See also:
+/// * [Feature]
+sealed class ConnectionStatus {
+  const ConnectionStatus();
+}
+
+class ConnectionNone extends ConnectionStatus {
+  const ConnectionNone();
+}
+
+class ConnectionConnecting extends ConnectionStatus {
+  const ConnectionConnecting();
+}
+
+class ConnectionDone extends ConnectionStatus {
+  const ConnectionDone();
+}
+
+class ConnectionFailed extends ConnectionStatus {
+  final dynamic error;
+  final StackTrace? stackTrace;
+  const ConnectionFailed(this.error, [this.stackTrace]);
+}
+
+class ConnectionFatalError extends ConnectionStatus {
+  final dynamic error;
+  final StackTrace? stackTrace;
+  const ConnectionFatalError(this.error, [this.stackTrace]);
+}

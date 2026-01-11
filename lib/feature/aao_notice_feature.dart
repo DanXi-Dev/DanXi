@@ -32,13 +32,10 @@ class FudanAAONoticesFeature extends Feature {
   /// So we can pass it to [AAONoticesList] page.
   List<Notice>? _initialData;
 
-  /// The status of the feature.
-  ConnectionStatus _status = ConnectionStatus.NONE;
-
   Future<void> _loadNotices() async {
-    _status = ConnectionStatus.CONNECTING;
+    status = const ConnectionConnecting();
     _initialData = await getNoticesForUserGroup(1);
-    _status = ConnectionStatus.DONE;
+    status = const ConnectionDone();
     notifyUpdate();
   }
 
@@ -47,9 +44,9 @@ class FudanAAONoticesFeature extends Feature {
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
-    if (_status == ConnectionStatus.NONE) {
-      _loadNotices().catchError((error) {
-        _status = ConnectionStatus.FAILED;
+    if (status is ConnectionNone) {
+      _loadNotices().catchError((error, stackTrace) {
+        status = ConnectionFailed(error, stackTrace);
         notifyUpdate();
       });
     }
@@ -60,18 +57,18 @@ class FudanAAONoticesFeature extends Feature {
 
   @override
   String? get subTitle {
-    switch (_status) {
-      case ConnectionStatus.NONE:
-      case ConnectionStatus.CONNECTING:
+    switch (status) {
+      case ConnectionNone():
+      case ConnectionConnecting():
         return S.of(context!).loading;
-      case ConnectionStatus.DONE:
+      case ConnectionDone():
         if (_initialData != null) {
           return _initialData!.isNotEmpty ? _initialData!.first.title : null;
         } else {
           return null;
         }
-      case ConnectionStatus.FAILED:
-      case ConnectionStatus.FATAL_ERROR:
+      case ConnectionFailed():
+      case ConnectionFatalError():
         return S.of(context!).failed;
     }
   }
@@ -80,7 +77,7 @@ class FudanAAONoticesFeature extends Feature {
   bool get loadOnTap => false;
 
   void refreshData() {
-    _status = ConnectionStatus.NONE;
+    status = const ConnectionNone();
     notifyUpdate();
   }
 
@@ -101,7 +98,7 @@ class FudanAAONoticesFeature extends Feature {
 
   @override
   Widget? get trailing {
-    if (_status == ConnectionStatus.CONNECTING) {
+    if (status is ConnectionConnecting) {
       return const FeatureProgressIndicator();
     }
     return null;
