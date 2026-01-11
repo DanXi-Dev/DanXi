@@ -86,10 +86,10 @@ unzip it.
 
 ```shell
 $ flutter --version
-Flutter 3.35.3 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision a402d9a437 (5 days ago) • 2025-09-03 14:54:31 -0700
-Engine • hash 672c59cfa87c8070c20ba2cd1a6c2a1baf5cf08b (revision ddf47dd3ff) (4 days ago) • 2025-09-03 20:02:13.000Z
-Tools • Dart 3.9.2 • DevTools 2.48.0
+Flutter 3.38.6 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 8b87286849 (3 days ago) • 2026-01-08 10:49:17 -0800
+Engine • hash 6f3039bf7c3cb5306513c75092822d4d94716003 (revision 78fc3012e4) (3 days ago) • 2026-01-07 18:42:12.000Z
+Tools • Dart 3.10.7 • DevTools 2.51.1
 ```
 
 ## Notes on compilation
