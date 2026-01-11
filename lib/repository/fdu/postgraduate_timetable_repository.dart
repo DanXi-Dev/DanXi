@@ -33,15 +33,15 @@ import 'package:dio/dio.dart';
 
 class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
   static const String TIME_TABLE_UG_URL =
-      'http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/xsxkCourse/loadKbxx.do?_=';
+      'http://yjsxk.fudan.sh.cn/yjsxkapp/sys/xsxkappfudan/xsxkCourse/loadKbxx.do?_=';
   static const String HOMEPAGE_URL =
-      "http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/*default/index.do";
+      "http://yjsxk.fudan.sh.cn/yjsxkapp/sys/xsxkappfudan/*default/index.do";
   static const String GET_TOKEN_URL =
-      "http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/login/4/vcode.do?";
+      "http://yjsxk.fudan.sh.cn/yjsxkapp/sys/xsxkappfudan/login/4/vcode.do?";
   static const String GET_CAPTCHA_URL =
-      "http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/login/vcode/image.do?vtoken=";
+      "http://yjsxk.fudan.sh.cn/yjsxkapp/sys/xsxkappfudan/login/vcode/image.do?vtoken=";
   static const String LOGIN_URL =
-      "http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/login/check/login.do?";
+      "http://yjsxk.fudan.sh.cn/yjsxkapp/sys/xsxkappfudan/login/check/login.do?";
 
   PostgraduateTimetableRepository._();
 
