@@ -120,6 +120,7 @@ class GpaTablePageState extends State<GpaTablePage> {
         element.gpa,
         element.credits,
         element.rank,
+        // The fetched GPA lists are usually sorted.
         "${(100 * index / chosenGpaList.length).toStringAsFixed(2)}%",
       ]
               .map((itemText) => Text(itemText,

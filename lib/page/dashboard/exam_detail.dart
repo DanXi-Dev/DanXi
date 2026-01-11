@@ -67,9 +67,14 @@ class GpaNotifier extends _$GpaNotifier {
     // `Riverpod(keepAlive: true)` doesn't set the state to loading by default,
     // so we are setting it manually.
     state = AsyncValue.loading();
-    final data = await _load();
-    state = AsyncValue.data(data);
-    return true;
+    try {
+      final data = await _load();
+      state = AsyncValue.data(data);
+      return true;
+    } catch (error, stacktrace) {
+      state = AsyncValue.error(error, stacktrace);
+      return false;
+    }
   }
 }
 
