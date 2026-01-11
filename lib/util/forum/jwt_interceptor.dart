@@ -24,6 +24,7 @@ import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dio/dio.dart';
+import 'package:dio5_log/dio_log.dart';
 import 'package:flutter/cupertino.dart';
 
 /// An interceptor that refresh the jwt token automatically.
@@ -39,6 +40,7 @@ class JWTInterceptor extends QueuedInterceptor {
 
   JWTInterceptor(this.refreshUrl, this.tokenGetter, [this.tokenSetter]) {
     _dio.interceptors.add(UserAgentInterceptor(userAgent: Uri.encodeComponent(Constant.version)));
+    _dio.interceptors.add(DioLogInterceptor());
     _dio.interceptors.add(WebVPNInterceptor());
   }
 
