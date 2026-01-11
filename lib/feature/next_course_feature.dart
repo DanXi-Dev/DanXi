@@ -29,23 +29,28 @@ import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+/// Exception thrown when timetable setup is required before loading course data.
+class TimeTableSetupRequiredException implements Exception {
+  const TimeTableSetupRequiredException();
+
+  @override
+  String toString() => 'TimeTable setup is required';
+}
+
 class NextCourseFeature extends Feature {
   @override
   bool get loadOnTap => false;
 
   LiveCourseModel? _data;
-  CourseFeatureStatus _courseStatus = const CourseStatusNone();
 
   Future<void> _loadCourse() async {
-    _courseStatus = const CourseStatusConnecting();
+    status = const ConnectionConnecting();
     if (!TimeTableRepository.getInstance().hasCache()) {
       // No cache indicates the user has never accessed timetable page.
       // In this scenario, because the semester start date requires manual configuration,
       // the course schedule should NOT be automatically fetched (the default start date is often incorrect!).
       // Instead, the user should be prompted to visit timetable page.
-      _courseStatus = const CourseStatusSetupRequired();
-      notifyUpdate();
-      return;
+      throw const TimeTableSetupRequiredException();
     }
     TimeTable? timetable = await Retrier.runAsyncWithRetry(() async {
       await Future.delayed(const Duration(milliseconds: 500));
@@ -55,7 +60,7 @@ class NextCourseFeature extends Feature {
       );
     });
     _data = getNextCourse(timetable!);
-    _courseStatus = const CourseStatusDone();
+    status = const ConnectionDone();
     notifyUpdate();
   }
 
@@ -90,9 +95,8 @@ class NextCourseFeature extends Feature {
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
-    if (_courseStatus is CourseStatusNone) {
+    if (status is ConnectionNone) {
       _loadCourse().catchError((error, stackTrace) {
-        _courseStatus = CourseStatusFailed(error, stackTrace);
         status = ConnectionFailed(error, stackTrace);
         notifyUpdate();
       });
@@ -104,11 +108,11 @@ class NextCourseFeature extends Feature {
 
   @override
   Widget? get customSubtitle {
-    switch (_courseStatus) {
-      case CourseStatusNone():
-      case CourseStatusConnecting():
+    switch (status) {
+      case ConnectionNone():
+      case ConnectionConnecting():
         return Text(S.of(context!).loading);
-      case CourseStatusDone():
+      case ConnectionDone():
         if (_data != null) {
           if (_data!.nextCourse?.course.courseName != null) {
             return Text(S.of(context!).next_course_is(
@@ -119,15 +123,15 @@ class NextCourseFeature extends Feature {
         } else {
           return null;
         }
-      case CourseStatusFailed():
-        return Text(S.of(context!).failed);
-      case CourseStatusSetupRequired():
+      case ConnectionFailed(:final error) when error is TimeTableSetupRequiredException:
         return Text(S.of(context!).next_course_setup);
+      case ConnectionFailed():
+      case ConnectionFatalError():
+        return Text(S.of(context!).failed);
     }
   }
 
   void refreshData() {
-    _courseStatus = const CourseStatusNone();
     status = const ConnectionNone();
     notifyUpdate();
   }
@@ -173,28 +177,3 @@ class LiveCourseModel {
   LiveCourseModel(this.nowCourse, this.nextCourse, this.courseLeft);
 }
 
-sealed class CourseFeatureStatus {
-  const CourseFeatureStatus();
-}
-
-class CourseStatusNone extends CourseFeatureStatus {
-  const CourseStatusNone();
-}
-
-class CourseStatusConnecting extends CourseFeatureStatus {
-  const CourseStatusConnecting();
-}
-
-class CourseStatusDone extends CourseFeatureStatus {
-  const CourseStatusDone();
-}
-
-class CourseStatusFailed extends CourseFeatureStatus {
-  final dynamic error;
-  final StackTrace? stackTrace;
-  const CourseStatusFailed(this.error, [this.stackTrace]);
-}
-
-class CourseStatusSetupRequired extends CourseFeatureStatus {
-  const CourseStatusSetupRequired();
-}
