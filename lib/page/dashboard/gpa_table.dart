@@ -100,7 +100,8 @@ class GpaTablePageState extends State<GpaTablePage> {
         S.of(context).major,
         S.of(context).gpa,
         S.of(context).credits,
-        S.of(context).rank
+        S.of(context).rank,
+        S.of(context).percentile,
       ]
               .map((headText) => Text(headText,
                   textAlign: TextAlign.center,
@@ -108,12 +109,19 @@ class GpaTablePageState extends State<GpaTablePage> {
               .toList())
     ];
 
-    for (var element in gpaList!) {
+    final chosenGpaList = gpaList!;
+    for (var (index, element) in chosenGpaList.indexed) {
       TextStyle? textColorStyle = identical(element, _myGpa)
           ? null
           : TextStyle(color: Theme.of(context).colorScheme.secondary);
       widgets.add(TableRow(
-          children: [element.major, element.gpa, element.credits, element.rank]
+          children: [
+        element.major,
+        element.gpa,
+        element.credits,
+        element.rank,
+        "${(100 * index / chosenGpaList.length).toStringAsFixed(2)}%",
+      ]
               .map((itemText) => Text(itemText,
                   textAlign: TextAlign.center, style: textColorStyle))
               .toList()));
