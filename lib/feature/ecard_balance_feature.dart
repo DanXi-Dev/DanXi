@@ -41,11 +41,8 @@ class EcardBalanceFeature extends Feature {
   /// The last transaction information to show in the [subTitle].
   CardRecord? _lastTransaction;
 
-  /// Status of the request.
-  ConnectionStatus _status = ConnectionStatus.NONE;
-
   Future<void> _loadCard(PersonInfo? info) async {
-    _status = ConnectionStatus.CONNECTING;
+    status = const ConnectionConnecting();
     _cardInfo = await CardRepository.getInstance().loadCardInfo(info, 0);
     _balance = _cardInfo!.cash;
 
@@ -54,9 +51,9 @@ class EcardBalanceFeature extends Feature {
       _lastTransaction = _cardInfo!.records!.first;
     }
     if (_balance == null) {
-      _status = ConnectionStatus.FAILED;
+      status = ConnectionFailed(Exception('Balance is null'));
     } else {
-      _status = ConnectionStatus.DONE;
+      status = const ConnectionDone();
     }
     notifyUpdate();
   }
@@ -66,10 +63,10 @@ class EcardBalanceFeature extends Feature {
     // Only load card data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
-    if (_status == ConnectionStatus.NONE) {
+    if (status is ConnectionNone) {
       _balance = "";
-      _loadCard(StateProvider.personInfo.value).catchError((error) {
-        _status = ConnectionStatus.FAILED;
+      _loadCard(StateProvider.personInfo.value).catchError((error, stackTrace) {
+        status = ConnectionFailed(error, stackTrace);
         notifyUpdate();
       });
     }
@@ -80,14 +77,14 @@ class EcardBalanceFeature extends Feature {
 
   @override
   String get subTitle {
-    switch (_status) {
-      case ConnectionStatus.NONE:
-      case ConnectionStatus.CONNECTING:
+    switch (status) {
+      case ConnectionNone():
+      case ConnectionConnecting():
         return S.of(context!).loading;
-      case ConnectionStatus.DONE:
+      case ConnectionDone():
         return "${Constant.yuanSymbol(_lastTransaction?.payment)} ${_lastTransaction?.location ?? ""}";
-      case ConnectionStatus.FAILED:
-      case ConnectionStatus.FATAL_ERROR:
+      case ConnectionFailed():
+      case ConnectionFatalError():
         return S.of(context!).failed;
     }
   }
@@ -97,9 +94,9 @@ class EcardBalanceFeature extends Feature {
 
   @override
   Widget? get trailing {
-    if (_status == ConnectionStatus.CONNECTING) {
+    if (status is ConnectionConnecting) {
       return const FeatureProgressIndicator();
-    } else if (_status == ConnectionStatus.DONE) {
+    } else if (status is ConnectionDone) {
       return Text(
         Constant.yuanSymbol(_balance),
         textScaler: TextScaler.linear(1.2),
@@ -120,7 +117,7 @@ class EcardBalanceFeature extends Feature {
       : const Icon(CupertinoIcons.creditcard);
 
   void refreshData() {
-    _status = ConnectionStatus.NONE;
+    status = const ConnectionNone();
     notifyUpdate();
   }
 

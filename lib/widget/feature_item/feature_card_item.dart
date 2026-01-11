@@ -15,7 +15,10 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -29,8 +32,12 @@ class FeatureCardItem extends StatefulWidget implements FeatureContainer {
   @override
   FeatureCardItemState createState() => FeatureCardItemState();
 
-  const FeatureCardItem(
-      {required this.feature, this.arguments, this.onDismissed, super.key});
+  const FeatureCardItem({
+    required this.feature,
+    this.arguments,
+    this.onDismissed,
+    super.key,
+  });
 
   @override
   Feature get childFeature => feature;
@@ -67,49 +74,73 @@ class FeatureCardItemState extends State<FeatureCardItem>
             widget.feature.padding ?? const EdgeInsets.fromLTRB(16, 16, 16, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Wrap(children: [
-              if (widget.feature.icon != null) ...[
-                PlatformWidget(
-                  cupertino: (_, __) => widget.feature.icon,
-                  material: (context, __) => IconTheme(
-                      data: IconThemeData(color: Theme.of(context).hintColor),
-                      child: widget.feature.icon!),
-                ),
-                const SizedBox(width: 12),
-              ],
-              Text(
-                widget.feature.mainTitle!,
-                style: const TextStyle(fontSize: 16),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              )
-            ]),
-            if (widget.feature.customSubtitle != null ||
-                summary.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              widget.feature.customSubtitle ??
-                  Text(
-                    summary.join("\n"),
-                    style: Theme.of(context)
-                        .textTheme
-                        .displayLarge!
-                        .copyWith(fontSize: 12),
-                  )
-            ],
-            widget.feature.trailing
-          ]
-              .takeWhile((value) => value != null)
-              .map((e) => e!)
-              .toList(growable: false),
+          children:
+              [
+                    Wrap(
+                      children: [
+                        if (widget.feature.icon != null) ...[
+                          PlatformWidget(
+                            cupertino: (_, _) => widget.feature.icon,
+                            material: (context, _) => IconTheme(
+                              data: IconThemeData(
+                                color: Theme.of(context).hintColor,
+                              ),
+                              child: widget.feature.icon!,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                        ],
+                        Text(
+                          widget.feature.mainTitle!,
+                          style: const TextStyle(fontSize: 16),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                    if (widget.feature.customSubtitle != null ||
+                        summary.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      widget.feature.customSubtitle ??
+                          Text(
+                            summary.join("\n"),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.displayLarge!.copyWith(fontSize: 12),
+                          ),
+                    ],
+                    widget.feature.trailing,
+                  ]
+                  .takeWhile((value) => value != null)
+                  .map((e) => e!)
+                  .toList(growable: false),
         ),
       ),
+    );
+    Widget body = GestureDetector(
+      onTap: widget.feature.clickable
+          ? () {
+              HapticFeedbackUtil.light();
+              widget.feature.onTap.call();
+            }
+          : null,
+      onLongPress: () {
+        switch (widget.feature.status) {
+          case ConnectionFailed(:final error, :final stackTrace):
+          case ConnectionFatalError(:final error, :final stackTrace):
+            HapticFeedbackUtil.medium();
+            Noticing.showErrorDialog(context, error, trace: stackTrace);
+          default:
+            break;
+        }
+      },
+      child: card,
     );
     widget.feature.onEvent(FeatureEvent.CREATE);
     if (widget.feature.removable) {
       return Dismissible(
         key: _key,
-        child: card,
+        child: body,
         onDismissed: (_) {
           widget.onDismissed?.call();
           widget.feature.onEvent(FeatureEvent.REMOVE);

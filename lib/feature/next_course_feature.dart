@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/time_table.dart';
@@ -33,16 +34,16 @@ class NextCourseFeature extends Feature {
   bool get loadOnTap => false;
 
   LiveCourseModel? _data;
-  CourseFeatureStatus _status = CourseFeatureStatus.NONE;
+  CourseFeatureStatus _courseStatus = const CourseStatusNone();
 
   Future<void> _loadCourse() async {
-    _status = CourseFeatureStatus.CONNECTING;
+    _courseStatus = const CourseStatusConnecting();
     if (!TimeTableRepository.getInstance().hasCache()) {
       // No cache indicates the user has never accessed timetable page.
       // In this scenario, because the semester start date requires manual configuration,
       // the course schedule should NOT be automatically fetched (the default start date is often incorrect!).
       // Instead, the user should be prompted to visit timetable page.
-      _status = CourseFeatureStatus.SETUP_REQUIRED;
+      _courseStatus = const CourseStatusSetupRequired();
       notifyUpdate();
       return;
     }
@@ -54,7 +55,7 @@ class NextCourseFeature extends Feature {
       );
     });
     _data = getNextCourse(timetable!);
-    _status = CourseFeatureStatus.DONE;
+    _courseStatus = const CourseStatusDone();
     notifyUpdate();
   }
 
@@ -89,9 +90,10 @@ class NextCourseFeature extends Feature {
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
-    if (_status == CourseFeatureStatus.NONE) {
-      _loadCourse().catchError((error) {
-        _status = CourseFeatureStatus.FAILED;
+    if (_courseStatus is CourseStatusNone) {
+      _loadCourse().catchError((error, stackTrace) {
+        _courseStatus = CourseStatusFailed(error, stackTrace);
+        status = ConnectionFailed(error, stackTrace);
         notifyUpdate();
       });
     }
@@ -102,11 +104,11 @@ class NextCourseFeature extends Feature {
 
   @override
   Widget? get customSubtitle {
-    switch (_status) {
-      case CourseFeatureStatus.NONE:
-      case CourseFeatureStatus.CONNECTING:
+    switch (_courseStatus) {
+      case CourseStatusNone():
+      case CourseStatusConnecting():
         return Text(S.of(context!).loading);
-      case CourseFeatureStatus.DONE:
+      case CourseStatusDone():
         if (_data != null) {
           if (_data!.nextCourse?.course.courseName != null) {
             return Text(S.of(context!).next_course_is(
@@ -117,15 +119,16 @@ class NextCourseFeature extends Feature {
         } else {
           return null;
         }
-      case CourseFeatureStatus.FAILED:
+      case CourseStatusFailed():
         return Text(S.of(context!).failed);
-      case CourseFeatureStatus.SETUP_REQUIRED:
+      case CourseStatusSetupRequired():
         return Text(S.of(context!).next_course_setup);
     }
   }
 
   void refreshData() {
-    _status = CourseFeatureStatus.NONE;
+    _courseStatus = const CourseStatusNone();
+    status = const ConnectionNone();
     notifyUpdate();
   }
 
@@ -170,4 +173,28 @@ class LiveCourseModel {
   LiveCourseModel(this.nowCourse, this.nextCourse, this.courseLeft);
 }
 
-enum CourseFeatureStatus { NONE, CONNECTING, DONE, FAILED, SETUP_REQUIRED }
+sealed class CourseFeatureStatus {
+  const CourseFeatureStatus();
+}
+
+class CourseStatusNone extends CourseFeatureStatus {
+  const CourseStatusNone();
+}
+
+class CourseStatusConnecting extends CourseFeatureStatus {
+  const CourseStatusConnecting();
+}
+
+class CourseStatusDone extends CourseFeatureStatus {
+  const CourseStatusDone();
+}
+
+class CourseStatusFailed extends CourseFeatureStatus {
+  final dynamic error;
+  final StackTrace? stackTrace;
+  const CourseStatusFailed(this.error, [this.stackTrace]);
+}
+
+class CourseStatusSetupRequired extends CourseFeatureStatus {
+  const CourseStatusSetupRequired();
+}
