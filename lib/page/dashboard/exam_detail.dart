@@ -44,28 +44,22 @@ part 'exam_detail.g.dart';
 
 @riverpod
 Future<List<GPAListItem>> gpa(Ref ref) async {
-  return await EduServiceRepository.getInstance()
-      .loadGPARemotely(sp.StateProvider.personInfo.value);
+  return await EduServiceRepository.getInstance().loadGPA();
 }
 
 @riverpod
 Future<List<SemesterInfo>> semester(Ref ref) async {
-  return await EduServiceRepository.getInstance()
-      .loadSemesters(sp.StateProvider.personInfo.value);
+  return (await EduServiceRepository.getInstance().loadSemesters()).semesters;
 }
 
 @riverpod
 Future<List<Exam>> exam(Ref ref, String semesterId) async {
-  return await EduServiceRepository.getInstance().loadExamListRemotely(
-      sp.StateProvider.personInfo.value,
-      semesterId: semesterId);
+  return await EduServiceRepository.getInstance().loadExamList(semesterId);
 }
 
 @riverpod
 Future<List<ExamScore>> examScore(Ref ref, String semesterId) async {
-  return await EduServiceRepository.getInstance().loadExamScoreRemotely(
-      sp.StateProvider.personInfo.value,
-      semesterId: semesterId);
+  return await EduServiceRepository.getInstance().loadExamScore(semesterId);
 }
 
 @riverpod
@@ -168,9 +162,10 @@ class ExamList extends HookConsumerWidget {
     final currentSemesterIndexValue =
         currentSemesterIndex.value ?? semesters.length - 3;
     final currentSemester = semesters[currentSemesterIndexValue];
+    final semesterId = currentSemester.semesterId!;
 
-    final currentExamProvider = examProvider(currentSemester.semesterId!);
-    final currentScoreProvider = examScoreProvider(currentSemester.semesterId!);
+    final currentExamProvider = examProvider(semesterId);
+    final currentScoreProvider = examScoreProvider(semesterId);
     final exams = ref.watch(currentExamProvider);
     final scores = ref.watch(currentScoreProvider);
 
@@ -180,11 +175,11 @@ class ExamList extends HookConsumerWidget {
     }
 
     Widget body;
-    List<Exam>? examList;
+    List<Exam>? providedExams;
     switch ((exams, scores)) {
       // Both exams and scores are available
       case (AsyncData(value: final exams), AsyncData(value: final scores)):
-        examList = exams;
+        providedExams = exams;
         body = exams.isEmpty
             ? _buildGradeLayout(context, ref, scores)
             : ListView(
@@ -193,7 +188,7 @@ class ExamList extends HookConsumerWidget {
       case (AsyncData(value: final exams), AsyncError(error: final scoreError))
           when scoreError is RangeError:
         body = ListView(
-            children: _getListWidgetsHybrid(context, ref, exams, []));
+            children: _getListWidgetsHybrid(context, ref, exams, const []));
       // There is no exam in this semester, but never mind, we are still loading scores
       case (AsyncError(:final error), AsyncLoading())
           when error is SemesterNoExamException:
@@ -235,7 +230,7 @@ class ExamList extends HookConsumerWidget {
       default:
         body = Center(child: PlatformCircularProgressIndicator());
     }
-    currentExamRef?.value = examList;
+    currentExamRef?.value = providedExams;
 
     final List<Widget> mainWidgets = [
       Row(
@@ -372,8 +367,7 @@ class ExamList extends HookConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SizedBox(
-                  width: ViewportUtils.getMainNavigatorWidth(context) - 80,
+                Expanded(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,

@@ -16,13 +16,14 @@
  */
 
 import 'dart:convert';
+
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/extra.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/util/io/cache.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dio/dio.dart';
@@ -122,10 +123,10 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     }
     final String semestersJsonText =
         semestersMatch.group(1)!.replaceAll('\'', '').replaceAll(r'\"', '"');
-    final semestersJson = jsonDecode(semestersJsonText);
+    final List<dynamic> semestersJson = jsonDecode(semestersJsonText);
     List<SemesterInfo> sems = [];
     List<TimeTableStartDateItem> startDates = [];
-    for (var element in semestersJson) {
+    for (var element in semestersJson.reversed) {
       if (element is Map<String, dynamic> && element.isNotEmpty) {
         var annualSemesters = SemesterInfo.fromCourseTableJson(element);
         sems.add(annualSemesters);

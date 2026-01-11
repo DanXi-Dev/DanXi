@@ -60,6 +60,9 @@ extension StringEx on String {
         .map((e) => String.fromCharCode(e))
         .every((element) => regex.hasMatch(element));
   }
+
+  String trimAndNormalizeWhitespace() =>
+      trim().replaceAll(RegExp("\\s+"), " ");
 }
 
 extension ObjectEx on dynamic {

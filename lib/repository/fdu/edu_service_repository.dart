@@ -15,49 +15,37 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'neo_login_tool.dart';
+
 class EduServiceRepository extends BaseRepositoryWithDio {
-  static const String EXAM_TABLE_LOGIN_URL =
-      'https://uis.fudan.edu.cn/authserver/login?service=http%3A%2F%2Fjwfw.fudan.edu.cn%2Feams%2FstdExamTable%21examTable.action';
-  static const String EXAM_TABLE_URL =
-      'https://jwfw.fudan.edu.cn/eams/stdExamTable!examTable.action';
+  static const String COURSE_TABLE_URL =
+      'https://fdjwgl.fudan.edu.cn/student/for-std/course-table';
 
-  static String kExamScoreUrl(String? semesterId) =>
-      'https://jwfw.fudan.edu.cn/eams/teach/grade/course/person!search.action?semesterId=$semesterId';
+  static String getSemesterCourseTableUrl(String semesterId) =>
+      'https://fdjwgl.fudan.edu.cn/student/for-std/course-table/semester/$semesterId/print-data';
 
-  static const String GPA_URL =
-      "https://jwfw.fudan.edu.cn/eams/myActualGpa!search.action";
+  static String getExamArrangeUrl(String studentId) =>
+      'https://fdjwgl.fudan.edu.cn/student/for-std/exam-arrange/info/$studentId';
 
-  static const String SEMESTER_DATA_URL =
-      "https://jwfw.fudan.edu.cn/eams/dataQuery.action";
+  static String getGradeSheetUrl(String studentId, String semester) =>
+      'https://fdjwgl.fudan.edu.cn/student/for-std/grade/sheet/info/$studentId?semester=$semester';
 
-  static const String HOST = "https://jwfw.fudan.edu.cn/eams/";
-  static const String KEY_TIMETABLE_CACHE = "timetable";
-  static const String ID_URL =
-      'https://jwfw.fudan.edu.cn/eams/courseTableForStd.action';
-  static const Map<String, String> _JWFW_HEADER = {
-    "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0",
-    "Accept": "text/xml",
-    "Accept-Language": "zh-CN,en-US;q=0.7,en;q=0.3",
-    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-    "Origin": "https://jwfw.fudan.edu.cn",
-    "Connection": "keep-alive",
-  };
+  static String getMyGpaSearchIndexUrl(String studentId) =>
+      'https://fdjwgl.fudan.edu.cn/student/for-std/grade/my-gpa/search-index/$studentId';
 
-  /// Error patterns from EduService.
-  static const String SEMESTER_NO_EXAM = "当前学期未设置排考批次";
-  static const String TOO_FAST = "请不要过快点击";
+  static String getMyGpaSearchUrl(
+    String studentId,
+    String grade,
+    String dept,
+  ) =>
+      'https://fdjwgl.fudan.edu.cn/student/for-std/grade/my-gpa/search?studentAssoc=$studentId&grade=$grade&departmentAssoc=$dept&majorAssoc=';
 
   @override
   String get linkHost => "fudan.edu.cn";
@@ -68,120 +56,312 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
   factory EduServiceRepository.getInstance() => _instance;
 
-  Future<List<Exam>> loadExamListRemotely(PersonInfo? info,
-          {String? semesterId}) =>
-      UISLoginTool.tryAsyncWithAuth(dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info,
-          () => _loadExamList(semesterId: semesterId),
-          isFatalError: (e) =>
-              e is SemesterNoExamException || e is ClickTooFastException);
-
-  Future<String?> get semesterIdFromCookie async =>
-      (await cookieJar!.loadForRequest(Uri.parse(HOST)))
-          .firstWhere((element) => element.name == "semester.id",
-              orElse: () => Cookie("semester.id", ""))
-          .value;
-
-  Future<List<Exam>> _loadExamList({String? semesterId}) async {
-    String? oldSemesterId = await semesterIdFromCookie;
-    // Set the semester id
-    if (semesterId != null) {
-      cookieJar?.saveFromResponse(
-          Uri.parse(HOST), [Cookie("semester.id", semesterId)]);
-    }
-    final Response<String> r = await dio.get(EXAM_TABLE_URL,
-        options: Options(headers: Map.of(_JWFW_HEADER)));
-
-    // Restore old semester id
-    if (oldSemesterId != null) {
-      cookieJar?.saveFromResponse(
-          Uri.parse(HOST), [Cookie("semester.id", oldSemesterId)]);
-    }
-    if (r.data!.contains(SEMESTER_NO_EXAM)) {
-      throw SemesterNoExamException();
-    } else if (r.data!.contains(TOO_FAST)) {
-      throw ClickTooFastException();
-    }
-    final BeautifulSoup soup = BeautifulSoup(r.data!);
-    final tableExists = soup.find("thead", class_: "gridhead") != null;
-    final tableBodyElement = soup.find("tbody");
-    if (tableExists && tableBodyElement == null) return [];
-    final dom.Element tableBody = tableBodyElement!.element!;
-    return tableBody
-        .getElementsByTagName("tr")
-        .map((e) => Exam.fromHtml(e))
-        .toList();
-  }
-
-  Future<List<ExamScore>> loadExamScoreRemotely(PersonInfo? info,
-          {String? semesterId}) =>
-      UISLoginTool.tryAsyncWithAuth(dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info,
-          () => _loadExamScore(semesterId),
-          isFatalError: (e) =>
-              e is SemesterNoExamException || e is ClickTooFastException);
-
-  Future<List<ExamScore>> _loadExamScore([String? semesterId]) async {
-    final Response<String> r = await dio.get(
-        kExamScoreUrl(semesterId ?? await semesterIdFromCookie),
-        options: Options(headers: Map.of(_JWFW_HEADER)));
-    if (r.data!.contains(SEMESTER_NO_EXAM)) {
-      throw SemesterNoExamException();
-    } else if (r.data!.contains(TOO_FAST)) {
-      throw ClickTooFastException();
-    }
-    final BeautifulSoup soup = BeautifulSoup(r.data!);
-    final tableExists = soup.find("thead", class_: "gridhead") != null;
-    final tableBodyElement = soup.find("tbody");
-    if (tableExists && tableBodyElement == null) return [];
-    final dom.Element tableBody = tableBodyElement!.element!;
-    return tableBody
-        .getElementsByTagName("tr")
-        .map((e) => ExamScore.fromEduServiceHtml(e))
-        .toList();
-  }
-
-  Future<List<GPAListItem>> loadGPARemotely(PersonInfo? info) =>
-      UISLoginTool.tryAsyncWithAuth(
-          dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info, () => _loadGPA());
-
-  Future<List<GPAListItem>> _loadGPA() async {
-    final Response<String> r =
-        await dio.get(GPA_URL, options: Options(headers: Map.of(_JWFW_HEADER)));
-    final BeautifulSoup soup = BeautifulSoup(r.data!);
-    final dom.Element tableBody = soup.find("tbody")!.element!;
-    return tableBody
-        .getElementsByTagName("tr")
-        .map((e) => GPAListItem.fromHtml(e))
-        .toList();
-  }
-
-  /// Load the semesters id & name, etc.
+  /// Load all semesters and their start dates, etc.
   ///
-  /// Returns an unpacked list of [SemesterInfo].
-  Future<List<SemesterInfo>> loadSemesters(PersonInfo? info) =>
-      UISLoginTool.tryAsyncWithAuth(
-          dio, EXAM_TABLE_LOGIN_URL, cookieJar!, info, () => _loadSemesters(),
-          retryTimes: 2);
+  /// Returns a [SemesterBundle].
+  Future<SemesterBundle> loadSemesters() =>
+      TimeTableRepository.getInstance().loadSemestersForTimeTable();
 
-  Future<List<SemesterInfo>> _loadSemesters() async {
-    await dio.get(EXAM_TABLE_URL,
-        options: Options(headers: Map.of(_JWFW_HEADER)));
-    final Response<String> semesterResponse = await dio.post(SEMESTER_DATA_URL,
-        data: "dataType=semesterCalendar&empty=false",
-        options: Options(contentType: 'application/x-www-form-urlencoded'));
-    final BeautifulSoup soup = BeautifulSoup(semesterResponse.data!);
+  String? _cachedStudentId;
+  Future<String>? _loadingStudentIdFuture;
 
-    final jsonText = _normalizeJson(soup.getText().trim());
-    final json = jsonDecode(jsonText);
-    final Map<String, dynamic> semesters = json['semesters'];
-    List<SemesterInfo> sems = [];
-    for (var element in semesters.values) {
-      if (element is List && element.isNotEmpty) {
-        var annualSemesters = element.map((e) => SemesterInfo.fromJson(e));
-        sems.addAll(annualSemesters);
-      }
+  /// Memorizes the in-flight request to avoid duplicate concurrent network
+  /// calls.
+  Future<String> loadStudentIdCached() {
+    final cachedStudentId = _cachedStudentId;
+    if (cachedStudentId != null) {
+      return Future.value(cachedStudentId);
     }
-    if (sems.isEmpty) throw "Retrieval failed";
-    return sems;
+    final loadingFuture = _loadingStudentIdFuture;
+    if (loadingFuture != null) {
+      return loadingFuture;
+    }
+    final newLoadingFuture = loadStudentId();
+    _loadingStudentIdFuture = newLoadingFuture;
+    return newLoadingFuture.then((studentId) {
+      _cachedStudentId = studentId;
+      return studentId;
+    }).whenComplete(() {
+      _loadingStudentIdFuture = null;
+    });
+  }
+
+  /// Get student ID from course table API
+  Future<String> loadStudentId() async {
+    final semesterBundle = await loadSemesters();
+    final options = RequestOptions(
+      method: "GET",
+      path: getSemesterCourseTableUrl(semesterBundle.defaultSemesterId),
+    );
+    return FudanSession.request(options, (res) {
+      final Map<String, dynamic> data = res.data!;
+      final List<dynamic> vms = data["studentTableVms"];
+      final Map<String, dynamic> vm = vms[0];
+      // Intentionally typed as int to fail fast if backend changes the schema.
+      // If it was `final int = vm["id"].toString;`, it would be hard to catch
+      // the bug.
+      final int idInt = vm["id"];
+      final id = idInt.toString();
+      return id;
+    });
+  }
+
+  /// Get user's exam list
+  ///
+  /// ## API Detail
+  ///
+  /// This API uses the neo authentication to fetch exam information from the new endpoint.
+  /// The new endpoint returns HTML with an exam table.
+  ///
+  /// - Returns: A list of ``Exam``, including both finished and upcoming exams
+  ///
+  /// Exam status:
+  /// - Exams with class "finished hide" are completed exams
+  /// - Exams with class "unfinished" are upcoming/pending exams
+  ///
+  /// ## Example HTML Response:
+  /// ```html
+  /// <tr data-finished="false" class="unfinished">
+  ///     <td>
+  ///         <div class="time">2026-01-04 08:30~10:30</div>
+  ///         <div>
+  ///             <span>邯郸校区</span>
+  ///             <span>H邯郸校区第六教学楼</span>
+  ///             <span>H6506</span>
+  ///         </div>
+  ///     </td>
+  ///     <td>
+  ///         <div>
+  ///             <span>数字集成电路设计原理(H) </span>
+  ///             <span>ICSE30021h.01 </span>
+  ///             <span>（闭卷） </span>
+  ///         </div>
+  ///         <div>
+  ///             <span class="tag-span type2">期末</span>
+  ///         </div>
+  ///     </td>
+  ///     <td>请携带学生证或一卡通，待考试时核查。</td>
+  ///     <td>未结束</td>
+  /// </tr>
+  /// <tr data-finished="true" class="finished hide">
+  ///     <td>
+  ///         <div class="time ">2025-11-11 13:00~15:00</div>
+  ///         <div>
+  ///             <span>邯郸校区</span>
+  ///             <span>H邯郸校区第二教学楼</span>
+  ///             <span>H2115</span>
+  ///         </div>
+  ///     </td>
+  ///     <td>
+  ///         <div>
+  ///             <span>半导体器件原理(H) </span>
+  ///             <span>ICSE30020h.01 </span>
+  ///             <span>（半开卷） </span>
+  ///         </div>
+  ///         <div>
+  ///             <span class="tag-span type1">期中</span>
+  ///         </div>
+  ///     </td>
+  ///     <td>请携带学生证或一卡通，待考试时核查。</td>
+  ///     <td>已结束</td>
+  /// </tr>
+  /// ```
+  Future<List<Exam>> loadExamList(String semesterId) async {
+    final studentId = await loadStudentIdCached();
+    final semesterBundle = await loadSemesters();
+    if (semesterBundle.defaultSemesterId != semesterId) {
+      throw SemesterNoExamException();
+    }
+    final options = RequestOptions(
+      method: "GET",
+      path: getExamArrangeUrl(studentId),
+    );
+    return FudanSession.request(options, (res) {
+      final soup = BeautifulSoup(res.data!);
+      // Use this selector to filter out finished exams.
+      final elements = soup.findAll(
+        "table.exam-table tbody tr:not(.tr-empty):not([data-finished=\"true\"])",
+      );
+
+      final exams = <Exam>[];
+      for (final element in elements) {
+        final cells = element.findAll("td");
+        if (cells.length < 4) {
+          continue;
+        }
+
+        var courseId = "";
+        var courseName = "";
+        var type = "";
+        var category = "";
+        var date = "";
+        var time = "";
+        var location = "";
+        var note = "";
+
+        final firstCell = cells[0];
+        final timeDiv = firstCell.find("div.time");
+        final timeText = timeDiv?.text.trimAndNormalizeWhitespace();
+        if (timeText != null) {
+          final timeComponents = timeText.split(" ");
+          if (timeComponents.length >= 2) {
+            date = timeComponents[0];
+            time = timeComponents[1];
+          }
+
+          final spans = firstCell.findAll("span");
+          if (spans.length > 2) {
+            location = spans[2].text.trimAndNormalizeWhitespace();
+          }
+        }
+
+        // Course information
+        final secondCell = cells[1];
+        final firstDiv = secondCell.find("div");
+        final spans = firstDiv?.findAll("span");
+        if (spans != null && spans.length >= 3) {
+          courseName = spans[0].text.trimAndNormalizeWhitespace();
+          courseId = spans[1].text.trimAndNormalizeWhitespace();
+
+          final categoryText = spans[2].text.trimAndNormalizeWhitespace();
+          if (categoryText.startsWith("（") && categoryText.endsWith("）")) {
+            category =
+                categoryText.substring(1, categoryText.length - 1).trim();
+          }
+        }
+
+        // Exam type
+        final divs = secondCell.findAll("div");
+        if (divs.length >= 2) {
+          final typeSpan = divs[1].find("span");
+          final typeText = typeSpan?.text.trimAndNormalizeWhitespace();
+          if (typeText != null) {
+            type = typeText.trim();
+          }
+        }
+
+        note = cells[2].text.trimAndNormalizeWhitespace();
+
+        final exam = Exam(
+          courseId,
+          courseName,
+          type,
+          date,
+          time,
+          location,
+          category,
+          note,
+        );
+        exams.add(exam);
+      }
+
+      return exams;
+    });
+  }
+
+  Future<List<ExamScore>> loadExamScore(String semesterId) async {
+    final studentId = await loadStudentIdCached();
+    final options = RequestOptions(
+      method: "GET",
+      path: getGradeSheetUrl(studentId, semesterId),
+    );
+    return FudanSession.request(options, (res) {
+      final Map<String, dynamic> data = res.data!;
+      final Map<String, dynamic> semesterId2StudentGrades =
+          data["semesterId2studentGrades"];
+      final List<dynamic> grades =
+          semesterId2StudentGrades[semesterId] ?? const [];
+
+      final scores = <ExamScore>[];
+      for (final gradeJson in grades) {
+        final Map<String, dynamic> grade = gradeJson;
+        final String lessonCode = grade["lessonCode"];
+        final String courseName = grade["courseName"];
+        final String? courseModuleTypeName = grade["courseModuleTypeName"];
+        final String? courseType = grade["courseType"];
+        final String gaGrade = grade["gaGrade"];
+        // PNP courses have no GP.
+        final num? gp = grade["gp"];
+        final score = ExamScore(
+          lessonCode,
+          courseName,
+          courseModuleTypeName ?? courseType ?? "",
+          "",
+          gaGrade,
+          gp?.toString() ?? "",
+        );
+        scores.add(score);
+      }
+
+      return scores;
+    });
+  }
+
+  Future<List<GPAListItem>> loadGPA() async {
+    final studentId = await loadStudentIdCached();
+    final searchIndexOptions = RequestOptions(
+      method: "GET",
+      path: getMyGpaSearchIndexUrl(studentId),
+    );
+    final (gradeYear, deptAssoc) =
+        await FudanSession.request(searchIndexOptions, (res) {
+      final soup = BeautifulSoup(res.data!);
+      final gradeYearElement = soup.find("input[name=\"grade\"]")!;
+      final gradeYear = gradeYearElement.attributes["value"]!;
+      final deptAssocElement = soup.find("input[name=\"departmentAssoc\"]")!;
+      final deptAssoc = deptAssocElement.attributes["value"]!;
+
+      return (gradeYear, deptAssoc);
+    });
+
+    // get department GPA ranks
+    final searchOptions = RequestOptions(
+      method: "GET",
+      path: getMyGpaSearchUrl(studentId, gradeYear, deptAssoc),
+    );
+    return FudanSession.request(searchOptions, (res) {
+      final Map<String, dynamic> data = res.data;
+      final List<dynamic> ranks = data["data"] ?? [];
+
+      final List<GPAListItem> gpaListItems = [];
+      for (final rankJson in ranks) {
+        /// Example:
+        /// {
+        //    id: null,
+        //    code: ****, // The 11-digit student ID
+        //    name: ****,
+        //    grade: 2022,
+        //    major: 计算机科学与技术,
+        //    department: 计算与智能创新学院,
+        //    gpa: 3.96,
+        //    credit: 130,
+        //    ranking: 1
+        //  }
+        final Map<String, dynamic> rank = rankJson;
+        final String name = rank["name"];
+        final String code = rank["code"];
+        final num gpa = rank["gpa"];
+        // Some courses have credit of 0.5.
+        final num credit = rank["credit"];
+        final int ranking = rank["ranking"];
+        final String grade = rank["grade"];
+        final String major = rank["major"];
+        final String department = rank["department"];
+        final item = GPAListItem(
+          name,
+          code,
+          gpa.toString(),
+          credit.toString(),
+          ranking.toString(),
+          grade,
+          major,
+          department,
+        );
+        gpaListItems.add(item);
+      }
+
+      return gpaListItems;
+    });
   }
 
   /// JSON-Like Text: {aaaa:"asdasd"}
@@ -247,9 +427,22 @@ class SemesterInfo {
     }
   }
 
+  /// Example:
+  ///
+  /// {
+  //    "startDate" : "2026-03-01",
+  //    "endDate" : "2026-07-04",
+  //    "name" : "2025-2026学年2学期",
+  //    "id" : 505
+  //  }
   factory SemesterInfo.fromCourseTableJson(Map<String, dynamic> json) {
-    return SemesterInfo(json['id'].toString(), json['schoolYear'],
-        seasonToName(json['season']));
+    final id = json["id"].toString();
+    final name = json["name"]!;
+    final nameRegex = RegExp("\\D*(\\d{4}-\\d{4})\\D+(\\d+)\\D*");
+    final nameMatch = nameRegex.firstMatch(name)!;
+    final schoolYear = nameMatch.group(1)!;
+    final season = nameMatch.group(2)!;
+    return SemesterInfo(id, schoolYear, season);
   }
 }
 
@@ -265,19 +458,6 @@ class Exam {
 
   Exam(this.id, this.name, this.type, this.date, this.time, this.location,
       this.testCategory, this.note);
-
-  factory Exam.fromHtml(dom.Element html) {
-    List<dom.Element> elements = html.getElementsByTagName("td");
-    return Exam(
-        elements[0].text.trim(),
-        elements[2].text.trim(),
-        elements[3].text.trim(),
-        elements[4].text.trim(),
-        elements[5].text.trim(),
-        elements[6].text.trim(),
-        elements[7].text.trim(),
-        elements[8].text.trim());
-  }
 }
 
 class ExamScore {
@@ -289,17 +469,6 @@ class ExamScore {
   final String? score;
 
   ExamScore(this.id, this.name, this.type, this.credit, this.level, this.score);
-
-  factory ExamScore.fromEduServiceHtml(dom.Element html) {
-    List<dom.Element> elements = html.getElementsByTagName("td");
-    return ExamScore(
-        elements[2].text.trim(),
-        elements[3].text.trim(),
-        elements[4].text.trim(),
-        elements[5].text.trim(),
-        elements[6].text.trim(),
-        elements[7].text.trim());
-  }
 
   /// NOTE: Result's [type] is year + semester(e.g. "2020-2021 2"),
   /// and [id] doesn't contain the last 2 digits.
@@ -327,19 +496,6 @@ class GPAListItem {
 
   GPAListItem(this.name, this.id, this.gpa, this.credits, this.rank, this.year,
       this.major, this.college);
-
-  factory GPAListItem.fromHtml(dom.Element html) {
-    List<dom.Element> elements = html.getElementsByTagName("td");
-    return GPAListItem(
-        elements[1].text,
-        elements[0].text,
-        elements[5].text,
-        elements[6].text,
-        elements[7].text,
-        elements[2].text,
-        elements[3].text,
-        elements[4].text);
-  }
 }
 
 class SemesterNoExamException implements Exception {}
