@@ -25,7 +25,6 @@ import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
