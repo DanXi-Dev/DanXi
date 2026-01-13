@@ -16,6 +16,7 @@
  */
 
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/state_provider.dart' as sp;
@@ -160,7 +161,7 @@ class ExamList extends HookConsumerWidget {
       List<SemesterInfo> semesters, ValueNotifier<int?> currentSemesterIndex,
       {ValueNotifier<List<Exam>?>? currentExamRef}) {
     final currentSemesterIndexValue =
-        currentSemesterIndex.value ?? semesters.length - 3;
+        currentSemesterIndex.value ?? max(semesters.length - 2, 0);
     final currentSemester = semesters[currentSemesterIndexValue];
     final semesterId = currentSemester.semesterId!;
 
