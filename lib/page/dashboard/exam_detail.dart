@@ -163,7 +163,10 @@ class ExamList extends HookConsumerWidget {
     final currentSemesterIndexValue =
         currentSemesterIndex.value ?? max(semesters.length - 2, 0);
     final currentSemester = semesters[currentSemesterIndexValue];
-    final semesterId = currentSemester.semesterId!;
+    final semesterId = currentSemester.semesterId;
+    if (semesterId == null) {
+      return _getNoDataWidget(context);
+    }
 
     final currentExamProvider = examProvider(semesterId);
     final currentScoreProvider = examScoreProvider(semesterId);
@@ -204,11 +207,7 @@ class ExamList extends HookConsumerWidget {
             AsyncError(error: final scoreError)
           )
           when examError is SemesterNoExamException && scoreError is RangeError:
-        body = Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Center(
-              child: Text(S.of(context).no_data),
-            ));
+        body = _getNoDataWidget(context);
       // Other cases, such as loading or error
       case (AsyncError(:final error, :final stackTrace), _):
         body = ErrorPageWidget.buildWidget(
@@ -219,11 +218,7 @@ class ExamList extends HookConsumerWidget {
         );
       case (_, AsyncError(:final error, :final stackTrace)):
         if (error is RangeError) {
-          body = Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: Center(
-                child: Text(S.of(context).no_data),
-              ));
+          body = _getNoDataWidget(context);
         } else {
           body = ErrorPageWidget.buildWidget(context, error,
               stackTrace: stackTrace, onTap: reloadData);
@@ -522,4 +517,11 @@ class ExamList extends HookConsumerWidget {
     }
     return widgets + secondaryWidgets;
   }
+
+  Widget _getNoDataWidget(BuildContext context) =>
+      Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Center(
+            child: Text(S.of(context).no_data),
+          ));
 }
