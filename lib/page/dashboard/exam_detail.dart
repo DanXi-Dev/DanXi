@@ -471,16 +471,20 @@ class ExamList extends HookConsumerWidget {
           width: 1,
         ),
       ),
-      child: Column(children: [
-        Center(
-          child: Text(
-            level,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: Text(
+              level,
+            ),
           ),
-        ),
-        Center(
-          child: Text(score!, textScaler: TextScaler.linear(0.6)),
-        ),
-      ]));
+          if (score != null)
+            Center(
+              child: Text(score, textScaler: TextScaler.linear(0.6))
+            ),
+        ],
+      ));
 
   List<Widget> _getListWidgetsHybrid(BuildContext context, WidgetRef ref,
       List<Exam> exams, List<ExamScore> scores) {

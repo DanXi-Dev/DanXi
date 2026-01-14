@@ -288,7 +288,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
           courseModuleTypeName ?? courseType ?? "",
           "",
           gaGrade,
-          gp?.toString() ?? "",
+          gp?.toString(),
         );
         scores.add(score);
       }
