@@ -162,7 +162,7 @@ class DanxiApp extends StatelessWidget {
     '/card/crowdData': (context, {arguments}) =>
         CardCrowdData(arguments: arguments),
     '/room/detail': (context, {arguments}) =>
-        EmptyClassroomDetailPage(arguments: arguments),
+        const EmptyClassroomDetailPage(),
     '/bbs/postDetail': (context, {arguments}) =>
         BBSPostDetail(arguments: arguments),
     '/notice/aao/list': (context, {arguments}) =>
