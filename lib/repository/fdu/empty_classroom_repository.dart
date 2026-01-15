@@ -21,22 +21,46 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
+import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 
 class EmptyClassroomRepository extends BaseRepositoryWithDio {
-  static String detailUrl(String? buildingName, DateTime date) {
+  static String detailUrl(String buildingName, DateTime date) {
     return "http://10.64.130.6/?b=$buildingName&c=&p=&day=${DateFormat("yyyy-MM-dd").format(date)}";
   }
 
-  static String classroomIdUrl(String? buildingName, DateTime date) {
+  // Example:
+  //
+  // {
+  //  "status": [
+  //
+  // {"id":"586","room":"HGX103","color":"white","ec":"1","c1":"green.png","c2":"green.png","c2t":"","mic":"micgreen.png","micstr":"麦克风 (2- ASUS XONAR U5)","fenbei":"0","touying":"0","vol":"00000000000000000000","daping":"0","headcheck":"1","head":"0%","keylock":"1","diskinfo":"good","errfile":"0","taidian":"0","chargeStatus":"-1","batteryLevel":"0","current":"0","duration":"0","chargeday":"yellow","camera":"camera2.png"}
+  // ,
+  // ...
+  // ],
+  //
+  //  "tempnotice":"",
+  //  "time":"2026-1-15 13:39:12.695",
+  //  "time1":"13:39",
+  //  "time2":47305,
+  //  "time3":"
+  // <script>
+  // ...
+  // }
+  // which is NOT a valid JSON due to the unescaped <script> tags, etc.
+  //
+  static String classroomIdUrl(String buildingName, DateTime date) {
     return "http://10.64.130.6/daystatus.asp?b=$buildingName&day=${DateFormat("yyyy-MM-dd").format(date)}";
   }
+  final statusMatcher = RegExp(r'"status"\s*:\s*(\[.*\])', dotAll: true);
 
-  EmptyClassroomRepository._();
+  EmptyClassroomRepository._() {
+    dio.interceptors.add(WebVPNInterceptor());
+  }
 
-  @override
-  Dio dio = DioUtils.newDioWithProxy(BaseOptions(
+  /// Dio instance that does not use WebVPN proxy to check LAN connection.
+  Dio directDio = DioUtils.newDioWithProxy(BaseOptions(
       connectTimeout: const Duration(seconds: 3),
       receiveTimeout: const Duration(seconds: 3)));
 
@@ -45,14 +69,15 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   factory EmptyClassroomRepository.getInstance() => _instance;
 
   /// Get [RoomInfo]s at [buildingName] on [date].
-  Future<List<RoomInfo>> getBuildingRoomInfo(
-      _, String? buildingName, DateTime date) async {
+  Future<List<RoomInfo>> getBuildingRoomInfo(String buildingName, DateTime date) async {
     List<RoomInfo> result = [];
     final Response<String> classroomIdData =
         await dio.get(classroomIdUrl(buildingName, date));
     final Response<String> response =
         await dio.get(detailUrl(buildingName, date));
-    final classroomIds = json.decode(classroomIdData.data!)['status'];
+    // classroomIdData is NOT a valid JSON, so we need to extract the "status" field manually.
+    final classroomData = statusMatcher.firstMatch(classroomIdData.data!)?.group(1);
+    final List<dynamic> classroomIds = json.decode(classroomData!);
     for (int i = 0; i < classroomIds.length; i++) {
       final classroomInfo = classroomIds[i];
       final classroomName = classroomInfo['room'];
@@ -69,7 +94,7 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
       final html = response.data!.substring(start, end);
       final patternForSeats = RegExp(r'>(\d+)<');
       final patternForUsages =
-          RegExp(r'<td style="background-color.*?>(.*?)<\/td>');
+          RegExp(r'<td style="background-color.*?>(.*?)</td>');
       final match1 = patternForSeats.firstMatch(html);
       String? roomCapacity;
       if (match1 != null) {
@@ -94,12 +119,16 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   }
 
   Future<bool> checkConnection() =>
-      dio.get('http://$linkHost').then((value) => true, onError: (e) => false);
+      directDio.get('http://$linkHost').then((value) => true, onError: (e) => false);
 
   @override
   String get linkHost => "10.64.130.6";
+
+  @override
+  bool get isWebvpnApplicable => true;
 }
 
+@Deprecated("2026-01-15: Seems like this API is no longer available. See #615 for details.")
 class EhallEmptyClassroomRepository extends BaseRepositoryWithDio {
   static String detailUrl(
       String areaName, String? buildingName, DateTime date) {
