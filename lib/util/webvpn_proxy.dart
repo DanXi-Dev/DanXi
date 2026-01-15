@@ -27,17 +27,19 @@ class WebvpnRequestException implements Exception {
 class WebVPNInterceptor extends Interceptor {
   static final Map<String, String> _vpnPrefix = {
     "www.fduhole.com":
-        "https://$WEBVPN_HOST/https/77726476706e69737468656265737421e7e056d221347d5871048ce29b5a2e",
+        "https://$WEBVPN_HOST/{scheme}/77726476706e69737468656265737421e7e056d221347d5871048ce29b5a2e",
     "auth.fduhole.com":
-        "https://$WEBVPN_HOST/https/77726476706e69737468656265737421f1e2559469366c45760785a9d6562c38",
+        "https://$WEBVPN_HOST/{scheme}/77726476706e69737468656265737421f1e2559469366c45760785a9d6562c38",
     "danke.fduhole.com":
-        "https://$WEBVPN_HOST/https/77726476706e69737468656265737421f4f64f97227e6e546b0086a09d1b203a73",
+        "https://$WEBVPN_HOST/{scheme}/77726476706e69737468656265737421f4f64f97227e6e546b0086a09d1b203a73",
     "forum.fduhole.com":
-        "https://$WEBVPN_HOST/https/77726476706e69737468656265737421f6f853892a7e6e546b0086a09d1b203a46",
+        "https://$WEBVPN_HOST/{scheme}/77726476706e69737468656265737421f6f853892a7e6e546b0086a09d1b203a46",
     "image.fduhole.com":
-        "https://$WEBVPN_HOST/https/77726476706e69737468656265737421f9fa409b227e6e546b0086a09d1b203ab8",
+        "https://$WEBVPN_HOST/{scheme}/77726476706e69737468656265737421f9fa409b227e6e546b0086a09d1b203ab8",
     "yjsxk.fudan.edu.cn":
-        "https://$WEBVPN_HOST/http/77726476706e69737468656265737421e9fd52842c7e6e457a0987e29d51367bba7b"
+        "https://$WEBVPN_HOST/{scheme}/77726476706e69737468656265737421e9fd52842c7e6e457a0987e29d51367bba7b",
+    "10.64.130.6":
+        "https://$WEBVPN_HOST/{scheme}/77726476706e69737468656265737421a1a70fca737e39032e46df",
   };
   static const String DIRECT_CONNECT_TEST_URL = "https://forum.fduhole.com";
   static const String EXTRA_ROUTE_TYPE = "webvpn_route_type";
@@ -57,14 +59,21 @@ class WebVPNInterceptor extends Interceptor {
       return null;
     }
 
-    if (_vpnPrefix.containsKey(u.host)) {
-      String prefix = "https://${u.host}";
-      String proxiedUri = url;
-      if (url.startsWith(prefix)) {
-        proxiedUri = _vpnPrefix[u.host]! + url.substring(prefix.length);
-      }
+    final uriScheme = u.scheme.isEmpty ? "http" : u.scheme;
+    if (uriScheme != "http" && uriScheme != "https") {
+      return null;
+    }
 
-      return proxiedUri;
+    if (_vpnPrefix.containsKey(u.host)) {
+      final vpnPrefix = _vpnPrefix[u.host]!;
+      final urlPrefix = "$uriScheme://${u.host}";
+      if (url.startsWith(urlPrefix)) {
+        final translatedUrl =
+            url.replaceFirst(urlPrefix, vpnPrefix.replaceFirst("{scheme}", uriScheme));
+        return translatedUrl;
+      } else {
+        return null;
+      }
     } else {
       return null;
     }

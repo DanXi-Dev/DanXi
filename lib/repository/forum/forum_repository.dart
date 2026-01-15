@@ -45,14 +45,15 @@ import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/dio.dart';
 
-/// The repository for forum.
+/// The repository for forum API.
 ///
 /// # State
-/// During to some history reasons, this repository's state can be complex.
+/// Due to historical reasons, this repository's state can be complex.
 /// Please read the method comments carefully before using them.
 ///
-/// All states have been moved to [ForumProvider], which is a [ChangeNotifier];
-/// any field in this class should be considered as temporary variables, e.g. caches.
+/// Most states have been moved to [ForumProvider], which is a [ChangeNotifier];
+/// any field in this class should be considered as temporary states that can
+/// be dropped anytime (e.g. cached data).
 class ForumRepository extends BaseRepositoryWithDio {
   static final _instance = ForumRepository._();
 

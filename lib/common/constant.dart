@@ -599,7 +599,7 @@ extension CampusEx on Campus? {
   }
 
   /// Get the teaching buildings of this campus.
-  List<String>? getTeachingBuildings() {
+  List<String> getTeachingBuildings() {
     switch (this) {
       case Campus.HANDAN_CAMPUS:
         return ['HGX', 'H2', 'H3', 'H4', 'H5', 'H6'];

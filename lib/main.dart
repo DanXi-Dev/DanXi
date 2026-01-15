@@ -48,7 +48,6 @@ import 'package:dan_xi/page/settings/hidden_tags_preference.dart';
 import 'package:dan_xi/page/settings/open_source_license.dart';
 import 'package:dan_xi/page/subpage_forum.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
-import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/provider/language_manager.dart';
 import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
@@ -163,7 +162,7 @@ class DanxiApp extends StatelessWidget {
     '/card/crowdData': (context, {arguments}) =>
         CardCrowdData(arguments: arguments),
     '/room/detail': (context, {arguments}) =>
-        EmptyClassroomDetailPage(arguments: arguments),
+        const EmptyClassroomDetailPage(),
     '/bbs/postDetail': (context, {arguments}) =>
         BBSPostDetail(arguments: arguments),
     '/notice/aao/list': (context, {arguments}) =>
@@ -271,7 +270,7 @@ class DanxiApp extends StatelessWidget {
                   scrollBehavior: TouchMouseScrollBehavior(),
                   debugShowCheckedModeBanner: false,
                   // Fix cupertino UI text color issue by override text color
-                  cupertino: (context, __) => CupertinoAppData(
+                  cupertino: (context, _) => CupertinoAppData(
                       theme: CupertinoThemeData(
                           brightness: context
                               .select<SettingsProvider, ThemeType>(
@@ -283,7 +282,7 @@ class DanxiApp extends StatelessWidget {
                                       ? Colors.white
                                       : Colors.black)
                               )))),
-                  material: (context, __) => MaterialAppData(
+                  material: (context, _) => MaterialAppData(
                     // Pass the ThemeData determined by DynamicThemeController
                     theme: Theme.of(context),
                   ),

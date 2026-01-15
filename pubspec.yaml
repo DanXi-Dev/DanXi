@@ -115,7 +115,7 @@ dependencies:
   html: any
   cookie_jar: any
   ffi: any
-  toml: ^0.16.0
+  toml: ^0.18.0
   pub_semver: ^2.1.4
   dynamic_color: ^1.6.8
   hooks_riverpod: ^3.1.0
