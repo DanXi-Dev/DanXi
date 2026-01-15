@@ -331,37 +331,34 @@ class ExamList extends HookConsumerWidget {
   }
 
   Widget _buildRefreshableListView(BuildContext context, WidgetRef ref,
-          List<Widget> widgets, String? semesterId,
-          {bool isFallback = false}) =>
+      List<Widget> widgets, String? semesterId) =>
       WithScrollbar(
           controller: PrimaryScrollController.of(context),
           child: RefreshIndicator(
               edgeOffset: MediaQuery.of(context).padding.top,
               color: Theme.of(context).colorScheme.secondary,
               backgroundColor: DialogTheme.of(context).backgroundColor,
-              onRefresh: () =>
-                  _refreshAll(ref, semesterId, isFallback: isFallback),
+              onRefresh: () => _refreshAll(ref, semesterId),
               child: ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: widgets)));
 
   Widget _buildGradeLayout(BuildContext context, WidgetRef ref,
-          List<ExamScore> examScores, String? semesterId,
-          {bool isFallback = false}) =>
+      List<ExamScore> examScores, String? semesterId,
+      {bool isFallback = false}) =>
       _buildRefreshableListView(
-          context,
-          ref,
-          _getListWidgetsGrade(context, ref, examScores,
-              isFallback: isFallback),
-          semesterId,
-          isFallback: isFallback);
+        context, ref,
+        _getListWidgetsGrade(context, ref, examScores, isFallback: isFallback),
+        semesterId,
+      );
 
   Widget _buildHybridLayout(BuildContext context, WidgetRef ref,
-          List<Exam> exams, List<ExamScore> scores, String? semesterId,
-          {bool isFallback = false}) =>
-      _buildRefreshableListView(context, ref,
-          _getListWidgetsHybrid(context, ref, exams, scores), semesterId,
-          isFallback: isFallback);
+      List<Exam> exams, List<ExamScore> scores, String? semesterId) =>
+      _buildRefreshableListView(
+        context, ref,
+        _getListWidgetsHybrid(context, ref, exams, scores),
+        semesterId,
+      );
 
   Widget _buildGpaCard(BuildContext context, WidgetRef ref) {
     final gpa = ref.watch(gpaProvider);
@@ -401,9 +398,8 @@ class ExamList extends HookConsumerWidget {
     );
   }
 
-  List<Widget> _getListWidgetsGrade(
-      BuildContext context, WidgetRef ref, List<ExamScore> scores,
-      {bool isFallback = false}) {
+  List<Widget> _getListWidgetsGrade(BuildContext context, WidgetRef ref,
+      List<ExamScore> scores, {bool isFallback = false}) {
     Widget buildLimitedCard() => Card(
         color: Theme.of(context).colorScheme.error,
         child: ListTile(
@@ -589,8 +585,7 @@ class ExamList extends HookConsumerWidget {
     return widgets + secondaryWidgets;
   }
 
-  Future<void> _refreshAll(WidgetRef ref, String? semesterId,
-      {bool isFallback = false}) async {
+  Future<void> _refreshAll(WidgetRef ref, String? semesterId) async {
     await ref.read(gpaProvider.notifier).reload();
 
     ref.invalidate(semesterProvider);
@@ -600,8 +595,6 @@ class ExamList extends HookConsumerWidget {
       ref.invalidate(examScoreProvider(semesterId));
     }
 
-    if (isFallback) {
-      ref.invalidate(examScoreFromDataCenterProvider);
-    }
+    ref.invalidate(examScoreFromDataCenterProvider);
   }
 }
