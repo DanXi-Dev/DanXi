@@ -65,19 +65,15 @@ class DormElectricityFeature extends Feature {
   /// The data instance. See `lib/repository/fdu/dorm_repository.dart`.
   ElectricityItem? _electricity;
 
-  /// Status of the request.
-  /// Whenever the status is changed, call [notifyUpdate] to update the widget.
-  ConnectionStatus _status = ConnectionStatus.NONE;
-
   Future<void> _loadData() async {
-    _status = ConnectionStatus.CONNECTING;
+    status = const ConnectionConnecting();
     try {
       // Await the repository to load data.
       _electricity =
           await FudanDormRepository.getInstance().loadElectricityInfo();
-      _status = ConnectionStatus.DONE;
-    } catch (e) {
-      _status = ConnectionStatus.FAILED;
+      status = const ConnectionDone();
+    } catch (error, stackTrace) {
+      status = ConnectionFailed(error, stackTrace);
     }
     // Remember to call [notifyUpdate] to update the widget.
     notifyUpdate();
@@ -93,7 +89,7 @@ class DormElectricityFeature extends Feature {
   /// Otherwise, [buildFeature] will be called when the feature is created.
   @override
   void buildFeature([Map<String, dynamic>? arguments]) {
-    if (_status == ConnectionStatus.NONE) {
+    if (status is ConnectionNone) {
       _electricity = null;
       _loadData();
     }
@@ -107,15 +103,15 @@ class DormElectricityFeature extends Feature {
   /// The subtitle of the feature. We usually display the data here.
   @override
   String get subTitle {
-    switch (_status) {
-      case ConnectionStatus.NONE:
-      case ConnectionStatus.CONNECTING:
+    switch (status) {
+      case ConnectionNone():
+      case ConnectionConnecting():
         return S.of(context!).loading;
-      case ConnectionStatus.DONE:
+      case ConnectionDone():
         return S.of(context!).dorm_electricity_subtitle(
             _electricity!.available, _electricity!.used);
-      case ConnectionStatus.FAILED:
-      case ConnectionStatus.FATAL_ERROR:
+      case ConnectionFailed():
+      case ConnectionFatalError():
         return S.of(context!).failed;
     }
   }
@@ -125,7 +121,7 @@ class DormElectricityFeature extends Feature {
   /// something else. See [WelcomeFeature] and [NextCourseFeature].
   @override
   Widget? get trailing {
-    if (_status == ConnectionStatus.CONNECTING) {
+    if (status is ConnectionConnecting) {
       return const FeatureProgressIndicator();
     }
     return null;
@@ -137,7 +133,7 @@ class DormElectricityFeature extends Feature {
       : const Icon(CupertinoIcons.bolt);
 
   void refreshData() {
-    _status = ConnectionStatus.NONE;
+    status = const ConnectionNone();
     notifyUpdate();
   }
 
@@ -149,7 +145,7 @@ class DormElectricityFeature extends Feature {
   /// [smartNavigatorPush] or reload the data when it failed.
   @override
   void onTap() {
-    if (_status == ConnectionStatus.DONE) {
+    if (status is ConnectionDone) {
       final content =
           DormElectricityModalSheet(currentElectricity: _electricity!);
       final Widget body;
