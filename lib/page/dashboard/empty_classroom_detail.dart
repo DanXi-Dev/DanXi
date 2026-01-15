@@ -63,11 +63,13 @@ class EmptyClassroomDetailPage extends HookConsumerWidget {
       SettingsProvider.getInstance().lastECBuildingChoiceRepresentation = selectBuildingIndex.value;
     });
     final selectDate = useState<DateTime>(DateTime.now());
+    // Slider value for material date selector. Must be a double to allow smooth sliding.
+    final selectDateSliderValue = useState<double>(0);
 
     final roomInfoProvider = buildingRoomInfoProvider(selectCampus.getTeachingBuildings()[selectBuildingIndex.value], selectDate.value);
     final roomInfos = ref.watch(roomInfoProvider);
 
-    List<Widget> widgets = _getFixedWidgets(context, selectCampusIndex, selectBuildingIndex, selectDate);
+    List<Widget> widgets = _getFixedWidgets(context, selectCampusIndex, selectBuildingIndex, selectDate, selectDateSliderValue);
     switch(roomInfos){
       case AsyncData(:final value):
         widgets.add(Expanded(
@@ -102,7 +104,7 @@ class EmptyClassroomDetailPage extends HookConsumerWidget {
         );
   }
 
-  List<Widget> _getFixedWidgets(BuildContext context, ValueNotifier<int> selectCampusIndex, ValueNotifier<int> selectBuildingIndex, ValueNotifier<DateTime> selectDate) {
+  List<Widget> _getFixedWidgets(BuildContext context, ValueNotifier<int> selectCampusIndex, ValueNotifier<int> selectBuildingIndex, ValueNotifier<DateTime> selectDate, ValueNotifier<double> sliderValue) {
     final campusTagWidgets = Constant.CAMPUS_VALUES
         .map((e) => Tag(
         e.displayTitle(context),
@@ -206,7 +208,7 @@ class EmptyClassroomDetailPage extends HookConsumerWidget {
             ),
           ],
         ),
-        material: (_, _) => _buildSlider(selectDate),
+        material: (_, _) => _buildSlider(selectDate, sliderValue),
       ),
 
       Container(
@@ -282,12 +284,12 @@ class EmptyClassroomDetailPage extends HookConsumerWidget {
         },
       ));
 
-  Widget _buildSlider(ValueNotifier<DateTime> selectDate) {
-    final sliderValue = selectDate.value.difference(DateTime.now()).inDays.toDouble();
+  Widget _buildSlider(ValueNotifier<DateTime> selectDate, ValueNotifier<double> sliderValue) {
     return Slider(
-        value: sliderValue,
+        value: sliderValue.value,
         onChanged: (v) {
           selectDate.value = DateTime.now().add(Duration(days: v.round()));
+          sliderValue.value = v;
         },
         label: DateFormat("MM/dd").format(selectDate.value),
         max: 6,
