@@ -190,14 +190,14 @@ class EduServiceRepository extends BaseRepositoryWithDio {
           continue;
         }
 
-        var courseId = "";
-        var courseName = "";
-        var type = "";
-        var category = "";
-        var date = "";
-        var time = "";
-        var location = "";
-        var note = "";
+        String? courseId;
+        String? courseName;
+        String? type;
+        String? category;
+        String? date;
+        String? time;
+        String? location;
+        String note;
 
         final firstCell = cells[0];
         final timeDiv = firstCell.find("div.time");
@@ -243,13 +243,13 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         note = cells[2].text.trimAndNormalizeWhitespace();
 
         final exam = Exam(
-          courseId,
-          courseName,
-          type,
-          date,
-          time,
-          location,
-          category,
+          courseId.toString(),
+          courseName.toString(),
+          type.toString(),
+          date.toString(),
+          time.toString(),
+          location.toString(),
+          category.toString(),
           note,
         );
         exams.add(exam);
@@ -275,20 +275,25 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       final scores = <ExamScore>[];
       for (final gradeJson in grades) {
         final Map<String, dynamic> grade = gradeJson;
-        final String lessonCode = grade["lessonCode"];
-        final String courseName = grade["courseName"];
+        // It can be null too.
+        final String? lessonCode = grade["lessonCode"];
+        final String? courseCode = grade["courseCode"];
+        // We are not sure whether these fields can be null, so we try as more
+        // fields as we could get.
+        final String? courseName = grade["courseName"];
+        final String? courseNameEn = grade["courseNameEn"];
         final String? courseModuleTypeName = grade["courseModuleTypeName"];
         final String? courseType = grade["courseType"];
-        final String gaGrade = grade["gaGrade"];
+        final String? gaGrade = grade["gaGrade"];
         // PNP courses have no GP.
         final num? gp = grade["gp"];
         final score = ExamScore(
-          lessonCode,
-          courseName,
-          courseModuleTypeName ?? courseType ?? "",
-          "",
-          gaGrade,
-          gp?.toString() ?? "",
+          (lessonCode ?? courseCode).toString(),
+          (courseName ?? courseNameEn).toString(),
+          (courseModuleTypeName ?? courseType).toString(),
+          null.toString(),
+          gaGrade.toString(),
+          gp?.toString(),
         );
         scores.add(score);
       }
@@ -338,24 +343,24 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         //    ranking: 1
         //  }
         final Map<String, dynamic> rank = rankJson;
-        final String name = rank["name"];
-        final String code = rank["code"];
-        final num gpa = rank["gpa"];
+        final String? name = rank["name"];
+        final String? code = rank["code"];
+        final num? gpa = rank["gpa"];
         // Some courses have credit of 0.5.
-        final num credit = rank["credit"];
-        final int ranking = rank["ranking"];
-        final String grade = rank["grade"];
-        final String major = rank["major"];
-        final String department = rank["department"];
+        final num? credit = rank["credit"];
+        final int? ranking = rank["ranking"];
+        final String? grade = rank["grade"];
+        final String? major = rank["major"];
+        final String? department = rank["department"];
         final item = GPAListItem(
-          name,
-          code,
+          name.toString(),
+          code.toString(),
           gpa.toString(),
           credit.toString(),
           ranking.toString(),
-          grade,
-          major,
-          department,
+          grade.toString(),
+          major.toString(),
+          department.toString(),
         );
         gpaListItems.add(item);
       }
