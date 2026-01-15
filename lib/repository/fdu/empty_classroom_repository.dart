@@ -53,7 +53,7 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   static String classroomIdUrl(String buildingName, DateTime date) {
     return "http://10.64.130.6/daystatus.asp?b=$buildingName&day=${DateFormat("yyyy-MM-dd").format(date)}";
   }
-  final statusMatcher = RegExp(r'"status"\s*:\s*(\[.*\])', dotAll: true);
+  final statusMatcher = RegExp(r'"status"\s*:\s*(\[.*?\])', dotAll: true);
 
   EmptyClassroomRepository._() {
     dio.interceptors.add(WebVPNInterceptor());
@@ -128,7 +128,7 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   bool get isWebvpnApplicable => true;
 }
 
-@Deprecated("2026-01-15: Seems like this API is no longer available. See #615 for details.")
+@Deprecated("Use EmptyClassroomRepository instead. The Ehall-based API is no longer available; see #615 for details.")
 class EhallEmptyClassroomRepository extends BaseRepositoryWithDio {
   static String detailUrl(
       String areaName, String? buildingName, DateTime date) {
