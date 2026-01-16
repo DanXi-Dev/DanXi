@@ -302,7 +302,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  Future<List<GPAListItem>> loadGPA() async {
+  Future<List<GpaListItem>> loadGpa() async {
     final studentId = await loadStudentIdCached();
     final searchIndexOptions = RequestOptions(
       method: "GET",
@@ -328,7 +328,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       final Map<String, dynamic> data = res.data;
       final List<dynamic> ranks = data["data"] ?? [];
 
-      final List<GPAListItem> gpaListItems = [];
+      final List<GpaListItem> gpaListItems = [];
       for (final rankJson in ranks) {
         /// Example:
         /// {
@@ -352,7 +352,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         final String? grade = rank["grade"];
         final String? major = rank["major"];
         final String? department = rank["department"];
-        final item = GPAListItem(
+        final item = GpaListItem(
           name.toString(),
           code.toString(),
           gpa.toString(),
@@ -489,7 +489,7 @@ class ExamScore {
   }
 }
 
-class GPAListItem {
+class GpaListItem {
   final String name;
   final String id;
   final String year;
@@ -499,7 +499,7 @@ class GPAListItem {
   final String credits;
   final String rank;
 
-  GPAListItem(this.name, this.id, this.gpa, this.credits, this.rank, this.year,
+  GpaListItem(this.name, this.id, this.gpa, this.credits, this.rank, this.year,
       this.major, this.college);
 }
 

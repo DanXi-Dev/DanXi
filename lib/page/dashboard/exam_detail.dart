@@ -18,6 +18,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/state_provider.dart' as sp;
 import 'package:dan_xi/repository/fdu/data_center_repository.dart';
@@ -25,7 +26,6 @@ import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
@@ -44,8 +44,24 @@ import 'package:share_plus/share_plus.dart';
 part 'exam_detail.g.dart';
 
 @riverpod
-Future<List<GPAListItem>> gpa(Ref ref) async {
-  return await EduServiceRepository.getInstance().loadGPA();
+Future<List<GpaListItem>> gpa(Ref ref) async {
+  return EduServiceRepository.getInstance().loadGpa();
+}
+
+@riverpod
+GpaListItem? userGpa(Ref ref) {
+  final gpa = ref.watch(gpaProvider);
+  final userId = sp.StateProvider.personInfo.value?.id;
+  if (userId == null) {
+    return null;
+  }
+
+  return gpa.maybeWhen(
+    data: (gpaList) =>
+        gpaList.firstWhereOrNull((element) => element.id == userId),
+    // If we cannot find such an element, we will just return null.
+    orElse: () => null,
+  );
 }
 
 @riverpod
@@ -129,6 +145,14 @@ class ExamList extends HookConsumerWidget {
     final currentSemesterIndex = useState<int?>(null);
     final currentExamRef = useState<List<Exam>?>(null);
 
+    useEffect(() {
+      // Setting the state requires widgets to be stable.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.invalidate(gpaProvider);
+      });
+      return null;
+    }, const []);
+
     return PlatformScaffold(
         iosContentBottomPadding: false,
         iosContentPadding: false,
@@ -185,14 +209,12 @@ class ExamList extends HookConsumerWidget {
       case (AsyncData(value: final exams), AsyncData(value: final scores)):
         providedExams = exams;
         body = exams.isEmpty
-            ? _buildGradeLayout(context, ref, scores)
-            : ListView(
-                children: _getListWidgetsHybrid(context, ref, exams, scores));
+            ? _buildGradeLayout(context, ref, scores, semesterId)
+            : _buildHybridLayout(context, ref, exams, scores, semesterId);
       // There are some exams in this semester, but no score has been published
       case (AsyncData(value: final exams), AsyncError(error: final scoreError))
           when scoreError is RangeError:
-        body = ListView(
-            children: _getListWidgetsHybrid(context, ref, exams, const []));
+        body = _buildHybridLayout(context, ref, exams, const [], semesterId);
       // There is no exam in this semester, but never mind, we are still loading scores
       case (AsyncError(:final error), AsyncLoading())
           when error is SemesterNoExamException:
@@ -200,7 +222,7 @@ class ExamList extends HookConsumerWidget {
       // There is no exam in this semester, but we indeed have scores!
       case (AsyncError(:final error), AsyncData(value: final scores))
           when error is SemesterNoExamException:
-        body = _buildGradeLayout(context, ref, scores);
+        body = _buildGradeLayout(context, ref, scores, semesterId);
       // There is no exam in this semester, and no scores have been published
       case (
             AsyncError(error: final examError),
@@ -259,7 +281,7 @@ class ExamList extends HookConsumerWidget {
     final scores = ref.watch(examScoreFromDataCenterProvider);
     switch (scores) {
       case AsyncData(value: final data):
-        return _buildGradeLayout(context, ref, data, isFallback: true);
+        return _buildGradeLayout(context, ref, data, null, isFallback: true);
       case AsyncError(:final error, :final stackTrace):
         return ErrorPageWidget(
           errorMessage:
@@ -274,27 +296,39 @@ class ExamList extends HookConsumerWidget {
     }
   }
 
-  Widget _buildGradeLayout(
-          BuildContext context, WidgetRef ref, List<ExamScore> examScores,
-          {bool isFallback = false}) =>
+  Widget _buildRefreshableListView(BuildContext context, WidgetRef ref,
+      List<Widget> widgets, String? semesterId) =>
       WithScrollbar(
           controller: PrimaryScrollController.of(context),
-          child: ListView(
-              primary: true,
-              children: _getListWidgetsGrade(context, ref, examScores,
-                  isFallback: isFallback)));
+          child: RefreshIndicator(
+              edgeOffset: MediaQuery.of(context).padding.top,
+              color: Theme.of(context).colorScheme.secondary,
+              backgroundColor: DialogTheme.of(context).backgroundColor,
+              onRefresh: () => _refreshAll(ref, semesterId),
+              child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: widgets)));
 
-  Widget _buildGPACard(BuildContext context, WidgetRef ref) {
+  Widget _buildGradeLayout(BuildContext context, WidgetRef ref,
+      List<ExamScore> examScores, String? semesterId,
+      {bool isFallback = false}) =>
+      _buildRefreshableListView(
+        context, ref,
+        _getListWidgetsGrade(context, ref, examScores, isFallback: isFallback),
+        semesterId,
+      );
+
+  Widget _buildHybridLayout(BuildContext context, WidgetRef ref,
+      List<Exam> exams, List<ExamScore> scores, String? semesterId) =>
+      _buildRefreshableListView(
+        context, ref,
+        _getListWidgetsHybrid(context, ref, exams, scores),
+        semesterId,
+      );
+
+  Widget _buildGpaCard(BuildContext context, WidgetRef ref) {
     final gpa = ref.watch(gpaProvider);
-    GPAListItem? userGPA;
-    if (gpa case AsyncData(value: final gpaList)) {
-      try {
-        userGPA = gpaList.firstWhere(
-            (element) => element.id == sp.StateProvider.personInfo.value!.id);
-      } catch (_) {
-        // If we cannot find such an element, we will just return null.
-      }
-    }
+    final userGpa = ref.watch(userGpaProvider);
     return Card(
       color: PlatformX.backgroundAccentColor(context),
       child: ListTile(
@@ -305,7 +339,7 @@ class ExamList extends HookConsumerWidget {
         ),
         trailing: switch (gpa) {
           AsyncData() => Text(
-              userGPA?.gpa ?? "N/A",
+              userGpa?.gpa ?? "N/A",
               textScaler: TextScaler.linear(1.25),
               style: const TextStyle(color: Colors.white),
             ),
@@ -315,7 +349,7 @@ class ExamList extends HookConsumerWidget {
         subtitle: switch (gpa) {
           AsyncData() => Text(
               S.of(context).your_gpa_subtitle(
-                  userGPA?.rank ?? "N/A", userGPA?.credits ?? "N/A"),
+                  userGpa?.rank ?? "N/A", userGpa?.credits ?? "N/A"),
               style: TextStyle(color: Colors.white)),
           AsyncError() => nil,
           _ => Text(S.of(context).loading),
@@ -330,9 +364,8 @@ class ExamList extends HookConsumerWidget {
     );
   }
 
-  List<Widget> _getListWidgetsGrade(
-      BuildContext context, WidgetRef ref, List<ExamScore> scores,
-      {bool isFallback = false}) {
+  List<Widget> _getListWidgetsGrade(BuildContext context, WidgetRef ref,
+      List<ExamScore> scores, {bool isFallback = false}) {
     Widget buildLimitedCard() => Card(
         color: Theme.of(context).colorScheme.error,
         child: ListTile(
@@ -349,7 +382,7 @@ class ExamList extends HookConsumerWidget {
     if (isFallback) {
       widgets.add(buildLimitedCard());
     } else {
-      widgets.add(_buildGPACard(context, ref));
+      widgets.add(_buildGpaCard(context, ref));
     }
     for (var value in scores) {
       widgets.add(_buildCardGrade(value, context));
@@ -496,7 +529,7 @@ class ExamList extends HookConsumerWidget {
           Expanded(child: Divider(color: color)),
         ]));
 
-    List<Widget> widgets = [_buildGPACard(context, ref)];
+    List<Widget> widgets = [_buildGpaCard(context, ref)];
     List<Widget> secondaryWidgets = [
       buildDividerWithText(S.of(context).other_types_exam,
           Theme.of(context).textTheme.bodyLarge!.color)
@@ -528,4 +561,17 @@ class ExamList extends HookConsumerWidget {
           child: Center(
             child: Text(S.of(context).no_data),
           ));
+
+  Future<void> _refreshAll(WidgetRef ref, String? semesterId) async {
+    ref.invalidate(gpaProvider);
+
+    ref.invalidate(semesterProvider);
+
+    if (semesterId != null) {
+      ref.invalidate(examProvider(semesterId));
+      ref.invalidate(examScoreProvider(semesterId));
+    }
+
+    ref.invalidate(examScoreFromDataCenterProvider);
+  }
 }

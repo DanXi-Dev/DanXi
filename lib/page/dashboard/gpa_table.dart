@@ -14,11 +14,15 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import 'package:collection/collection.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
+import '../../util/platform_universal.dart';
 
 /// A list page showing user's GPA scores and his/her ranking.
 class GpaTablePage extends StatefulWidget {
@@ -31,8 +35,22 @@ class GpaTablePage extends StatefulWidget {
 }
 
 class GpaTablePageState extends State<GpaTablePage> {
-  List<GPAListItem>? gpaList;
+  bool inSameMajor = false;
+
+  GpaListItem? _myGpa;
+  List<GpaListItem>? _gpaList;
+  List<GpaListItem>? _sameMajorGpaList;
   static const String NAME_HIDDEN = "****";
+
+  List<GpaListItem>? get gpaList => inSameMajor ? _sameMajorGpaList : _gpaList;
+
+  set gpaList(List<GpaListItem>? value) {
+    _myGpa = value?.firstWhereOrNull((element) => element.name != NAME_HIDDEN);
+    _gpaList = value;
+    _sameMajorGpaList = _myGpa == null
+        ? _gpaList
+        : value?.where((element) => element.major == _myGpa?.major).toList();
+  }
 
   @override
   void initState() {
@@ -48,6 +66,23 @@ class GpaTablePageState extends State<GpaTablePage> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: PlatformAppBarX(
           title: Text(S.of(context).your_gpa),
+          trailingActions: [
+            PlatformIconButton(
+              padding: EdgeInsets.zero,
+              icon: Icon(PlatformX.isMaterial(context)
+                  ? inSameMajor
+                      ? Icons.group_off
+                      : Icons.group
+                  : inSameMajor
+                      ? CupertinoIcons.person_2
+                      : CupertinoIcons.person_3),
+              onPressed: () {
+                setState(() {
+                  inSameMajor = !inSameMajor;
+                });
+              },
+            ),
+          ],
         ),
         body: SafeArea(
             bottom: false,
@@ -65,7 +100,8 @@ class GpaTablePageState extends State<GpaTablePage> {
         S.of(context).major,
         S.of(context).gpa,
         S.of(context).credits,
-        S.of(context).rank
+        S.of(context).rank,
+        S.of(context).percentile,
       ]
               .map((headText) => Text(headText,
                   textAlign: TextAlign.center,
@@ -73,12 +109,20 @@ class GpaTablePageState extends State<GpaTablePage> {
               .toList())
     ];
 
-    for (var element in gpaList!) {
-      TextStyle? textColorStyle = element.name == NAME_HIDDEN
+    final chosenGpaList = gpaList!;
+    for (var (index, element) in chosenGpaList.indexed) {
+      TextStyle? textColorStyle = identical(element, _myGpa)
           ? null
           : TextStyle(color: Theme.of(context).colorScheme.secondary);
       widgets.add(TableRow(
-          children: [element.major, element.gpa, element.credits, element.rank]
+          children: [
+        element.major,
+        element.gpa,
+        element.credits,
+        element.rank,
+        // The fetched GPA lists are usually sorted.
+        "${(100 * index / chosenGpaList.length).toStringAsFixed(2)}%",
+      ]
               .map((itemText) => Text(itemText,
                   textAlign: TextAlign.center, style: textColorStyle))
               .toList()));

@@ -335,6 +335,7 @@
   "parse_fatal_error": "A fatal error occurred when parsing this post.",
   "password": "Password",
   "pe_exercises": "PE Exercises",
+  "percentile": "Percentile",
   "pin_unpin_hole": "Pin/Unpin Post",
   "pinned": "Pinned",
   "post_does_not_exist": "The requested post does not exist.",
