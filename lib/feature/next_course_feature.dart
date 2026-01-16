@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/base_feature.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/time_table.dart';
@@ -28,23 +29,28 @@ import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+/// Exception thrown when timetable setup is required before loading course data.
+class TimeTableSetupRequiredException implements Exception {
+  const TimeTableSetupRequiredException();
+
+  @override
+  String toString() => 'TimeTable setup is required';
+}
+
 class NextCourseFeature extends Feature {
   @override
   bool get loadOnTap => false;
 
   LiveCourseModel? _data;
-  CourseFeatureStatus _status = CourseFeatureStatus.NONE;
 
   Future<void> _loadCourse() async {
-    _status = CourseFeatureStatus.CONNECTING;
+    status = const ConnectionConnecting();
     if (!TimeTableRepository.getInstance().hasCache()) {
       // No cache indicates the user has never accessed timetable page.
       // In this scenario, because the semester start date requires manual configuration,
       // the course schedule should NOT be automatically fetched (the default start date is often incorrect!).
       // Instead, the user should be prompted to visit timetable page.
-      _status = CourseFeatureStatus.SETUP_REQUIRED;
-      notifyUpdate();
-      return;
+      throw const TimeTableSetupRequiredException();
     }
     TimeTable? timetable = await Retrier.runAsyncWithRetry(() async {
       await Future.delayed(const Duration(milliseconds: 500));
@@ -54,7 +60,7 @@ class NextCourseFeature extends Feature {
       );
     });
     _data = getNextCourse(timetable!);
-    _status = CourseFeatureStatus.DONE;
+    status = const ConnectionDone();
     notifyUpdate();
   }
 
@@ -89,9 +95,9 @@ class NextCourseFeature extends Feature {
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
-    if (_status == CourseFeatureStatus.NONE) {
-      _loadCourse().catchError((error) {
-        _status = CourseFeatureStatus.FAILED;
+    if (status is ConnectionNone) {
+      _loadCourse().catchError((error, stackTrace) {
+        status = ConnectionFailed(error, stackTrace);
         notifyUpdate();
       });
     }
@@ -102,11 +108,11 @@ class NextCourseFeature extends Feature {
 
   @override
   Widget? get customSubtitle {
-    switch (_status) {
-      case CourseFeatureStatus.NONE:
-      case CourseFeatureStatus.CONNECTING:
+    switch (status) {
+      case ConnectionNone():
+      case ConnectionConnecting():
         return Text(S.of(context!).loading);
-      case CourseFeatureStatus.DONE:
+      case ConnectionDone():
         if (_data != null) {
           if (_data!.nextCourse?.course.courseName != null) {
             return Text(S.of(context!).next_course_is(
@@ -117,15 +123,16 @@ class NextCourseFeature extends Feature {
         } else {
           return null;
         }
-      case CourseFeatureStatus.FAILED:
-        return Text(S.of(context!).failed);
-      case CourseFeatureStatus.SETUP_REQUIRED:
+      case ConnectionFailed(:final error) when error is TimeTableSetupRequiredException:
         return Text(S.of(context!).next_course_setup);
+      case ConnectionFailed():
+      case ConnectionFatalError():
+        return Text(S.of(context!).failed);
     }
   }
 
   void refreshData() {
-    _status = CourseFeatureStatus.NONE;
+    status = const ConnectionNone();
     notifyUpdate();
   }
 
@@ -170,4 +177,3 @@ class LiveCourseModel {
   LiveCourseModel(this.nowCourse, this.nextCourse, this.courseLeft);
 }
 
-enum CourseFeatureStatus { NONE, CONNECTING, DONE, FAILED, SETUP_REQUIRED }

@@ -31,17 +31,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class WelcomeFeature extends Feature {
-  ConnectionStatus _status = ConnectionStatus.NONE;
-
   /// A list of card details.
   ///
   /// We only use them to determine whether the user has entry permission to the campus.
   List<CardDetailInfo>? _cardInfos;
 
   Future<void> _loadCardStatus() async {
-    _status = ConnectionStatus.CONNECTING;
+    status = const ConnectionConnecting();
     _cardInfos = await DataCenterRepository.getInstance().getCardDetailInfo();
-    _status = ConnectionStatus.DONE;
+    status = const ConnectionDone();
     notifyUpdate();
   }
 
@@ -81,9 +79,9 @@ class WelcomeFeature extends Feature {
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
-    if (_status == ConnectionStatus.NONE) {
-      _loadCardStatus().catchError((error) {
-        _status = ConnectionStatus.FAILED;
+    if (status is ConnectionNone) {
+      _loadCardStatus().catchError((error, stackTrace) {
+        status = ConnectionFailed(error, stackTrace);
         notifyUpdate();
       });
     }
@@ -113,9 +111,9 @@ class WelcomeFeature extends Feature {
   @override
   Widget get trailing {
     Widget status;
-    switch (_status) {
-      case ConnectionStatus.NONE:
-      case ConnectionStatus.CONNECTING:
+    switch (this.status) {
+      case ConnectionNone():
+      case ConnectionConnecting():
         status = PlatformCircularProgressIndicator();
         if (PlatformX.isMaterial(context!)) {
           status = SizedBox(
@@ -124,7 +122,7 @@ class WelcomeFeature extends Feature {
               child: ScaleTransform(scale: 0.5, child: status));
         }
         break;
-      case ConnectionStatus.DONE:
+      case ConnectionDone():
         if (_cardInfos?.any((element) => !element.permission.contains("是")) ??
             false) {
           status = Icon(
@@ -142,8 +140,8 @@ class WelcomeFeature extends Feature {
           );
         }
         break;
-      case ConnectionStatus.FAILED:
-      case ConnectionStatus.FATAL_ERROR:
+      case ConnectionFailed():
+      case ConnectionFatalError():
         status = const Icon(Icons.error);
         break;
     }
@@ -160,20 +158,20 @@ class WelcomeFeature extends Feature {
         ],
       ),
       onTap: () {
-        switch (_status) {
-          case ConnectionStatus.NONE:
-          case ConnectionStatus.CONNECTING:
+        switch (this.status) {
+          case ConnectionNone():
+          case ConnectionConnecting():
             break;
-          case ConnectionStatus.DONE:
+          case ConnectionDone():
             Noticing.showModalNotice(context!,
                 title: S.of(context!).entry_permission,
                 message: _cardInfos!.isEmpty
                     ? S.of(context!).no_data
                     : _cardInfos!.map((e) => e.permission).join("\n"));
             break;
-          case ConnectionStatus.FAILED:
-          case ConnectionStatus.FATAL_ERROR:
-            _status = ConnectionStatus.NONE;
+          case ConnectionFailed():
+          case ConnectionFatalError():
+            this.status = const ConnectionNone();
             notifyUpdate();
             break;
         }
