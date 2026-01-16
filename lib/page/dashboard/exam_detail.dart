@@ -42,39 +42,9 @@ import 'package:share_plus/share_plus.dart';
 
 part 'exam_detail.g.dart';
 
-// To preserve GPA data across semesters switches, we need `keepAlive: true`.
-// To control the behaviour of dropping previous GPA data when quit and re-enter
-// the `ExamList`, we need a notifier.
-//
-// Using `GpaNotifier` instead of `GPANotifier` avoids generating the awkward
-// provider name `gPANotifierProvider`.
-@Riverpod(keepAlive: true)
-class GpaNotifier extends _$GpaNotifier {
-  @override
-  Future<List<GpaListItem>> build() async {
-    return await _load();
-  }
-
-  Future<List<GpaListItem>> _load() =>
-      EduServiceRepository.getInstance().loadGpa();
-
-  Future<bool> reload() async {
-    if (state.isLoading) {
-      return false;
-    }
-
-    // `Riverpod(keepAlive: true)` doesn't set the state to loading by default,
-    // so we are setting it manually.
-    state = AsyncValue.loading();
-    try {
-      final data = await _load();
-      state = AsyncValue.data(data);
-      return true;
-    } catch (error, stacktrace) {
-      state = AsyncValue.error(error, stacktrace);
-      return false;
-    }
-  }
+@riverpod
+Future<List<GpaListItem>> gpa(Ref ref) async {
+  return EduServiceRepository.getInstance().loadGpa();
 }
 
 @riverpod
@@ -177,7 +147,7 @@ class ExamList extends HookConsumerWidget {
     useEffect(() {
       // Setting the state requires widgets to be stable.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(gpaProvider.notifier).reload();
+        ref.invalidate(gpaProvider);
       });
       return null;
     }, const []);
@@ -586,7 +556,7 @@ class ExamList extends HookConsumerWidget {
   }
 
   Future<void> _refreshAll(WidgetRef ref, String? semesterId) async {
-    await ref.read(gpaProvider.notifier).reload();
+    ref.invalidate(gpaProvider);
 
     ref.invalidate(semesterProvider);
 
