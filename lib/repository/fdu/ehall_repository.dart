@@ -26,7 +26,7 @@ class FudanEhallRepository extends BaseRepositoryWithDio {
   static const String _INFO_URL = "https://ehall.fudan.edu.cn/";
 
   static final Uri _LOGIN_URL = Uri.parse(
-      "https://ehall.fudan.edu.cn/manage/common/cas_login/30001?redirect=https%3A%2F%2Fehall.fudan.edu.cn");
+      "https://ehall.fudan.edu.cn/manage/common/login/index?redirect=https%3A%2F%2Fehall.fudan.edu.cn");
 
   static Future<void>? loginSession;
 
@@ -64,7 +64,7 @@ class FudanEhallRepository extends BaseRepositoryWithDio {
       },
       manualLoginUrl: _LOGIN_URL,
       info: info,
-      type: FudanLoginType.UISNeo,
+      type: FudanLoginType.Neo,
     );
   }
 
