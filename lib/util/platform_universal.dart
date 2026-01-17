@@ -136,7 +136,7 @@ class PlatformX {
     return type.getBrightness() == Brightness.dark;
   }
 
-  static bool isDebugMode(_) => SettingsProvider.getInstance().debugMode;
+  static bool isDebugMode(_) => SettingsProvider.getInstance().debugMode || kDebugMode;
 
   static Future<bool> get galleryStorageGranted async {
     if (isAndroid) {

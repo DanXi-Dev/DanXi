@@ -3,7 +3,9 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/dialogs/login_dialog.dart';
+import 'package:dio5_log/overlay_draggable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -14,6 +16,9 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (PlatformX.isDebugMode(SettingsProvider.getInstance().preferences)) {
+      showDebugBtn(context, btnSize: 50);
+    }
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
