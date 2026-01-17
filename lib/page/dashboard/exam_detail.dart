@@ -26,6 +26,7 @@ import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
@@ -41,48 +42,85 @@ import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../repository/fdu/time_table_repository.dart';
+
 part 'exam_detail.g.dart';
 
+@Riverpod(keepAlive: true)
+Future<SemesterBundle> semesterBundle(Ref ref) async {
+  return await EduServiceRepository.getInstance().loadSemesterBundle();
+}
+
+@Riverpod(keepAlive: true)
+Future<String> studentId(Ref ref) async {
+  final semesterBundle = await ref.watch(semesterBundleProvider.future);
+  return EduServiceRepository.getInstance()
+      .loadStudentId(semesterBundle.defaultSemesterId);
+}
+
+// Automatic retry is introduced in 3.0.0, so we are customizing the `retry`
+// parameter to keep the intermediate error states on `SemesterNoExamException`.
+//
+// https://pub.dev/documentation/riverpod/latest/riverpod/ProviderContainer/defaultRetry.html
+//
+// flutter_riverpod 3.0.0-dev.12
+// > Failing providers are now automatically retried after a delay.
+//
+// flutter_riverpod 3.0.0-dev.18
+// > A provider that is currently being retried is now flagged as "loading"
+// > while the retry attempts complete. Meaning that
+// > `ref.watch(provider.future)` skips the intermediate error states.
+Duration? _examListRetry(int retryCount, Object error) {
+  if (error is SemesterNoExamException) {
+    return null;
+  }
+  // https://pub.dev/documentation/riverpod/latest/riverpod/ProviderContainer/defaultRetry.html
+  return ProviderContainer.defaultRetry(retryCount, error);
+}
+
+@Riverpod(keepAlive: true, retry: _examListRetry)
+Future<List<Exam>> examList(Ref ref) async {
+  final studentId = await ref.watch(studentIdProvider.future);
+  return await EduServiceRepository.getInstance().loadExamList(studentId);
+}
+
+@Riverpod(retry: _examListRetry)
+Future<List<Exam>> examListInSemester(Ref ref, SemesterInfo semester) async {
+  final exams = await ref.watch(examListProvider.future);
+  final examsInSemester = exams.filter((exam) => semester.matchName(exam.date));
+  if (examsInSemester.isEmpty) {
+    throw SemesterNoExamException();
+  }
+  return examsInSemester;
+}
+
+@Riverpod(keepAlive: true)
+Future<List<ExamScore>> examScoreList(Ref ref, String semesterId) async {
+  final studentId = await ref.watch(studentIdProvider.future);
+  return await EduServiceRepository.getInstance()
+      .loadExamScoreList(studentId, semesterId);
+}
+
 @riverpod
-Future<List<GpaListItem>> gpa(Ref ref) async {
-  return EduServiceRepository.getInstance().loadGpa();
+Future<List<ExamScore>> examScoreListFromDataCenter(Ref ref) async {
+  return await DataCenterRepository.getInstance()
+      .loadAllExamScore(sp.StateProvider.personInfo.value);
+}
+
+@Riverpod(keepAlive: true)
+Future<List<GpaListItem>> gpaList(Ref ref) async {
+  final studentId = await ref.watch(studentIdProvider.future);
+  return EduServiceRepository.getInstance().loadGpaList(studentId);
 }
 
 @riverpod
 GpaListItem? userGpa(Ref ref) {
-  final gpa = ref.watch(gpaProvider);
-  final userId = sp.StateProvider.personInfo.value?.id;
-  if (userId == null) {
-    return null;
-  }
-
-  return gpa.maybeWhen(
-    data: (gpaList) =>
-        gpaList.firstWhereOrNull((element) => element.id == userId),
+  final gpaList = ref.watch(gpaListProvider);
+  return gpaList.maybeWhen(
+    data: (value) => ExamList.getUserGpaItem(value),
     // If we cannot find such an element, we will just return null.
     orElse: () => null,
   );
-}
-
-@riverpod
-Future<List<SemesterInfo>> semester(Ref ref) async {
-  return (await EduServiceRepository.getInstance().loadSemesters()).semesters;
-}
-
-@riverpod
-Future<List<Exam>> exam(Ref ref, String semesterId) async {
-  return await EduServiceRepository.getInstance().loadExamList(semesterId);
-}
-
-@riverpod
-Future<List<ExamScore>> examScore(Ref ref, String semesterId) async {
-  return await EduServiceRepository.getInstance().loadExamScore(semesterId);
-}
-
-@riverpod
-Future<List<ExamScore>> examScoreFromDataCenter(Ref ref) async {
-  return await DataCenterRepository.getInstance()
-      .loadAllExamScore(sp.StateProvider.personInfo.value);
 }
 
 /// A list page showing user's GPA scores and exam information.
@@ -94,61 +132,16 @@ class ExamList extends HookConsumerWidget {
 
   const ExamList({super.key, this.arguments});
 
-  void _exportICal(BuildContext context, List<Exam> examList) async {
-    if (examList.isEmpty) {
-      Noticing.showNotice(context, S.of(context).exam_unavailable,
-          title: S.of(context).fatal_error);
-      return;
-    }
-    ICalendar cal = ICalendar(company: 'DanXi', lang: "CN");
-    for (var element in examList) {
-      if (element.date.trim().isNotEmpty && element.time.trim().isNotEmpty) {
-        try {
-          cal.addElement(IEvent(
-            summary: element.name,
-            location: element.location,
-            status: IEventStatus.CONFIRMED,
-            description:
-                "${element.testCategory} ${element.type}\n${element.note}",
-            // toUtc: https://github.com/DanXi-Dev/DanXi/issues/522
-            start:
-                DateTime.parse('${element.date} ${element.time.split('~')[0]}')
-                    .toUtc(),
-            end: DateTime.parse('${element.date} ${element.time.split('~')[1]}')
-                .toUtc(),
-          ));
-        } catch (ignored) {
-          Noticing.showNotice(
-              context, S.of(context).error_adding_exam(element.name),
-              title: S.of(context).fatal_error);
-        }
-      }
-    }
-    Directory documentDir = await getApplicationDocumentsDirectory();
-    File outputFile = PlatformX.createPlatformFile(
-        "${documentDir.absolute.path}/output_timetable/exam.ics");
-    outputFile.createSync(recursive: true);
-    await outputFile.writeAsString(cal.serialize(), flush: true);
-    if (PlatformX.isIOS) {
-      OpenFile.open(outputFile.absolute.path, type: "text/calendar");
-    } else if (PlatformX.isAndroid) {
-      SharePlus.instance.share(ShareParams(
-          files: [XFile(outputFile.absolute.path, mimeType: "text/calendar")]));
-    } else if (context.mounted) {
-      Noticing.showNotice(context, outputFile.absolute.path);
-    }
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final semesters = ref.watch(semesterProvider);
+    final semesterBundle = ref.watch(semesterBundleProvider);
     final currentSemesterIndex = useState<int?>(null);
     final currentExamRef = useState<List<Exam>?>(null);
 
     useEffect(() {
       // Setting the state requires widgets to be stable.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.invalidate(gpaProvider);
+        _refreshAll(ref);
       });
       return null;
     }, const []);
@@ -171,9 +164,9 @@ class ExamList extends HookConsumerWidget {
           ],
         ),
         body: SafeArea(
-          child: switch (semesters) {
+          child: switch (semesterBundle) {
             AsyncData(:final value) => _loadExamGradeHybridView(
-                context, ref, value, currentSemesterIndex,
+                context, ref, value.semesters, currentSemesterIndex,
                 currentExamRef: currentExamRef),
             AsyncError() => _loadGradeViewFromDataCenter(context, ref),
             _ => Center(child: PlatformCircularProgressIndicator()),
@@ -192,14 +185,14 @@ class ExamList extends HookConsumerWidget {
       return _getNoDataWidget(context);
     }
 
-    final currentExamProvider = examProvider(semesterId);
-    final currentScoreProvider = examScoreProvider(semesterId);
-    final exams = ref.watch(currentExamProvider);
-    final scores = ref.watch(currentScoreProvider);
+    final currentExamListProvider = examListInSemesterProvider(currentSemester);
+    final currentScoreListProvider = examScoreListProvider(semesterId);
+    final exams = ref.watch(currentExamListProvider);
+    final scores = ref.watch(currentScoreListProvider);
 
     void reloadData() {
-      ref.invalidate(currentExamProvider);
-      ref.invalidate(currentScoreProvider);
+      ref.invalidate(currentExamListProvider);
+      ref.invalidate(currentScoreListProvider);
     }
 
     Widget body;
@@ -278,7 +271,7 @@ class ExamList extends HookConsumerWidget {
   }
 
   Widget _loadGradeViewFromDataCenter(BuildContext context, WidgetRef ref) {
-    final scores = ref.watch(examScoreFromDataCenterProvider);
+    final scores = ref.watch(examScoreListFromDataCenterProvider);
     switch (scores) {
       case AsyncData(value: final data):
         return _buildGradeLayout(context, ref, data, null, isFallback: true);
@@ -288,7 +281,7 @@ class ExamList extends HookConsumerWidget {
               '${S.of(context).failed}\n${S.of(context).need_campus_network}\n\nError:\n${ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error)}',
           error: error,
           trace: stackTrace,
-          onTap: () => ref.invalidate(examScoreFromDataCenterProvider),
+          onTap: () => ref.invalidate(examScoreListFromDataCenterProvider),
           buttonText: S.of(context).retry,
         );
       default:
@@ -297,14 +290,14 @@ class ExamList extends HookConsumerWidget {
   }
 
   Widget _buildRefreshableListView(BuildContext context, WidgetRef ref,
-      List<Widget> widgets, String? semesterId) =>
+      List<Widget> widgets) =>
       WithScrollbar(
           controller: PrimaryScrollController.of(context),
           child: RefreshIndicator(
               edgeOffset: MediaQuery.of(context).padding.top,
               color: Theme.of(context).colorScheme.secondary,
               backgroundColor: DialogTheme.of(context).backgroundColor,
-              onRefresh: () => _refreshAll(ref, semesterId),
+              onRefresh: () => _refreshAll(ref),
               child: ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: widgets)));
@@ -312,23 +305,45 @@ class ExamList extends HookConsumerWidget {
   Widget _buildGradeLayout(BuildContext context, WidgetRef ref,
       List<ExamScore> examScores, String? semesterId,
       {bool isFallback = false}) =>
-      _buildRefreshableListView(
-        context, ref,
-        _getListWidgetsGrade(context, ref, examScores, isFallback: isFallback),
-        semesterId,
-      );
+      _buildRefreshableListView(context, ref, _getListWidgetsGrade(
+          context, ref, examScores, isFallback: isFallback),);
 
   Widget _buildHybridLayout(BuildContext context, WidgetRef ref,
       List<Exam> exams, List<ExamScore> scores, String? semesterId) =>
       _buildRefreshableListView(
-        context, ref,
-        _getListWidgetsHybrid(context, ref, exams, scores),
-        semesterId,
-      );
+          context, ref, _getListWidgetsHybrid(context, ref, exams, scores));
 
   Widget _buildGpaCard(BuildContext context, WidgetRef ref) {
-    final gpa = ref.watch(gpaProvider);
-    final userGpa = ref.watch(userGpaProvider);
+    final gpaList = ref.watch(gpaListProvider);
+    Widget? trailing;
+    Widget? subtitle;
+    var onTap = () {};
+    switch (gpaList) {
+      case AsyncData(value: final gpaList):
+        {
+          final userGpa = getUserGpaItem(gpaList);
+          trailing = Text(
+            userGpa?.gpa ?? "N/A",
+            textScaler: TextScaler.linear(1.25),
+            style: const TextStyle(color: Colors.white),
+          );
+          subtitle = Text(
+              S.of(context).your_gpa_subtitle(
+                  userGpa?.rank ?? "N/A", userGpa?.credits ?? "N/A"),
+              style: TextStyle(color: Colors.white));
+          onTap = () {
+            smartNavigatorPush(
+                context, "/exam/gpa", arguments: {"gpalist": gpaList});
+          };
+        }
+      case AsyncError():
+        {}
+      case _:
+        {
+          trailing = const PlatformCircularProgressIndicator();
+          subtitle = Text(S.of(context).loading);
+        }
+    }
     return Card(
       color: PlatformX.backgroundAccentColor(context),
       child: ListTile(
@@ -337,29 +352,9 @@ class ExamList extends HookConsumerWidget {
           S.of(context).your_gpa,
           style: const TextStyle(color: Colors.white),
         ),
-        trailing: switch (gpa) {
-          AsyncData() => Text(
-              userGpa?.gpa ?? "N/A",
-              textScaler: TextScaler.linear(1.25),
-              style: const TextStyle(color: Colors.white),
-            ),
-          AsyncError() => nil,
-          _ => PlatformCircularProgressIndicator(),
-        },
-        subtitle: switch (gpa) {
-          AsyncData() => Text(
-              S.of(context).your_gpa_subtitle(
-                  userGpa?.rank ?? "N/A", userGpa?.credits ?? "N/A"),
-              style: TextStyle(color: Colors.white)),
-          AsyncError() => nil,
-          _ => Text(S.of(context).loading),
-        },
-        onTap: () {
-          if (gpa case AsyncData(value: final gpaList)) {
-            smartNavigatorPush(context, "/exam/gpa",
-                arguments: {"gpalist": gpaList});
-          }
-        },
+        trailing: trailing,
+        subtitle: subtitle,
+        onTap: onTap,
       ),
     );
   }
@@ -562,16 +557,63 @@ class ExamList extends HookConsumerWidget {
             child: Text(S.of(context).no_data),
           ));
 
-  Future<void> _refreshAll(WidgetRef ref, String? semesterId) async {
-    ref.invalidate(gpaProvider);
+  Future<void> _refreshAll(WidgetRef ref) async {
+    // Invalidate the root and all dependent providers will be invalidated.
+    ref.invalidate(semesterBundleProvider);
+  }
 
-    ref.invalidate(semesterProvider);
+  void _exportICal(BuildContext context, List<Exam> examList) async {
+    if (examList.isEmpty) {
+      Noticing.showNotice(context, S.of(context).exam_unavailable,
+          title: S.of(context).fatal_error);
+      return;
+    }
+    ICalendar cal = ICalendar(company: 'DanXi', lang: "CN");
+    for (var element in examList) {
+      if (element.date.trim().isNotEmpty && element.time.trim().isNotEmpty) {
+        try {
+          cal.addElement(IEvent(
+            summary: element.name,
+            location: element.location,
+            status: IEventStatus.CONFIRMED,
+            description:
+            "${element.testCategory} ${element.type}\n${element.note}",
+            // toUtc: https://github.com/DanXi-Dev/DanXi/issues/522
+            start:
+            DateTime.parse('${element.date} ${element.time.split('~')[0]}')
+                .toUtc(),
+            end: DateTime.parse('${element.date} ${element.time.split('~')[1]}')
+                .toUtc(),
+          ));
+        } catch (ignored) {
+          Noticing.showNotice(
+              context, S.of(context).error_adding_exam(element.name),
+              title: S.of(context).fatal_error);
+        }
+      }
+    }
+    Directory documentDir = await getApplicationDocumentsDirectory();
+    File outputFile = PlatformX.createPlatformFile(
+        "${documentDir.absolute.path}/output_timetable/exam.ics");
+    outputFile.createSync(recursive: true);
+    await outputFile.writeAsString(cal.serialize(), flush: true);
+    if (PlatformX.isIOS) {
+      OpenFile.open(outputFile.absolute.path, type: "text/calendar");
+    } else if (PlatformX.isAndroid) {
+      SharePlus.instance.share(ShareParams(
+          files: [XFile(outputFile.absolute.path, mimeType: "text/calendar")]));
+    } else if (context.mounted) {
+      Noticing.showNotice(context, outputFile.absolute.path);
+    }
+  }
 
-    if (semesterId != null) {
-      ref.invalidate(examProvider(semesterId));
-      ref.invalidate(examScoreProvider(semesterId));
+  static GpaListItem? getUserGpaItem(List<GpaListItem> gpaList) {
+    final userId = sp.StateProvider.personInfo.value?.id;
+    if (userId == null) {
+      return null;
     }
 
-    ref.invalidate(examScoreFromDataCenterProvider);
+    // If we cannot find such an element, we will just return null.
+    return gpaList.firstWhereOrNull((element) => element.id == userId);
   }
 }

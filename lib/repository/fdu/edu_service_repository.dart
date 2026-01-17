@@ -59,39 +59,14 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   /// Load all semesters and their start dates, etc.
   ///
   /// Returns a [SemesterBundle].
-  Future<SemesterBundle> loadSemesters() =>
+  Future<SemesterBundle> loadSemesterBundle() =>
       TimeTableRepository.getInstance().loadSemestersForTimeTable();
 
-  String? _cachedStudentId;
-  Future<String>? _loadingStudentIdFuture;
-
-  /// Memorizes the in-flight request to avoid duplicate concurrent network
-  /// calls.
-  Future<String> loadStudentIdCached() {
-    final cachedStudentId = _cachedStudentId;
-    if (cachedStudentId != null) {
-      return Future.value(cachedStudentId);
-    }
-    final loadingFuture = _loadingStudentIdFuture;
-    if (loadingFuture != null) {
-      return loadingFuture;
-    }
-    final newLoadingFuture = loadStudentId();
-    _loadingStudentIdFuture = newLoadingFuture;
-    return newLoadingFuture.then((studentId) {
-      _cachedStudentId = studentId;
-      return studentId;
-    }).whenComplete(() {
-      _loadingStudentIdFuture = null;
-    });
-  }
-
   /// Get student ID from course table API
-  Future<String> loadStudentId() async {
-    final semesterBundle = await loadSemesters();
+  Future<String> loadStudentId(String defaultSemesterId) async {
     final options = RequestOptions(
       method: "GET",
-      path: getSemesterCourseTableUrl(semesterBundle.defaultSemesterId),
+      path: getSemesterCourseTableUrl(defaultSemesterId),
     );
     return FudanSession.request(options, (res) {
       final Map<String, dynamic> data = res.data!;
@@ -166,17 +141,12 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   ///     <td>已结束</td>
   /// </tr>
   /// ```
-  Future<List<Exam>> loadExamList(String semesterId) async {
-    final studentId = await loadStudentIdCached();
-    final semesterBundle = await loadSemesters();
-    if (semesterBundle.defaultSemesterId != semesterId) {
-      throw SemesterNoExamException();
-    }
+  Future<List<Exam>> loadExamList(String studentId) async {
     final options = RequestOptions(
       method: "GET",
       path: getExamArrangeUrl(studentId),
     );
-    return FudanSession.request(options, (res) {
+    return await FudanSession.request(options, (res) {
       final soup = BeautifulSoup(res.data!);
       // Use this selector to filter out finished exams.
       final elements = soup.findAll(
@@ -259,8 +229,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  Future<List<ExamScore>> loadExamScore(String semesterId) async {
-    final studentId = await loadStudentIdCached();
+  Future<List<ExamScore>> loadExamScoreList(String studentId,
+      String semesterId) async {
     final options = RequestOptions(
       method: "GET",
       path: getGradeSheetUrl(studentId, semesterId),
@@ -302,8 +272,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  Future<List<GpaListItem>> loadGpa() async {
-    final studentId = await loadStudentIdCached();
+  Future<List<GpaListItem>> loadGpaList(String studentId) async {
     final searchIndexOptions = RequestOptions(
       method: "GET",
       path: getMyGpaSearchIndexUrl(studentId),
@@ -443,11 +412,31 @@ class SemesterInfo {
   factory SemesterInfo.fromCourseTableJson(Map<String, dynamic> json) {
     final id = json["id"].toString();
     final name = json["name"]!;
-    final nameRegex = RegExp("\\D*(\\d{4}-\\d{4})\\D+(\\d+)\\D*");
-    final nameMatch = nameRegex.firstMatch(name)!;
-    final schoolYear = nameMatch.group(1)!;
-    final season = nameMatch.group(2)!;
+    final (schoolYear, season) = parseYearAndSeason(name)!;
     return SemesterInfo(id, schoolYear, season);
+  }
+
+  static (String, String)? parseYearAndSeason(String name) {
+    final nameRegex = RegExp("\\D*(\\d{4}-\\d{4})\\D+(\\d+)\\D*");
+    final nameMatch = nameRegex.firstMatch(name);
+    if (nameMatch == null) {
+      return null;
+    }
+    final schoolYear = nameMatch.group(1);
+    final season = nameMatch.group(2);
+    if (schoolYear == null || season == null) {
+      return null;
+    }
+    return (schoolYear, season);
+  }
+
+  bool matchName(String name) {
+    final yearAndSeason = parseYearAndSeason(name);
+    if (yearAndSeason == null) {
+      return false;
+    }
+    final (schoolYear, season) = yearAndSeason;
+    return this.schoolYear == schoolYear && this.name == season;
   }
 }
 

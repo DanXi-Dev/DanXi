@@ -14,118 +14,129 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import 'package:collection/collection.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../util/platform_universal.dart';
+import 'exam_detail.dart';
 
 /// A list page showing user's GPA scores and his/her ranking.
-class GpaTablePage extends StatefulWidget {
+class GpaTablePage extends HookConsumerWidget {
   final Map<String, dynamic>? arguments;
 
-  @override
-  GpaTablePageState createState() => GpaTablePageState();
-
   const GpaTablePage({super.key, this.arguments});
-}
-
-class GpaTablePageState extends State<GpaTablePage> {
-  bool inSameMajor = false;
-
-  GpaListItem? _myGpa;
-  List<GpaListItem>? _gpaList;
-  List<GpaListItem>? _sameMajorGpaList;
-  static const String NAME_HIDDEN = "****";
-
-  List<GpaListItem>? get gpaList => inSameMajor ? _sameMajorGpaList : _gpaList;
-
-  set gpaList(List<GpaListItem>? value) {
-    _myGpa = value?.firstWhereOrNull((element) => element.name != NAME_HIDDEN);
-    _gpaList = value;
-    _sameMajorGpaList = _myGpa == null
-        ? _gpaList
-        : value?.where((element) => element.major == _myGpa?.major).toList();
-  }
 
   @override
-  void initState() {
-    super.initState();
-    gpaList = widget.arguments!['gpalist'];
-  }
+  Widget build(BuildContext context, WidgetRef ref) {
+    // No need to use `useMemoized` for these calculations being light enough.
+    final List<GpaListItem> fullGpaList = arguments!['gpalist'];
+    final userGpa = ExamList.getUserGpaItem(fullGpaList);
+    final sameMajorGpaList = userGpa == null
+        ? fullGpaList
+        : fullGpaList
+              .where((element) => element.major == userGpa.major)
+              .toList();
 
-  @override
-  Widget build(BuildContext context) {
+    final inSameMajor = useState(false);
+
     return PlatformScaffold(
-        iosContentBottomPadding: false,
-        iosContentPadding: false,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: PlatformAppBarX(
-          title: Text(S.of(context).your_gpa),
-          trailingActions: [
-            PlatformIconButton(
-              padding: EdgeInsets.zero,
-              icon: Icon(PlatformX.isMaterial(context)
-                  ? inSameMajor
-                      ? Icons.group_off
-                      : Icons.group
-                  : inSameMajor
-                      ? CupertinoIcons.person_2
-                      : CupertinoIcons.person_3),
-              onPressed: () {
-                setState(() {
-                  inSameMajor = !inSameMajor;
-                });
-              },
+      iosContentBottomPadding: false,
+      iosContentPadding: false,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: PlatformAppBarX(
+        title: Text(S.of(context).your_gpa),
+        trailingActions: [
+          PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon: Icon(
+              PlatformX.isMaterial(context)
+                  ? inSameMajor.value
+                        ? Icons.group_off
+                        : Icons.group
+                  : inSameMajor.value
+                  ? CupertinoIcons.person_2
+                  : CupertinoIcons.person_3,
             ),
-          ],
+            onPressed: () {
+              inSameMajor.value = !inSameMajor.value;
+            },
+          ),
+        ],
+      ),
+      body: SafeArea(
+        bottom: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+          controller: PrimaryScrollController.of(context),
+          child: Table(
+            children: _buildGpaRow(
+              context,
+              inSameMajor.value ? sameMajorGpaList : fullGpaList,
+              userGpa,
+            ),
+          ),
         ),
-        body: SafeArea(
-            bottom: false,
-            child: SingleChildScrollView(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-                controller: PrimaryScrollController.of(context),
-                child: Table(children: _buildGpaRow()))));
+      ),
+    );
   }
 
-  List<TableRow> _buildGpaRow() {
+  List<TableRow> _buildGpaRow(
+    BuildContext context,
+    List<GpaListItem> gpaList,
+    GpaListItem? userGpa,
+  ) {
     List<TableRow> widgets = [
       TableRow(
-          children: [
-        S.of(context).major,
-        S.of(context).gpa,
-        S.of(context).credits,
-        S.of(context).rank,
-        S.of(context).percentile,
-      ]
-              .map((headText) => Text(headText,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.bold)))
-              .toList())
+        children:
+            [
+                  S.of(context).major,
+                  S.of(context).gpa,
+                  S.of(context).credits,
+                  S.of(context).rank,
+                  S.of(context).percentile,
+                ]
+                .map(
+                  (headText) => Text(
+                    headText,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                )
+                .toList(),
+      ),
     ];
 
-    final chosenGpaList = gpaList!;
-    for (var (index, element) in chosenGpaList.indexed) {
-      TextStyle? textColorStyle = identical(element, _myGpa)
+    for (var (index, element) in gpaList.indexed) {
+      TextStyle? textColorStyle = identical(element, userGpa)
           ? null
           : TextStyle(color: Theme.of(context).colorScheme.secondary);
-      widgets.add(TableRow(
-          children: [
-        element.major,
-        element.gpa,
-        element.credits,
-        element.rank,
-        // The fetched GPA lists are usually sorted.
-        "${(100 * index / chosenGpaList.length).toStringAsFixed(2)}%",
-      ]
-              .map((itemText) => Text(itemText,
-                  textAlign: TextAlign.center, style: textColorStyle))
-              .toList()));
+      widgets.add(
+        TableRow(
+          children:
+              [
+                    element.major,
+                    element.gpa,
+                    element.credits,
+                    element.rank,
+                    // The fetched GPA lists are usually sorted.
+                    "${(100 * index / gpaList.length).toStringAsFixed(2)}%",
+                  ]
+                  .map(
+                    (itemText) => Text(
+                      itemText,
+                      textAlign: TextAlign.center,
+                      style: textColorStyle,
+                    ),
+                  )
+                  .toList(),
+        ),
+      );
     }
     return widgets;
   }
