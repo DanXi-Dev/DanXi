@@ -26,6 +26,7 @@ import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
@@ -78,9 +79,19 @@ Duration? _examListRetry(int retryCount, Object error) {
 }
 
 @Riverpod(keepAlive: true, retry: _examListRetry)
-Future<List<Exam>> examList(Ref ref, String semesterId) async {
+Future<List<Exam>> examList(Ref ref) async {
   final studentId = await ref.watch(studentIdProvider.future);
   return await EduServiceRepository.getInstance().loadExamList(studentId);
+}
+
+@Riverpod(retry: _examListRetry)
+Future<List<Exam>> examListInSemester(Ref ref, SemesterInfo semester) async {
+  final exams = await ref.watch(examListProvider.future);
+  final examsInSemester = exams.filter((exam) => semester.matchName(exam.date));
+  if (examsInSemester.isEmpty) {
+    throw SemesterNoExamException();
+  }
+  return examsInSemester;
 }
 
 @Riverpod(keepAlive: true)
@@ -174,7 +185,7 @@ class ExamList extends HookConsumerWidget {
       return _getNoDataWidget(context);
     }
 
-    final currentExamListProvider = examListProvider(semesterId);
+    final currentExamListProvider = examListInSemesterProvider(currentSemester);
     final currentScoreListProvider = examScoreListProvider(semesterId);
     final exams = ref.watch(currentExamListProvider);
     final scores = ref.watch(currentScoreListProvider);

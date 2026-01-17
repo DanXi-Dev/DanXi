@@ -146,7 +146,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       method: "GET",
       path: getExamArrangeUrl(studentId),
     );
-    final exams = await FudanSession.request(options, (res) {
+    return await FudanSession.request(options, (res) {
       final soup = BeautifulSoup(res.data!);
       // Use this selector to filter out finished exams.
       final elements = soup.findAll(
@@ -227,11 +227,6 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
       return exams;
     });
-
-    if (exams.isEmpty) {
-      throw SemesterNoExamException();
-    }
-    return exams;
   }
 
   Future<List<ExamScore>> loadExamScoreList(String studentId,
@@ -417,11 +412,31 @@ class SemesterInfo {
   factory SemesterInfo.fromCourseTableJson(Map<String, dynamic> json) {
     final id = json["id"].toString();
     final name = json["name"]!;
-    final nameRegex = RegExp("\\D*(\\d{4}-\\d{4})\\D+(\\d+)\\D*");
-    final nameMatch = nameRegex.firstMatch(name)!;
-    final schoolYear = nameMatch.group(1)!;
-    final season = nameMatch.group(2)!;
+    final (schoolYear, season) = parseYearAndSeason(name)!;
     return SemesterInfo(id, schoolYear, season);
+  }
+
+  static (String, String)? parseYearAndSeason(String name) {
+    final nameRegex = RegExp("\\D*(\\d{4}-\\d{4})\\D+(\\d+)\\D*");
+    final nameMatch = nameRegex.firstMatch(name);
+    if (nameMatch == null) {
+      return null;
+    }
+    final schoolYear = nameMatch.group(1);
+    final season = nameMatch.group(2);
+    if (schoolYear == null || season == null) {
+      return null;
+    }
+    return (schoolYear, season);
+  }
+
+  bool matchName(String name) {
+    final yearAndSeason = parseYearAndSeason(name);
+    if (yearAndSeason == null) {
+      return false;
+    }
+    final (schoolYear, season) = yearAndSeason;
+    return this.schoolYear == schoolYear && this.name == season;
   }
 }
 
