@@ -152,7 +152,11 @@ class ErrorPageWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[icon!, const SizedBox(height: 8)],
-            Text(errorMessage, style: errorMessageTextStyle),
+            Text(
+              errorMessage,
+              style: errorMessageTextStyle,
+              textAlign: TextAlign.center,
+            ),
             if (buttonText != "") ...[
               const SizedBox(height: 8),
               PlatformElevatedButton(

@@ -321,15 +321,28 @@ class ExamList extends HookConsumerWidget {
         return _buildGradeLayout(context, ref, data, null, isFallback: true);
       case AsyncError(:final error, :final stackTrace):
         return ErrorPageWidget(
-          errorMessage:
-              '${S.of(context).failed}\n${S.of(context).need_campus_network}\n\nError:\n${ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error)}',
+          errorMessage: S.of(context).data_center_unavailable_2026_0117,
           error: error,
           trace: stackTrace,
           onTap: () => ref.invalidate(examScoreListFromDataCenterProvider),
           buttonText: S.of(context).retry,
         );
       default:
-        return Center(child: PlatformCircularProgressIndicator());
+        return Center(
+          // Revert it and the above to the single progress indicator after the
+          // data center source is fixed.
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              PlatformCircularProgressIndicator(),
+              const SizedBox(height: 64),
+              Text(
+                S.of(context).data_center_unavailable_2026_0117,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
     }
   }
 
