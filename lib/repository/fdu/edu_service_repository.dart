@@ -146,7 +146,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       method: "GET",
       path: getExamArrangeUrl(studentId),
     );
-    return FudanSession.request(options, (res) {
+    final exams = await FudanSession.request(options, (res) {
       final soup = BeautifulSoup(res.data!);
       // Use this selector to filter out finished exams.
       final elements = soup.findAll(
@@ -227,6 +227,11 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
       return exams;
     });
+
+    if (exams.isEmpty) {
+      throw SemesterNoExamException();
+    }
+    return exams;
   }
 
   Future<List<ExamScore>> loadExamScoreList(String studentId,
