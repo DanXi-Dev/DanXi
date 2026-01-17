@@ -52,7 +52,7 @@ class LoginPage extends StatelessWidget {
                             enabled: !uisLoggedIn,
                             onTap: () => LoginDialog.showLoginDialog(
                                 context,
-                                SettingsProvider.getInstance().preferences,
+                                SettingsProvider.getInstance().preferences!,
                                 StateProvider.personInfo,
                                 true,
                                 showFullOptions: false),
@@ -64,7 +64,7 @@ class LoginPage extends StatelessWidget {
                             enabled: !uisLoggedIn,
                             onTap: () => LoginDialog.showLoginDialog(
                                 context,
-                                SettingsProvider.getInstance().preferences,
+                                SettingsProvider.getInstance().preferences!,
                                 StateProvider.personInfo,
                                 true,
                                 showFullOptions: false,

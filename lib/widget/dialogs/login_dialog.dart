@@ -36,8 +36,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 const kCompatibleUserGroup = [
   UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
@@ -47,170 +49,35 @@ const kCompatibleUserGroup = [
 /// [LoginDialog] is a dialog allowing user to log in by inputting their UIS ID/Password.
 ///
 /// Also contains the logic to process logging in.
-class LoginDialog extends StatefulWidget {
-  final XSharedPreferences? sharedPreferences;
+class LoginDialog extends HookConsumerWidget {
+  final XSharedPreferences sharedPreferences;
   final ValueNotifier<PersonInfo?> personInfo;
   final bool dismissible;
   final bool showFullOptions;
   final bool isGraduate;
-  static bool _isShown = false;
+  final UserGroup _defaultUserGroup;
 
-  static bool get dialogShown => _isShown;
-
-  static Future<void> showLoginDialog(BuildContext context, XSharedPreferences? preferences,
-      ValueNotifier<PersonInfo?> personInfo, bool dismissible, {bool showFullOptions = true, bool isGraduate = false}) async {
-    if (_isShown) return;
-    _isShown = true;
-    await showPlatformDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => LoginDialog(
-            sharedPreferences: preferences,
-            personInfo: personInfo,
-            dismissible: dismissible,
-            showFullOptions: showFullOptions,
-            isGraduate: isGraduate));
-    _isShown = false;
-  }
-
-  const LoginDialog(
-      {super.key,
-      required this.sharedPreferences,
-      required this.personInfo,
-      required this.dismissible,
-      required this.showFullOptions,
-      required this.isGraduate});
+  const LoginDialog({super.key, required this.sharedPreferences, required this.personInfo, required this.dismissible, required this.showFullOptions, required this.isGraduate}):
+    _defaultUserGroup = isGraduate ? UserGroup.FUDAN_POSTGRADUATE_STUDENT : UserGroup.FUDAN_UNDERGRADUATE_STUDENT;
 
   @override
-  LoginDialogState createState() => LoginDialogState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nameController = useTextEditingController();
+    final pwdController = useTextEditingController();
+    final currentGroup = useState<UserGroup>(_defaultUserGroup);
+    final errorWidget = useState<Widget>(SizedBox.shrink());
 
-class LoginDialogState extends State<LoginDialog> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _pwdController = TextEditingController();
-  Widget _errorWidget = SizedBox.shrink();
-  late final UserGroup _defaultUserGroup;
-  late UserGroup _group;
-
-  @override
-  void initState() {
-    super.initState();
-    _defaultUserGroup = widget.isGraduate 
-        ? UserGroup.FUDAN_POSTGRADUATE_STUDENT
-        : UserGroup.FUDAN_UNDERGRADUATE_STUDENT;
-    _group = _defaultUserGroup;
-  }
-
-  /// Attempt to log in for verification.
-  Future<void> _tryLogin(String id, String password) async {
-    if (id.length * password.length == 0) {
-      return;
-    }
-    ProgressFuture progressDialog = showProgressDialog(
-        loadingText: S.of(context).logining, context: context);
-    switch (_group) {
-      case UserGroup.FUDAN_POSTGRADUATE_STUDENT:
-      case UserGroup.FUDAN_UNDERGRADUATE_STUDENT:
-        PersonInfo newInfo = PersonInfo.createNewInfo(id, password, _group);
-        try {
-          final stuInfo =
-              await FudanEhallRepository.getInstance().getStudentInfo(newInfo);
-          newInfo.name = stuInfo.name;
-          await newInfo.saveToSharedPreferences(widget.sharedPreferences!);
-          widget.personInfo.value = newInfo;
-          progressDialog.dismiss(showAnim: false);
-          if (mounted) {
-            Navigator.of(context).pop(); 
-          }
-        } catch (e) {
-          if (e is DioException) {
-            progressDialog.dismiss(showAnim: false);
-            rethrow;
-          }
-          try {
-            newInfo.name = await CardRepository.getInstance().getName(newInfo);
-            if (newInfo.name?.isEmpty ?? true) {
-              throw Exception("Unable to get user name");
-            }
-            await newInfo.saveToSharedPreferences(widget.sharedPreferences!);
-            widget.personInfo.value = newInfo;
-            progressDialog.dismiss(showAnim: false);
-            if (mounted) {
-              Navigator.of(context).pop(); 
-            }
-          } catch (error) {
-            progressDialog.dismiss(showAnim: false);
-            rethrow;
-          }
-        }
-        break;
-      case UserGroup.FUDAN_STAFF:
-      case UserGroup.SJTU_STUDENT:
-        progressDialog.dismiss(showAnim: false);
-        break;
-    }
-  }
-
-  
-
-  void requestInternetAccess() async {
-    // This webpage only returns plain-text 'SUCCESS' and is ideal for testing connection.
-    try {
-      // fixme: use a privacy-friendly captive portal detection method.
-      await DioUtils.newDioWithProxy().head('http://captive.apple.com');
-    } catch (ignored) {}
-  }
-
-  List<Widget> _buildLoginAsList(BuildContext menuContext) {
-    List<Widget> widgets = [];
-    for (var e in kCompatibleUserGroup) {
-      if (e != _group) {
-        widgets.add(PlatformContextMenuItem(
-          menuContext: menuContext,
-          onPressed: () => _switchLoginGroup(e),
-          child: Text(kUserGroupDescription[e]!(menuContext)),
-        ));
-      }
-    }
-    return widgets;
-  }
-
-  void _executeLogin() {
-    _tryLogin(_nameController.text, _pwdController.text)
-        .catchError((error, stack) {
-      if (error is CredentialsInvalidException) {
-        _pwdController.text = "";
-      }
-      if (!mounted) return;
-      _errorWidget = ErrorPageWidget.buildWidget(
-        context,
-        error,
-        stackTrace: stack,
-        buttonText: "", // hide the button
-        errorMessageTextStyle: const TextStyle(fontSize: 12, color: Colors.red),
-      );
-      refreshSelf();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var defaultText =
-        Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 12);
-    var linkText = Theme.of(context)
+    final defaultText =
+    Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 12);
+    final linkText = Theme.of(context)
         .textTheme
         .bodyMedium!
         .copyWith(color: Theme.of(context).colorScheme.secondary, fontSize: 12);
 
-    //Tackle #25
-    if (!widget.dismissible) {
-      requestInternetAccess();
-    }
-
     final scrollController = PrimaryScrollController.of(context);
 
     return AlertDialog(
-      title: Text(kUserGroupDescription[_group]!(context)),
+      title: Text(kUserGroupDescription[currentGroup.value]!(context)),
       content: WithScrollbar(
         controller: scrollController,
         child: SingleChildScrollView(
@@ -222,26 +89,26 @@ class LoginDialogState extends State<LoginDialog> {
                 S.of(context).login_uis_description,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              if (_group == _defaultUserGroup && widget.showFullOptions) ...[
+              if (currentGroup.value == _defaultUserGroup && showFullOptions) ...[
                 GestureDetector(
                   child: Text(
                     S.of(context).not_undergraduate,
                     style: linkText,
                   ),
-                  onTap: () => _showSwitchGroupModal(),
+                  onTap: () => _showSwitchGroupModal(context, currentGroup, [nameController, pwdController]),
                 ),
                 GestureDetector(
                   child: Text(
                     S.of(context).try_visitor_mode,
                     style: linkText,
                   ),
-                  onTap: () => _showSwitchGroupModal(),
+                  onTap: () => _showSwitchGroupModal(context, currentGroup, [nameController, pwdController]),
                 ),
               ],
 
-              _errorWidget,
+              errorWidget.value,
               TextField(
-                controller: _nameController,
+                controller: nameController,
                 enabled: true,
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
@@ -253,7 +120,7 @@ class LoginDialogState extends State<LoginDialog> {
               ),
               if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
               TextField(
-                controller: _pwdController,
+                controller: pwdController,
                 enabled: true,
                 decoration: InputDecoration(
                   labelText: S.of(context).login_uis_pwd,
@@ -262,7 +129,7 @@ class LoginDialogState extends State<LoginDialog> {
                       : const Icon(CupertinoIcons.lock_circle),
                 ),
                 obscureText: true,
-                onSubmitted: (_) => _executeLogin(),
+                onSubmitted: (_) => _executeLogin(context, nameController, pwdController, errorWidget, currentGroup.value),
               ),
               const SizedBox(height: 24),
               GestureDetector(
@@ -276,16 +143,16 @@ class LoginDialogState extends State<LoginDialog> {
                     useSnackBar: false,
                     customActions: [
                       CustomDialogActionItem(S.of(context).read_announcements,
-                          () {
-                        while (Navigator.canPop(context)) {
-                          Navigator.pop(context);
-                        }
-                        smartNavigatorPush(context, '/announcement/list',
-                            forcePushOnMainNavigator: true);
-                      }),
+                              () {
+                            while (Navigator.canPop(context)) {
+                              Navigator.pop(context);
+                            }
+                            smartNavigatorPush(context, '/announcement/list',
+                                forcePushOnMainNavigator: true);
+                          }),
                       CustomDialogActionItem(
                           S.of(context).copy_qq_group_id,
-                          () => Clipboard.setData(const ClipboardData(
+                              () => Clipboard.setData(const ClipboardData(
                               text: Constant.SUPPORT_QQ_GROUP))),
                     ]),
               ),
@@ -314,40 +181,148 @@ class LoginDialogState extends State<LoginDialog> {
         ),
       ),
       actions: [
-        if (widget.dismissible)
+        if (dismissible)
           TextButton(
               child: Text(S.of(context).cancel),
               onPressed: () {
                 Navigator.of(context).pop();
               }),
         TextButton(
-          onPressed: _executeLogin,
+          onPressed: () => _executeLogin(context, nameController, pwdController, errorWidget, currentGroup.value),
           child: Text(S.of(context).login),
         ),
-        if (widget.showFullOptions)
+        if (showFullOptions)
           TextButton(
               onPressed: () {
-                _showSwitchGroupModal();
-            },
-            child: Text(S.of(context).login_as_others))
+                _showSwitchGroupModal(context, currentGroup, [nameController, pwdController]);
+              },
+              child: Text(S.of(context).login_as_others))
       ],
     );
   }
 
-  Future<void> _showSwitchGroupModal() async {
+  Future<void> _showSwitchGroupModal(BuildContext context, ValueNotifier<UserGroup> currentGroup, List<TextEditingController> controllers) async {
+    List<Widget> buildLoginAsList(BuildContext menuContext) {
+      List<Widget> widgets = [];
+      for (final group in kCompatibleUserGroup) {
+        if (group != currentGroup.value) {
+          widgets.add(PlatformContextMenuItem(
+            menuContext: menuContext,
+            onPressed: () {
+              currentGroup.value = group;
+              for (final controller in controllers) {
+                controller.text = "";
+              }
+            },
+            child: Text(kUserGroupDescription[group]!(menuContext)),
+          ));
+        }
+      }
+      return widgets;
+    }
+
     await showPlatformModalSheet(
         context: context,
         builder: (context) => PlatformContextMenu(
-            actions: _buildLoginAsList(context),
+            actions: buildLoginAsList(context),
             cancelButton: CupertinoActionSheetAction(
               child: Text(S.of(context).cancel),
               onPressed: () => Navigator.of(context).pop(),
             )));
   }
 
-  /// Change the login group and rebuild the dialog.
-  void _switchLoginGroup(UserGroup e) {
-    _nameController.text = _pwdController.text = "";
-    setState(() => _group = e);
+  Future<void> _executeLogin(BuildContext context, TextEditingController nameController, TextEditingController pwdController, ValueNotifier<Widget> errorWidget, UserGroup group) async {
+    try {
+      await _tryLogin(context, nameController.text, pwdController.text, group);
+    } catch (error, stack) {
+      if (error is CredentialsInvalidException) {
+        pwdController.text = "";
+      }
+      if (!context.mounted) return;
+      errorWidget.value = ErrorPageWidget.buildWidget(
+        context,
+        error,
+        stackTrace: stack,
+        buttonText: "", // hide the button
+        errorMessageTextStyle: const TextStyle(fontSize: 12, color: Colors.red),
+      );
+    }
   }
+
+  /// Attempt to log in for verification.
+  Future<void> _tryLogin(BuildContext context, String id, String password, UserGroup group) async {
+    if (id.length * password.length == 0) {
+      return;
+    }
+    ProgressFuture progressDialog = showProgressDialog(
+        loadingText: S.of(context).logining, context: context);
+    switch (group) {
+      case UserGroup.FUDAN_POSTGRADUATE_STUDENT:
+      case UserGroup.FUDAN_UNDERGRADUATE_STUDENT:
+        PersonInfo newInfo = PersonInfo.createNewInfo(id, password, group);
+        try {
+          final stuInfo =
+          await FudanEhallRepository.getInstance().getStudentInfo(newInfo);
+          newInfo.name = stuInfo.name;
+          await newInfo.saveToSharedPreferences(sharedPreferences);
+          personInfo.value = newInfo;
+          progressDialog.dismiss(showAnim: false);
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
+        } catch (e, st) {
+          if (e is DioException) {
+            progressDialog.dismiss(showAnim: false);
+            rethrow;
+          }
+          try {
+            newInfo.name = await CardRepository.getInstance().getName(newInfo);
+            await newInfo.saveToSharedPreferences(sharedPreferences);
+            personInfo.value = newInfo;
+            progressDialog.dismiss(showAnim: false);
+            if (context.mounted) {
+              Navigator.of(context).pop();
+            }
+          } catch (error) {
+            progressDialog.dismiss(showAnim: false);
+            rethrow;
+          }
+        }
+        break;
+      case UserGroup.FUDAN_STAFF:
+      case UserGroup.SJTU_STUDENT:
+        progressDialog.dismiss(showAnim: false);
+        break;
+    }
+  }
+
+  void requestInternetAccess() async {
+    // This webpage only returns plain-text 'SUCCESS' and is ideal for testing connection.
+    try {
+      // fixme: use a privacy-friendly captive portal detection method.
+      await DioUtils.newDioWithProxy().head('http://captive.apple.com');
+    } catch (ignored) {}
+  }
+
+  static Future<void> showLoginDialog(BuildContext context, XSharedPreferences preferences,
+      ValueNotifier<PersonInfo?> personInfo, bool dismissible, {bool showFullOptions = true, bool isGraduate = false}) async {
+    if (_isShown) return;
+    _isShown = true;
+    await showPlatformDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) => LoginDialog(
+            sharedPreferences: preferences,
+            personInfo: personInfo,
+            dismissible: dismissible,
+            showFullOptions: showFullOptions,
+            isGraduate: isGraduate));
+    _isShown = false;
+  }
+
+
+  static bool _isShown = false;
+
+  static bool get dialogShown => _isShown;
+
 }
