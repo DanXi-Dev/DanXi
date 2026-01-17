@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/widget/dialogs/login_dialog.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -101,6 +102,10 @@ class ErrorPageWidget extends StatelessWidget {
       errorType = locale.under_maintenance;
     } else if (error is WeakPasswordException) {
       errorType = locale.weak_password;
+    } else if (error is FallbackLoginException) {
+      final primaryDesc = generateUserFriendlyDescription(locale, error.primaryError);
+      final fallbackDesc = generateUserFriendlyDescription(locale, error.fallbackError);
+      errorType = '1. $primaryDesc\n2. $fallbackDesc';
     }
     return errorType;
   }
@@ -125,6 +130,12 @@ class ErrorPageWidget extends StatelessWidget {
   }
 
   static String generateErrorDetails(dynamic error, StackTrace? trace) {
+    if (error is FallbackLoginException) {
+      return 'Primary error: ${error.primaryError}\n'
+          '${error.primaryStackTrace}\n\n'
+          'Fallback error: ${error.fallbackError}\n'
+          '${error.fallbackStackTrace}';
+    }
     String errorInfo = error.toString();
     if (trace != null) {
       errorInfo += ("\n$trace");

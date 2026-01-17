@@ -39,6 +39,27 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+/// [FallbackLoginException] is thrown when both primary and fallback login methods fail.
+/// Captures error information from both attempts for better debugging.
+class FallbackLoginException implements Exception {
+  final Object primaryError;
+  final StackTrace primaryStackTrace;
+  final Object fallbackError;
+  final StackTrace fallbackStackTrace;
+
+  FallbackLoginException({
+    required this.primaryError,
+    required this.primaryStackTrace,
+    required this.fallbackError,
+    required this.fallbackStackTrace,
+  });
+
+  @override
+  String toString() => 'FallbackLoginException: Both login methods failed.\n'
+      'Primary error: $primaryError\n'
+      'Fallback error: $fallbackError';
+}
+
 /// [LoginDialog] is a dialog allowing user to log in by inputting their UIS ID/Password.
 ///
 /// Also contains the logic to process logging in.
@@ -209,8 +230,8 @@ class LoginDialog extends HookConsumerWidget {
           if (context.mounted) {
             Navigator.of(context).pop();
           }
-        } catch (e, st) {
-          if (e is DioException) {
+        } catch (primaryError, primaryStackTrace) {
+          if (primaryError is DioException) {
             progressDialog.dismiss(showAnim: false);
             rethrow;
           }
@@ -222,9 +243,14 @@ class LoginDialog extends HookConsumerWidget {
             if (context.mounted) {
               Navigator.of(context).pop();
             }
-          } catch (error) {
+          } catch (fallbackError, fallbackStackTrace) {
             progressDialog.dismiss(showAnim: false);
-            rethrow;
+            throw FallbackLoginException(
+              primaryError: primaryError,
+              primaryStackTrace: primaryStackTrace,
+              fallbackError: fallbackError,
+              fallbackStackTrace: fallbackStackTrace,
+            );
           }
         }
         break;
