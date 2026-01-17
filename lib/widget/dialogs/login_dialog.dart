@@ -26,10 +26,8 @@ import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
-import 'package:dan_xi/widget/libraries/platform_context_menu.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -41,11 +39,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-const kCompatibleUserGroup = [
-  UserGroup.FUDAN_UNDERGRADUATE_STUDENT,
-  UserGroup.FUDAN_POSTGRADUATE_STUDENT,
-];
-
 /// [LoginDialog] is a dialog allowing user to log in by inputting their UIS ID/Password.
 ///
 /// Also contains the logic to process logging in.
@@ -53,11 +46,10 @@ class LoginDialog extends HookConsumerWidget {
   final XSharedPreferences sharedPreferences;
   final ValueNotifier<PersonInfo?> personInfo;
   final bool dismissible;
-  final bool showFullOptions;
   final bool isGraduate;
   final UserGroup _defaultUserGroup;
 
-  const LoginDialog({super.key, required this.sharedPreferences, required this.personInfo, required this.dismissible, required this.showFullOptions, required this.isGraduate}):
+  const LoginDialog({super.key, required this.sharedPreferences, required this.personInfo, required this.dismissible, required this.isGraduate}):
     _defaultUserGroup = isGraduate ? UserGroup.FUDAN_POSTGRADUATE_STUDENT : UserGroup.FUDAN_UNDERGRADUATE_STUDENT;
 
   @override
@@ -89,23 +81,6 @@ class LoginDialog extends HookConsumerWidget {
                 S.of(context).login_uis_description,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              if (currentGroup.value == _defaultUserGroup && showFullOptions) ...[
-                GestureDetector(
-                  child: Text(
-                    S.of(context).not_undergraduate,
-                    style: linkText,
-                  ),
-                  onTap: () => _showSwitchGroupModal(context, currentGroup, [nameController, pwdController]),
-                ),
-                GestureDetector(
-                  child: Text(
-                    S.of(context).try_visitor_mode,
-                    style: linkText,
-                  ),
-                  onTap: () => _showSwitchGroupModal(context, currentGroup, [nameController, pwdController]),
-                ),
-              ],
-
               errorWidget.value,
               TextField(
                 controller: nameController,
@@ -191,44 +166,8 @@ class LoginDialog extends HookConsumerWidget {
           onPressed: () => _executeLogin(context, nameController, pwdController, errorWidget, currentGroup.value),
           child: Text(S.of(context).login),
         ),
-        if (showFullOptions)
-          TextButton(
-              onPressed: () {
-                _showSwitchGroupModal(context, currentGroup, [nameController, pwdController]);
-              },
-              child: Text(S.of(context).login_as_others))
       ],
     );
-  }
-
-  Future<void> _showSwitchGroupModal(BuildContext context, ValueNotifier<UserGroup> currentGroup, List<TextEditingController> controllers) async {
-    List<Widget> buildLoginAsList(BuildContext menuContext) {
-      List<Widget> widgets = [];
-      for (final group in kCompatibleUserGroup) {
-        if (group != currentGroup.value) {
-          widgets.add(PlatformContextMenuItem(
-            menuContext: menuContext,
-            onPressed: () {
-              currentGroup.value = group;
-              for (final controller in controllers) {
-                controller.text = "";
-              }
-            },
-            child: Text(kUserGroupDescription[group]!(menuContext)),
-          ));
-        }
-      }
-      return widgets;
-    }
-
-    await showPlatformModalSheet(
-        context: context,
-        builder: (context) => PlatformContextMenu(
-            actions: buildLoginAsList(context),
-            cancelButton: CupertinoActionSheetAction(
-              child: Text(S.of(context).cancel),
-              onPressed: () => Navigator.of(context).pop(),
-            )));
   }
 
   Future<void> _executeLogin(BuildContext context, TextEditingController nameController, TextEditingController pwdController, ValueNotifier<Widget> errorWidget, UserGroup group) async {
@@ -305,7 +244,7 @@ class LoginDialog extends HookConsumerWidget {
   }
 
   static Future<void> showLoginDialog(BuildContext context, XSharedPreferences preferences,
-      ValueNotifier<PersonInfo?> personInfo, bool dismissible, {bool showFullOptions = true, bool isGraduate = false}) async {
+      ValueNotifier<PersonInfo?> personInfo, bool dismissible, {bool isGraduate = false}) async {
     if (_isShown) return;
     _isShown = true;
     await showPlatformDialog(
@@ -315,7 +254,6 @@ class LoginDialog extends HookConsumerWidget {
             sharedPreferences: preferences,
             personInfo: personInfo,
             dismissible: dismissible,
-            showFullOptions: showFullOptions,
             isGraduate: isGraduate));
     _isShown = false;
   }

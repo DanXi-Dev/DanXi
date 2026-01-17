@@ -54,8 +54,7 @@ class LoginPage extends StatelessWidget {
                                 context,
                                 SettingsProvider.getInstance().preferences!,
                                 StateProvider.personInfo,
-                                true,
-                                showFullOptions: false),
+                                true),
                           ),
                           _gradientBtn(
                             context,
@@ -67,7 +66,6 @@ class LoginPage extends StatelessWidget {
                                 SettingsProvider.getInstance().preferences!,
                                 StateProvider.personInfo,
                                 true,
-                                showFullOptions: false,
                                 isGraduate: true),
                           ),
                         ],
