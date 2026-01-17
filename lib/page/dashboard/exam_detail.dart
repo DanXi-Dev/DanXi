@@ -107,51 +107,6 @@ class ExamList extends HookConsumerWidget {
 
   const ExamList({super.key, this.arguments});
 
-  void _exportICal(BuildContext context, List<Exam> examList) async {
-    if (examList.isEmpty) {
-      Noticing.showNotice(context, S.of(context).exam_unavailable,
-          title: S.of(context).fatal_error);
-      return;
-    }
-    ICalendar cal = ICalendar(company: 'DanXi', lang: "CN");
-    for (var element in examList) {
-      if (element.date.trim().isNotEmpty && element.time.trim().isNotEmpty) {
-        try {
-          cal.addElement(IEvent(
-            summary: element.name,
-            location: element.location,
-            status: IEventStatus.CONFIRMED,
-            description:
-                "${element.testCategory} ${element.type}\n${element.note}",
-            // toUtc: https://github.com/DanXi-Dev/DanXi/issues/522
-            start:
-                DateTime.parse('${element.date} ${element.time.split('~')[0]}')
-                    .toUtc(),
-            end: DateTime.parse('${element.date} ${element.time.split('~')[1]}')
-                .toUtc(),
-          ));
-        } catch (ignored) {
-          Noticing.showNotice(
-              context, S.of(context).error_adding_exam(element.name),
-              title: S.of(context).fatal_error);
-        }
-      }
-    }
-    Directory documentDir = await getApplicationDocumentsDirectory();
-    File outputFile = PlatformX.createPlatformFile(
-        "${documentDir.absolute.path}/output_timetable/exam.ics");
-    outputFile.createSync(recursive: true);
-    await outputFile.writeAsString(cal.serialize(), flush: true);
-    if (PlatformX.isIOS) {
-      OpenFile.open(outputFile.absolute.path, type: "text/calendar");
-    } else if (PlatformX.isAndroid) {
-      SharePlus.instance.share(ShareParams(
-          files: [XFile(outputFile.absolute.path, mimeType: "text/calendar")]));
-    } else if (context.mounted) {
-      Noticing.showNotice(context, outputFile.absolute.path);
-    }
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final semesterBundle = ref.watch(semesterBundleProvider);
@@ -572,5 +527,50 @@ class ExamList extends HookConsumerWidget {
   Future<void> _refreshAll(WidgetRef ref) async {
     // Invalidate the root and all dependent providers will be invalidated.
     ref.invalidate(semesterBundleProvider);
+  }
+
+  void _exportICal(BuildContext context, List<Exam> examList) async {
+    if (examList.isEmpty) {
+      Noticing.showNotice(context, S.of(context).exam_unavailable,
+          title: S.of(context).fatal_error);
+      return;
+    }
+    ICalendar cal = ICalendar(company: 'DanXi', lang: "CN");
+    for (var element in examList) {
+      if (element.date.trim().isNotEmpty && element.time.trim().isNotEmpty) {
+        try {
+          cal.addElement(IEvent(
+            summary: element.name,
+            location: element.location,
+            status: IEventStatus.CONFIRMED,
+            description:
+            "${element.testCategory} ${element.type}\n${element.note}",
+            // toUtc: https://github.com/DanXi-Dev/DanXi/issues/522
+            start:
+            DateTime.parse('${element.date} ${element.time.split('~')[0]}')
+                .toUtc(),
+            end: DateTime.parse('${element.date} ${element.time.split('~')[1]}')
+                .toUtc(),
+          ));
+        } catch (ignored) {
+          Noticing.showNotice(
+              context, S.of(context).error_adding_exam(element.name),
+              title: S.of(context).fatal_error);
+        }
+      }
+    }
+    Directory documentDir = await getApplicationDocumentsDirectory();
+    File outputFile = PlatformX.createPlatformFile(
+        "${documentDir.absolute.path}/output_timetable/exam.ics");
+    outputFile.createSync(recursive: true);
+    await outputFile.writeAsString(cal.serialize(), flush: true);
+    if (PlatformX.isIOS) {
+      OpenFile.open(outputFile.absolute.path, type: "text/calendar");
+    } else if (PlatformX.isAndroid) {
+      SharePlus.instance.share(ShareParams(
+          files: [XFile(outputFile.absolute.path, mimeType: "text/calendar")]));
+    } else if (context.mounted) {
+      Noticing.showNotice(context, outputFile.absolute.path);
+    }
   }
 }
