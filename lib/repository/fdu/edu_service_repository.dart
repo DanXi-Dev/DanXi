@@ -62,36 +62,11 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   Future<SemesterBundle> loadSemesters() =>
       TimeTableRepository.getInstance().loadSemestersForTimeTable();
 
-  String? _cachedStudentId;
-  Future<String>? _loadingStudentIdFuture;
-
-  /// Memorizes the in-flight request to avoid duplicate concurrent network
-  /// calls.
-  Future<String> loadStudentIdCached() {
-    final cachedStudentId = _cachedStudentId;
-    if (cachedStudentId != null) {
-      return Future.value(cachedStudentId);
-    }
-    final loadingFuture = _loadingStudentIdFuture;
-    if (loadingFuture != null) {
-      return loadingFuture;
-    }
-    final newLoadingFuture = loadStudentId();
-    _loadingStudentIdFuture = newLoadingFuture;
-    return newLoadingFuture.then((studentId) {
-      _cachedStudentId = studentId;
-      return studentId;
-    }).whenComplete(() {
-      _loadingStudentIdFuture = null;
-    });
-  }
-
   /// Get student ID from course table API
-  Future<String> loadStudentId() async {
-    final semesterBundle = await loadSemesters();
+  Future<String> loadStudentId(String defaultSemesterId) async {
     final options = RequestOptions(
       method: "GET",
-      path: getSemesterCourseTableUrl(semesterBundle.defaultSemesterId),
+      path: getSemesterCourseTableUrl(defaultSemesterId),
     );
     return FudanSession.request(options, (res) {
       final Map<String, dynamic> data = res.data!;
@@ -166,12 +141,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   ///     <td>已结束</td>
   /// </tr>
   /// ```
-  Future<List<Exam>> loadExamList(String semesterId) async {
-    final studentId = await loadStudentIdCached();
-    final semesterBundle = await loadSemesters();
-    if (semesterBundle.defaultSemesterId != semesterId) {
-      throw SemesterNoExamException();
-    }
+  Future<List<Exam>> loadExamList(String studentId) async {
     final options = RequestOptions(
       method: "GET",
       path: getExamArrangeUrl(studentId),
@@ -259,8 +229,8 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  Future<List<ExamScore>> loadExamScore(String semesterId) async {
-    final studentId = await loadStudentIdCached();
+  Future<List<ExamScore>> loadExamScore(String studentId,
+      String semesterId) async {
     final options = RequestOptions(
       method: "GET",
       path: getGradeSheetUrl(studentId, semesterId),
@@ -302,8 +272,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  Future<List<GpaListItem>> loadGpa() async {
-    final studentId = await loadStudentIdCached();
+  Future<List<GpaListItem>> loadGpa(String studentId) async {
     final searchIndexOptions = RequestOptions(
       method: "GET",
       path: getMyGpaSearchIndexUrl(studentId),

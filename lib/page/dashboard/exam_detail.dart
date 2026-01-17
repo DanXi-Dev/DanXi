@@ -41,11 +41,21 @@ import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../repository/fdu/time_table_repository.dart';
+
 part 'exam_detail.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
+Future<String> studentId(Ref ref) async {
+  final semesterBundle = await ref.watch(semesterProvider.future);
+  return EduServiceRepository.getInstance()
+      .loadStudentId(semesterBundle.defaultSemesterId);
+}
+
+@Riverpod(keepAlive: true)
 Future<List<GpaListItem>> gpa(Ref ref) async {
-  return EduServiceRepository.getInstance().loadGpa();
+  final studentId = await ref.watch(studentIdProvider.future);
+  return EduServiceRepository.getInstance().loadGpa(studentId);
 }
 
 @riverpod
@@ -64,19 +74,22 @@ GpaListItem? userGpa(Ref ref) {
   );
 }
 
-@riverpod
-Future<List<SemesterInfo>> semester(Ref ref) async {
-  return (await EduServiceRepository.getInstance().loadSemesters()).semesters;
+@Riverpod(keepAlive: true)
+Future<SemesterBundle> semester(Ref ref) async {
+  return await EduServiceRepository.getInstance().loadSemesters();
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<List<Exam>> exam(Ref ref, String semesterId) async {
-  return await EduServiceRepository.getInstance().loadExamList(semesterId);
+  final studentId = await ref.watch(studentIdProvider.future);
+  return await EduServiceRepository.getInstance().loadExamList(studentId);
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<List<ExamScore>> examScore(Ref ref, String semesterId) async {
-  return await EduServiceRepository.getInstance().loadExamScore(semesterId);
+  final studentId = await ref.watch(studentIdProvider.future);
+  return await EduServiceRepository.getInstance()
+      .loadExamScore(studentId, semesterId);
 }
 
 @riverpod
@@ -141,14 +154,14 @@ class ExamList extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final semesters = ref.watch(semesterProvider);
+    final semesterBundle = ref.watch(semesterProvider);
     final currentSemesterIndex = useState<int?>(null);
     final currentExamRef = useState<List<Exam>?>(null);
 
     useEffect(() {
       // Setting the state requires widgets to be stable.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.invalidate(gpaProvider);
+        _refreshAll(ref);
       });
       return null;
     }, const []);
@@ -171,9 +184,9 @@ class ExamList extends HookConsumerWidget {
           ],
         ),
         body: SafeArea(
-          child: switch (semesters) {
+          child: switch (semesterBundle) {
             AsyncData(:final value) => _loadExamGradeHybridView(
-                context, ref, value, currentSemesterIndex,
+                context, ref, value.semesters, currentSemesterIndex,
                 currentExamRef: currentExamRef),
             AsyncError() => _loadGradeViewFromDataCenter(context, ref),
             _ => Center(child: PlatformCircularProgressIndicator()),
@@ -297,14 +310,14 @@ class ExamList extends HookConsumerWidget {
   }
 
   Widget _buildRefreshableListView(BuildContext context, WidgetRef ref,
-      List<Widget> widgets, String? semesterId) =>
+      List<Widget> widgets) =>
       WithScrollbar(
           controller: PrimaryScrollController.of(context),
           child: RefreshIndicator(
               edgeOffset: MediaQuery.of(context).padding.top,
               color: Theme.of(context).colorScheme.secondary,
               backgroundColor: DialogTheme.of(context).backgroundColor,
-              onRefresh: () => _refreshAll(ref, semesterId),
+              onRefresh: () => _refreshAll(ref),
               child: ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: widgets)));
@@ -312,19 +325,13 @@ class ExamList extends HookConsumerWidget {
   Widget _buildGradeLayout(BuildContext context, WidgetRef ref,
       List<ExamScore> examScores, String? semesterId,
       {bool isFallback = false}) =>
-      _buildRefreshableListView(
-        context, ref,
-        _getListWidgetsGrade(context, ref, examScores, isFallback: isFallback),
-        semesterId,
-      );
+      _buildRefreshableListView(context, ref, _getListWidgetsGrade(
+          context, ref, examScores, isFallback: isFallback),);
 
   Widget _buildHybridLayout(BuildContext context, WidgetRef ref,
       List<Exam> exams, List<ExamScore> scores, String? semesterId) =>
       _buildRefreshableListView(
-        context, ref,
-        _getListWidgetsHybrid(context, ref, exams, scores),
-        semesterId,
-      );
+          context, ref, _getListWidgetsHybrid(context, ref, exams, scores));
 
   Widget _buildGpaCard(BuildContext context, WidgetRef ref) {
     final gpa = ref.watch(gpaProvider);
@@ -562,16 +569,8 @@ class ExamList extends HookConsumerWidget {
             child: Text(S.of(context).no_data),
           ));
 
-  Future<void> _refreshAll(WidgetRef ref, String? semesterId) async {
-    ref.invalidate(gpaProvider);
-
+  Future<void> _refreshAll(WidgetRef ref) async {
+    // Invalidate the root and all dependent providers will be invalidated.
     ref.invalidate(semesterProvider);
-
-    if (semesterId != null) {
-      ref.invalidate(examProvider(semesterId));
-      ref.invalidate(examScoreProvider(semesterId));
-    }
-
-    ref.invalidate(examScoreFromDataCenterProvider);
   }
 }
