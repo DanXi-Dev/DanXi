@@ -85,14 +85,8 @@ Future<List<GpaListItem>> gpaList(Ref ref) async {
 @riverpod
 GpaListItem? userGpa(Ref ref) {
   final gpaList = ref.watch(gpaListProvider);
-  final userId = sp.StateProvider.personInfo.value?.id;
-  if (userId == null) {
-    return null;
-  }
-
   return gpaList.maybeWhen(
-    data: (value) =>
-        value.firstWhereOrNull((element) => element.id == userId),
+    data: (value) => ExamList.getUserGpaItem(value),
     // If we cannot find such an element, we will just return null.
     orElse: () => null,
   );
@@ -290,7 +284,35 @@ class ExamList extends HookConsumerWidget {
 
   Widget _buildGpaCard(BuildContext context, WidgetRef ref) {
     final gpaList = ref.watch(gpaListProvider);
-    final userGpa = ref.watch(userGpaProvider);
+    Widget? trailing;
+    Widget? subtitle;
+    var onTap = () {};
+    switch (gpaList) {
+      case AsyncData(value: final gpaList):
+        {
+          final userGpa = getUserGpaItem(gpaList);
+          trailing = Text(
+            userGpa?.gpa ?? "N/A",
+            textScaler: TextScaler.linear(1.25),
+            style: const TextStyle(color: Colors.white),
+          );
+          subtitle = Text(
+              S.of(context).your_gpa_subtitle(
+                  userGpa?.rank ?? "N/A", userGpa?.credits ?? "N/A"),
+              style: TextStyle(color: Colors.white));
+          onTap = () {
+            smartNavigatorPush(
+                context, "/exam/gpa", arguments: {"gpalist": gpaList});
+          };
+        }
+      case AsyncError():
+        {}
+      case _:
+        {
+          trailing = const PlatformCircularProgressIndicator();
+          subtitle = Text(S.of(context).loading);
+        }
+    }
     return Card(
       color: PlatformX.backgroundAccentColor(context),
       child: ListTile(
@@ -299,29 +321,9 @@ class ExamList extends HookConsumerWidget {
           S.of(context).your_gpa,
           style: const TextStyle(color: Colors.white),
         ),
-        trailing: switch (gpaList) {
-          AsyncData() => Text(
-              userGpa?.gpa ?? "N/A",
-              textScaler: TextScaler.linear(1.25),
-              style: const TextStyle(color: Colors.white),
-            ),
-          AsyncError() => nil,
-          _ => PlatformCircularProgressIndicator(),
-        },
-        subtitle: switch (gpaList) {
-          AsyncData() => Text(
-              S.of(context).your_gpa_subtitle(
-                  userGpa?.rank ?? "N/A", userGpa?.credits ?? "N/A"),
-              style: TextStyle(color: Colors.white)),
-          AsyncError() => nil,
-          _ => Text(S.of(context).loading),
-        },
-        onTap: () {
-          if (gpaList case AsyncData(value: final gpaList)) {
-            smartNavigatorPush(context, "/exam/gpa",
-                arguments: {"gpalist": gpaList});
-          }
-        },
+        trailing: trailing,
+        subtitle: subtitle,
+        onTap: onTap,
       ),
     );
   }
@@ -572,5 +574,15 @@ class ExamList extends HookConsumerWidget {
     } else if (context.mounted) {
       Noticing.showNotice(context, outputFile.absolute.path);
     }
+  }
+
+  static GpaListItem? getUserGpaItem(List<GpaListItem> gpaList) {
+    final userId = sp.StateProvider.personInfo.value?.id;
+    if (userId == null) {
+      return null;
+    }
+
+    // If we cannot find such an element, we will just return null.
+    return gpaList.firstWhereOrNull((element) => element.id == userId);
   }
 }
