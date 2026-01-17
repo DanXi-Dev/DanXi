@@ -20,9 +20,11 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart' as sp;
 import 'package:dan_xi/repository/fdu/data_center_repository.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
+import 'package:dan_xi/repository/fdu/graduate_exam_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -123,6 +125,13 @@ GpaListItem? userGpa(Ref ref) {
   );
 }
 
+/// Provider for graduate student exam scores.
+/// Returns all scores across all semesters.
+@riverpod
+Future<List<ExamScore>> graduateExamScoreList(Ref ref) async {
+  return await GraduateExamRepository.getInstance().loadExamScore();
+}
+
 /// A list page showing user's GPA scores and exam information.
 /// It will try to fetch [SemesterInfo] first.
 /// If successful, it will fetch exams in this term. In case that there is no exam, it shows the score of this term.
@@ -134,6 +143,12 @@ class ExamList extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Graduate students use a simplified view without semester navigation
+    if (sp.StateProvider.personInfo.value?.group ==
+        UserGroup.FUDAN_POSTGRADUATE_STUDENT) {
+      return _buildGraduateView(context, ref);
+    }
+
     final semesterBundle = ref.watch(semesterBundleProvider);
     final currentSemesterIndex = useState<int?>(null);
     final currentExamRef = useState<List<Exam>?>(null);
@@ -172,6 +187,35 @@ class ExamList extends HookConsumerWidget {
             _ => Center(child: PlatformCircularProgressIndicator()),
           },
         ));
+  }
+
+  /// Build simplified view for graduate students.
+  /// Shows all scores without semester navigation or exam schedule.
+  Widget _buildGraduateView(BuildContext context, WidgetRef ref) {
+    final scores = ref.watch(graduateExamScoreListProvider);
+
+    return PlatformScaffold(
+      iosContentBottomPadding: false,
+      iosContentPadding: false,
+      appBar: PlatformAppBarX(
+        title: Text(S.of(context).exam_schedule),
+      ),
+      body: SafeArea(
+        child: switch (scores) {
+          AsyncData(value: final data) =>
+            _buildGradeLayout(context, ref, data, null, isGraduate: true),
+          AsyncError(:final error, :final stackTrace) => ErrorPageWidget(
+              errorMessage:
+                  '${S.of(context).failed}\n\nError:\n${ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error)}',
+              error: error,
+              trace: stackTrace,
+              onTap: () => ref.invalidate(graduateExamScoreListProvider),
+              buttonText: S.of(context).retry,
+            ),
+          _ => Center(child: PlatformCircularProgressIndicator()),
+        },
+      ),
+    );
   }
 
   Widget _loadExamGradeHybridView(BuildContext context, WidgetRef ref,
@@ -304,9 +348,9 @@ class ExamList extends HookConsumerWidget {
 
   Widget _buildGradeLayout(BuildContext context, WidgetRef ref,
       List<ExamScore> examScores, String? semesterId,
-      {bool isFallback = false}) =>
+      {bool isFallback = false, bool isGraduate = false}) =>
       _buildRefreshableListView(context, ref, _getListWidgetsGrade(
-          context, ref, examScores, isFallback: isFallback),);
+          context, ref, examScores, isFallback: isFallback, isGraduate: isGraduate),);
 
   Widget _buildHybridLayout(BuildContext context, WidgetRef ref,
       List<Exam> exams, List<ExamScore> scores, String? semesterId) =>
@@ -360,7 +404,7 @@ class ExamList extends HookConsumerWidget {
   }
 
   List<Widget> _getListWidgetsGrade(BuildContext context, WidgetRef ref,
-      List<ExamScore> scores, {bool isFallback = false}) {
+      List<ExamScore> scores, {bool isFallback = false, bool isGraduate = false}) {
     Widget buildLimitedCard() => Card(
         color: Theme.of(context).colorScheme.error,
         child: ListTile(
@@ -376,7 +420,8 @@ class ExamList extends HookConsumerWidget {
     List<Widget> widgets = [];
     if (isFallback) {
       widgets.add(buildLimitedCard());
-    } else {
+    } else if (!isGraduate) {
+      // Only show GPA card for undergraduate students
       widgets.add(_buildGpaCard(context, ref));
     }
     for (var value in scores) {

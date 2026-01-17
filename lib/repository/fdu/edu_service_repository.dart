@@ -476,6 +476,37 @@ class ExamScore {
         elements[5].text.trim(),
         null);
   }
+
+  /// Parse from graduate student score JSON.
+  ///
+  /// Expected JSON format:
+  /// ```json
+  /// {
+  ///     "KCMC": "Course Name",
+  ///     "KCDM": "Course Code",
+  ///     "XF": 2.0,
+  ///     "KCLBMC": "Course Type",
+  ///     "CJ": "A",
+  ///     "JDZ": 4.0
+  /// }
+  /// ```
+  factory ExamScore.fromGraduateJson(Map<String, dynamic> json) {
+    final String id = json['KCDM']?.toString() ?? '';
+    final String name = json['KCMC']?.toString() ?? '';
+    final String type = json['KCLBMC']?.toString() ?? '';
+    final num? credit = json['XF'];
+    final String level = json['CJ']?.toString() ?? '';
+    final num? gpa = json['JDZ'];
+
+    return ExamScore(
+      id,
+      name,
+      type,
+      credit?.toString() ?? '',
+      level,
+      gpa?.toString(),
+    );
+  }
 }
 
 class GpaListItem {
