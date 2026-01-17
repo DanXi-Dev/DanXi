@@ -28,7 +28,7 @@ import 'package:intl/intl.dart';
 
 class CardRepository extends BaseRepositoryWithDio {
   static const String _LOGIN_URL =
-      "https://uis.fudan.edu.cn/authserver/login?service=https%3A%2F%2Fecard.fudan.edu.cn%2Fepay%2Fj_spring_cas_security_check";
+      "https://ecard.fudan.edu.cn/epay";
   static const String _USER_DETAIL_URL =
       "https://ecard.fudan.edu.cn/epay/myepay/index";
   static const String _CONSUME_DETAIL_URL =
@@ -95,7 +95,7 @@ class CardRepository extends BaseRepositoryWithDio {
       responseType: ResponseType.plain,
     );
     return FudanSession.request(options, (_) => _loadCardRecord(logDays),
-        type: FudanLoginType.UISLegacy);
+        type: FudanLoginType.Neo);
   }
 
   Future<List<CardRecord>> _loadCardRecord(int logDays) async {
@@ -153,17 +153,11 @@ class CardRepository extends BaseRepositoryWithDio {
       responseType: ResponseType.plain,
     );
     return FudanSession.request(options, (_) => _loadCardInfo(logDays),
-        type: FudanLoginType.UISLegacy, info: info);
+        type: FudanLoginType.Neo, info: info);
   }
 
   Future<CardInfo?> _loadCardInfo(int logDays) async {
     final cardInfo = CardInfo();
-
-    // // 2024-11-18 (@w568w): The ECard system is a little bit tricky, we need to
-    // // obtain the ticket first. During this process, the correct JSESSIONID will be set.
-    // final res = await dio.get(_LOGIN_URL,
-    //     options: DioUtils.NON_REDIRECT_OPTION_WITH_FORM_TYPE);
-    // await DioUtils.processRedirect(dio, res);
 
     // FIXME: FudanSession should provide a method to request with login queue.
     final userPageResponse =
@@ -176,6 +170,9 @@ class CardRepository extends BaseRepositoryWithDio {
       ..name = nameElement?.text.between("您好，", "！")?.trim()
       ..cash = cashElement?.text.trim()
       ..records = await _loadCardRecord(logDays);
+    if (cardInfo.name?.isEmpty ?? true) {
+      throw Exception("Unable to get user name");
+    }
     return cardInfo;
   }
 
