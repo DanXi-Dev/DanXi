@@ -59,7 +59,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   /// Load all semesters and their start dates, etc.
   ///
   /// Returns a [SemesterBundle].
-  Future<SemesterBundle> loadSemesters() =>
+  Future<SemesterBundle> loadSemesterBundle() =>
       TimeTableRepository.getInstance().loadSemestersForTimeTable();
 
   /// Get student ID from course table API
@@ -229,7 +229,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  Future<List<ExamScore>> loadExamScore(String studentId,
+  Future<List<ExamScore>> loadExamScoreList(String studentId,
       String semesterId) async {
     final options = RequestOptions(
       method: "GET",
@@ -272,7 +272,7 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  Future<List<GpaListItem>> loadGpa(String studentId) async {
+  Future<List<GpaListItem>> loadGpaList(String studentId) async {
     final searchIndexOptions = RequestOptions(
       method: "GET",
       path: getMyGpaSearchIndexUrl(studentId),

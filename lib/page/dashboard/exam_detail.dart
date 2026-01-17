@@ -46,56 +46,56 @@ import '../../repository/fdu/time_table_repository.dart';
 part 'exam_detail.g.dart';
 
 @Riverpod(keepAlive: true)
+Future<SemesterBundle> semesterBundle(Ref ref) async {
+  return await EduServiceRepository.getInstance().loadSemesterBundle();
+}
+
+@Riverpod(keepAlive: true)
 Future<String> studentId(Ref ref) async {
-  final semesterBundle = await ref.watch(semesterProvider.future);
+  final semesterBundle = await ref.watch(semesterBundleProvider.future);
   return EduServiceRepository.getInstance()
       .loadStudentId(semesterBundle.defaultSemesterId);
 }
 
 @Riverpod(keepAlive: true)
-Future<List<GpaListItem>> gpa(Ref ref) async {
-  final studentId = await ref.watch(studentIdProvider.future);
-  return EduServiceRepository.getInstance().loadGpa(studentId);
-}
-
-@riverpod
-GpaListItem? userGpa(Ref ref) {
-  final gpa = ref.watch(gpaProvider);
-  final userId = sp.StateProvider.personInfo.value?.id;
-  if (userId == null) {
-    return null;
-  }
-
-  return gpa.maybeWhen(
-    data: (gpaList) =>
-        gpaList.firstWhereOrNull((element) => element.id == userId),
-    // If we cannot find such an element, we will just return null.
-    orElse: () => null,
-  );
-}
-
-@Riverpod(keepAlive: true)
-Future<SemesterBundle> semester(Ref ref) async {
-  return await EduServiceRepository.getInstance().loadSemesters();
-}
-
-@Riverpod(keepAlive: true)
-Future<List<Exam>> exam(Ref ref, String semesterId) async {
+Future<List<Exam>> examList(Ref ref, String semesterId) async {
   final studentId = await ref.watch(studentIdProvider.future);
   return await EduServiceRepository.getInstance().loadExamList(studentId);
 }
 
 @Riverpod(keepAlive: true)
-Future<List<ExamScore>> examScore(Ref ref, String semesterId) async {
+Future<List<ExamScore>> examScoreList(Ref ref, String semesterId) async {
   final studentId = await ref.watch(studentIdProvider.future);
   return await EduServiceRepository.getInstance()
-      .loadExamScore(studentId, semesterId);
+      .loadExamScoreList(studentId, semesterId);
 }
 
 @riverpod
-Future<List<ExamScore>> examScoreFromDataCenter(Ref ref) async {
+Future<List<ExamScore>> examScoreListFromDataCenter(Ref ref) async {
   return await DataCenterRepository.getInstance()
       .loadAllExamScore(sp.StateProvider.personInfo.value);
+}
+
+@Riverpod(keepAlive: true)
+Future<List<GpaListItem>> gpaList(Ref ref) async {
+  final studentId = await ref.watch(studentIdProvider.future);
+  return EduServiceRepository.getInstance().loadGpaList(studentId);
+}
+
+@riverpod
+GpaListItem? userGpa(Ref ref) {
+  final gpaList = ref.watch(gpaListProvider);
+  final userId = sp.StateProvider.personInfo.value?.id;
+  if (userId == null) {
+    return null;
+  }
+
+  return gpaList.maybeWhen(
+    data: (value) =>
+        value.firstWhereOrNull((element) => element.id == userId),
+    // If we cannot find such an element, we will just return null.
+    orElse: () => null,
+  );
 }
 
 /// A list page showing user's GPA scores and exam information.
@@ -154,7 +154,7 @@ class ExamList extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final semesterBundle = ref.watch(semesterProvider);
+    final semesterBundle = ref.watch(semesterBundleProvider);
     final currentSemesterIndex = useState<int?>(null);
     final currentExamRef = useState<List<Exam>?>(null);
 
@@ -205,14 +205,14 @@ class ExamList extends HookConsumerWidget {
       return _getNoDataWidget(context);
     }
 
-    final currentExamProvider = examProvider(semesterId);
-    final currentScoreProvider = examScoreProvider(semesterId);
-    final exams = ref.watch(currentExamProvider);
-    final scores = ref.watch(currentScoreProvider);
+    final currentExamListProvider = examListProvider(semesterId);
+    final currentScoreListProvider = examScoreListProvider(semesterId);
+    final exams = ref.watch(currentExamListProvider);
+    final scores = ref.watch(currentScoreListProvider);
 
     void reloadData() {
-      ref.invalidate(currentExamProvider);
-      ref.invalidate(currentScoreProvider);
+      ref.invalidate(currentExamListProvider);
+      ref.invalidate(currentScoreListProvider);
     }
 
     Widget body;
@@ -291,7 +291,7 @@ class ExamList extends HookConsumerWidget {
   }
 
   Widget _loadGradeViewFromDataCenter(BuildContext context, WidgetRef ref) {
-    final scores = ref.watch(examScoreFromDataCenterProvider);
+    final scores = ref.watch(examScoreListFromDataCenterProvider);
     switch (scores) {
       case AsyncData(value: final data):
         return _buildGradeLayout(context, ref, data, null, isFallback: true);
@@ -301,7 +301,7 @@ class ExamList extends HookConsumerWidget {
               '${S.of(context).failed}\n${S.of(context).need_campus_network}\n\nError:\n${ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error)}',
           error: error,
           trace: stackTrace,
-          onTap: () => ref.invalidate(examScoreFromDataCenterProvider),
+          onTap: () => ref.invalidate(examScoreListFromDataCenterProvider),
           buttonText: S.of(context).retry,
         );
       default:
@@ -334,7 +334,7 @@ class ExamList extends HookConsumerWidget {
           context, ref, _getListWidgetsHybrid(context, ref, exams, scores));
 
   Widget _buildGpaCard(BuildContext context, WidgetRef ref) {
-    final gpa = ref.watch(gpaProvider);
+    final gpaList = ref.watch(gpaListProvider);
     final userGpa = ref.watch(userGpaProvider);
     return Card(
       color: PlatformX.backgroundAccentColor(context),
@@ -344,7 +344,7 @@ class ExamList extends HookConsumerWidget {
           S.of(context).your_gpa,
           style: const TextStyle(color: Colors.white),
         ),
-        trailing: switch (gpa) {
+        trailing: switch (gpaList) {
           AsyncData() => Text(
               userGpa?.gpa ?? "N/A",
               textScaler: TextScaler.linear(1.25),
@@ -353,7 +353,7 @@ class ExamList extends HookConsumerWidget {
           AsyncError() => nil,
           _ => PlatformCircularProgressIndicator(),
         },
-        subtitle: switch (gpa) {
+        subtitle: switch (gpaList) {
           AsyncData() => Text(
               S.of(context).your_gpa_subtitle(
                   userGpa?.rank ?? "N/A", userGpa?.credits ?? "N/A"),
@@ -362,7 +362,7 @@ class ExamList extends HookConsumerWidget {
           _ => Text(S.of(context).loading),
         },
         onTap: () {
-          if (gpa case AsyncData(value: final gpaList)) {
+          if (gpaList case AsyncData(value: final gpaList)) {
             smartNavigatorPush(context, "/exam/gpa",
                 arguments: {"gpalist": gpaList});
           }
@@ -571,6 +571,6 @@ class ExamList extends HookConsumerWidget {
 
   Future<void> _refreshAll(WidgetRef ref) async {
     // Invalidate the root and all dependent providers will be invalidated.
-    ref.invalidate(semesterProvider);
+    ref.invalidate(semesterBundleProvider);
   }
 }
