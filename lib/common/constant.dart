@@ -643,18 +643,6 @@ extension CampusEx on Campus? {
 }
 
 extension LanguageEx on Language? {
-  static const _LANGUAGE = ["简化汉字", "English", "日本語", "傳統漢字"];
-
-  /// Find the corresponding [Language] from its Chinese name in [_LANGUAGE].
-  static Language fromChineseName(String name) {
-    for (int i = 0; i < _LANGUAGE.length; i++) {
-      if (name.contains(_LANGUAGE[i])) {
-        return Constant.LANGUAGE_VALUES[i];
-      }
-    }
-    return Language.NONE;
-  }
-
   /// Get the i18n name of this language for display.
   String displayTitle(BuildContext? context) {
     switch (this) {
