@@ -652,11 +652,11 @@ extension LanguageEx on Language? {
   String displayTitle(BuildContext? context) {
     switch (this) {
       case Language.SIMPLE_CHINESE:
-        return S.of(context!).simplified_chinese_languae;
+        return S.of(context!).simplified_chinese_language;
       case Language.ENGLISH:
-        return S.of(context!).english_languae;
+        return S.of(context!).english_language;
       case Language.JAPANESE:
-        return S.of(context!).japanese_languae;
+        return S.of(context!).japanese_language;
       case Language.NONE:
         return "?";
       case null:
