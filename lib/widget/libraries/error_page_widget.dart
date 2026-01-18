@@ -145,6 +145,7 @@ class ErrorPageWidget extends StatelessWidget {
               errorMessage,
               style: errorMessageTextStyle,
               textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
             ),
             if (buttonText != "") ...[
               const SizedBox(height: 8),
@@ -158,9 +159,12 @@ class ErrorPageWidget extends StatelessWidget {
               PlatformTextButton(
                 child: Text(S.of(context).error_detail),
                 onPressed: () {
-                  Noticing.showModalNotice(context,
-                      title: S.of(context).error_detail,
-                      message: generateErrorDetails(error, trace));
+                  Noticing.showModalNotice(
+                    context,
+                    title: S.of(context).error_detail,
+                    message: generateErrorDetails(error, trace),
+                    selectable: true,
+                  );
                 },
               )
             ],
