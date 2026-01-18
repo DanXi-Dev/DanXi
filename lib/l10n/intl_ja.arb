@@ -453,6 +453,7 @@
   "timetable_refresh_error": "新学期のスケジュールが公開されましたが、復旦のサーバーからダウンロードすることができません。\n\n復旦のイントラネットに接続されていることを確認し、手動で授業スケジュールを更新してください。\n\nヒント：「スケジュール」ページで下にスクロールすると、更新できます。",
   "tip_that_danxi_is_not_fdu": "注意：旦タのアカウントは、復旦大学メールやUISアカウントではありません。",
   "today_course": "今日の授業",
+  "traditional_chinese_language": "繁体字中国語",
   "try_visitor_mode": "入力したくない？Visitorモードをご試します",
   "unable_to_access_url": "テスト接続失敗\nこのページにアクセスできません。URLをご確認ください。",
   "unable_to_connect_to_server": "現在サーバーに接続できませんので、再度お試しください。",
