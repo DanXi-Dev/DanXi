@@ -299,7 +299,7 @@ class ExamList extends HookConsumerWidget {
                 : null,
           ),
           Text(S.of(context).semester(
-              currentSemester.schoolYear ?? "?", currentSemester.name ?? "?")),
+              currentSemester.schoolYear, currentSemester.seasonCode)),
           PlatformIconButton(
             icon: const Icon(Icons.chevron_right),
             onPressed: currentSemesterIndexValue < semesters.length - 1

@@ -19,6 +19,7 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/type_requires.dart';
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -69,13 +70,15 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       path: getSemesterCourseTableUrl(defaultSemesterId),
     );
     return FudanSession.request(options, (res) {
-      final Map<String, dynamic> data = res.data!;
-      final List<dynamic> vms = data["studentTableVms"];
-      final Map<String, dynamic> vm = vms[0];
+      final contextGetter = () => (options, res);
+
+      final Map<String, dynamic> data = require(res.data, contextGetter);
+      final List<dynamic> vms = require(data["studentTableVms"], contextGetter);
+      final Map<String, dynamic> vm = require(vms[0], contextGetter);
       // Intentionally typed as int to fail fast if backend changes the schema.
       // If it was `final int = vm["id"].toString;`, it would be hard to catch
       // the bug.
-      final int idInt = vm["id"];
+      final int idInt = require(vm["id"], contextGetter);
       final id = idInt.toString();
       return id;
     });
@@ -147,7 +150,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       path: getExamArrangeUrl(studentId),
     );
     return await FudanSession.request(options, (res) {
-      final soup = BeautifulSoup(res.data!);
+      final contextGetter = () => (options, res);
+
+      final String data = require(res.data, contextGetter);
+      final soup = BeautifulSoup(data);
       // Use this selector to filter out finished exams.
       final elements = soup.findAll(
         "table.exam-table tbody tr:not(.tr-empty):not([data-finished=\"true\"])",
@@ -195,8 +201,9 @@ class EduServiceRepository extends BaseRepositoryWithDio {
 
           final categoryText = spans[2].text.trimAndNormalizeWhitespace();
           if (categoryText.startsWith("（") && categoryText.endsWith("）")) {
-            category =
-                categoryText.substring(1, categoryText.length - 1).trim();
+            category = categoryText
+                .substring(1, categoryText.length - 1)
+                .trim();
           }
         }
 
@@ -229,18 +236,26 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  Future<List<ExamScore>> loadExamScoreList(String studentId,
-      String semesterId) async {
+  Future<List<ExamScore>> loadExamScoreList(
+    String studentId,
+    String semesterId,
+  ) async {
     final options = RequestOptions(
       method: "GET",
       path: getGradeSheetUrl(studentId, semesterId),
     );
     return FudanSession.request(options, (res) {
-      final Map<String, dynamic> data = res.data!;
-      final Map<String, dynamic> semesterId2StudentGrades =
-          data["semesterId2studentGrades"];
-      final List<dynamic> grades =
-          semesterId2StudentGrades[semesterId] ?? const [];
+      final contextGetter = () => (options, res);
+
+      final Map<String, dynamic> data = require(res.data, contextGetter);
+      final Map<String, dynamic> semesterId2StudentGrades = require(
+        data["semesterId2studentGrades"],
+        contextGetter,
+      );
+      final List<dynamic> grades = require(
+        semesterId2StudentGrades[semesterId],
+        contextGetter,
+      );
 
       final scores = <ExamScore>[];
       for (final gradeJson in grades) {
@@ -277,16 +292,32 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       method: "GET",
       path: getMyGpaSearchIndexUrl(studentId),
     );
-    final (gradeYear, deptAssoc) =
-        await FudanSession.request(searchIndexOptions, (res) {
-      final soup = BeautifulSoup(res.data!);
-      final gradeYearElement = soup.find("input[name=\"grade\"]")!;
-      final gradeYear = gradeYearElement.attributes["value"]!;
-      final deptAssocElement = soup.find("input[name=\"departmentAssoc\"]")!;
-      final deptAssoc = deptAssocElement.attributes["value"]!;
+    final (gradeYear, deptAssoc) = await FudanSession.request(
+      searchIndexOptions,
+      (res) {
+        final contextGetter = () => (searchIndexOptions, res);
+        final String data = require(res.data, contextGetter);
+        final soup = BeautifulSoup(data);
+        final gradeYearElement = requireNotNull(
+          soup.find("input[name=\"grade\"]"),
+          contextGetter,
+        );
+        final gradeYear = requireNotNull(
+          gradeYearElement.attributes["value"],
+          contextGetter,
+        );
+        final deptAssocElement = requireNotNull(
+          soup.find("input[name=\"departmentAssoc\"]"),
+          contextGetter,
+        );
+        final deptAssoc = requireNotNull(
+          deptAssocElement.attributes["value"],
+          contextGetter,
+        );
 
-      return (gradeYear, deptAssoc);
-    });
+        return (gradeYear, deptAssoc);
+      },
+    );
 
     // get department GPA ranks
     final searchOptions = RequestOptions(
@@ -294,8 +325,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       path: getMyGpaSearchUrl(studentId, gradeYear, deptAssoc),
     );
     return FudanSession.request(searchOptions, (res) {
-      final Map<String, dynamic> data = res.data;
-      final List<dynamic> ranks = data["data"] ?? [];
+      final contextGetter = () => (searchOptions, res);
+
+      final Map<String, dynamic> data = require(res.data, contextGetter);
+      final List<dynamic> ranks = require(data["data"], contextGetter);
 
       final List<GpaListItem> gpaListItems = [];
       for (final rankJson in ranks) {
@@ -348,8 +381,9 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     String result = "";
     bool inQuote = false;
     bool inKey = false;
-    for (String char
-        in jsonLikeText.runes.map((rune) => String.fromCharCode(rune))) {
+    for (String char in jsonLikeText.runes.map(
+      (rune) => String.fromCharCode(rune),
+    )) {
       if (char == '"') {
         inQuote = !inQuote;
       } else if (char.isAlpha() || char.isNumber()) {
@@ -369,12 +403,14 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   }
 }
 
-class SemesterInfo {
-  final String? semesterId;
-  final String? schoolYear;
-  final String? name;
+enum SemesterSeason { AUTUMN, SPRING, SUMMER, WINTER }
 
-  SemesterInfo(this.semesterId, this.schoolYear, this.name);
+class SemesterInfo {
+  final String semesterId;
+  final String schoolYear;
+  final SemesterSeason season;
+
+  SemesterInfo(this.semesterId, this.schoolYear, this.season);
 
   /// Example:
   /// "name":"1" means this is the first semester of the year.
@@ -388,19 +424,6 @@ class SemesterInfo {
     return SemesterInfo(json['id'], json['schoolYear'], json['name']);
   }
 
-  static String seasonToName(String name) {
-    switch (name) {
-      case "AUTUMN":
-        return "1";
-      case "SPRING":
-        return "2";
-      case "SUMMER":
-        return "3";
-      default:
-        return "?";
-    }
-  }
-
   /// Example:
   ///
   /// {
@@ -410,33 +433,56 @@ class SemesterInfo {
   //    "id" : 505
   //  }
   factory SemesterInfo.fromCourseTableJson(Map<String, dynamic> json) {
-    final id = json["id"].toString();
-    final name = json["name"]!;
-    final (schoolYear, season) = parseYearAndSeason(name)!;
+    final contextGetter = () => json;
+
+    final int idInt = require(json["id"], contextGetter);
+    final id = idInt.toString();
+    final String name = require(json["name"], contextGetter);
+    final (schoolYearNullable, seasonNullable) = _parseYearAndSeason(name);
+    final schoolYear = requireNotNull(schoolYearNullable, contextGetter);
+    final season = requireNotNull(seasonNullable, contextGetter);
     return SemesterInfo(id, schoolYear, season);
   }
 
-  static (String, String)? parseYearAndSeason(String name) {
-    final nameRegex = RegExp("\\D*(\\d{4}-\\d{4})\\D+(\\d+)\\D*");
-    final nameMatch = nameRegex.firstMatch(name);
+  int get seasonCode => season.index + 1;
+
+  static final _nameRegex = RegExp(
+    "\\D*(\\d{4}-\\d{4})\\D+(\\d+|autumn|fall|秋|一|上|spring|春|二|下|summer|夏|暑|三|winter|冬|寒|四)\\D*",
+    caseSensitive: false,
+  );
+
+  static SemesterSeason? _normalizeSeason(String seasonRaw) {
+    final seasonInt = int.tryParse(seasonRaw);
+    if (seasonInt != null) {
+      return SemesterSeason.values.get(seasonInt - 1);
+    }
+    return switch (seasonRaw.toLowerCase()) {
+      "autumn" || "fall" || "秋" || "一" || "上" => SemesterSeason.AUTUMN,
+      "spring" || "春" || "二" || "下" => SemesterSeason.SPRING,
+      "summer" || "夏" || "暑" || "三" => SemesterSeason.SUMMER,
+      "winter" || "冬" || "寒" || "四" => SemesterSeason.WINTER,
+      _ => null,
+    };
+  }
+
+  static (String?, SemesterSeason?) _parseYearAndSeason(String name) {
+    final nameMatch = _nameRegex.firstMatch(name);
     if (nameMatch == null) {
-      return null;
+      return (null, null);
     }
     final schoolYear = nameMatch.group(1);
-    final season = nameMatch.group(2);
-    if (schoolYear == null || season == null) {
-      return null;
+    final seasonRaw = nameMatch.group(2);
+    if (seasonRaw == null) {
+      return (schoolYear, null);
     }
+    final season = _normalizeSeason(seasonRaw);
     return (schoolYear, season);
   }
 
   bool matchName(String name) {
-    final yearAndSeason = parseYearAndSeason(name);
-    if (yearAndSeason == null) {
-      return false;
-    }
+    final yearAndSeason = _parseYearAndSeason(name);
     final (schoolYear, season) = yearAndSeason;
-    return this.schoolYear == schoolYear && this.name == season;
+    return this.schoolYear == schoolYear && this.season == season;
   }
 }
 
@@ -450,8 +496,16 @@ class Exam {
   final String testCategory;
   final String note;
 
-  Exam(this.id, this.name, this.type, this.date, this.time, this.location,
-      this.testCategory, this.note);
+  Exam(
+    this.id,
+    this.name,
+    this.type,
+    this.date,
+    this.time,
+    this.location,
+    this.testCategory,
+    this.note,
+  );
 }
 
 class ExamScore {
@@ -469,12 +523,13 @@ class ExamScore {
   factory ExamScore.fromDataCenterHtml(dom.Element html) {
     List<dom.Element> elements = html.getElementsByTagName("td");
     return ExamScore(
-        elements[0].text.trim(),
-        elements[3].text.trim(),
-        '${elements[1].text.trim()} ${elements[2].text.trim()}',
-        elements[4].text.trim(),
-        elements[5].text.trim(),
-        null);
+      elements[0].text.trim(),
+      elements[3].text.trim(),
+      '${elements[1].text.trim()} ${elements[2].text.trim()}',
+      elements[4].text.trim(),
+      elements[5].text.trim(),
+      null,
+    );
   }
 
   /// Parse from graduate student score JSON.
@@ -519,8 +574,16 @@ class GpaListItem {
   final String credits;
   final String rank;
 
-  GpaListItem(this.name, this.id, this.gpa, this.credits, this.rank, this.year,
-      this.major, this.college);
+  GpaListItem(
+    this.name,
+    this.id,
+    this.gpa,
+    this.credits,
+    this.rank,
+    this.year,
+    this.major,
+    this.college,
+  );
 }
 
 class SemesterNoExamException implements Exception {}
