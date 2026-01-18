@@ -93,7 +93,7 @@ class Constant {
 
   static const String TERMS_AND_CONDITIONS_URL =
       "https://danxi.fduhole.com/doc";
-  
+
   static const LINKIFY_THEME =
       TextStyle(color: Colors.blue, decoration: TextDecoration.none);
 
@@ -535,9 +535,10 @@ class Constant {
   ///
   /// It is a copy of [Language.values] except [Language.NONE].
   static const LANGUAGE_VALUES = [
-    Language.SIMPLE_CHINESE,
+    Language.SIMPLIFIED_CHINESE,
     Language.ENGLISH,
-    Language.JAPANESE
+    Language.JAPANESE,
+    Language.TRADITIONAL_CHINESE,
   ];
 
   /// A default configuration JSON string for setting special days to celebrate
@@ -572,7 +573,13 @@ class Constant {
   static const WeekDays = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
 }
 
-enum Language { SIMPLE_CHINESE, ENGLISH, JAPANESE, NONE }
+enum Language {
+  SIMPLIFIED_CHINESE,
+  ENGLISH,
+  JAPANESE,
+  TRADITIONAL_CHINESE,
+  NONE,
+}
 
 /// A list of Fudan campus.
 enum Campus {
@@ -636,7 +643,7 @@ extension CampusEx on Campus? {
 }
 
 extension LanguageEx on Language? {
-  static const _LANGUAGE = ["简体中文", "English", "日本語"];
+  static const _LANGUAGE = ["简化汉字", "English", "日本語", "傳統漢字"];
 
   /// Find the corresponding [Language] from its Chinese name in [_LANGUAGE].
   static Language fromChineseName(String name) {
@@ -651,12 +658,14 @@ extension LanguageEx on Language? {
   /// Get the i18n name of this language for display.
   String displayTitle(BuildContext? context) {
     switch (this) {
-      case Language.SIMPLE_CHINESE:
+      case Language.SIMPLIFIED_CHINESE:
         return S.of(context!).simplified_chinese_language;
       case Language.ENGLISH:
         return S.of(context!).english_language;
       case Language.JAPANESE:
         return S.of(context!).japanese_language;
+      case Language.TRADITIONAL_CHINESE:
+        return S.of(context!).traditional_chinese_language;
       case Language.NONE:
         return "?";
       case null:

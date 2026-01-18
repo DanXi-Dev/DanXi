@@ -441,16 +441,24 @@ class SettingsProvider with ChangeNotifier {
   }
 
   Language get defaultLanguage {
-    Locale locale = PlatformDispatcher.instance.locale;
-    if (locale.languageCode == 'en') {
-      return Language.ENGLISH;
-    } else if (locale.languageCode == 'ja') {
-      return Language.JAPANESE;
-    } else if (locale.languageCode == 'zh') {
-      return Language.SIMPLE_CHINESE;
-    } else {
-      return Language.NONE;
-    }
+    final locale = PlatformDispatcher.instance.locale;
+    return switch (locale.languageCode) {
+      'en' => Language.ENGLISH,
+      'ja' => Language.JAPANESE,
+      'zh' => switch (locale.scriptCode) {
+        'Hans' => Language.SIMPLIFIED_CHINESE,
+        'Hant' => Language.TRADITIONAL_CHINESE,
+        _ => switch (locale.countryCode) {
+          'CN' => Language.SIMPLIFIED_CHINESE, // Mainland China
+          'MO' => Language.TRADITIONAL_CHINESE, // Macau
+          'HK' => Language.TRADITIONAL_CHINESE, // Hong Kong
+          'SG' => Language.SIMPLIFIED_CHINESE, // Singapore
+          'TW' => Language.TRADITIONAL_CHINESE, // Taiwan
+          _ => Language.SIMPLIFIED_CHINESE,
+        },
+      },
+      _ => Language.NONE,
+    };
   }
 
   Language get language {
