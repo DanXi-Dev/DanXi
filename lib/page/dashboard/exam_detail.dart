@@ -89,7 +89,9 @@ Future<List<Exam>> examList(Ref ref) async {
 @Riverpod(retry: _examListRetry)
 Future<List<Exam>> examListInSemester(Ref ref, SemesterInfo semester) async {
   final exams = await ref.watch(examListProvider.future);
-  final examsInSemester = exams.filter((exam) => semester.matchName(exam.date));
+  final examsInSemester = exams
+      .where((exam) => semester.matchName(exam.date))
+      .toList(growable: false);
   if (examsInSemester.isEmpty) {
     throw SemesterNoExamException();
   }

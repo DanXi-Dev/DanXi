@@ -159,78 +159,11 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         "table.exam-table tbody tr:not(.tr-empty):not([data-finished=\"true\"])",
       );
 
-      final exams = <Exam>[];
-      for (final element in elements) {
-        final cells = element.findAll("td");
-        if (cells.length < 4) {
-          continue;
-        }
-
-        String? courseId;
-        String? courseName;
-        String? type;
-        String? category;
-        String? date;
-        String? time;
-        String? location;
-        String note;
-
-        final firstCell = cells[0];
-        final timeDiv = firstCell.find("div.time");
-        final timeText = timeDiv?.text.trimAndNormalizeWhitespace();
-        if (timeText != null) {
-          final timeComponents = timeText.split(" ");
-          if (timeComponents.length >= 2) {
-            date = timeComponents[0];
-            time = timeComponents[1];
-          }
-
-          final spans = firstCell.findAll("span");
-          if (spans.length > 2) {
-            location = spans[2].text.trimAndNormalizeWhitespace();
-          }
-        }
-
-        // Course information
-        final secondCell = cells[1];
-        final firstDiv = secondCell.find("div");
-        final spans = firstDiv?.findAll("span");
-        if (spans != null && spans.length >= 3) {
-          courseName = spans[0].text.trimAndNormalizeWhitespace();
-          courseId = spans[1].text.trimAndNormalizeWhitespace();
-
-          final categoryText = spans[2].text.trimAndNormalizeWhitespace();
-          if (categoryText.startsWith("（") && categoryText.endsWith("）")) {
-            category = categoryText
-                .substring(1, categoryText.length - 1)
-                .trim();
-          }
-        }
-
-        // Exam type
-        final divs = secondCell.findAll("div");
-        if (divs.length >= 2) {
-          final typeSpan = divs[1].find("span");
-          final typeText = typeSpan?.text.trimAndNormalizeWhitespace();
-          if (typeText != null) {
-            type = typeText.trim();
-          }
-        }
-
-        note = cells[2].text.trimAndNormalizeWhitespace();
-
-        final exam = Exam(
-          courseId.toString(),
-          courseName.toString(),
-          type.toString(),
-          date.toString(),
-          time.toString(),
-          location.toString(),
-          category.toString(),
-          note,
-        );
-        exams.add(exam);
-      }
+      final exams = elements
+          .map((element) => element.findAll("td"))
+          .where((cells) => cells.length >= 4)
+          .map((cells) => Exam.fromJwglHtml(cells))
+          .toList(growable: false);
 
       return exams;
     });
@@ -257,31 +190,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
         contextGetter,
       );
 
-      final scores = <ExamScore>[];
-      for (final gradeJson in grades) {
-        final Map<String, dynamic> grade = gradeJson;
-        // It can be null too.
-        final String? lessonCode = grade["lessonCode"];
-        final String? courseCode = grade["courseCode"];
-        // We are not sure whether these fields can be null, so we try as more
-        // fields as we could get.
-        final String? courseName = grade["courseName"];
-        final String? courseNameEn = grade["courseNameEn"];
-        final String? courseModuleTypeName = grade["courseModuleTypeName"];
-        final String? courseType = grade["courseType"];
-        final String? gaGrade = grade["gaGrade"];
-        // PNP courses have no GP.
-        final num? gp = grade["gp"];
-        final score = ExamScore(
-          (lessonCode ?? courseCode).toString(),
-          (courseName ?? courseNameEn).toString(),
-          (courseModuleTypeName ?? courseType).toString(),
-          null.toString(),
-          gaGrade.toString(),
-          gp?.toString(),
-        );
-        scores.add(score);
-      }
+      final scores = grades
+          .whereType<Map<String, dynamic>>()
+          .map((grade) => ExamScore.fromJwglJson(grade))
+          .toList(growable: false);
 
       return scores;
     });
@@ -330,42 +242,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       final Map<String, dynamic> data = require(res.data, contextGetter);
       final List<dynamic> ranks = require(data["data"], contextGetter);
 
-      final List<GpaListItem> gpaListItems = [];
-      for (final rankJson in ranks) {
-        /// Example:
-        /// {
-        //    id: null,
-        //    code: ****, // The 11-digit student ID
-        //    name: ****,
-        //    grade: 2022,
-        //    major: 计算机科学与技术,
-        //    department: 计算与智能创新学院,
-        //    gpa: 3.96,
-        //    credit: 130,
-        //    ranking: 1
-        //  }
-        final Map<String, dynamic> rank = rankJson;
-        final String? name = rank["name"];
-        final String? code = rank["code"];
-        final num? gpa = rank["gpa"];
-        // Some courses have credit of 0.5.
-        final num? credit = rank["credit"];
-        final int? ranking = rank["ranking"];
-        final String? grade = rank["grade"];
-        final String? major = rank["major"];
-        final String? department = rank["department"];
-        final item = GpaListItem(
-          name.toString(),
-          code.toString(),
-          gpa.toString(),
-          credit.toString(),
-          ranking.toString(),
-          grade.toString(),
-          major.toString(),
-          department.toString(),
-        );
-        gpaListItems.add(item);
-      }
+      final gpaListItems = ranks
+          .whereType<Map<String, dynamic>>()
+          .map((rank) => GpaListItem.fromJwglJson(rank))
+          .toList(growable: false);
 
       return gpaListItems;
     });
@@ -506,6 +386,71 @@ class Exam {
     this.testCategory,
     this.note,
   );
+
+  factory Exam.fromJwglHtml(List<Bs4Element> cells) {
+    String? courseId;
+    String? courseName;
+    String? type;
+    String? category;
+    String? date;
+    String? time;
+    String? location;
+    String note;
+
+    final firstCell = cells[0];
+    final timeDiv = firstCell.find("div.time");
+    final timeText = timeDiv?.text.trimAndNormalizeWhitespace();
+    if (timeText != null) {
+      final timeComponents = timeText.split(" ");
+      if (timeComponents.length >= 2) {
+        date = timeComponents[0];
+        time = timeComponents[1];
+      }
+
+      final spans = firstCell.findAll("span");
+      if (spans.length > 2) {
+        location = spans[2].text.trimAndNormalizeWhitespace();
+      }
+    }
+
+    // Course information
+    final secondCell = cells[1];
+    final firstDiv = secondCell.find("div");
+    final spans = firstDiv?.findAll("span");
+    if (spans != null && spans.length >= 3) {
+      courseName = spans[0].text.trimAndNormalizeWhitespace();
+      courseId = spans[1].text.trimAndNormalizeWhitespace();
+
+      final categoryText = spans[2].text.trimAndNormalizeWhitespace();
+      if (categoryText.startsWith("（") && categoryText.endsWith("）")) {
+        category = categoryText.substring(1, categoryText.length - 1).trim();
+      }
+    }
+
+    // Exam type
+    final divs = secondCell.findAll("div");
+    if (divs.length >= 2) {
+      final typeSpan = divs[1].find("span");
+      final typeText = typeSpan?.text.trimAndNormalizeWhitespace();
+      if (typeText != null) {
+        type = typeText.trim();
+      }
+    }
+
+    note = cells[2].text.trimAndNormalizeWhitespace();
+
+    final exam = Exam(
+      courseId.toString(),
+      courseName.toString(),
+      type.toString(),
+      date.toString(),
+      time.toString(),
+      location.toString(),
+      category.toString(),
+      note,
+    );
+    return exam;
+  }
 }
 
 class ExamScore {
@@ -517,6 +462,30 @@ class ExamScore {
   final String? score;
 
   ExamScore(this.id, this.name, this.type, this.credit, this.level, this.score);
+
+  factory ExamScore.fromJwglJson(Map<String, dynamic> json) {
+    // It can be null too.
+    final String? lessonCode = json["lessonCode"];
+    final String? courseCode = json["courseCode"];
+    // We are not sure whether these fields can be null, so we try as more
+    // fields as we could get.
+    final String? courseName = json["courseName"];
+    final String? courseNameEn = json["courseNameEn"];
+    final String? courseModuleTypeName = json["courseModuleTypeName"];
+    final String? courseType = json["courseType"];
+    final String? gaGrade = json["gaGrade"];
+    // PNP courses have no GP.
+    final num? gp = json["gp"];
+    final score = ExamScore(
+      (lessonCode ?? courseCode).toString(),
+      (courseName ?? courseNameEn).toString(),
+      (courseModuleTypeName ?? courseType).toString(),
+      null.toString(),
+      gaGrade.toString(),
+      gp?.toString(),
+    );
+    return score;
+  }
 
   /// NOTE: Result's [type] is year + semester(e.g. "2020-2021 2"),
   /// and [id] doesn't contain the last 2 digits.
@@ -584,6 +553,41 @@ class GpaListItem {
     this.major,
     this.college,
   );
+
+  factory GpaListItem.fromJwglJson(Map<String, dynamic> json) {
+    /// Example:
+    /// {
+    //    id: null,
+    //    code: ****, // The 11-digit student ID
+    //    name: ****,
+    //    grade: 2022,
+    //    major: 计算机科学与技术,
+    //    department: 计算与智能创新学院,
+    //    gpa: 3.96,
+    //    credit: 130,
+    //    ranking: 1
+    //  }
+    final String? name = json["name"];
+    final String? code = json["code"];
+    final num? gpa = json["gpa"];
+    // Some courses have credit of 0.5.
+    final num? credit = json["credit"];
+    final int? ranking = json["ranking"];
+    final String? grade = json["grade"];
+    final String? major = json["major"];
+    final String? department = json["department"];
+    final item = GpaListItem(
+      name.toString(),
+      code.toString(),
+      gpa.toString(),
+      credit.toString(),
+      ranking.toString(),
+      grade.toString(),
+      major.toString(),
+      department.toString(),
+    );
+    return item;
+  }
 }
 
 class SemesterNoExamException implements Exception {}
