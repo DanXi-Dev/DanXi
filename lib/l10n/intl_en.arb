@@ -590,5 +590,9 @@
   "export_log_success": "Export successful",
   "hole_frozen": "Frozen",
   "dorm_electricity_history": "Usage History",
-  "data_center_unavailable_2026_0117": "The app has switched to the backup Data Center source, which is currently unavailable. Please restart the app or clear the cache and try again."
+  "data_center_unavailable_2026_0117": "The app has switched to the backup Data Center source, which is currently unavailable. Please restart the app or clear the cache and try again.",
+  "season_spring": "Spring",
+  "season_summer": "Summer",
+  "season_autumn": "Autumn",
+  "season_winter": "Winter"
 }

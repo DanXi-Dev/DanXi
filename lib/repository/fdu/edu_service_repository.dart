@@ -16,11 +16,13 @@
  */
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
+import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/type_requires.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'neo_login_tool.dart';
@@ -283,7 +285,23 @@ class EduServiceRepository extends BaseRepositoryWithDio {
   }
 }
 
-enum SemesterSeason { AUTUMN, SPRING, SUMMER, WINTER }
+enum SemesterSeason {
+  AUTUMN,
+  SPRING,
+  SUMMER,
+  WINTER;
+
+  int get code => index + 1;
+
+  String getDisplayedName(BuildContext context) {
+    return switch (this) {
+      AUTUMN => S.of(context).season_autumn,
+      SPRING => S.of(context).season_spring,
+      SUMMER => S.of(context).season_summer,
+      WINTER => S.of(context).season_winter,
+    };
+  }
+}
 
 class SemesterInfo {
   final String semesterId;
@@ -323,8 +341,6 @@ class SemesterInfo {
     final season = requireNotNull(seasonNullable, contextGetter);
     return SemesterInfo(id, schoolYear, season);
   }
-
-  int get seasonCode => season.index + 1;
 
   static final _nameRegex = RegExp(
     "\\D*(\\d{4}-\\d{4})\\D+(\\d+|autumn|fall|秋|一|上|spring|春|二|下|summer|夏|暑|三|winter|冬|寒|四)\\D*",

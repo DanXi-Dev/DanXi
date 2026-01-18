@@ -572,5 +572,9 @@
   "export_log_success": "エクスポートに成功しました",
   "hole_frozen": "凍結",
   "dorm_electricity_history": "履歴",
-  "data_center_unavailable_2026_0117": "バックアップのデータセンターソースに切り替わりましたが、現在ご利用いただけません。アプリを再起動するか、キャッシュを削除してからもう一度お試しください。"
+  "data_center_unavailable_2026_0117": "バックアップのデータセンターソースに切り替わりましたが、現在ご利用いただけません。アプリを再起動するか、キャッシュを削除してからもう一度お試しください。",
+  "season_spring": "春",
+  "season_summer": "夏",
+  "season_autumn": "秋",
+  "season_winter": "冬"
 }
