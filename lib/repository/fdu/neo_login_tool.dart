@@ -349,9 +349,17 @@ class FudanAuthenticationAPIV2 {
       },
     );
     final methods = chainCodeResponse.data!["data"] as List<dynamic>;
-    final userAndPwdMethod =
+    final Map<String, dynamic> userAndPwdMethod;
+    try {
+      userAndPwdMethod =
         methods.firstWhere((method) => method["moduleCode"] == "userAndPwd")
-            as Map<String, dynamic>;
+        as Map<String, dynamic>;
+    } catch (e) {
+      final allMethodCodes = methods
+          .map((method) => method["moduleCode"])
+          .join(", ");
+      throw Exception("No userAndPwd authentication method found. Auth methods: $allMethodCodes");
+    }
     final authChainCode = userAndPwdMethod["authChainCode"] as String;
 
     return AuthenticationParameters(lck, entityId, authChainCode);
