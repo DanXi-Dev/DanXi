@@ -311,18 +311,6 @@ class SemesterInfo {
   SemesterInfo(this.semesterId, this.schoolYear, this.season);
 
   /// Example:
-  /// "name":"1" means this is the first semester of the year.
-  ///
-  ///   {
-  // 			"id": "163",
-  // 			"schoolYear": "1994-1995",
-  // 			"name": "1"
-  // 		}
-  factory SemesterInfo.fromJson(Map<String, dynamic> json) {
-    return SemesterInfo(json['id'], json['schoolYear'], json['name']);
-  }
-
-  /// Example:
   ///
   /// {
   //    "startDate" : "2026-03-01",
@@ -350,7 +338,7 @@ class SemesterInfo {
   static SemesterSeason? _normalizeSeason(String seasonRaw) {
     final seasonInt = int.tryParse(seasonRaw);
     if (seasonInt != null) {
-      return SemesterSeason.values.get(seasonInt - 1);
+      return SemesterSeason.values.elementAtOrNull(seasonInt - 1);
     }
     return switch (seasonRaw.toLowerCase()) {
       "autumn" || "fall" || "秋" || "一" || "上" => SemesterSeason.AUTUMN,
