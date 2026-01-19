@@ -227,9 +227,6 @@ class ExamList extends HookConsumerWidget {
         currentSemesterIndex.value ?? max(semesters.length - 2, 0);
     final currentSemester = semesters[currentSemesterIndexValue];
     final semesterId = currentSemester.semesterId;
-    if (semesterId == null) {
-      return _getNoDataWidget(context);
-    }
 
     final currentExamListProvider = examListInSemesterProvider(currentSemester);
     final currentScoreListProvider = examScoreListProvider(semesterId);
@@ -300,8 +297,12 @@ class ExamList extends HookConsumerWidget {
                     currentSemesterIndex.value = currentSemesterIndexValue - 1
                 : null,
           ),
-          Text(S.of(context).semester(
-              currentSemester.schoolYear, currentSemester.season.code)),
+          Text(
+            S.of(context).semester(
+              currentSemester.schoolYear,
+              currentSemester.season.getDisplayedName(context),
+            ),
+          ),
           PlatformIconButton(
             icon: const Icon(Icons.chevron_right),
             onPressed: currentSemesterIndexValue < semesters.length - 1
