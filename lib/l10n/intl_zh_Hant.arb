@@ -588,5 +588,6 @@
   "season_spring": "春",
   "season_summer": "夏",
   "season_autumn": "秋",
-  "season_winter": "冬"
+  "season_winter": "冬",
+  "fudan_api_exception": "校園網路界面無法解析"
 }

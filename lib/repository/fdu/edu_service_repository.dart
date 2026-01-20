@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:convert';
+
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/base_repository.dart';
@@ -72,15 +74,25 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       path: getSemesterCourseTableUrl(defaultSemesterId),
     );
     return FudanSession.request(options, (res) {
-      final contextGetter = () => (options, res);
-
-      final Map<String, dynamic> data = require(res.data, contextGetter);
-      final List<dynamic> vms = require(data["studentTableVms"], contextGetter);
-      final Map<String, dynamic> vm = require(vms[0], contextGetter);
+      final Map<String, dynamic> data = require(
+        res.data,
+        () => FudanApiException(options.uri.toString()),
+      );
+      final List<dynamic> vms = require(
+        data["studentTableVms"],
+        () => FudanApiException(jsonEncode(data)),
+      );
+      final Map<String, dynamic> vm = require(
+        vms[0],
+        () => FudanApiException(jsonEncode(vms)),
+      );
       // Intentionally typed as int to fail fast if backend changes the schema.
       // If it was `final int = vm["id"].toString;`, it would be hard to catch
       // the bug.
-      final int idInt = require(vm["id"], contextGetter);
+      final int idInt = require(
+        vm["id"],
+        () => FudanApiException(jsonEncode(vm)),
+      );
       final id = idInt.toString();
       return id;
     });
@@ -152,9 +164,10 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       path: getExamArrangeUrl(studentId),
     );
     return await FudanSession.request(options, (res) {
-      final contextGetter = () => (options, res);
-
-      final String data = require(res.data, contextGetter);
+      final String data = require(
+        res.data,
+        () => FudanApiException(options.uri.toString()),
+      );
       final soup = BeautifulSoup(data);
       // Use this selector to filter out finished exams.
       final elements = soup.findAll(
@@ -180,16 +193,17 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       path: getGradeSheetUrl(studentId, semesterId),
     );
     return FudanSession.request(options, (res) {
-      final contextGetter = () => (options, res);
-
-      final Map<String, dynamic> data = require(res.data, contextGetter);
+      final Map<String, dynamic> data = require(
+        res.data,
+        () => FudanApiException(options.uri.toString()),
+      );
       final Map<String, dynamic> semesterId2StudentGrades = require(
         data["semesterId2studentGrades"],
-        contextGetter,
+        () => FudanApiException(jsonEncode(data)),
       );
       final List<dynamic> grades = require(
         semesterId2StudentGrades[semesterId],
-        contextGetter,
+        () => FudanApiException(jsonEncode(semesterId2StudentGrades)),
       );
 
       final scores = grades
@@ -209,24 +223,26 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     final (gradeYear, deptAssoc) = await FudanSession.request(
       searchIndexOptions,
       (res) {
-        final contextGetter = () => (searchIndexOptions, res);
-        final String data = require(res.data, contextGetter);
+        final String data = require(
+          res.data,
+          () => FudanApiException(searchIndexOptions.uri.toString()),
+        );
         final soup = BeautifulSoup(data);
         final gradeYearElement = requireNotNull(
           soup.find("input[name=\"grade\"]"),
-          contextGetter,
+          () => FudanApiException(data),
         );
         final gradeYear = requireNotNull(
           gradeYearElement.attributes["value"],
-          contextGetter,
+          () => FudanApiException(gradeYearElement.outerHtml),
         );
         final deptAssocElement = requireNotNull(
           soup.find("input[name=\"departmentAssoc\"]"),
-          contextGetter,
+          () => FudanApiException(data),
         );
         final deptAssoc = requireNotNull(
           deptAssocElement.attributes["value"],
-          contextGetter,
+          () => FudanApiException(deptAssocElement.outerHtml),
         );
 
         return (gradeYear, deptAssoc);
@@ -239,10 +255,14 @@ class EduServiceRepository extends BaseRepositoryWithDio {
       path: getMyGpaSearchUrl(studentId, gradeYear, deptAssoc),
     );
     return FudanSession.request(searchOptions, (res) {
-      final contextGetter = () => (searchOptions, res);
-
-      final Map<String, dynamic> data = require(res.data, contextGetter);
-      final List<dynamic> ranks = require(data["data"], contextGetter);
+      final Map<String, dynamic> data = require(
+        res.data,
+        () => FudanApiException(searchOptions.uri.toString()),
+      );
+      final List<dynamic> ranks = require(
+        data["data"],
+        () => FudanApiException(jsonEncode(data)),
+      );
 
       final gpaListItems = ranks
           .whereType<Map<String, dynamic>>()
@@ -319,14 +339,24 @@ class SemesterInfo {
   //    "id" : 505
   //  }
   factory SemesterInfo.fromCourseTableJson(Map<String, dynamic> json) {
-    final contextGetter = () => json;
-
-    final int idInt = require(json["id"], contextGetter);
+    final int idInt = require(
+      json["id"],
+      () => FudanApiException(jsonEncode(json)),
+    );
     final id = idInt.toString();
-    final String name = require(json["name"], contextGetter);
+    final String name = require(
+      json["name"],
+      () => FudanApiException(jsonEncode(json)),
+    );
     final (schoolYearNullable, seasonNullable) = _parseYearAndSeason(name);
-    final schoolYear = requireNotNull(schoolYearNullable, contextGetter);
-    final season = requireNotNull(seasonNullable, contextGetter);
+    final schoolYear = requireNotNull(
+      schoolYearNullable,
+      () => FudanApiException(name),
+    );
+    final season = requireNotNull(
+      seasonNullable,
+      () => FudanApiException(name),
+    );
     return SemesterInfo(id, schoolYear, season);
   }
 
@@ -597,3 +627,12 @@ class GpaListItem {
 class SemesterNoExamException implements Exception {}
 
 class ClickTooFastException implements Exception {}
+
+class FudanApiException implements Exception {
+  String message;
+
+  FudanApiException([this.message = ""]);
+
+  @override
+  String toString() => message;
+}

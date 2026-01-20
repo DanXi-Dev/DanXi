@@ -15,12 +15,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-T require<T, V>(V value, dynamic Function() message) {
+T require<T, V>(V value, Exception Function() exception) {
   if (value is! T) {
-    throw Exception(message().toString());
+    throw exception();
   }
   return value;
 }
 
-T requireNotNull<T>(T? value, dynamic Function() message) =>
-    require(value, message);
+T requireNotNull<T>(T? value, Exception Function() exception) =>
+    require(value, exception);

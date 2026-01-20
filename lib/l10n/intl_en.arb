@@ -594,5 +594,6 @@
   "season_spring": "Spring",
   "season_summer": "Summer",
   "season_autumn": "Autumn",
-  "season_winter": "Winter"
+  "season_winter": "Winter",
+  "fudan_api_exception": "Parsing Campus Service API Failed"
 }
