@@ -584,5 +584,10 @@
   "export_log_success": "匯出成功",
   "hole_frozen": "已凍結",
   "dorm_electricity_history": "歷史用電",
-  "data_center_unavailable_2026_0117": "目前已切換至備援之資料中心來源，惟該來源暫不可用。請重入應用程式或清除快取後再試。"
+  "data_center_unavailable_2026_0117": "目前已切換至備援之資料中心來源，惟該來源暫不可用。請重入應用程式或清除快取後再試。",
+  "season_spring": "春",
+  "season_summer": "夏",
+  "season_autumn": "秋",
+  "season_winter": "冬",
+  "fudan_api_exception": "校園網路界面無法解析"
 }
