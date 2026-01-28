@@ -641,7 +641,7 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
           PlatformIconButton(
             padding: EdgeInsets.zero,
             icon: AutoSizeText(
-                "${_selectionInfo!.schoolYear} ${_selectionInfo!.name!}",
+                "${_selectionInfo!.schoolYear} ${_selectionInfo!.season.code}",
                 minFontSize: 10),
             onPressed: () => showPlatformModalSheet(
               context: context,
@@ -662,7 +662,7 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
                               SettingsProvider.getInstance()
                                   .semesterStartDates
                                   ?.parseStartDate(
-                                    e.semesterId!,
+                                    e.semesterId,
                                     group:
                                         StateProvider.personInfo.value!.group,
                                   );
@@ -673,12 +673,12 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
                             Noticing.showNotice(
                                 this.context,
                                 S.of(context).unknown_start_date(
-                                    "${e.schoolYear} ${e.name!}"));
+                                    "${e.schoolYear} ${e.season.code}"));
                           }
                           widget.onSelectionUpdate?.call();
                         },
                         child: Text(
-                          "${e.schoolYear} ${e.name!}",
+                          "${e.schoolYear} ${e.season.getDisplayedName(context)}",
                           // Highlight the selected item
                           style: TextStyle(
                               color: PlatformX.isMaterial(context) &&
