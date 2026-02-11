@@ -352,6 +352,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
+        unawaited(neo.FudanSession.forceSaveCookies());
+        break;
       case AppLifecycleState.detached:
       case AppLifecycleState.hidden:
         break;

@@ -53,6 +53,7 @@ import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -75,7 +76,7 @@ import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 
 /// The main entry of the whole app.
 /// Do some initial work here.
-void main() {
+Future<void> main() async {
   // Ensure that the engine has bound itself to
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -104,19 +105,24 @@ void main() {
 
   // Init SettingsProvider. SettingsProvider is a singleton class that stores
   // all the settings of the app.
-  SettingsProvider.getInstance().init().then((_) {
-    SettingsProvider.getInstance().isTagSuggestionAvailable().then((value) {
-      SettingsProvider.getInstance().tagSuggestionAvailable = value;
-      final registerDeviceIdentity =
-          PlatformX.isAndroid ? DeviceIdentity.register() : Future.value();
-      registerDeviceIdentity.then((_) {
-        // This is the entrypoint of a simple Flutter app.
-        // runApp() is a function that takes a [Widget] and makes it the root
-        // of the widget tree.
-        runApp(riverpod.ProviderScope(child: const DanxiApp()));
-      });
-    });
-  });
+  await SettingsProvider.getInstance().init();
+
+  // Restore persisted session cookies before any network requests.
+  // This must run after SettingsProvider.init() because it depends on
+  // XSharedPreferences being initialized.
+  await FudanSession.initSession();
+
+  SettingsProvider.getInstance().tagSuggestionAvailable =
+      await SettingsProvider.getInstance().isTagSuggestionAvailable();
+
+  if (PlatformX.isAndroid) {
+    await DeviceIdentity.register();
+  }
+
+  // This is the entrypoint of a simple Flutter app.
+  // runApp() is a function that takes a [Widget] and makes it the root
+  // of the widget tree.
+  runApp(riverpod.ProviderScope(child: const DanxiApp()));
 }
 
 class TouchMouseScrollBehavior extends MaterialScrollBehavior {

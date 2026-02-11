@@ -4,7 +4,8 @@ import 'dart:io';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/cookie/independent_cookie_jar.dart';
+import 'package:dan_xi/repository/cookie/persistent_cookie_jar.dart';
+import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dan_xi/util/condition_variable.dart';
 import 'package:dan_xi/util/io/cookie_manager_fix.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
@@ -57,7 +58,8 @@ class FudanSession {
   static Dio? _dio;
 
   /// Shared cookie jar to maintain authentication sessions across all requests.
-  static final IndependentCookieJar _sessionCookieJar = IndependentCookieJar();
+  /// Initialized by [initSession] before [dio] is first accessed.
+  static late PersistentCookieJar _sessionCookieJar;
 
   /// Login queues for each authentication type to coordinate concurrent requests.
   /// Ensures only one login operation runs at a time per authentication method.
@@ -258,6 +260,25 @@ class FudanSession {
     await _sessionCookieJar.deleteAll();
     // Clear the Dio instance to reset interceptors and state
     _dio = null;
+  }
+
+  /// Initialize the session by creating a [PersistentCookieJar] backed by
+  /// [XSharedPreferences] and restoring any previously persisted cookies.
+  ///
+  /// Must be called after [XSharedPreferences] is initialized (i.e. after
+  /// [SettingsProvider.init]) and before any access to [dio].
+  static Future<void> initSession() async {
+    XSharedPreferences prefs = await XSharedPreferences.getInstance();
+    _sessionCookieJar = PersistentCookieJar(prefs);
+    _sessionCookieJar.restore();
+  }
+
+  /// Force the cookie jar to persist any pending changes immediately.
+  ///
+  /// Call this when the app is about to enter the background to ensure
+  /// no cookie data is lost if the process is killed afterwards.
+  static Future<void> forceSaveCookies() async {
+    await _sessionCookieJar.forceSave();
   }
 }
 
