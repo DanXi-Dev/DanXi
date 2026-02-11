@@ -14,6 +14,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import 'package:collection/collection.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
@@ -35,7 +36,9 @@ class GpaTablePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // No need to use `useMemoized` for these calculations being light enough.
-    final List<GpaListItem> fullGpaList = arguments!['gpalist'];
+    final fullGpaList = (arguments!['gpalist'] as List<GpaListItem>).sortedBy(
+      (gpa) => int.tryParse(gpa.rank) ?? 0x7fffffff,
+    );
     final userGpa = ExamList.getUserGpaItem(fullGpaList);
     final sameMajorGpaList = userGpa == null
         ? fullGpaList
@@ -91,6 +94,17 @@ class GpaTablePage extends HookConsumerWidget {
     List<GpaListItem> gpaList,
     GpaListItem? userGpa,
   ) {
+    String? lastRank;
+    int lastTiedIndex = 0;
+    final sameMajorOrdinals = gpaList
+        .mapIndexed((index, gpa) {
+          if (gpa.rank != lastRank) {
+            lastRank = gpa.rank;
+            lastTiedIndex = index;
+          }
+          return lastTiedIndex + 1;
+        })
+        .toList(growable: false);
     List<TableRow> widgets = [
       TableRow(
         children:
@@ -112,7 +126,8 @@ class GpaTablePage extends HookConsumerWidget {
       ),
     ];
 
-    for (var (index, element) in gpaList.indexed) {
+    for (final (index, element) in gpaList.indexed) {
+      final ordinal = sameMajorOrdinals[index];
       TextStyle? textColorStyle = identical(element, userGpa)
           ? null
           : TextStyle(color: Theme.of(context).colorScheme.secondary);
@@ -125,7 +140,7 @@ class GpaTablePage extends HookConsumerWidget {
                     element.credits,
                     element.rank,
                     // The fetched GPA lists are usually sorted.
-                    "${(100 * index / gpaList.length).toStringAsFixed(2)}%",
+                    "${(100 * ordinal / gpaList.length).toStringAsFixed(2)}%",
                   ]
                   .map(
                     (itemText) => Text(
