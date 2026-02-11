@@ -596,5 +596,9 @@
   "season_autumn": "Autumn",
   "season_winter": "Winter",
   "fudan_api_exception": "Parsing Campus Service API Failed",
-  "enhanced_auth_waiting": "Please complete authentication in the browser..."
+  "enhanced_auth_waiting": "Please complete authentication in the browser...",
+  "enhanced_auth_title": "Two-Factor Authentication Required",
+  "enhanced_auth_description": "This campus service requires two-factor authentication (2FA).\nA browser will open with your credentials pre-filled. Please complete the verification in the browser.",
+  "enhanced_auth_continue": "Continue",
+  "enhanced_auth_cancelled": "Verification incomplete. Some features may be temporarily unavailable."
 }

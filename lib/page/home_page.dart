@@ -228,6 +228,29 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// A waiting dialog is shown while the browser is open.
   Future<void> _dealWithEnhancedAuth(
       neo.EnhancedAuthenticationRequiredException e) async {
+    // Stage 1: Explanation dialog telling the user why 2FA is needed
+    final shouldContinue = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(S.of(context).enhanced_auth_title),
+        content: Text(S.of(context).enhanced_auth_description),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(S.of(context).cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(S.of(context).enhanced_auth_continue),
+          ),
+        ],
+      ),
+    );
+    if (shouldContinue != true) return;
+
+    // Stage 2: Waiting dialog while the browser is open
+    if (!mounted) return;
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -239,12 +262,31 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             Expanded(child: Text(S.of(context).enhanced_auth_waiting)),
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              final completer = neo.FudanSession.enhancedAuthCompleter;
+              if (completer != null && !completer.isCompleted) {
+                completer.completeError(
+                    Exception('User cancelled authentication'));
+              }
+              Navigator.of(context, rootNavigator: true).pop();
+            },
+            child: Text(S.of(context).cancel),
+          ),
+        ],
       ),
     );
+
     try {
       await BrowserUtil.openForAuthentication(
           e.loginUrl.toString(), e.targetHost, context);
-    } catch (_) {}
+    } catch (_) {
+      // Stage 3: Failure notice if the user closes the browser early or cancels
+      if (mounted) {
+        Noticing.showNotice(context, S.of(context).enhanced_auth_cancelled);
+      }
+    }
     if (mounted) {
       Navigator.of(context, rootNavigator: true).pop();
     }

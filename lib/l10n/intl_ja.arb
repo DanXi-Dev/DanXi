@@ -578,5 +578,9 @@
   "season_autumn": "秋",
   "season_winter": "冬",
   "fudan_api_exception": "校内サービスAPI解析できません",
-  "enhanced_auth_waiting": "ブラウザで認証を完了してください…"
+  "enhanced_auth_waiting": "ブラウザで認証を完了してください…",
+  "enhanced_auth_title": "二要素認証が必要です",
+  "enhanced_auth_description": "このキャンパスサービスには二要素認証（2FA）が必要です。\nブラウザが開き、認証情報が自動入力されます。ブラウザで認証を完了してください。",
+  "enhanced_auth_continue": "続行",
+  "enhanced_auth_cancelled": "認証が完了していません。一部の機能が一時的に利用できない場合があります。"
 }

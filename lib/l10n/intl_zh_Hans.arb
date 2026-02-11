@@ -590,5 +590,9 @@
   "season_autumn": "秋",
   "season_winter": "冬",
   "fudan_api_exception": "校园网接口无法解析",
-  "enhanced_auth_waiting": "请在浏览器中完成身份验证…"
+  "enhanced_auth_waiting": "请在浏览器中完成身份验证…",
+  "enhanced_auth_title": "需要双因素认证",
+  "enhanced_auth_description": "该校园服务需要双因素认证（2FA）。\n即将打开浏览器，账号密码将自动填入，请在浏览器中完成验证。",
+  "enhanced_auth_continue": "继续",
+  "enhanced_auth_cancelled": "验证未完成，部分功能可能暂时无法使用。"
 }
