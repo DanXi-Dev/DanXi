@@ -102,6 +102,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       StateStreamListener();
   final StateStreamListener<dynamic> _credentialsInvalidSubscription =
       StateStreamListener();
+  final StateStreamListener<dynamic> _enhancedAuthSubscription =
+      StateStreamListener();
 
   /// Listener to Android Activity intents.
   final StateStreamListener<ri.Intent?> _receivedIntentSubscription =
@@ -153,6 +155,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     StateProvider.isLoggedIn.removeListener(_loginListener);
     _captchaSubscription.cancel();
     _credentialsInvalidSubscription.cancel();
+    _enhancedAuthSubscription.cancel();
     _receivedIntentSubscription.cancel();
     _uniLinksSubscription.cancel();
     screenListener?.dispose();
@@ -215,6 +218,35 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       PersonInfo.removeFromSharedPreferences(
           SettingsProvider.getInstance().preferences!);
       FlutterApp.restartApp(context);
+    }
+  }
+
+  /// Deal with enhanced authentication (2FA) requirement from id.fudan.edu.cn.
+  ///
+  /// Opens an in-app browser where the user can complete the second
+  /// authentication step (e.g. SMS verification). Credentials are auto-filled.
+  /// A waiting dialog is shown while the browser is open.
+  Future<void> _dealWithEnhancedAuth(
+      neo.EnhancedAuthenticationRequiredException e) async {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        content: Row(
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(width: 16),
+            Expanded(child: Text(S.of(context).enhanced_auth_waiting)),
+          ],
+        ),
+      ),
+    );
+    try {
+      await BrowserUtil.openForAuthentication(
+          e.loginUrl.toString(), e.targetHost, context);
+    } catch (_) {}
+    if (mounted) {
+      Navigator.of(context, rootNavigator: true).pop();
     }
   }
 
@@ -481,6 +513,13 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 e is uis.CredentialsInvalidException ||
                 e is neo.CredentialsInvalidException)
             .listen((_) => _dealWithCredentialsInvalidException()),
+        hashCode);
+    _enhancedAuthSubscription.bindOnlyInvalid(
+        Constant.eventBus
+            .on()
+            .where((e) => e is neo.EnhancedAuthenticationRequiredException)
+            .listen((e) => _dealWithEnhancedAuth(
+                e as neo.EnhancedAuthenticationRequiredException)),
         hashCode);
     _initReceiveIntents();
     _initUniLinks();

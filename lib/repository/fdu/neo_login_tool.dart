@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
@@ -21,6 +22,12 @@ import 'package:pointycastle/asymmetric/api.dart';
 enum FudanLoginType {
   /// The new Fudan authentication system using id.fudan.edu.cn
   Neo,
+
+  /// Same as [Neo], but uses an independent login queue for services that
+  /// require enhanced authentication (2FA), e.g. my.fudan.edu.cn.
+  /// This prevents piggyback issues where a non-2FA login success is mistakenly
+  /// shared with requests that actually need 2FA.
+  Neo2FA,
 
   /// The hybrid Fudan authentication system using id.fudan.edu.cn but jump through uis.fudan.edu.cn
   ///
@@ -145,6 +152,7 @@ class FudanSession {
 
     switch (type) {
       case FudanLoginType.Neo:
+      case FudanLoginType.Neo2FA:
         return _authenticationQueues[type]!.runNormalRequest(
           () async {
             // Work around Dio bug: FormData objects can only be used once
@@ -161,8 +169,19 @@ class FudanSession {
             return Future.sync(() => validateAndParse(response));
           },
           () async {
-            await FudanAuthenticationAPIV2.authenticate(
-                personInfo, effectiveServiceUrl, effectiveLoginMethod);
+            try {
+              await FudanAuthenticationAPIV2.authenticate(
+                  personInfo, effectiveServiceUrl, effectiveLoginMethod);
+            } on EnhancedAuthenticationRequiredException {
+              // Enhanced authentication (2FA) is required. The UI layer will
+              // open a WebView for the user to complete 2FA. Wait for it.
+              final completer = enhancedAuthCompleter;
+              if (completer == null) {
+                // No UI listener registered; cannot proceed.
+                rethrow;
+              }
+              await completer.future;
+            }
           },
           isFatalError: effectiveIsFatalErrorNeo,
         );
@@ -221,6 +240,17 @@ class FudanSession {
           isFatalError: effectiveIsFatalError,
         );
     }
+  }
+
+  /// A [Completer] that resolves when enhanced authentication (2FA) via WebView
+  /// completes. Set by the UI layer when it opens the WebView for manual login,
+  /// and completed when cookies are imported back.
+  static Completer<void>? enhancedAuthCompleter;
+
+  /// Import cookies from an external source (e.g. InAppWebView) into the
+  /// session cookie jar. Used after the user completes 2FA in a WebView.
+  static Future<void> importCookies(List<Cookie> cookies, Uri uri) async {
+    await _sessionCookieJar.saveFromResponse(uri, cookies);
   }
 
   static Future<void> clearSession() async {
@@ -284,10 +314,11 @@ class FudanAuthenticationAPIV2 {
     } catch (_) {}
 
     // If not authenticated, we need to login
-    final params = await _getAuthParams(redirectedUrl);
+    final params = await _getAuthParams(redirectedUrl, serviceUrl);
     final publicKey = await _getPublicKey();
-    final loginToken =
-        await _login(params, publicKey, info.id!, info.password!);
+    final loginToken = await _login(
+        params, publicKey, info.id!, info.password!,
+        redirectedUrl, serviceUrl.host);
     final document = await _postToken(loginToken);
     final targetUrl = _retrieveUrlWithTicket(document);
 
@@ -332,7 +363,8 @@ class FudanAuthenticationAPIV2 {
     return RSAKeyParser().parse(pcks8Key) as RSAPublicKey;
   }
 
-  static Future<AuthenticationParameters> _getAuthParams(Uri idUrl) async {
+  static Future<AuthenticationParameters> _getAuthParams(
+      Uri idUrl, Uri serviceUrl) async {
     // 1. parse lck and entityId from the idUrl
     // concat fragment (#...) with a new URL to parse it as query parameters
     final Uri tmpUrlForParsing = Uri.parse("https://$idHost/${idUrl.fragment}");
@@ -348,6 +380,16 @@ class FudanAuthenticationAPIV2 {
         "entityId": entityId,
       },
     );
+
+    // Enhanced authentication (2FA) is required. The response structure
+    // differs when second is true, so we must check before parsing methods.
+    if (chainCodeResponse.data!["second"] == true) {
+      final exception =
+          EnhancedAuthenticationRequiredException(idUrl, serviceUrl.host);
+      exception.fire();
+      throw exception;
+    }
+
     final methods = chainCodeResponse.data!["data"] as List<dynamic>;
     final Map<String, dynamic> userAndPwdMethod;
     try {
@@ -366,7 +408,8 @@ class FudanAuthenticationAPIV2 {
   }
 
   static Future<String> _login(AuthenticationParameters params,
-      RSAPublicKey publicKey, String username, String password) async {
+      RSAPublicKey publicKey, String username, String password,
+      Uri loginUrl, String targetHost) async {
     final encrypter =
         Encrypter(RSA(publicKey: publicKey, encoding: RSAEncoding.PKCS1));
     final encryptedPassword = encrypter.encrypt(password).base64;
@@ -392,7 +435,15 @@ class FudanAuthenticationAPIV2 {
       CaptchaNeededException().fire();
       throw CaptchaNeededException();
     }
-    return response.data!["loginToken"] as String;
+
+    final loginToken = response.data!["loginToken"] as String?;
+    if (loginToken == null) {
+      final exception =
+          EnhancedAuthenticationRequiredException(loginUrl, targetHost);
+      exception.fire();
+      throw exception;
+    }
+    return loginToken;
   }
 
   static Future<BeautifulSoup> _postToken(String loginToken) async {
@@ -551,6 +602,22 @@ class AuthenticationV1FailedException implements Exception {}
 class AuthenticationV2FailedException implements Exception {}
 
 class CaptchaNeededException implements AuthenticationV1FailedException, AuthenticationV2FailedException {}
+
+/// Thrown when the id.fudan.edu.cn authentication system requires enhanced
+/// authentication (2FA), e.g. SMS verification. The user must complete this
+/// step manually in a WebView.
+class EnhancedAuthenticationRequiredException
+    implements AuthenticationV2FailedException {
+  /// The id.fudan.edu.cn login page URL (with lck/entityId fragment) that
+  /// the browser should open so the user can complete 2FA.
+  final Uri loginUrl;
+
+  /// The host of the target service. After the user completes 2FA in the
+  /// browser, cookies are extracted once the browser reaches this host.
+  final String targetHost;
+
+  EnhancedAuthenticationRequiredException(this.loginUrl, this.targetHost);
+}
 
 class CredentialsInvalidException implements AuthenticationV1FailedException {}
 

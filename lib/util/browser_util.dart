@@ -15,6 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
+import 'dart:io' as io;
 import 'dart:math';
 
 import 'package:dan_xi/common/constant.dart';
@@ -22,6 +24,7 @@ import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/cookie/independent_cookie_jar.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:flutter/material.dart';
@@ -111,6 +114,42 @@ class BrowserUtil {
         urlRequest: URLRequest(url: WebUri(url)),
         settings: getOptions(context!));
   }
+
+  /// Open an [InAppBrowser] for manual enhanced authentication (2FA).
+  ///
+  /// The browser navigates to [url] (typically the service URL that triggers
+  /// a redirect to id.fudan.edu.cn). Credentials are auto-injected when the
+  /// login page loads. Once the browser lands on [targetHost], cookies are
+  /// extracted and imported into [FudanSession], and the returned [Future]
+  /// completes.
+  static Future<void> openForAuthentication(
+      String url, String targetHost, BuildContext context) {
+    final completer = Completer<void>();
+    FudanSession.enhancedAuthCompleter = completer;
+
+    final browser = AuthenticationInAppBrowser(
+      targetHost: targetHost,
+      completer: completer,
+    );
+    browser.openUrlRequest(
+      urlRequest: URLRequest(url: WebUri(url)),
+      settings: InAppBrowserClassSettings(
+        browserSettings: InAppBrowserSettings(
+          toolbarTopBackgroundColor: Theme.of(context).cardTheme.color,
+          hideTitleBar: true,
+          hideToolbarBottom: true,
+        ),
+        webViewSettings: InAppWebViewSettings(
+          sharedCookiesEnabled: true,
+          javaScriptEnabled: true,
+          // Must NOT be incognito so that CookieManager can read cookies.
+          incognito: false,
+        ),
+      ),
+    );
+
+    return completer.future;
+  }
 }
 
 class CustomInAppBrowser extends InAppBrowser {
@@ -174,17 +213,17 @@ class CustomInAppBrowser extends InAppBrowser {
 
   String idLoginJavaScript(PersonInfo info) =>
       r'''try{
-            const usernameInput = document.querySelectorAll('.el-input__inner')[0];
+            const usernameInput = document.getElementById('login-username');
             usernameInput.value = String.raw`''' +
       info.id! +
       r'''`;
-            usernameInput.dispatchEvent(new Event('input')); // Trigger the input event
+            usernameInput.dispatchEvent(new Event('input'));
             
-            const passwordInput = document.querySelectorAll('.el-input__inner')[1];
+            const passwordInput = document.getElementById('login-password');
             passwordInput.value = String.raw`''' +
       info.password! +
       r'''`;
-            passwordInput.dispatchEvent(new Event('input')); // Trigger the input event
+            passwordInput.dispatchEvent(new Event('input'));
 
             document.querySelector('.el-button.content_submit').click();
         }
@@ -212,5 +251,128 @@ class CustomInAppBrowser extends InAppBrowser {
   void onExit() {
     // Request App Store/Google Play review after user closes the broswer.
     requestStoreReviewWhenAppropriate();
+  }
+}
+
+/// An [InAppBrowser] that handles enhanced authentication (2FA) for Fudan
+/// services. It auto-fills credentials on login pages and extracts cookies
+/// once the user reaches the target service.
+class AuthenticationInAppBrowser extends InAppBrowser {
+  final String targetHost;
+  final Completer<void> completer;
+
+  AuthenticationInAppBrowser({
+    required this.targetHost,
+    required this.completer,
+  });
+
+  String _uisLoginJavaScript(PersonInfo info) =>
+      r'''try{
+            document.getElementById('username').value = String.raw`''' +
+      info.id! +
+      r'''`;
+            document.getElementById('password').value = String.raw`''' +
+      info.password! +
+      r'''`;
+            document.forms[0].submit();
+        }
+        catch (e) {
+            try{
+                document.getElementById('mobileUsername').value = String.raw`''' +
+      info.id! +
+      r'''`;
+                document.getElementById('mobilePassword').value = String.raw`''' +
+      info.password! +
+      r'''`;
+                document.forms[0].submit();
+            }
+            catch (e) {
+                window.alert("Danta: Failed to auto login UIS");
+            }
+        }''';
+
+  String _idLoginJavaScript(PersonInfo info) =>
+      r'''try{
+            const usernameInput = document.getElementById('login-username');
+            usernameInput.value = String.raw`''' +
+      info.id! +
+      r'''`;
+            usernameInput.dispatchEvent(new Event('input'));
+            
+            const passwordInput = document.getElementById('login-password');
+            passwordInput.value = String.raw`''' +
+      info.password! +
+      r'''`;
+            passwordInput.dispatchEvent(new Event('input'));
+
+            document.querySelector('.el-button.content_submit').click();
+        }
+        catch (e) {
+            window.alert("Danta: Failed to auto login");
+        }''';
+
+  @override
+  Future<void> onLoadStop(WebUri? url) async {
+    final info = StateProvider.personInfo.value;
+    if (info == null) return;
+
+    final urlStr = url?.toString() ?? '';
+
+    if (urlStr.startsWith('https://uis.fudan.edu.cn/authserver/login')) {
+      Future.delayed(const Duration(milliseconds: 1000)).then((_) =>
+          webViewController?.evaluateJavascript(
+              source: _uisLoginJavaScript(info)));
+    } else if (urlStr.startsWith('https://id.fudan.edu.cn/')) {
+      Future.delayed(const Duration(milliseconds: 1000)).then((_) =>
+          webViewController?.evaluateJavascript(
+              source: _idLoginJavaScript(info)));
+    } else if (url?.host == targetHost) {
+      // The user has completed 2FA and reached the target service.
+      // Extract cookies and import them into FudanSession.
+      await _extractAndImportCookies(url!);
+      if (!completer.isCompleted) {
+        completer.complete();
+      }
+      // flutter_inappwebview_linux 0.1.0-beta.1 has a bug where
+      // InAppBrowser.close() returns NOT_IMPLEMENTED because
+      // setInAppBrowserDelegate() is never called in setupWebView().
+      // On Linux, skip close() and let the user close the window manually.
+      if (!PlatformX.isLinux) {
+        close();
+      }
+    }
+  }
+
+  Future<void> _extractAndImportCookies(WebUri url) async {
+    final cookieManager = CookieManager.instance();
+
+    // Import cookies from the target service host.
+    final targetCookies = await cookieManager.getCookies(url: url);
+    final targetUri = Uri.parse(url.toString());
+    final ioCookies = targetCookies
+        .map((c) => io.Cookie(c.name, '${c.value}')
+          ..domain = c.domain
+          ..path = c.path ?? '/')
+        .toList();
+    await FudanSession.importCookies(ioCookies, targetUri);
+
+    // Also import cookies from id.fudan.edu.cn to maintain the session.
+    final idUrl = WebUri('https://${FudanAuthenticationAPIV2.idHost}/');
+    final idCookies = await cookieManager.getCookies(url: idUrl);
+    final idUri = Uri.parse(idUrl.toString());
+    final idIoCookies = idCookies
+        .map((c) => io.Cookie(c.name, '${c.value}')
+          ..domain = c.domain
+          ..path = c.path ?? '/')
+        .toList();
+    await FudanSession.importCookies(idIoCookies, idUri);
+  }
+
+  @override
+  void onExit() {
+    if (!completer.isCompleted) {
+      completer.completeError(
+          Exception('User closed the authentication browser'));
+    }
   }
 }

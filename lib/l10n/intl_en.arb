@@ -595,5 +595,6 @@
   "season_summer": "Summer",
   "season_autumn": "Autumn",
   "season_winter": "Winter",
-  "fudan_api_exception": "Parsing Campus Service API Failed"
+  "fudan_api_exception": "Parsing Campus Service API Failed",
+  "enhanced_auth_waiting": "Please complete authentication in the browser..."
 }

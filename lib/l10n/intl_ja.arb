@@ -577,5 +577,6 @@
   "season_summer": "夏",
   "season_autumn": "秋",
   "season_winter": "冬",
-  "fudan_api_exception": "校内サービスAPI解析できません"
+  "fudan_api_exception": "校内サービスAPI解析できません",
+  "enhanced_auth_waiting": "ブラウザで認証を完了してください…"
 }

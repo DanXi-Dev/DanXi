@@ -589,5 +589,6 @@
   "season_summer": "夏",
   "season_autumn": "秋",
   "season_winter": "冬",
-  "fudan_api_exception": "校園網路界面無法解析"
+  "fudan_api_exception": "校園網路界面無法解析",
+  "enhanced_auth_waiting": "請在瀏覽器中完成身份驗證…"
 }

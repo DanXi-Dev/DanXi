@@ -92,7 +92,8 @@ class DataCenterRepository extends BaseRepositoryWithDio {
       responseType: ResponseType.plain,
     );
     return FudanSession.request(
-        options, (req) => _parseCrowdednessInfo(req.data, areaCode));
+        options, (req) => _parseCrowdednessInfo(req.data, areaCode),
+        type: FudanLoginType.Neo2FA);
   }
 
   Map<String, TrafficInfo> _parseCrowdednessInfo(
@@ -161,7 +162,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
           .map<CardDetailInfo>(
               (e) => CardDetailInfo.fromList(List<String>.from(e)))
           .toList();
-    });
+    }, type: FudanLoginType.Neo2FA);
   }
 
   Future<List<ElectricityHistoryItem>> getElectricityHistory(
@@ -181,7 +182,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
           .map<ElectricityHistoryItem>(
               (e) => ElectricityHistoryItem.fromList((e as List).map((item) => item.toString()).toList()))
           .toList();
-    });
+    }, type: FudanLoginType.Neo2FA);
   }
 
   @override
