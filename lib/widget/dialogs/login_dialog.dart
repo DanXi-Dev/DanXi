@@ -261,14 +261,6 @@ class LoginDialog extends HookConsumerWidget {
     }
   }
 
-  void requestInternetAccess() async {
-    // This webpage only returns plain-text 'SUCCESS' and is ideal for testing connection.
-    try {
-      // fixme: use a privacy-friendly captive portal detection method.
-      await DioUtils.newDioWithProxy().head('http://captive.apple.com');
-    } catch (ignored) {}
-  }
-
   static Future<void> showLoginDialog(BuildContext context, XSharedPreferences preferences,
       ValueNotifier<PersonInfo?> personInfo, bool dismissible, {bool isGraduate = false}) async {
     if (_isShown) return;
