@@ -40,6 +40,17 @@
   "background_image_already_set": "背景圖片已設定，是否移除？",
   "background_image_description": "選擇一張圖片作爲茶樓背景",
   "ban_post_until": "您在 {date} 前無法在此分區發帖",
+  "ban_reporter": "封禁舉報人",
+  "ban_reporter_days": "{days} 天",
+  "@ban_reporter_days": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "ban_reporter_reason_hint": "封禁理由（可選）",
+  "ban_reporter_tip": "注意：此操作將封禁提交該舉報的用戶，而非被舉報的用戶。",
   "before_enabled": "開啓前",
   "boreas618_description": "旦撻開發者",
   "bus_dest": "終點站",
@@ -274,6 +285,7 @@
   "logout_subtitle": "並刪除此裝置上的所有資料",
   "major": "專業",
   "mark_all_as_read": "全部標爲已讀",
+  "mark_as_dealt": "標記為已處理",
   "markdown_description": "Markdown 解析器已啓用。您可以直接使用 Markdown 語法撰寫帖子。若您不熟悉 Markdown，可參考 https://www.runoob.com/markdown/md-tutorial.html。",
   "markdown_enabled": "Markdown 已啓用",
   "messages": "訊息",
@@ -589,5 +601,10 @@
   "season_summer": "夏",
   "season_autumn": "秋",
   "season_winter": "冬",
-  "fudan_api_exception": "校園網路界面無法解析"
+  "fudan_api_exception": "校園網路界面無法解析",
+  "enhanced_auth_waiting": "請在瀏覽器中完成身份驗證…",
+  "enhanced_auth_title": "需要雙因素認證",
+  "enhanced_auth_description": "該校園服務需要雙因素認證（2FA）。\n即將打開瀏覽器，帳號密碼將自動填入，請在瀏覽器中完成驗證。",
+  "enhanced_auth_continue": "繼續",
+  "enhanced_auth_cancelled": "驗證未完成，部分功能可能暫時無法使用。"
 }

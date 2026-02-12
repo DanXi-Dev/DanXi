@@ -74,6 +74,28 @@ sudo pacman -S danxi-git # 最新 Git 版
 
 打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版 zip 压缩包，解压运行即可。
 
+#### 依赖项
+
+在 Linux 上运行旦挞需要以下依赖项：
+
+- **libsecret** 和 **gnome-keyring**：用于安全存储加密配置文件所用的主密钥。
+  - libsecret：[官网](https://gnome.pages.gitlab.gnome.org/libsecret/) | [安装源](https://repology.org/project/libsecret/versions)
+  - gnome-keyring：[官网](https://gitlab.gnome.org/GNOME/gnome-keyring) | [安装源](https://repology.org/project/gnome-keyring/versions)
+- **gtk3**：用于显示 GTK3 窗口。
+  - [官网](https://gtk.org/) | [安装源](https://repology.org/project/gtk/versions)
+- **wpewebkit**：用于显示应用内 WebView。
+  - [官网](https://wpewebkit.org/) | [安装源](https://repology.org/project/wpewebkit/versions)
+
+### 已知问题
+
+部分 GPU（如 AMD 显卡）上，应用内 WebView 可能显示为黑屏。这是 WPE WebKit 硬件渲染的兼容性问题。可通过设置环境变量强制使用软件渲染来解决：
+
+```shell
+LIBGL_ALWAYS_SOFTWARE=1 ./danxi
+```
+
+详见 [flutter_inappwebview#460](https://github.com/pichillilorenzo/flutter_inappwebview/issues/460#issuecomment-3798706399)。
+
 # 构建
 
 ## 我们当前使用的 Flutter 编译版本
@@ -90,13 +112,13 @@ Tools • Dart 3.10.7 • DevTools 2.51.1
 
 本应用使用 [Dart](https://dart.cn/) 和 [Flutter](https://flutter.cn/) 开发。
 
-为了构建本应用，您需要按照 `Flutter`官网的要求[配置国内镜像源](https://flutter.cn/community/china)，然后[下载](https://flutter.cn/docs/get-started/install)并安装 `Flutter SDK`。
+为了构建本应用，您需要按照 `Flutter` 官网的要求[配置国内镜像源](https://flutter.cn/community/china)，然后[下载](https://flutter.cn/docs/get-started/install)并安装 `Flutter SDK`。
 
-如果您正在为 `Windows`平台构建，您还需要[安装并配置](https://visualstudio.microsoft.com/zh-hans/downloads/) `Visual Studio`。
+如果您正在为 `Windows` 平台构建，您还需要[安装并配置](https://visualstudio.microsoft.com/zh-hans/downloads/) `Visual Studio`。
 
-如果您正在为 `Android`平台构建，您还需要[安装并配置](https://developer.android.google.cn/studio) `Android Command Line Tools`。
+如果您正在为 `Android` 平台构建，您还需要[安装并配置](https://developer.android.google.cn/studio) `Android Command Line Tools`。
 
-如果你正在为 `iOS/iPadOS/macOS`平台构建，您还需要[安装并配置](https://apps.apple.com/app/id497799835) `Xcode`。
+如果你正在为 `iOS/iPadOS/macOS` 平台构建，您还需要[安装并配置](https://apps.apple.com/app/id497799835) `Xcode`。
 
 确定配置正确后，你需要首先在项目根目录下运行 
 

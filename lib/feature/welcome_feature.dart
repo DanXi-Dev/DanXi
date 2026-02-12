@@ -75,16 +75,6 @@ class WelcomeFeature extends Feature {
     } else if (time >= 17 && time <= 22) {
       _helloQuote = S.of(context!).good_night;
     }
-
-    // Only load data once.
-    // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
-    // not just FeatureContainer. So the feature will be recreated then.
-    if (status is ConnectionNone) {
-      _loadCardStatus().catchError((error, stackTrace) {
-        status = ConnectionFailed(error, stackTrace);
-        notifyUpdate();
-      });
-    }
   }
 
   @override
@@ -113,6 +103,12 @@ class WelcomeFeature extends Feature {
     Widget status;
     switch (this.status) {
       case ConnectionNone():
+        status = Icon(
+          PlatformX.isMaterial(context!)
+              ? Icons.refresh
+              : CupertinoIcons.refresh,
+        );
+        break;
       case ConnectionConnecting():
         status = PlatformCircularProgressIndicator();
         if (PlatformX.isMaterial(context!)) {
@@ -160,6 +156,11 @@ class WelcomeFeature extends Feature {
       onTap: () {
         switch (this.status) {
           case ConnectionNone():
+            _loadCardStatus().catchError((error, stackTrace) {
+              this.status = ConnectionFailed(error, stackTrace);
+              notifyUpdate();
+            });
+            break;
           case ConnectionConnecting():
             break;
           case ConnectionDone():

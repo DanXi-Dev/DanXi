@@ -37,8 +37,10 @@ import 'package:dan_xi/widget/libraries/top_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 
@@ -65,9 +67,9 @@ class BBSReportDetailState extends State<BBSReportDetail> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
-        material: (_, __) =>
+        material: (_, _) =>
             MaterialScaffoldData(resizeToAvoidBottomInset: false),
-        cupertino: (_, __) =>
+        cupertino: (_, _) =>
             CupertinoPageScaffoldData(resizeToAvoidBottomInset: false),
         iosContentPadding: false,
         iosContentBottomPadding: false,
@@ -145,12 +147,36 @@ class BBSReportDetailState extends State<BBSReportDetail> {
         ),
       );
 
+  Future<void> _banReporter(BuildContext context, OTReport e) async {
+    final result = await showPlatformDialog<(int, String)?>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return _BanReporterDialog(reportId: e.report_id!);
+      },
+    );
+    if (result == null || !context.mounted) return;
+
+    final (days, reason) = result;
+    try {
+      final response = await ForumRepository.getInstance()
+          .adminBanReporter(e.report_id!, days, reason);
+      if (response != null && response < 300 && context.mounted) {
+        Noticing.showModalNotice(context,
+            message: S.of(context).operation_successful);
+      }
+    } catch (error, st) {
+      if (context.mounted) {
+        Noticing.showErrorDialog(context, error, trace: st);
+      }
+    }
+  }
+
   List<Widget> _buildReportContextMenu(
           BuildContext pageContext, BuildContext menuContext, OTReport e) =>
       [
         PlatformContextMenuItem(
           menuContext: menuContext,
-          child: const Text("Mark as dealt"),
+          child: Text(S.of(pageContext).mark_as_dealt),
           onPressed: () async {
             int? result = await ForumRepository.getInstance()
                 .adminSetReportDealt(e.report_id!);
@@ -161,7 +187,13 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                   useInitialData: false, queueDataClear: false);
             }
           },
-        )
+        ),
+        PlatformContextMenuItem(
+          menuContext: menuContext,
+          isDestructive: true,
+          child: Text(S.of(pageContext).ban_reporter),
+          onPressed: () => _banReporter(pageContext, e),
+        ),
       ];
 
   Widget _getReportListItems(BuildContext context,
@@ -225,7 +257,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                       color: Theme.of(context).hintColor, fontSize: 12),
                 ),
                 GestureDetector(
-                  child: Text("Mark as dealt",
+                  child: Text(S.of(context).mark_as_dealt,
                       style: TextStyle(
                           color: Theme.of(context).hintColor, fontSize: 12)),
                   onTap: () async {
@@ -514,6 +546,97 @@ class AuditListState extends State<AuditList> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _BanReporterDialog extends HookConsumerWidget {
+  final int reportId;
+
+  const _BanReporterDialog({required this.reportId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final days = useState<int>(1);
+    final reasonController = useTextEditingController();
+
+    return PlatformAlertDialog(
+      title: Text(S.of(context).ban_reporter),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Card(
+            color: Theme.of(context).colorScheme.errorContainer,
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.onErrorContainer),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      S.of(context).ban_reporter_tip,
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onErrorContainer),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.remove),
+                onPressed:
+                    days.value > 1 ? () => days.value-- : null,
+              ),
+              Text(
+                S.of(context).ban_reporter_days(days.value),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed:
+                    days.value < 10000 ? () => days.value++ : null,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          PlatformTextField(
+            controller: reasonController,
+            hintText: S.of(context).ban_reporter_reason_hint,
+            maxLines: 2,
+          ),
+        ],
+      ),
+      actions: [
+        PlatformDialogAction(
+          cupertino: (_, _) =>
+              CupertinoDialogActionData(isDefaultAction: true),
+          child: PlatformText(S.of(context).cancel),
+          onPressed: () => Navigator.pop(context, null),
+        ),
+        PlatformDialogAction(
+          cupertino: (_, _) =>
+              CupertinoDialogActionData(isDestructiveAction: true),
+          material: (_, _) => MaterialDialogActionData(
+              style: ButtonStyle(
+                  foregroundColor:
+                      WidgetStateProperty.all<Color>(Colors.red))),
+          child: PlatformText(S.of(context).confirm),
+          onPressed: () =>
+              Navigator.pop(context, (days.value, reasonController.text)),
+        ),
+      ],
     );
   }
 }

@@ -41,6 +41,17 @@
   "background_image_already_set": "A background image is already set, do you wish to remove it?",
   "background_image_description": "Choose an image as forum background",
   "ban_post_until": "You are not allowed to post in this division until {date}",
+  "ban_reporter": "Ban reporter",
+  "ban_reporter_days": "{days} day(s)",
+  "@ban_reporter_days": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "ban_reporter_reason_hint": "Reason (optional)",
+  "ban_reporter_tip": "Note: This will ban the user who submitted the report, NOT the reported user.",
   "before_enabled": "Before",
   "boreas618_description": "Danta Developer",
   "bus_dest": "To    ",
@@ -277,6 +288,7 @@
   "logout_subtitle": "And delete all data from this device",
   "major": "Major",
   "mark_all_as_read": "Read All",
+  "mark_as_dealt": "Mark as dealt",
   "markdown_description": "Markdown parser is on. You can write with Markdown syntax. If you don't know what Markdown is, check out https://www.runoob.com/markdown/md-tutorial.html .",
   "markdown_enabled": "Markdown enabled",
   "material": "[WARNING: DEBUG FEATURE] Material",
@@ -595,5 +607,10 @@
   "season_summer": "Summer",
   "season_autumn": "Autumn",
   "season_winter": "Winter",
-  "fudan_api_exception": "Parsing Campus Service API Failed"
+  "fudan_api_exception": "Parsing Campus Service API Failed",
+  "enhanced_auth_waiting": "Please complete authentication in the browser...",
+  "enhanced_auth_title": "Two-Factor Authentication Required",
+  "enhanced_auth_description": "This campus service requires two-factor authentication (2FA).\nA browser will open with your credentials pre-filled. Please complete the verification in the browser.",
+  "enhanced_auth_continue": "Continue",
+  "enhanced_auth_cancelled": "Verification incomplete. Some features may be temporarily unavailable."
 }

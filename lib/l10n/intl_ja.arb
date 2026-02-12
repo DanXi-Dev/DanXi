@@ -40,6 +40,17 @@
   "background_image_already_set": "背景画像が設定されていますが、削除されますか？",
   "background_image_description": "フォーラムの背景となる画像を選択します",
   "ban_post_until": "このセクションは{date}まで投稿することができません。",
+  "ban_reporter": "報告者を制限する",
+  "ban_reporter_days": "{days} 日間",
+  "@ban_reporter_days": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "ban_reporter_reason_hint": "制限理由（任意）",
+  "ban_reporter_tip": "注意：この操作は報告を提出したユーザーを制限します。報告されたユーザーではありません。",
   "before_enabled": "無効",
   "boreas618_description": "旦タの開発者",
   "bus_dest": "到着駅",
@@ -273,6 +284,7 @@
   "logout_subtitle": "このデバイスのすべてのデータを削除する",
   "major": "専門",
   "mark_all_as_read": "すべて読む",
+  "mark_as_dealt": "対処済みにする",
   "markdown_description": "Markdownパーサーが有効です。 Markdownを使って直接書き込みができます。「Markdownが何であるか」分からない場合は、 https://www.runoob.com/markdown/md-tutorial.html を参照してください。",
   "markdown_enabled": "Markdown 有効",
   "messages": "メッセージ",
@@ -577,5 +589,10 @@
   "season_summer": "夏",
   "season_autumn": "秋",
   "season_winter": "冬",
-  "fudan_api_exception": "校内サービスAPI解析できません"
+  "fudan_api_exception": "校内サービスAPI解析できません",
+  "enhanced_auth_waiting": "ブラウザで認証を完了してください…",
+  "enhanced_auth_title": "二要素認証が必要です",
+  "enhanced_auth_description": "このキャンパスサービスには二要素認証（2FA）が必要です。\nブラウザが開き、認証情報が自動入力されます。ブラウザで認証を完了してください。",
+  "enhanced_auth_continue": "続行",
+  "enhanced_auth_cancelled": "認証が完了していません。一部の機能が一時的に利用できない場合があります。"
 }

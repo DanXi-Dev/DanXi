@@ -102,6 +102,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       StateStreamListener();
   final StateStreamListener<dynamic> _credentialsInvalidSubscription =
       StateStreamListener();
+  final StateStreamListener<dynamic> _enhancedAuthSubscription =
+      StateStreamListener();
 
   /// Listener to Android Activity intents.
   final StateStreamListener<ri.Intent?> _receivedIntentSubscription =
@@ -121,6 +123,10 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// If a dialog has been shown, we will not show a duplicated one.
   /// See [_dealWithCaptchaNeededException]
   bool _isErrorDialogShown = false;
+
+  /// Whether the 2FA dialog is shown.
+  /// See [_dealWithEnhancedAuth]
+  bool _is2FADialogShown = false;
 
   /// The tab page index.
   final ValueNotifier<int> _pageIndex = ValueNotifier(0);
@@ -153,6 +159,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     StateProvider.isLoggedIn.removeListener(_loginListener);
     _captchaSubscription.cancel();
     _credentialsInvalidSubscription.cancel();
+    _enhancedAuthSubscription.cancel();
     _receivedIntentSubscription.cancel();
     _uniLinksSubscription.cancel();
     screenListener?.dispose();
@@ -218,6 +225,89 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
+  /// Deal with enhanced authentication (2FA) requirement from id.fudan.edu.cn.
+  ///
+  /// Opens an in-app browser where the user can complete the second
+  /// authentication step (e.g. SMS verification). Credentials are auto-filled.
+  /// A waiting dialog is shown while the browser is open.
+  Future<void> _dealWithEnhancedAuth(
+      neo.EnhancedAuthenticationRequiredException e) async {
+    if (_is2FADialogShown) return;
+    _is2FADialogShown = true;
+
+    // Stage 1: Explanation dialog telling the user why 2FA is needed
+    final shouldContinue = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(S.of(context).enhanced_auth_title),
+        content: Text(S.of(context).enhanced_auth_description),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(S.of(context).cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(S.of(context).enhanced_auth_continue),
+          ),
+        ],
+      ),
+    );
+    if (shouldContinue != true) {
+      neo.FudanSession.fail2FA(
+          Exception('User declined 2FA'), StackTrace.current);
+      _is2FADialogShown = false;
+      return;
+    }
+
+    // Stage 2: Waiting dialog while the browser is open
+    if (!mounted) {
+      _is2FADialogShown = false;
+      return;
+    }
+    bool waitingDialogOpen = true;
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        content: Row(
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(width: 16),
+            Expanded(child: Text(S.of(context).enhanced_auth_waiting)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              waitingDialogOpen = false;
+              neo.FudanSession.fail2FA(
+                  Exception('User cancelled authentication'),
+                  StackTrace.current);
+              Navigator.of(context, rootNavigator: true).pop();
+            },
+            child: Text(S.of(context).cancel),
+          ),
+        ],
+      ),
+    );
+
+    try {
+      await BrowserUtil.openForAuthentication(
+          e.loginUrl.toString(), e.targetHost, context);
+    } catch (_) {
+      // Stage 3: Failure notice if the user closes the browser early or cancels
+      if (mounted) {
+        Noticing.showNotice(context, S.of(context).enhanced_auth_cancelled);
+      }
+    }
+    if (mounted && waitingDialogOpen) {
+      Navigator.of(context, rootNavigator: true).pop();
+    }
+    _is2FADialogShown = false;
+  }
+
   /// Deal with bmob error (e.g. unable to obtain data in [AnnouncementRepository]).
   void _dealWithBmobError() {
     showPlatformDialog(
@@ -278,6 +368,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
+        unawaited(neo.FudanSession.forceSaveCookies());
+        break;
       case AppLifecycleState.detached:
       case AppLifecycleState.hidden:
         break;
@@ -481,6 +573,13 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 e is uis.CredentialsInvalidException ||
                 e is neo.CredentialsInvalidException)
             .listen((_) => _dealWithCredentialsInvalidException()),
+        hashCode);
+    _enhancedAuthSubscription.bindOnlyInvalid(
+        Constant.eventBus
+            .on()
+            .where((e) => e is neo.EnhancedAuthenticationRequiredException)
+            .listen((e) => _dealWithEnhancedAuth(
+                e as neo.EnhancedAuthenticationRequiredException)),
         hashCode);
     _initReceiveIntents();
     _initUniLinks();
