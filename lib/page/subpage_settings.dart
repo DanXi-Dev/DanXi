@@ -93,8 +93,6 @@ class SettingsPageState extends State<SettingsPage> {
         "meta", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dart-lang/sdk"),
     LicenseItem("flutter_layout_grid", LICENSE_MIT,
         "https://github.com/madewithfelt/flutter_layout_grid"),
-    LicenseItem(
-        "flutter_js", LICENSE_MIT, "https://github.com/abner/flutter_js"),
     LicenseItem("fluttertoast", LICENSE_MIT,
         "https://github.com/PonnamKarthik/FlutterToast"),
     LicenseItem("markdown", LICENSE_BSD_3_0_CLAUSE,
