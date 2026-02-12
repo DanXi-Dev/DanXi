@@ -86,9 +86,9 @@ class PersistentCookieJar extends IndependentCookieJar {
   }
 
   Future<void> _persistToDisk() async {
-    _dirty = false;
     String json = jsonEncode(_toJson());
     await _preferences.setString(KEY_SESSION_COOKIES, json);
+    _dirty = false;
   }
 
   Map<String, dynamic> _toJson() {
