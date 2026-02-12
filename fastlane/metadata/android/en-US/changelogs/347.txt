@@ -1,0 +1,1 @@
+This semester we encountered numerous API changes from the university. This update not only adds and improves the network layer and many API implementations, but also introduces various useful features. For the complete changelog, please visit https://github.com/DanXi-Dev/DanXi/releases.
