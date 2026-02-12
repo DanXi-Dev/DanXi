@@ -40,6 +40,17 @@
   "background_image_already_set": "背景圖片已設定，是否移除？",
   "background_image_description": "選擇一張圖片作爲茶樓背景",
   "ban_post_until": "您在 {date} 前無法在此分區發帖",
+  "ban_reporter": "封禁舉報人",
+  "ban_reporter_days": "{days} 天",
+  "@ban_reporter_days": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "ban_reporter_reason_hint": "封禁理由（可選）",
+  "ban_reporter_tip": "注意：此操作將封禁提交該舉報的用戶，而非被舉報的用戶。",
   "before_enabled": "開啓前",
   "boreas618_description": "旦撻開發者",
   "bus_dest": "終點站",

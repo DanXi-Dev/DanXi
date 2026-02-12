@@ -40,6 +40,17 @@
   "background_image_already_set": "背景画像が設定されていますが、削除されますか？",
   "background_image_description": "フォーラムの背景となる画像を選択します",
   "ban_post_until": "このセクションは{date}まで投稿することができません。",
+  "ban_reporter": "報告者を制限する",
+  "ban_reporter_days": "{days} 日間",
+  "@ban_reporter_days": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "ban_reporter_reason_hint": "制限理由（任意）",
+  "ban_reporter_tip": "注意：この操作は報告を提出したユーザーを制限します。報告されたユーザーではありません。",
   "before_enabled": "無効",
   "boreas618_description": "旦タの開発者",
   "bus_dest": "到着駅",

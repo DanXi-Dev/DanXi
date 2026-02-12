@@ -41,6 +41,17 @@
   "background_image_already_set": "A background image is already set, do you wish to remove it?",
   "background_image_description": "Choose an image as forum background",
   "ban_post_until": "You are not allowed to post in this division until {date}",
+  "ban_reporter": "Ban reporter",
+  "ban_reporter_days": "{days} day(s)",
+  "@ban_reporter_days": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "ban_reporter_reason_hint": "Reason (optional)",
+  "ban_reporter_tip": "Note: This will ban the user who submitted the report, NOT the reported user.",
   "before_enabled": "Before",
   "boreas618_description": "Danta Developer",
   "bus_dest": "To    ",
