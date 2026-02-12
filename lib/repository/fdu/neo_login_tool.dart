@@ -174,15 +174,19 @@ class FudanSession {
             try {
               await FudanAuthenticationAPIV2.authenticate(
                   personInfo, effectiveServiceUrl, effectiveLoginMethod);
-            } on EnhancedAuthenticationRequiredException {
-              // Enhanced authentication (2FA) is required. The UI layer will
-              // open a WebView for the user to complete 2FA. Wait for it.
-              final completer = enhancedAuthCompleter;
-              if (completer == null) {
-                // No UI listener registered; cannot proceed.
-                rethrow;
+            } on EnhancedAuthenticationRequiredException catch (e) {
+              // Enhanced authentication (2FA) is required.
+              final existing = _enhancedAuthCompleter;
+              if (existing != null && !existing.isCompleted) {
+                // A 2FA flow is already in progress; wait for it.
+                await existing.future;
+              } else {
+                // Start a new 2FA flow.
+                final completer = Completer<void>();
+                _enhancedAuthCompleter = completer;
+                e.fire(); // Notify the UI layer via EventBus.
+                await completer.future;
               }
-              await completer.future;
             }
           },
           isFatalError: effectiveIsFatalErrorNeo,
@@ -244,10 +248,28 @@ class FudanSession {
     }
   }
 
-  /// A [Completer] that resolves when enhanced authentication (2FA) via WebView
-  /// completes. Set by the UI layer when it opens the WebView for manual login,
-  /// and completed when cookies are imported back.
-  static Completer<void>? enhancedAuthCompleter;
+  /// The [Completer] for the currently active 2FA flow, if any.
+  ///
+  /// Created by the login logic when enhanced authentication is first required,
+  /// and completed by the UI layer (via [complete2FA] or [fail2FA]) once the
+  /// user finishes or cancels the WebView-based authentication.
+  static Completer<void>? _enhancedAuthCompleter;
+
+  /// Called by the UI layer when the user completes 2FA successfully.
+  static void complete2FA() {
+    final c = _enhancedAuthCompleter;
+    if (c != null && !c.isCompleted) c.complete();
+    _enhancedAuthCompleter = null;
+  }
+
+  /// Called by the UI layer when 2FA fails or is cancelled by the user.
+  static void fail2FA(dynamic error, StackTrace stackTrace) {
+    final c = _enhancedAuthCompleter;
+    if (c != null && !c.isCompleted) {
+      c.completeError(error, stackTrace);
+    }
+    _enhancedAuthCompleter = null;
+  }
 
   /// Import cookies from an external source (e.g. InAppWebView) into the
   /// session cookie jar. Used after the user completes 2FA in a WebView.
@@ -405,10 +427,7 @@ class FudanAuthenticationAPIV2 {
     // Enhanced authentication (2FA) is required. The response structure
     // differs when second is true, so we must check before parsing methods.
     if (chainCodeResponse.data!["second"] == true) {
-      final exception =
-          EnhancedAuthenticationRequiredException(idUrl, serviceUrl.host);
-      exception.fire();
-      throw exception;
+      throw EnhancedAuthenticationRequiredException(idUrl, serviceUrl.host);
     }
 
     final methods = chainCodeResponse.data!["data"] as List<dynamic>;
@@ -459,10 +478,7 @@ class FudanAuthenticationAPIV2 {
 
     final loginToken = response.data!["loginToken"] as String?;
     if (loginToken == null) {
-      final exception =
-          EnhancedAuthenticationRequiredException(loginUrl, targetHost);
-      exception.fire();
-      throw exception;
+      throw EnhancedAuthenticationRequiredException(loginUrl, targetHost);
     }
     return loginToken;
   }

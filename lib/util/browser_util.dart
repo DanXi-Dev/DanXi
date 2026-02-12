@@ -125,7 +125,6 @@ class BrowserUtil {
   static Future<void> openForAuthentication(
       String url, String targetHost, BuildContext context) {
     final completer = Completer<void>();
-    FudanSession.enhancedAuthCompleter = completer;
 
     final browser = AuthenticationInAppBrowser(
       targetHost: targetHost,
@@ -330,6 +329,7 @@ class AuthenticationInAppBrowser extends InAppBrowser {
       // The user has completed 2FA and reached the target service.
       // Extract cookies and import them into FudanSession.
       await _extractAndImportCookies(url!);
+      FudanSession.complete2FA();
       if (!completer.isCompleted) {
         completer.complete();
       }
@@ -372,8 +372,9 @@ class AuthenticationInAppBrowser extends InAppBrowser {
   @override
   void onExit() {
     if (!completer.isCompleted) {
-      completer.completeError(
-          Exception('User closed the authentication browser'));
+      final error = Exception('User closed the authentication browser');
+      FudanSession.fail2FA(error, StackTrace.current);
+      completer.completeError(error);
     }
   }
 }

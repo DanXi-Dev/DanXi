@@ -255,6 +255,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ),
     );
     if (shouldContinue != true) {
+      neo.FudanSession.fail2FA(
+          Exception('User declined 2FA'), StackTrace.current);
       _is2FADialogShown = false;
       return;
     }
@@ -278,11 +280,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         actions: [
           TextButton(
             onPressed: () {
-              final completer = neo.FudanSession.enhancedAuthCompleter;
-              if (completer != null && !completer.isCompleted) {
-                completer.completeError(
-                    Exception('User cancelled authentication'));
-              }
+              neo.FudanSession.fail2FA(
+                  Exception('User cancelled authentication'),
+                  StackTrace.current);
               Navigator.of(context, rootNavigator: true).pop();
             },
             child: Text(S.of(context).cancel),
