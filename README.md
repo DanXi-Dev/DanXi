@@ -52,18 +52,6 @@ dmg 硬盘映像，挂载拷贝即可。
 
 ## Linux
 
-### 依赖项
-
-在 Linux 上运行旦挞需要以下依赖项：
-
-- **libsecret** 和 **gnome-keyring**：用于安全存储加密配置文件所用的主密钥。
-  - libsecret：[官网](https://gnome.pages.gitlab.gnome.org/libsecret/) | [安装源](https://repology.org/project/libsecret/versions)
-  - gnome-keyring：[官网](https://gitlab.gnome.org/GNOME/gnome-keyring) | [安装源](https://repology.org/project/gnome-keyring/versions)
-- **gtk3**：用于显示 GTK3 窗口。
-  - [官网](https://gtk.org/) | [安装源](https://repology.org/project/gtk/versions)
-- **wpewebkit**：用于显示应用内 WebView。
-  - [官网](https://wpewebkit.org/) | [安装源](https://repology.org/project/wpewebkit/versions)
-
 ### Arch Linux
 
 从 [AUR](https://aur.archlinux.org) 或 [archlinuxcn](https://github.com/archlinuxcn/repo) 安装。
@@ -85,6 +73,28 @@ sudo pacman -S danxi-git # 最新 Git 版
 ### 其他 Linux 发行版
 
 打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版 zip 压缩包，解压运行即可。
+
+#### 依赖项
+
+在 Linux 上运行旦挞需要以下依赖项：
+
+- **libsecret** 和 **gnome-keyring**：用于安全存储加密配置文件所用的主密钥。
+  - libsecret：[官网](https://gnome.pages.gitlab.gnome.org/libsecret/) | [安装源](https://repology.org/project/libsecret/versions)
+  - gnome-keyring：[官网](https://gitlab.gnome.org/GNOME/gnome-keyring) | [安装源](https://repology.org/project/gnome-keyring/versions)
+- **gtk3**：用于显示 GTK3 窗口。
+  - [官网](https://gtk.org/) | [安装源](https://repology.org/project/gtk/versions)
+- **wpewebkit**：用于显示应用内 WebView。
+  - [官网](https://wpewebkit.org/) | [安装源](https://repology.org/project/wpewebkit/versions)
+
+### 已知问题
+
+部分 GPU（如 AMD 显卡）上，应用内 WebView 可能显示为黑屏。这是 WPE WebKit 硬件渲染的兼容性问题。可通过设置环境变量强制使用软件渲染来解决：
+
+```shell
+LIBGL_ALWAYS_SOFTWARE=1 ./danxi
+```
+
+详见 [flutter_inappwebview#460](https://github.com/pichillilorenzo/flutter_inappwebview/issues/460#issuecomment-3798706399)。
 
 # 构建
 

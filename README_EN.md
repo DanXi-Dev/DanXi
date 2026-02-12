@@ -59,18 +59,6 @@ mount it.
 
 ## Linux
 
-### Dependencies
-
-Running Danta on Linux requires the following dependencies:
-
-- **libsecret** and **gnome-keyring**: For securely storing the master key used to encrypt configuration files.
-  - libsecret: [Website](https://gnome.pages.gitlab.gnome.org/libsecret/) | [Packages](https://repology.org/project/libsecret/versions)
-  - gnome-keyring: [Website](https://gitlab.gnome.org/GNOME/gnome-keyring) | [Packages](https://repology.org/project/gnome-keyring/versions)
-- **gtk3**: For displaying GTK3 windows.
-  - [Website](https://gtk.org/) | [Packages](https://repology.org/project/gtk/versions)
-- **wpewebkit**: For displaying in-app WebViews.
-  - [Website](https://wpewebkit.org/) | [Packages](https://repology.org/project/wpewebkit/versions)
-
 ### Arch Linux
 
 You can install it from [AUR](https://aur.archlinux.org/danxi-git.git) or [archlinuxcn](https://github.com/archlinuxcn/repo/tree/master/archlinuxcn/danxi-git).
@@ -91,6 +79,28 @@ sudo pacman -S danxi-git
 
 Go to [release page](https://github.com/DanXi-Dev/DanXi/releases), just download the zip file and
 unzip it.
+
+#### Dependencies
+
+Running Danta on Linux requires the following dependencies:
+
+- **libsecret** and **gnome-keyring**: For securely storing the master key used to encrypt configuration files.
+  - libsecret: [Website](https://gnome.pages.gitlab.gnome.org/libsecret/) | [Packages](https://repology.org/project/libsecret/versions)
+  - gnome-keyring: [Website](https://gitlab.gnome.org/GNOME/gnome-keyring) | [Packages](https://repology.org/project/gnome-keyring/versions)
+- **gtk3**: For displaying GTK3 windows.
+  - [Website](https://gtk.org/) | [Packages](https://repology.org/project/gtk/versions)
+- **wpewebkit**: For displaying in-app WebViews.
+  - [Website](https://wpewebkit.org/) | [Packages](https://repology.org/project/wpewebkit/versions)
+
+### Known Issues
+
+On some GPUs (e.g. AMD graphics cards), the in-app WebView may render as a black screen. This is a WPE WebKit hardware rendering compatibility issue. You can work around it by forcing software rendering via an environment variable:
+
+```shell
+LIBGL_ALWAYS_SOFTWARE=1 ./danxi
+```
+
+See [flutter_inappwebview#460](https://github.com/pichillilorenzo/flutter_inappwebview/issues/460#issuecomment-3798706399) for details.
 
 # Compile
 
