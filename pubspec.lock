@@ -727,15 +727,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.0-beta.3"
-  flutter_js:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "82eb46ac02f80ffb62c155ce014081bfbb42122b"
-      url: "https://github.com/lmdevstudio/flutter_js.git"
-    source: git
-    version: "0.8.5"
   flutter_keyboard_visibility:
     dependency: transitive
     description:
@@ -1171,7 +1162,7 @@ packages:
     source: hosted
     version: "1.0.5"
   js:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: js
       sha256: "53385261521cc4a0c4658fd0ad07a7d14591cf8fc33abbceae306ddb974888dc"
@@ -2154,14 +2145,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.1"
-  sync_http:
-    dependency: transitive
-    description:
-      name: sync_http
-      sha256: "7f0cd72eca000d2e026bcd6f990b81d0ca06022ef4e32fb257b30d3d1014a961"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.1"
   synchronized:
     dependency: transitive
     description:

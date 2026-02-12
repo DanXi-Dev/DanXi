@@ -17,9 +17,7 @@
 
 import 'dart:convert';
 
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
-import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dio/dio.dart';
@@ -126,54 +124,6 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
 
   @override
   bool get isWebvpnApplicable => true;
-}
-
-@Deprecated("Use EmptyClassroomRepository instead. The Ehall-based API is no longer available; see #615 for details.")
-class EhallEmptyClassroomRepository extends BaseRepositoryWithDio {
-  static String detailUrl(
-      String areaName, String? buildingName, DateTime date) {
-    return "https://zlapp.fudan.edu.cn/fudanzlfreeclass/wap/mobile/index?xqdm=$areaName&floor=$buildingName&date=${DateFormat("yyyy-MM-dd").format(date)}&page=1&flag=3&roomnum=&pagesize=10000";
-  }
-
-  EhallEmptyClassroomRepository._();
-
-  static final _instance = EhallEmptyClassroomRepository._();
-
-  factory EhallEmptyClassroomRepository.getInstance() => _instance;
-
-  /// Get [RoomInfo]s at [buildingName] on [date].
-  ///
-  /// Request [PersonInfo] for logging in, if necessary.
-  Future<List<RoomInfo>> getBuildingRoomInfo(
-      String areaName, String? buildingName, DateTime date) {
-    final options = RequestOptions(
-      method: "GET",
-      path: detailUrl(areaName, buildingName, date),
-    );
-    return FudanSession.request(options, (rep) {
-      List<RoomInfo> result = [];
-      final Map<String, dynamic> json = jsonDecode(rep.data!);
-      final Map<String, dynamic> buildingInfo = json['d']['list'];
-      for (var element in buildingInfo.values) {
-        if (element is List) {
-          for (var element in element) {
-            RoomInfo info = RoomInfo(element['name'], date, element['roomrl']);
-            info.busy = [];
-            if (element['kxsds'] is Map) {
-              element['kxsds']
-                  .values
-                  .forEach((element) => info.busy!.add(element != "闲"));
-              result.add(info);
-            }
-          }
-        }
-      }
-      return result;
-    });
-  }
-
-  @override
-  String get linkHost => "fudan.edu.cn";
 }
 
 class RoomInfo {

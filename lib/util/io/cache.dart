@@ -71,27 +71,4 @@ class Cache {
     }
   }
 
-  static Future<T?> getNew<T>(String key, Future<T> Function() fetch,
-      T Function(String? cachedValue) decode, String Function(T object) encode,
-      {bool Function(String cachedValue)? validate}) async {
-    XSharedPreferences preferences =
-        SettingsProvider.getInstance().preferences!;
-    validate ??= (v) => true;
-    if (!preferences.containsKey(key)) {
-      // Reload the cache
-      T newValue = await fetch();
-      if (validate(encode(newValue))) {
-        preferences.setString(key, encode(newValue));
-      }
-      return newValue;
-    }
-    String? result = preferences.getString(key);
-    if (validate(result!)) {
-      return decode(result);
-    } else {
-      T newValue = await fetch();
-      preferences.setString(key, encode(newValue));
-      return newValue;
-    }
-  }
 }

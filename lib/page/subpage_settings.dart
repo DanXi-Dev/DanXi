@@ -770,31 +770,6 @@ class SettingsPageState extends State<SettingsPage> {
                                   FlutterApp.restartApp(context);
                                 })),
 
-                  // Sponsor Option
-                  // if (PlatformX.isMobile)
-                  //   Card(
-                  //     child: ListTile(
-                  //       isThreeLine:
-                  //           !SettingsProvider.getInstance().isAdEnabled,
-                  //       leading: Icon(
-                  //         PlatformIcons(context).heartSolid,
-                  //       ),
-                  //       title: Text(S.of(context).sponsor_us),
-                  //       subtitle: Text(
-                  //           SettingsProvider.getInstance().isAdEnabled
-                  //               ? S.of(context).sponsor_us_enabled
-                  //               : S.of(context).sponsor_us_disabled),
-                  //       onTap: () async {
-                  //         if (SettingsProvider.getInstance().isAdEnabled) {
-                  //           _toggleAdDisplay();
-                  //         } else {
-                  //           _toggleAdDisplay();
-                  //           await _showAdsThankDialog();
-                  //         }
-                  //       },
-                  //     ),
-                  //   ),
-
                   // About
                   _buildAboutCard(context)
                 ]))),
