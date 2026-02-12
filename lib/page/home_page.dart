@@ -124,6 +124,10 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// See [_dealWithCaptchaNeededException]
   bool _isErrorDialogShown = false;
 
+  /// Whether the 2FA dialog is shown.
+  /// See [_dealWithEnhancedAuth]
+  bool _is2FADialogShown = false;
+
   /// The tab page index.
   final ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
@@ -228,6 +232,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// A waiting dialog is shown while the browser is open.
   Future<void> _dealWithEnhancedAuth(
       neo.EnhancedAuthenticationRequiredException e) async {
+    if (_is2FADialogShown) return;
+    _is2FADialogShown = true;
+
     // Stage 1: Explanation dialog telling the user why 2FA is needed
     final shouldContinue = await showDialog<bool>(
       context: context,
@@ -247,10 +254,16 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ],
       ),
     );
-    if (shouldContinue != true) return;
+    if (shouldContinue != true) {
+      _is2FADialogShown = false;
+      return;
+    }
 
     // Stage 2: Waiting dialog while the browser is open
-    if (!mounted) return;
+    if (!mounted) {
+      _is2FADialogShown = false;
+      return;
+    }
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -290,6 +303,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (mounted) {
       Navigator.of(context, rootNavigator: true).pop();
     }
+    _is2FADialogShown = false;
   }
 
   /// Deal with bmob error (e.g. unable to obtain data in [AnnouncementRepository]).
