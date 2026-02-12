@@ -93,8 +93,6 @@ class SettingsPageState extends State<SettingsPage> {
         "meta", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dart-lang/sdk"),
     LicenseItem("flutter_layout_grid", LICENSE_MIT,
         "https://github.com/madewithfelt/flutter_layout_grid"),
-    LicenseItem(
-        "flutter_js", LICENSE_MIT, "https://github.com/abner/flutter_js"),
     LicenseItem("fluttertoast", LICENSE_MIT,
         "https://github.com/PonnamKarthik/FlutterToast"),
     LicenseItem("markdown", LICENSE_BSD_3_0_CLAUSE,
@@ -769,31 +767,6 @@ class SettingsPageState extends State<SettingsPage> {
                                   }
                                   FlutterApp.restartApp(context);
                                 })),
-
-                  // Sponsor Option
-                  // if (PlatformX.isMobile)
-                  //   Card(
-                  //     child: ListTile(
-                  //       isThreeLine:
-                  //           !SettingsProvider.getInstance().isAdEnabled,
-                  //       leading: Icon(
-                  //         PlatformIcons(context).heartSolid,
-                  //       ),
-                  //       title: Text(S.of(context).sponsor_us),
-                  //       subtitle: Text(
-                  //           SettingsProvider.getInstance().isAdEnabled
-                  //               ? S.of(context).sponsor_us_enabled
-                  //               : S.of(context).sponsor_us_disabled),
-                  //       onTap: () async {
-                  //         if (SettingsProvider.getInstance().isAdEnabled) {
-                  //           _toggleAdDisplay();
-                  //         } else {
-                  //           _toggleAdDisplay();
-                  //           await _showAdsThankDialog();
-                  //         }
-                  //       },
-                  //     ),
-                  //   ),
 
                   // About
                   _buildAboutCard(context)

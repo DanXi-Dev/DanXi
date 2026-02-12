@@ -108,10 +108,10 @@ See [flutter_inappwebview#460](https://github.com/pichillilorenzo/flutter_inappw
 
 ```shell
 $ flutter --version
-Flutter 3.38.6 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 8b87286849 (3 days ago) • 2026-01-08 10:49:17 -0800
-Engine • hash 6f3039bf7c3cb5306513c75092822d4d94716003 (revision 78fc3012e4) (3 days ago) • 2026-01-07 18:42:12.000Z
-Tools • Dart 3.10.7 • DevTools 2.51.1
+Flutter 3.41.0 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 44a626f4f0 (2 days ago) • 2026-02-10 10:16:12 -0800
+Engine • hash cc8e596aa65130a0678cc59613ed1c5125184db4 (revision 3452d735bd) (2 days ago) • 2026-02-09 22:03:17.000Z
+Tools • Dart 3.11.0 • DevTools 2.54.1
 ```
 
 ## Notes on compilation
