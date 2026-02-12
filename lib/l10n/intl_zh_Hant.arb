@@ -285,6 +285,7 @@
   "logout_subtitle": "並刪除此裝置上的所有資料",
   "major": "專業",
   "mark_all_as_read": "全部標爲已讀",
+  "mark_as_dealt": "標記為已處理",
   "markdown_description": "Markdown 解析器已啓用。您可以直接使用 Markdown 語法撰寫帖子。若您不熟悉 Markdown，可參考 https://www.runoob.com/markdown/md-tutorial.html。",
   "markdown_enabled": "Markdown 已啓用",
   "messages": "訊息",

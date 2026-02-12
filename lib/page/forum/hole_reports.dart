@@ -176,7 +176,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
       [
         PlatformContextMenuItem(
           menuContext: menuContext,
-          child: const Text("Mark as dealt"),
+          child: Text(S.of(pageContext).mark_as_dealt),
           onPressed: () async {
             int? result = await ForumRepository.getInstance()
                 .adminSetReportDealt(e.report_id!);
@@ -257,7 +257,7 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                       color: Theme.of(context).hintColor, fontSize: 12),
                 ),
                 GestureDetector(
-                  child: Text("Mark as dealt",
+                  child: Text(S.of(context).mark_as_dealt,
                       style: TextStyle(
                           color: Theme.of(context).hintColor, fontSize: 12)),
                   onTap: () async {
@@ -270,13 +270,6 @@ class BBSReportDetailState extends State<BBSReportDetail> {
                           useInitialData: false, queueDataClear: false);
                     }
                   },
-                ),
-                GestureDetector(
-                  child: Text(S.of(context).ban_reporter,
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                          fontSize: 12)),
-                  onTap: () => _banReporter(context, e),
                 ),
               ]),
             ]),

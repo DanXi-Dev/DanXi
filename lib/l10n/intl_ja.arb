@@ -284,6 +284,7 @@
   "logout_subtitle": "このデバイスのすべてのデータを削除する",
   "major": "専門",
   "mark_all_as_read": "すべて読む",
+  "mark_as_dealt": "対処済みにする",
   "markdown_description": "Markdownパーサーが有効です。 Markdownを使って直接書き込みができます。「Markdownが何であるか」分からない場合は、 https://www.runoob.com/markdown/md-tutorial.html を参照してください。",
   "markdown_enabled": "Markdown 有効",
   "messages": "メッセージ",

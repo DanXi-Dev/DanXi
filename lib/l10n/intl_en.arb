@@ -288,6 +288,7 @@
   "logout_subtitle": "And delete all data from this device",
   "major": "Major",
   "mark_all_as_read": "Read All",
+  "mark_as_dealt": "Mark as dealt",
   "markdown_description": "Markdown parser is on. You can write with Markdown syntax. If you don't know what Markdown is, check out https://www.runoob.com/markdown/md-tutorial.html .",
   "markdown_enabled": "Markdown enabled",
   "material": "[WARNING: DEBUG FEATURE] Material",
