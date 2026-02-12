@@ -207,7 +207,7 @@ class CustomInAppBrowser extends InAppBrowser {
                 document.forms[0].submit();
             }
             catch (e) {
-                window.alert("Danta: Failed to auto login UIS");
+                console.log("Danta: Failed to auto login UIS", e);
             }
         }''';
 
@@ -228,7 +228,7 @@ class CustomInAppBrowser extends InAppBrowser {
             document.querySelector('.el-button.content_submit').click();
         }
         catch (e) {
-            window.alert("Danta: Failed to auto login UIS");
+            console.log("Danta: Failed to auto login UIS", e);
         }''';
 
   @override
@@ -287,7 +287,7 @@ class AuthenticationInAppBrowser extends InAppBrowser {
                 document.forms[0].submit();
             }
             catch (e) {
-                window.alert("Danta: Failed to auto login UIS");
+                console.log("Danta: Failed to auto login UIS", e);
             }
         }''';
 
@@ -308,7 +308,7 @@ class AuthenticationInAppBrowser extends InAppBrowser {
             document.querySelector('.el-button.content_submit').click();
         }
         catch (e) {
-            window.alert("Danta: Failed to auto login");
+            console.log("Danta: Failed to auto login", e);
         }''';
 
   @override
