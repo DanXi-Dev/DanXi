@@ -303,7 +303,9 @@ class DanxiApp extends StatelessWidget {
                   ],
                   locale: LanguageManager.toLocale(
                       context.watch<SettingsProvider>().language),
-                  supportedLocales: S.delegate.supportedLocales,
+                  // Configure supported locales. Hard-code "zh-CN" locale for correct Chinese font selection on Windows.
+                  // See https://github.com/flutter/flutter/issues/103811#issuecomment-1199012026 for details.
+                  supportedLocales: [...S.delegate.supportedLocales, const Locale('zh', 'CN')],
                   onUnknownRoute: (settings) => throw AssertionError(
                       "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code."),
                   home: ThemedSystemOverlay(
