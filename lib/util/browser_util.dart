@@ -343,29 +343,30 @@ class AuthenticationInAppBrowser extends InAppBrowser {
     }
   }
 
+  static io.Cookie _toIoCookie(Cookie c) => io.Cookie(c.name, '${c.value}')
+    ..domain = c.domain
+    ..path = c.path ?? '/'
+    ..secure = c.isSecure ?? false
+    ..httpOnly = c.isHttpOnly ?? false
+    ..expires = c.expiresDate != null
+        ? DateTime.fromMillisecondsSinceEpoch(c.expiresDate!)
+        : null;
+
   Future<void> _extractAndImportCookies(WebUri url) async {
     final cookieManager = CookieManager.instance();
 
     // Import cookies from the target service host.
     final targetCookies = await cookieManager.getCookies(url: url);
     final targetUri = Uri.parse(url.toString());
-    final ioCookies = targetCookies
-        .map((c) => io.Cookie(c.name, '${c.value}')
-          ..domain = c.domain
-          ..path = c.path ?? '/')
-        .toList();
-    await FudanSession.importCookies(ioCookies, targetUri);
+    await FudanSession.importCookies(
+        targetCookies.map(_toIoCookie).toList(), targetUri);
 
     // Also import cookies from id.fudan.edu.cn to maintain the session.
     final idUrl = WebUri('https://${FudanAuthenticationAPIV2.idHost}/');
     final idCookies = await cookieManager.getCookies(url: idUrl);
     final idUri = Uri.parse(idUrl.toString());
-    final idIoCookies = idCookies
-        .map((c) => io.Cookie(c.name, '${c.value}')
-          ..domain = c.domain
-          ..path = c.path ?? '/')
-        .toList();
-    await FudanSession.importCookies(idIoCookies, idUri);
+    await FudanSession.importCookies(
+        idCookies.map(_toIoCookie).toList(), idUri);
   }
 
   @override
