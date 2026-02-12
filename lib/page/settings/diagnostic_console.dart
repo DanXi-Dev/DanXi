@@ -25,6 +25,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -391,6 +392,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
                   child: const Text("Clear Cookies"),
                   onPressed: () async {
                     await BaseRepositoryWithDio.clearAllCookies();
+                    await FudanSession.clearSession();
                     await inappwebview.CookieManager.instance()
                         .deleteAllCookies();
                   },
