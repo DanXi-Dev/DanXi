@@ -266,6 +266,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _is2FADialogShown = false;
       return;
     }
+    bool waitingDialogOpen = true;
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -280,6 +281,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         actions: [
           TextButton(
             onPressed: () {
+              waitingDialogOpen = false;
               neo.FudanSession.fail2FA(
                   Exception('User cancelled authentication'),
                   StackTrace.current);
@@ -300,7 +302,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         Noticing.showNotice(context, S.of(context).enhanced_auth_cancelled);
       }
     }
-    if (mounted) {
+    if (mounted && waitingDialogOpen) {
       Navigator.of(context, rootNavigator: true).pop();
     }
     _is2FADialogShown = false;
