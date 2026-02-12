@@ -59,6 +59,18 @@ mount it.
 
 ## Linux
 
+### Dependencies
+
+Running Danta on Linux requires the following dependencies:
+
+- **libsecret** and **gnome-keyring**: For securely storing the master key used to encrypt configuration files.
+  - libsecret: [Website](https://gnome.pages.gitlab.gnome.org/libsecret/) | [Packages](https://repology.org/project/libsecret/versions)
+  - gnome-keyring: [Website](https://gitlab.gnome.org/GNOME/gnome-keyring) | [Packages](https://repology.org/project/gnome-keyring/versions)
+- **gtk3**: For displaying GTK3 windows.
+  - [Website](https://gtk.org/) | [Packages](https://repology.org/project/gtk/versions)
+- **wpewebkit**: For displaying in-app WebViews.
+  - [Website](https://wpewebkit.org/) | [Packages](https://repology.org/project/wpewebkit/versions)
+
 ### Arch Linux
 
 You can install it from [AUR](https://aur.archlinux.org/danxi-git.git) or [archlinuxcn](https://github.com/archlinuxcn/repo/tree/master/archlinuxcn/danxi-git).
