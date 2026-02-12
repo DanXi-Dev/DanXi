@@ -35,6 +35,8 @@ import 'package:dio5_log/bean/net_options.dart';
 import 'package:dio5_log/dio_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart'
+    as inappwebview;
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:intl/intl.dart';
@@ -389,6 +391,8 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
                   child: const Text("Clear Cookies"),
                   onPressed: () async {
                     await BaseRepositoryWithDio.clearAllCookies();
+                    await inappwebview.CookieManager.instance()
+                        .deleteAllCookies();
                   },
                 ),
                 PlatformElevatedButton(
