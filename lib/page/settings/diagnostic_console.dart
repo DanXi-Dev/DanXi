@@ -25,6 +25,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/base_repository.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -35,6 +36,8 @@ import 'package:dio5_log/bean/net_options.dart';
 import 'package:dio5_log/dio_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart'
+    as inappwebview;
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:intl/intl.dart';
@@ -393,6 +396,9 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
                   child: const Text("Clear Cookies"),
                   onPressed: () async {
                     await BaseRepositoryWithDio.clearAllCookies();
+                    await FudanSession.clearSession();
+                    await inappwebview.CookieManager.instance()
+                        .deleteAllCookies();
                   },
                 ),
                 PlatformElevatedButton(

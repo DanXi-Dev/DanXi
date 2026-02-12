@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
-import 'package:dan_xi/repository/cookie/independent_cookie_jar.dart';
+import 'package:dan_xi/repository/cookie/persistent_cookie_jar.dart';
+import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dan_xi/util/condition_variable.dart';
 import 'package:dan_xi/util/io/cookie_manager_fix.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
@@ -21,6 +23,12 @@ import 'package:pointycastle/asymmetric/api.dart';
 enum FudanLoginType {
   /// The new Fudan authentication system using id.fudan.edu.cn
   Neo,
+
+  /// Same as [Neo], but uses an independent login queue for services that
+  /// require enhanced authentication (2FA), e.g. my.fudan.edu.cn.
+  /// This prevents piggyback issues where a non-2FA login success is mistakenly
+  /// shared with requests that actually need 2FA.
+  Neo2FA,
 
   /// The hybrid Fudan authentication system using id.fudan.edu.cn but jump through uis.fudan.edu.cn
   ///
@@ -50,7 +58,8 @@ class FudanSession {
   static Dio? _dio;
 
   /// Shared cookie jar to maintain authentication sessions across all requests.
-  static final IndependentCookieJar _sessionCookieJar = IndependentCookieJar();
+  /// Initialized by [initSession] before [dio] is first accessed.
+  static late PersistentCookieJar _sessionCookieJar;
 
   /// Login queues for each authentication type to coordinate concurrent requests.
   /// Ensures only one login operation runs at a time per authentication method.
@@ -145,6 +154,7 @@ class FudanSession {
 
     switch (type) {
       case FudanLoginType.Neo:
+      case FudanLoginType.Neo2FA:
         return _authenticationQueues[type]!.runNormalRequest(
           () async {
             // Work around Dio bug: FormData objects can only be used once
@@ -161,8 +171,23 @@ class FudanSession {
             return Future.sync(() => validateAndParse(response));
           },
           () async {
-            await FudanAuthenticationAPIV2.authenticate(
-                personInfo, effectiveServiceUrl, effectiveLoginMethod);
+            try {
+              await FudanAuthenticationAPIV2.authenticate(
+                  personInfo, effectiveServiceUrl, effectiveLoginMethod);
+            } on EnhancedAuthenticationRequiredException catch (e) {
+              // Enhanced authentication (2FA) is required.
+              final existing = _enhancedAuthCompleter;
+              if (existing != null && !existing.isCompleted) {
+                // A 2FA flow is already in progress; wait for it.
+                await existing.future;
+              } else {
+                // Start a new 2FA flow.
+                final completer = Completer<void>();
+                _enhancedAuthCompleter = completer;
+                e.fire(); // Notify the UI layer via EventBus.
+                await completer.future;
+              }
+            }
           },
           isFatalError: effectiveIsFatalErrorNeo,
         );
@@ -223,11 +248,59 @@ class FudanSession {
     }
   }
 
+  /// The [Completer] for the currently active 2FA flow, if any.
+  ///
+  /// Created by the login logic when enhanced authentication is first required,
+  /// and completed by the UI layer (via [complete2FA] or [fail2FA]) once the
+  /// user finishes or cancels the WebView-based authentication.
+  static Completer<void>? _enhancedAuthCompleter;
+
+  /// Called by the UI layer when the user completes 2FA successfully.
+  static void complete2FA() {
+    final c = _enhancedAuthCompleter;
+    if (c != null && !c.isCompleted) c.complete();
+    _enhancedAuthCompleter = null;
+  }
+
+  /// Called by the UI layer when 2FA fails or is cancelled by the user.
+  static void fail2FA(dynamic error, StackTrace stackTrace) {
+    final c = _enhancedAuthCompleter;
+    if (c != null && !c.isCompleted) {
+      c.completeError(error, stackTrace);
+    }
+    _enhancedAuthCompleter = null;
+  }
+
+  /// Import cookies from an external source (e.g. InAppWebView) into the
+  /// session cookie jar. Used after the user completes 2FA in a WebView.
+  static Future<void> importCookies(List<Cookie> cookies, Uri uri) async {
+    await _sessionCookieJar.saveFromResponse(uri, cookies);
+  }
+
   static Future<void> clearSession() async {
     // Clear cookies to reset the session
     await _sessionCookieJar.deleteAll();
     // Clear the Dio instance to reset interceptors and state
     _dio = null;
+  }
+
+  /// Initialize the session by creating a [PersistentCookieJar] backed by
+  /// [XSharedPreferences] and restoring any previously persisted cookies.
+  ///
+  /// Must be called after [XSharedPreferences] is initialized (i.e. after
+  /// [SettingsProvider.init]) and before any access to [dio].
+  static Future<void> initSession() async {
+    XSharedPreferences prefs = await XSharedPreferences.getInstance();
+    _sessionCookieJar = PersistentCookieJar(prefs);
+    _sessionCookieJar.restore();
+  }
+
+  /// Force the cookie jar to persist any pending changes immediately.
+  ///
+  /// Call this when the app is about to enter the background to ensure
+  /// no cookie data is lost if the process is killed afterwards.
+  static Future<void> forceSaveCookies() async {
+    await _sessionCookieJar.forceSave();
   }
 }
 
@@ -239,8 +312,32 @@ class FudanAuthenticationAPIV2 {
 
   static Future<Response<dynamic>> authenticate(
       PersonInfo info, Uri serviceUrl, String? serviceRequestMethod) async {
-    final Response<dynamic> firstResponse = await FudanSession.dio
-        .requestUri(serviceUrl, options: Options(method: serviceRequestMethod));
+    Response<dynamic> firstResponse;
+    try {
+      firstResponse = await FudanSession.dio
+          .requestUri(
+          serviceUrl, options: Options(method: serviceRequestMethod));
+    } on DioException catch (e) {
+      if (e.type != DioExceptionType.badResponse) {
+        // If the error is not due to a bad response (e.g. 404), rethrow
+        rethrow;
+      }
+      // From here on, we only consider badResponse errors (e.g. 404)
+      if ((serviceRequestMethod ?? "GET") == "GET") {
+        // If the original request is a GET request, we should not get a bad response
+        // from the target service, rethrow
+        rethrow;
+      }
+      // else, we are getting a bad response from the target service while doing a POST (etc.),
+      // which may indicate wrong HTTP method (GET), which is not a problem of authentication.
+      // Ignore and suppose the fetch is successful.
+      final rep = e.response;
+      if (rep == null) {
+        // If there's no response at all, rethrow
+        rethrow;
+      }
+      firstResponse = rep;
+    }
     // already redirected to the target service, return the response
     if (firstResponse.realUri.host == serviceUrl.host) {
       return firstResponse;
@@ -260,10 +357,11 @@ class FudanAuthenticationAPIV2 {
     } catch (_) {}
 
     // If not authenticated, we need to login
-    final params = await _getAuthParams(redirectedUrl);
+    final params = await _getAuthParams(redirectedUrl, serviceUrl);
     final publicKey = await _getPublicKey();
-    final loginToken =
-        await _login(params, publicKey, info.id!, info.password!);
+    final loginToken = await _login(
+        params, publicKey, info.id!, info.password!,
+        redirectedUrl, serviceUrl.host);
     final document = await _postToken(loginToken);
     final targetUrl = _retrieveUrlWithTicket(document);
 
@@ -275,18 +373,13 @@ class FudanAuthenticationAPIV2 {
         // If the final redirect is not to the target service, rethrow
         rethrow;
       }
+      // Above code (getting [firstResponse]) has explained these conditions
       if (e.type != DioExceptionType.badResponse) {
-        // If the error is not due to a bad response (e.g. 404), rethrow
         rethrow;
       }
       if ((serviceRequestMethod ?? "GET") == "GET") {
-        // If the original request is a GET request, we should not get a bad response
-        // from the target service, rethrow
         rethrow;
       }
-      // else, we are getting a bad response from the target service,
-      // which may indicate wrong method (GET/POST), which is not a problem of authentication.
-      // Ignore and suppose the login is successful.
       return e.response!;
     }
 
@@ -313,7 +406,8 @@ class FudanAuthenticationAPIV2 {
     return RSAKeyParser().parse(pcks8Key) as RSAPublicKey;
   }
 
-  static Future<AuthenticationParameters> _getAuthParams(Uri idUrl) async {
+  static Future<AuthenticationParameters> _getAuthParams(
+      Uri idUrl, Uri serviceUrl) async {
     // 1. parse lck and entityId from the idUrl
     // concat fragment (#...) with a new URL to parse it as query parameters
     final Uri tmpUrlForParsing = Uri.parse("https://$idHost/${idUrl.fragment}");
@@ -329,17 +423,33 @@ class FudanAuthenticationAPIV2 {
         "entityId": entityId,
       },
     );
+
+    // Enhanced authentication (2FA) is required. The response structure
+    // differs when second is true, so we must check before parsing methods.
+    if (chainCodeResponse.data!["second"] == true) {
+      throw EnhancedAuthenticationRequiredException(idUrl, serviceUrl.host);
+    }
+
     final methods = chainCodeResponse.data!["data"] as List<dynamic>;
-    final userAndPwdMethod =
+    final Map<String, dynamic> userAndPwdMethod;
+    try {
+      userAndPwdMethod =
         methods.firstWhere((method) => method["moduleCode"] == "userAndPwd")
-            as Map<String, dynamic>;
+        as Map<String, dynamic>;
+    } catch (e) {
+      final allMethodCodes = methods
+          .map((method) => method["moduleCode"])
+          .join(", ");
+      throw Exception("No userAndPwd authentication method found. Auth methods: $allMethodCodes");
+    }
     final authChainCode = userAndPwdMethod["authChainCode"] as String;
 
     return AuthenticationParameters(lck, entityId, authChainCode);
   }
 
   static Future<String> _login(AuthenticationParameters params,
-      RSAPublicKey publicKey, String username, String password) async {
+      RSAPublicKey publicKey, String username, String password,
+      Uri loginUrl, String targetHost) async {
     final encrypter =
         Encrypter(RSA(publicKey: publicKey, encoding: RSAEncoding.PKCS1));
     final encryptedPassword = encrypter.encrypt(password).base64;
@@ -365,7 +475,12 @@ class FudanAuthenticationAPIV2 {
       CaptchaNeededException().fire();
       throw CaptchaNeededException();
     }
-    return response.data!["loginToken"] as String;
+
+    final loginToken = response.data!["loginToken"] as String?;
+    if (loginToken == null) {
+      throw EnhancedAuthenticationRequiredException(loginUrl, targetHost);
+    }
+    return loginToken;
   }
 
   static Future<BeautifulSoup> _postToken(String loginToken) async {
@@ -524,6 +639,22 @@ class AuthenticationV1FailedException implements Exception {}
 class AuthenticationV2FailedException implements Exception {}
 
 class CaptchaNeededException implements AuthenticationV1FailedException, AuthenticationV2FailedException {}
+
+/// Thrown when the id.fudan.edu.cn authentication system requires enhanced
+/// authentication (2FA), e.g. SMS verification. The user must complete this
+/// step manually in a WebView.
+class EnhancedAuthenticationRequiredException
+    implements AuthenticationV2FailedException {
+  /// The id.fudan.edu.cn login page URL (with lck/entityId fragment) that
+  /// the browser should open so the user can complete 2FA.
+  final Uri loginUrl;
+
+  /// The host of the target service. After the user completes 2FA in the
+  /// browser, cookies are extracted once the browser reaches this host.
+  final String targetHost;
+
+  EnhancedAuthenticationRequiredException(this.loginUrl, this.targetHost);
+}
 
 class CredentialsInvalidException implements AuthenticationV1FailedException {}
 

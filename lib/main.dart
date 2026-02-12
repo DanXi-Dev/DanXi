@@ -53,6 +53,7 @@ import 'package:dan_xi/provider/notification_provider.dart';
 import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -73,7 +74,7 @@ import 'package:provider/provider.dart';
 
 /// The main entry of the whole app.
 /// Do some initial work here.
-void main() {
+Future<void> main() async {
   // Ensure that the engine has bound itself to
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -102,18 +103,20 @@ void main() {
 
   // Init SettingsProvider. SettingsProvider is a singleton class that stores
   // all the settings of the app.
-  SettingsProvider.getInstance().init().then((_) {
-    SettingsProvider.getInstance().isTagSuggestionAvailable().then((value) {
-      SettingsProvider.getInstance().tagSuggestionAvailable = value;
-      final registerDeviceIdentity = Future.value(); // We've disabled this feature in FOSS build.
-      registerDeviceIdentity.then((_) {
-        // This is the entrypoint of a simple Flutter app.
-        // runApp() is a function that takes a [Widget] and makes it the root
-        // of the widget tree.
-        runApp(riverpod.ProviderScope(child: const DanxiApp()));
-      });
-    });
-  });
+  await SettingsProvider.getInstance().init();
+
+  // Restore persisted session cookies before any network requests.
+  // This must run after SettingsProvider.init() because it depends on
+  // XSharedPreferences being initialized.
+  await FudanSession.initSession();
+
+  SettingsProvider.getInstance().tagSuggestionAvailable =
+      await SettingsProvider.getInstance().isTagSuggestionAvailable();
+
+  // This is the entrypoint of a simple Flutter app.
+  // runApp() is a function that takes a [Widget] and makes it the root
+  // of the widget tree.
+  runApp(riverpod.ProviderScope(child: const DanxiApp()));
 }
 
 class TouchMouseScrollBehavior extends MaterialScrollBehavior {
@@ -159,7 +162,7 @@ class DanxiApp extends StatelessWidget {
     '/card/crowdData': (context, {arguments}) =>
         CardCrowdData(arguments: arguments),
     '/room/detail': (context, {arguments}) =>
-        EmptyClassroomDetailPage(arguments: arguments),
+        const EmptyClassroomDetailPage(),
     '/bbs/postDetail': (context, {arguments}) =>
         BBSPostDetail(arguments: arguments),
     '/notice/aao/list': (context, {arguments}) =>
@@ -267,7 +270,7 @@ class DanxiApp extends StatelessWidget {
                   scrollBehavior: TouchMouseScrollBehavior(),
                   debugShowCheckedModeBanner: false,
                   // Fix cupertino UI text color issue by override text color
-                  cupertino: (context, __) => CupertinoAppData(
+                  cupertino: (context, _) => CupertinoAppData(
                       theme: CupertinoThemeData(
                           brightness: context
                               .select<SettingsProvider, ThemeType>(
@@ -279,7 +282,7 @@ class DanxiApp extends StatelessWidget {
                                       ? Colors.white
                                       : Colors.black)
                               )))),
-                  material: (context, __) => MaterialAppData(
+                  material: (context, _) => MaterialAppData(
                     // Pass the ThemeData determined by DynamicThemeController
                     theme: Theme.of(context),
                   ),
@@ -294,7 +297,9 @@ class DanxiApp extends StatelessWidget {
                   ],
                   locale: LanguageManager.toLocale(
                       context.watch<SettingsProvider>().language),
-                  supportedLocales: S.delegate.supportedLocales,
+                  // Configure supported locales. Hard-code "zh-CN" locale for correct Chinese font selection on Windows.
+                  // See https://github.com/flutter/flutter/issues/103811#issuecomment-1199012026 for details.
+                  supportedLocales: [...S.delegate.supportedLocales, const Locale('zh', 'CN')],
                   onUnknownRoute: (settings) => throw AssertionError(
                       "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code."),
                   home: ThemedSystemOverlay(

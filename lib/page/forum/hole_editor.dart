@@ -22,6 +22,7 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/icon_fonts.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/forum/tag.dart';
+import 'package:dan_xi/model/remote_sticker.dart';
 import 'package:dan_xi/page/home_page.dart';
 import 'package:dan_xi/page/forum/hole_detail.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
@@ -34,7 +35,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/forum/editor_object.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
-import 'package:dan_xi/util/stickers.dart';
+import 'package:dan_xi/util/sticker_download_manager.dart';
 import 'package:dan_xi/widget/dialogs/care_dialog.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/image_picker_proxy.dart';
@@ -49,6 +50,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:provider/provider.dart';
 
 enum OTEditorType { DIALOG, PAGE }
@@ -357,10 +359,6 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
   }
 
   Future<T?> _buildStickersSheet<T>(BuildContext context) {
-    int stickerSheetColumns = 5;
-    int stickerSheetRows =
-        (Stickers.values.length / stickerSheetColumns).ceil();
-
     return showPlatformModalSheet(
         context: context,
         builder: (BuildContext context) {
@@ -374,43 +372,58 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                     ListTile(
                         leading: const Icon(Icons.emoji_emotions),
                         title: Text(S.of(context).sticker)),
-                    // const Divider(),
                     Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: LayoutGrid(
-                            columnSizes: List.filled(stickerSheetColumns, 1.fr),
-                            rowSizes: List.filled(stickerSheetRows, auto),
-                            rowGap: 8,
-                            columnGap: 8,
-                            children: Stickers.values.map((e) {
-                              return Container(
-                                alignment: Alignment.center,
-                                child: InkWell(
-                                  onTap: () {
-                                    var cursorPosition =
-                                        widget.controller.selection.base.offset;
-                                    cursorPosition = cursorPosition == -1
-                                        ? widget.controller.text.length
-                                        : cursorPosition;
-                                    widget.controller.text =
-                                        "${widget.controller.text.substring(0, cursorPosition)}![](${e.name})${widget.controller.text.substring(cursorPosition)}";
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Image.asset(
-                                    getStickerAssetPath(e.name)!,
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.contain,
+                      child: HookConsumer(builder:
+                          (BuildContext context, WidgetRef ref, Widget? child) {
+                        final stickers = ref.watch(availableStickersProvider);
+                        return stickers.when(
+                          loading: () => const Center(
+                            child: PlatformCircularProgressIndicator(),
+                          ),
+                          error: (error, stackTrace) => Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.error_outline,
+                                  size: 48,
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
+                                const SizedBox(height: 16),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0),
+                                  child: Text(
+                                    ErrorPageWidget
+                                        .generateUserFriendlyDescription(
+                                            S.of(context), error),
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.error,
+                                      fontSize: 16,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
-                              );
-                            }).toList(),
+                                const SizedBox(height: 8),
+                                TextButton(
+                                  onPressed: () =>
+                                      ref.invalidate(availableStickersProvider),
+                                  child: Text(S.of(context).retry),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(S.of(context).cancel),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ),
+                          data: (stickers) =>
+                              _buildStickerGrid(context, ref, stickers),
+                        );
+                      }),
                     ),
                   ]),
             ),
@@ -422,6 +435,92 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                   child: Card(child: body))
               : body;
         });
+  }
+
+  Widget _buildStickerGrid(
+      BuildContext context, WidgetRef ref, List<RemoteSticker> stickers) {
+    final allStickerIds = stickers.map((e) => e.id).toList();
+
+    final stickerSheetColumns = 5;
+    final stickerSheetRows =
+        (allStickerIds.length / stickerSheetColumns).ceil();
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: LayoutGrid(
+          columnSizes: List.filled(stickerSheetColumns, 1.fr),
+          rowSizes: List.filled(stickerSheetRows, auto),
+          rowGap: 8,
+          columnGap: 8,
+          children: allStickerIds.map((stickerId) {
+            final sticker = ref.watch(stickerFilePathProvider(stickerId));
+            return Container(
+              alignment: Alignment.center,
+              child: InkWell(
+                  onTap: () {
+                    var cursorPosition =
+                        widget.controller.selection.base.offset;
+                    cursorPosition = cursorPosition == -1
+                        ? widget.controller.text.length
+                        : cursorPosition;
+                    widget.controller.text =
+                        "${widget.controller.text.substring(0, cursorPosition)}![]($stickerId)${widget.controller.text.substring(cursorPosition)}";
+                    Navigator.of(context).pop();
+                  },
+                  child: sticker.when(
+                    loading: () => SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                    error: (error, stackTrace) => Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: InkWell(
+                        onTap: () =>
+                            ref.invalidate(stickerFilePathProvider(stickerId)),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.refresh,
+                                color: Theme.of(context).colorScheme.error,
+                                size: 20,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                S.of(context).retry,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.error,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    data: (filePath) => Image.file(
+                      File(filePath),
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.contain,
+                    ),
+                  )),
+            );
+          }).toList(),
+        ),
+      ),
+    );
   }
 
   Widget _buildIntroButton(BuildContext context, IconData iconData,

@@ -29,8 +29,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
 
 class BusFeature extends Feature {
-  ConnectionStatus _status = ConnectionStatus.NONE;
-
   /// The bus schedules retrieved.
   List<BusScheduleItem>? _busList;
 
@@ -48,9 +46,9 @@ class BusFeature extends Feature {
     // Only load data once.
     // If user needs to refresh the data, [refreshSelf()] will be called on the whole page,
     // not just FeatureContainer. So the feature will be recreated then.
-    if (_status == ConnectionStatus.NONE) {
-      _loadBusList().catchError((error) {
-        _status = ConnectionStatus.FAILED;
+    if (status is ConnectionNone) {
+      _loadBusList().catchError((error, stackTrace) {
+        status = ConnectionFailed(error, stackTrace);
         notifyUpdate();
       });
     }
@@ -62,30 +60,30 @@ class BusFeature extends Feature {
   }
 
   Future<void> _loadBusList() async {
-    _status = ConnectionStatus.CONNECTING;
+    status = const ConnectionConnecting();
     _busList = await FudanBusRepository.getInstance()
         .loadBusList(holiday: isHoliday!);
-    _status = ConnectionStatus.DONE;
+    status = const ConnectionDone();
     notifyUpdate();
   }
 
   @override
   String get subTitle {
-    switch (_status) {
-      case ConnectionStatus.NONE:
-      case ConnectionStatus.CONNECTING:
+    switch (status) {
+      case ConnectionNone():
+      case ConnectionConnecting():
         return S.of(context!).loading;
-      case ConnectionStatus.DONE:
+      case ConnectionDone():
         return S.of(context!).no_matching_bus;
-      case ConnectionStatus.FAILED:
-      case ConnectionStatus.FATAL_ERROR:
+      case ConnectionFailed():
+      case ConnectionFatalError():
         return S.of(context!).failed;
     }
   }
 
   @override
   Widget? get customSubtitle {
-    if (_status == ConnectionStatus.DONE && _busList != null) {
+    if (status is ConnectionDone && _busList != null) {
       return buildSubtitle(
           nextBusForCampus(SettingsProvider.getInstance().campus));
     }
@@ -155,7 +153,7 @@ class BusFeature extends Feature {
   }
 
   void refreshData() {
-    _status = ConnectionStatus.NONE;
+    status = const ConnectionNone();
     notifyUpdate();
   }
 
@@ -171,7 +169,7 @@ class BusFeature extends Feature {
 
   @override
   Widget? get trailing {
-    if (_status == ConnectionStatus.CONNECTING) {
+    if (status is ConnectionConnecting) {
       return const FeatureProgressIndicator();
     }
     return null;

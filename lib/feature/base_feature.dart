@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/feature/lan_connection_notification.dart';
 import 'package:dan_xi/provider/notification_provider.dart';
@@ -33,6 +34,9 @@ import 'package:flutter/widgets.dart';
 /// See also:
 /// - [NotificationProvider], a provider to hold a list of notifications.
 abstract class Feature {
+  /// The current connection status of this feature.
+  ConnectionStatus status = const ConnectionNone();
+
   /// Request [FeatureContainer] to update the widget status since they're changed.
   @nonVirtual
   void notifyUpdate() => container.doUpdate();

@@ -6,7 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   desktop_window
   dynamic_color
   file_selector_linux
-  flutter_js
+  flutter_inappwebview_linux
   flutter_secure_storage_linux
   gtk
   open_file_linux

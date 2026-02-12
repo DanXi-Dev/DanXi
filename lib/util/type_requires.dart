@@ -1,5 +1,5 @@
 /*
- *     Copyright (C) 2022  DanXi-Dev
+ *     Copyright (C) 2026  DanXi-Dev
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -15,10 +15,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:flutter_js/flutter_js.dart';
-
-var flutterJs = getJavascriptRuntime();
-
-String evaluate(String jsCode) {
-  return flutterJs.evaluate(jsCode).stringResult;
+T require<T, V>(V value, Exception Function() exception) {
+  if (value is! T) {
+    throw exception();
+  }
+  return value;
 }
+
+T requireNotNull<T>(T? value, Exception Function() exception) =>
+    require(value, exception);

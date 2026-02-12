@@ -16,7 +16,9 @@
  */
 
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/widget/dialogs/login_dialog.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/noticing.dart';
@@ -49,7 +51,7 @@ class ErrorPageWidget extends StatelessWidget {
   static String generateUserFriendlyDescription(S locale, dynamic error,
       {StackTrace? stackTrace}) {
     if (error == null) return locale.unknown_error;
-    String errorType = error.toString();
+    String? errorType;
 
     if (error is DioException) {
       switch (error.type) {
@@ -101,8 +103,14 @@ class ErrorPageWidget extends StatelessWidget {
       errorType = locale.under_maintenance;
     } else if (error is WeakPasswordException) {
       errorType = locale.weak_password;
+    } else if (error is FallbackLoginException) {
+      final primaryDesc = generateUserFriendlyDescription(locale, error.primaryError);
+      final fallbackDesc = generateUserFriendlyDescription(locale, error.fallbackError);
+      errorType = '1. $primaryDesc\n2. $fallbackDesc';
+    } else if (error is FudanApiException) {
+      errorType = locale.fudan_api_exception;
     }
-    return errorType;
+    return errorType ?? error.toString();
   }
 
   /// Build a new [ErrorPageWidget] with the given [error] and optional [stackTrace].
@@ -125,9 +133,14 @@ class ErrorPageWidget extends StatelessWidget {
   }
 
   static String generateErrorDetails(dynamic error, StackTrace? trace) {
+    if (error is FallbackLoginException) {
+      return 'Primary error: ${error.primaryError}\n'
+          '${error.primaryStackTrace}\n\n'
+          'Fallback error: ${error.fallbackError}\n'
+          '${error.fallbackStackTrace}';
+    }
     String errorInfo = error.toString();
-    // DioError will insert its stack trace in the result of [toString] method.
-    if (trace != null && error is! DioException) {
+    if (trace != null) {
       errorInfo += ("\n$trace");
     }
     return errorInfo;
@@ -142,7 +155,12 @@ class ErrorPageWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[icon!, const SizedBox(height: 8)],
-            Text(errorMessage, style: errorMessageTextStyle),
+            Text(
+              errorMessage,
+              style: errorMessageTextStyle,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+            ),
             if (buttonText != "") ...[
               const SizedBox(height: 8),
               PlatformElevatedButton(
@@ -155,9 +173,12 @@ class ErrorPageWidget extends StatelessWidget {
               PlatformTextButton(
                 child: Text(S.of(context).error_detail),
                 onPressed: () {
-                  Noticing.showModalNotice(context,
-                      title: S.of(context).error_detail,
-                      message: generateErrorDetails(error, trace));
+                  Noticing.showModalNotice(
+                    context,
+                    title: S.of(context).error_detail,
+                    message: generateErrorDetails(error, trace),
+                    selectable: true,
+                  );
                 },
               )
             ],

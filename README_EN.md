@@ -87,16 +87,38 @@ sudo pacman -S danxi-git
 Go to [release page](https://github.com/DanXi-Dev/DanXi/releases), just download the zip file and
 unzip it.
 
+#### Dependencies
+
+Running Danta on Linux requires the following dependencies:
+
+- **libsecret** and **gnome-keyring**: For securely storing the master key used to encrypt configuration files.
+  - libsecret: [Website](https://gnome.pages.gitlab.gnome.org/libsecret/) | [Packages](https://repology.org/project/libsecret/versions)
+  - gnome-keyring: [Website](https://gitlab.gnome.org/GNOME/gnome-keyring) | [Packages](https://repology.org/project/gnome-keyring/versions)
+- **gtk3**: For displaying GTK3 windows.
+  - [Website](https://gtk.org/) | [Packages](https://repology.org/project/gtk/versions)
+- **wpewebkit**: For displaying in-app WebViews.
+  - [Website](https://wpewebkit.org/) | [Packages](https://repology.org/project/wpewebkit/versions)
+
+### Known Issues
+
+On some GPUs (e.g. AMD graphics cards), the in-app WebView may render as a black screen. This is a WPE WebKit hardware rendering compatibility issue. You can work around it by forcing software rendering via an environment variable:
+
+```shell
+LIBGL_ALWAYS_SOFTWARE=1 ./danxi
+```
+
+See [flutter_inappwebview#460](https://github.com/pichillilorenzo/flutter_inappwebview/issues/460#issuecomment-3798706399) for details.
+
 # Compile
 
 ## Flutter version that we're using
 
 ```shell
 $ flutter --version
-Flutter 3.35.3 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision a402d9a437 (5 days ago) • 2025-09-03 14:54:31 -0700
-Engine • hash 672c59cfa87c8070c20ba2cd1a6c2a1baf5cf08b (revision ddf47dd3ff) (4 days ago) • 2025-09-03 20:02:13.000Z
-Tools • Dart 3.9.2 • DevTools 2.48.0
+Flutter 3.41.0 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 44a626f4f0 (2 days ago) • 2026-02-10 10:16:12 -0800
+Engine • hash cc8e596aa65130a0678cc59613ed1c5125184db4 (revision 3452d735bd) (2 days ago) • 2026-02-09 22:03:17.000Z
+Tools • Dart 3.11.0 • DevTools 2.54.1
 ```
 
 ## Notes on compilation

@@ -52,6 +52,10 @@ class AutoBannerState extends State<AutoBanner> {
   void Function(bool)? onExpand;
   List<BannerExtra?>? list;
 
+  static final Map<String, String Function()> placeholderList = Map.unmodifiable({
+    "{danta_access_token}": () => SettingsProvider.getInstance().forumToken?.access ?? ""
+  });
+
   @override
   void initState() {
     super.initState();
@@ -64,7 +68,7 @@ class AutoBannerState extends State<AutoBanner> {
     if (newList == null || newList.isEmpty) {
       return false;
     }
-
+  
     setState(() {
       list = newList;
       list!.shuffle();
@@ -72,8 +76,25 @@ class AutoBannerState extends State<AutoBanner> {
     return true;
   }
 
+  String replacePlaceholders(String action, Map<String, String Function()> placeholderList) {
+    if (action.isEmpty || placeholderList.isEmpty) {
+      return action;
+    }
+
+    final pattern = placeholderList.keys.map(RegExp.escape).join('|');
+    final regex = RegExp(pattern);
+
+    return action.replaceAllMapped(regex, (match) {
+      final placeholder = match.group(0)!;
+      final value = placeholderList[placeholder]?.call() ?? placeholder;
+      return Uri.encodeComponent(value);
+    });
+  }
+
   void onTapAction(String action) {
     try {
+      action = replacePlaceholders(action, placeholderList);
+
       if (action.startsWith("##")) {
         final floorMatch = floorPattern.firstMatch(action);
         int floorId = int.parse(floorMatch!.group(1)!);

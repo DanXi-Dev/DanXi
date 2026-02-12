@@ -60,6 +60,9 @@ extension StringEx on String {
         .map((e) => String.fromCharCode(e))
         .every((element) => regex.hasMatch(element));
   }
+
+  String trimAndNormalizeWhitespace() =>
+      trim().replaceAll(RegExp("\\s+"), " ");
 }
 
 extension ObjectEx on dynamic {
@@ -138,11 +141,6 @@ extension ListEx<T> on List<T>? {
       }
     }
     return newList;
-  }
-
-  T? get(int index, [T? defaultValue]) {
-    if (this != null && index >= 0 && index < this!.length) return this![index];
-    return defaultValue;
   }
 }
 

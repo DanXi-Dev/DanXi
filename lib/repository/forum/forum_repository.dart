@@ -45,14 +45,15 @@ import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dan_xi/widget/libraries/paged_listview.dart';
 import 'package:dio/dio.dart';
 
-/// The repository for forum.
+/// The repository for forum API.
 ///
 /// # State
-/// During to some history reasons, this repository's state can be complex.
+/// Due to historical reasons, this repository's state can be complex.
 /// Please read the method comments carefully before using them.
 ///
-/// All states have been moved to [ForumProvider], which is a [ChangeNotifier];
-/// any field in this class should be considered as temporary variables, e.g. caches.
+/// Most states have been moved to [ForumProvider], which is a [ChangeNotifier];
+/// any field in this class should be considered as temporary states that can
+/// be dropped anytime (e.g. cached data).
 class ForumRepository extends BaseRepositoryWithDio {
   static final _instance = ForumRepository._();
 
@@ -500,7 +501,7 @@ class ForumRepository extends BaseRepositoryWithDio {
     if (tags == null || tags.isEmpty) tags = [const OTTag(0, 0, KEY_NO_TAG)];
     // Suppose user is logged in. He should be.
     final options = RequestOptions(
-        path: "$_BASE_URL/divisions/${divisionId}/holes",
+        path: "$_BASE_URL/divisions/$divisionId/holes",
         method: "POST",
         data: {
           "content": content,
@@ -951,6 +952,16 @@ class ForumRepository extends BaseRepositoryWithDio {
         path: "$_BASE_URL/penalty/$floorId",
         method: "POST",
         data: jsonEncode({"days": penaltyDays}),
+        headers: _tokenHeader);
+    return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
+  }
+
+  Future<int?> adminBanReporter(
+      int reportId, int days, String reason) async {
+    final options = RequestOptions(
+        path: "$_BASE_URL/reports/ban/$reportId",
+        method: "POST",
+        data: jsonEncode({"days": days, "reason": reason}),
         headers: _tokenHeader);
     return (await WebvpnProxy.requestWithProxy(dio, options)).statusCode;
   }

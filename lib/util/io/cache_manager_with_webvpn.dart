@@ -18,7 +18,6 @@
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/webvpn_proxy.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:http/http.dart';
 

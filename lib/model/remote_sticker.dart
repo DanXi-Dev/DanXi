@@ -15,18 +15,32 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:dan_xi/model/time_table.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-/// [Event] represents a specific course at a specific time.
-///
-/// Usually you can ignore [course.times], and treat the [course] as a single event.
-class Event {
-  final Course course;
+part 'remote_sticker.g.dart';
 
-  final CourseTime slot;
+@JsonSerializable()
+class RemoteSticker {
+  final String id;
+  final String url;
+  final String sha256;
 
-  Event({
-    required this.course,
-    required this.slot,
+  RemoteSticker({
+    required this.id,
+    required this.url,
+    required this.sha256,
   });
+
+  factory RemoteSticker.fromJson(Map<String, dynamic> json) =>
+      _$RemoteStickerFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RemoteStickerToJson(this);
+
+  factory RemoteSticker.fromToml(Map<String, dynamic> tomlData) {
+    return RemoteSticker(
+      id: tomlData['id'] as String,
+      url: tomlData['url'] as String,
+      sha256: tomlData['sha256'] as String,
+    );
+  }
 }

@@ -61,23 +61,47 @@ dmg 硬盘映像，挂载拷贝即可。
 
 ### Arch Linux
 
-从 [AUR](https://aur.archlinux.org/danxi-git.git) 或 [archlinuxcn](https://github.com/archlinuxcn/repo/tree/master/archlinuxcn/danxi-git) 安装。
+从 [AUR](https://aur.archlinux.org) 或 [archlinuxcn](https://github.com/archlinuxcn/repo) 安装。
 
 #### AUR
 
 ```shell
-[yay/paru] -S danxi-git
+[yay/paru] -S danxi # 最新稳定版
+[yay/paru] -S danxi-git # 最新 Git 版
 ```
 
 #### archlinuxcn
 
 ```shell
-sudo pacman -S danxi-git
+sudo pacman -S danxi # 最新稳定版
+sudo pacman -S danxi-git # 最新 Git 版
 ```
 
 ### 其他 Linux 发行版
 
 打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版 zip 压缩包，解压运行即可。
+
+#### 依赖项
+
+在 Linux 上运行旦挞需要以下依赖项：
+
+- **libsecret** 和 **gnome-keyring**：用于安全存储加密配置文件所用的主密钥。
+  - libsecret：[官网](https://gnome.pages.gitlab.gnome.org/libsecret/) | [安装源](https://repology.org/project/libsecret/versions)
+  - gnome-keyring：[官网](https://gitlab.gnome.org/GNOME/gnome-keyring) | [安装源](https://repology.org/project/gnome-keyring/versions)
+- **gtk3**：用于显示 GTK3 窗口。
+  - [官网](https://gtk.org/) | [安装源](https://repology.org/project/gtk/versions)
+- **wpewebkit**：用于显示应用内 WebView。
+  - [官网](https://wpewebkit.org/) | [安装源](https://repology.org/project/wpewebkit/versions)
+
+### 已知问题
+
+部分 GPU（如 AMD 显卡）上，应用内 WebView 可能显示为黑屏。这是 WPE WebKit 硬件渲染的兼容性问题。可通过设置环境变量强制使用软件渲染来解决：
+
+```shell
+LIBGL_ALWAYS_SOFTWARE=1 ./danxi
+```
+
+详见 [flutter_inappwebview#460](https://github.com/pichillilorenzo/flutter_inappwebview/issues/460#issuecomment-3798706399)。
 
 # 构建
 
@@ -85,23 +109,23 @@ sudo pacman -S danxi-git
 
 ```shell
 $ flutter --version
-Flutter 3.35.3 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision a402d9a437 (5 天前) • 2025-09-03 14:54:31 -0700
-Engine • hash 672c59cfa87c8070c20ba2cd1a6c2a1baf5cf08b (revision ddf47dd3ff) (4 days ago) • 2025-09-03 20:02:13.000Z
-Tools • Dart 3.9.2 • DevTools 2.48.0
+Flutter 3.41.0 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 44a626f4f0 (2 天前) • 2026-02-10 10:16:12 -0800
+Engine • hash cc8e596aa65130a0678cc59613ed1c5125184db4 (revision 3452d735bd) (2 days ago) • 2026-02-09 22:03:17.000Z
+Tools • Dart 3.11.0 • DevTools 2.54.1
 ```
 
 ## 编译说明
 
 本应用使用 [Dart](https://dart.cn/) 和 [Flutter](https://flutter.cn/) 开发。
 
-为了构建本应用，您需要按照 `Flutter`官网的要求[配置国内镜像源](https://flutter.cn/community/china)，然后[下载](https://flutter.cn/docs/get-started/install)并安装 `Flutter SDK`。
+为了构建本应用，您需要按照 `Flutter` 官网的要求[配置国内镜像源](https://flutter.cn/community/china)，然后[下载](https://flutter.cn/docs/get-started/install)并安装 `Flutter SDK`。
 
-如果您正在为 `Windows`平台构建，您还需要[安装并配置](https://visualstudio.microsoft.com/zh-hans/downloads/) `Visual Studio`。
+如果您正在为 `Windows` 平台构建，您还需要[安装并配置](https://visualstudio.microsoft.com/zh-hans/downloads/) `Visual Studio`。
 
-如果您正在为 `Android`平台构建，您还需要[安装并配置](https://developer.android.google.cn/studio) `Android Command Line Tools`。
+如果您正在为 `Android` 平台构建，您还需要[安装并配置](https://developer.android.google.cn/studio) `Android Command Line Tools`。
 
-如果你正在为 `iOS/iPadOS/macOS`平台构建，您还需要[安装并配置](https://apps.apple.com/app/id497799835) `Xcode`。
+如果你正在为 `iOS/iPadOS/macOS` 平台构建，您还需要[安装并配置](https://apps.apple.com/app/id497799835) `Xcode`。
 
 确定配置正确后，你需要首先在项目根目录下运行 
 
