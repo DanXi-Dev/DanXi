@@ -399,14 +399,18 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
               .loadUserHoles(time, sortOrder: SortOrder.LAST_CREATED);
         }).call(page);
 
+        // If not more posts, notify ListView that we reached the end.
+        if (loadedPost?.isEmpty ?? false) return [];
+
+        // Update the cursor before filtering so that it advances
+        // even if all items are filtered out.
+        if (loadedPost != null) adaptLayer.updateCursor(loadedPost);
+
         // Filter away hidden posts (I know this is O(n^2), but the list won't be too large so I assume it's OK)
         loadedPost = loadedPost?.filter((element) =>
             !SettingsProvider.getInstance()
                 .hiddenMyPosts
                 .contains(element.hole_id));
-
-        // If not more posts, notify ListView that we reached the end.
-        if (loadedPost?.isEmpty ?? false) return [];
 
         // About this line, see [PagedListView].
         return loadedPost == null || loadedPost.isEmpty
@@ -431,6 +435,10 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
         // If not more posts, notify ListView that we reached the end.
         if (loadedPost?.isEmpty ?? false) return [];
+
+        // Update the cursor before filtering so that it advances
+        // even if all items are filtered out.
+        if (loadedPost != null) adaptLayer.updateCursor(loadedPost);
 
         // Remove posts of which the first floor is empty (aka hidden)
         loadedPost?.removeWhere(
@@ -458,6 +466,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
   /// Refresh the whole list.
   Future<void> refreshList({bool queueDataClear = true}) async {
+    adaptLayer.reset();
     try {
       if (_postsType == PostsType.FAVORED_DISCUSSION) {
         await ForumRepository.getInstance().getFavoriteHoleId();
@@ -850,17 +859,44 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
 /// This class is a workaround between Open Tree Hole's time-based content retrieval style
 /// and [PagedListView]'s page-based loading style.
+///
+/// # Caveats
+/// There is a footgun case where if client-side filtering removes all items from a page,
+/// the cursor will stall (because data[-1] remains the same) and the same page will be
+/// requested repeatedly.
+///
+/// To solve this, [TimeBasedLoadAdaptLayer] tracks the last seen element independently,
+/// so that the cursor can always advance. See [updateCursor] for details.
 class TimeBasedLoadAdaptLayer<T> {
   final int pageSize;
   final int startPage;
 
+  /// The last element returned by the API, tracked independently of [PagedListView]'s
+  /// data list. This ensures the time cursor advances even when all items in a page
+  /// are filtered out by the client.
+  T? _lastSeenElement;
+
   TimeBasedLoadAdaptLayer(this.pageSize, this.startPage);
+
+  /// Update the cursor with the raw API response data.
+  /// Should be called after each successful API response.
+  void updateCursor(List<T> rawData) {
+    if (rawData.isNotEmpty) {
+      _lastSeenElement = rawData.last;
+    }
+  }
+
+  /// Reset the cursor. Should be called when the list is refreshed.
+  void reset() {
+    _lastSeenElement = null;
+  }
 
   DataReceiver<T> generateReceiver(PagedListViewController<T> controller,
       TimeBasedDataReceiver<T> receiver) {
     return (int pageIndex) async {
       int nextPageEnd = pageSize * (pageIndex - startPage + 1);
-      if (controller.length() == 0 || pageIndex == startPage) {
+      if ((controller.length() == 0 && _lastSeenElement == null) ||
+          pageIndex == startPage) {
         // If this is the first page, call with nothing.
         return receiver.call(null);
       } else if (nextPageEnd < controller.length()) {
@@ -869,8 +905,11 @@ class TimeBasedLoadAdaptLayer<T> {
         return receiver
             .call(controller.getElementAt(nextPageEnd - startPage - 1));
       } else {
-        // If requesting a brand new page, just loaded it with info of the last item.
-        return receiver.call(controller.getElementAt(controller.length() - 1));
+        // If requesting a brand new page, prefer the independently tracked cursor
+        // over the controller's last element, as the controller may not have advanced
+        // due to client-side filtering.
+        return receiver.call(
+            _lastSeenElement ?? controller.getElementAt(controller.length() - 1));
       }
     };
   }
