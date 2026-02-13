@@ -56,7 +56,6 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:intl/intl.dart';
 import 'package:nil/nil.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -1401,18 +1400,6 @@ class OTNotificationSettingsTile extends StatelessWidget {
   final VoidCallback onSettingsUpdate;
 
   const OTNotificationSettingsTile({super.key, required this.onSettingsUpdate});
-
-  String _generateNotificationSettingsSummary(
-      BuildContext context, List<String>? data) {
-    List<String> summary = [];
-    data?.forEach((element) {
-      final text = notificationTypeFromInternalString(element)
-          ?.displayShortTitle(context);
-      if (text == null) return;
-      summary.add(text);
-    });
-    return summary.join(', ');
-  }
 
   @override
   Widget build(BuildContext context) {
