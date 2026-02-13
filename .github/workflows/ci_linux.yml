@@ -27,6 +27,9 @@ jobs:
       - name: Install Flutter Linux Dependencies
         run: |
           pacman -S --noconfirm gtk3 libsecret gnome-keyring wpewebkit git clang cmake ninja
+      - name: Config Git to Trust All Repositories
+        run: |
+          git config --global --add safe.directory '*'
       - name: Prepare Flutter Dependencies
         run: |
           flutter pub get
