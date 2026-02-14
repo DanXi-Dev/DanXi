@@ -161,6 +161,7 @@ class FudanSession {
             // CookieManager merges headers from both the existing request and the cookie jar,
             // so reusing the same RequestOptions would accumulate stale cookies.
             final reqCopy = req.copyWith();
+            // Work around Dio bug: FormData objects can only be used once
             if (reqCopy.data is FormData) {
               reqCopy.data = (reqCopy.data as FormData).clone();
             }
@@ -200,6 +201,7 @@ class FudanSession {
             // CookieManager merges headers from both the existing request and the cookie jar,
             // so reusing the same RequestOptions would accumulate stale cookies.
             final reqCopy = req.copyWith();
+            // Work around Dio bug: FormData objects can only be used once
             if (reqCopy.data is FormData) {
               reqCopy.data = (reqCopy.data as FormData).clone();
             }
@@ -234,6 +236,7 @@ class FudanSession {
             // CookieManager merges headers from both the existing request and the cookie jar,
             // so reusing the same RequestOptions would accumulate stale cookies.
             final reqCopy = req.copyWith();
+            // Work around Dio bug: FormData objects can only be used once
             if (reqCopy.data is FormData) {
               reqCopy.data = (reqCopy.data as FormData).clone();
             }
