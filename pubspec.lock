@@ -815,10 +815,11 @@ packages:
   flutter_markdown_plus:
     dependency: "direct main"
     description:
-      name: flutter_markdown_plus
-      sha256: "039177906850278e8fb1cd364115ee0a46281135932fa8ecea8455522166d2de"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: "27b57cecd19d3dd3c3c3a2b4be0e28acf4fc09ab"
+      resolved-ref: "27b57cecd19d3dd3c3c3a2b4be0e28acf4fc09ab"
+      url: "https://github.com/w568w/flutter_markdown_plus.git"
+    source: git
     version: "1.0.7"
   flutter_math_fork:
     dependency: "direct main"
