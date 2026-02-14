@@ -157,13 +157,16 @@ class FudanSession {
       case FudanLoginType.Neo2FA:
         return _authenticationQueues[type]!.runNormalRequest(
           () async {
+            // Shallow-copy the request to avoid cookie header pollution across retries:
+            // CookieManager merges headers from both the existing request and the cookie jar,
+            // so reusing the same RequestOptions would accumulate stale cookies.
+            final reqCopy = req.copyWith();
             // Work around Dio bug: FormData objects can only be used once
-            final requestData = req.data;
-            if (requestData is FormData) {
-              req.data = requestData.clone();
+            if (reqCopy.data is FormData) {
+              reqCopy.data = (reqCopy.data as FormData).clone();
             }
 
-            final response = await dio.fetch(req);
+            final response = await dio.fetch(reqCopy);
             if (isNeoAuthenticationRequired(response)) {
               throw Exception(
                   "Authentication required for request: ${response.realUri}");
@@ -194,13 +197,16 @@ class FudanSession {
       case FudanLoginType.UISNeo:
         return _authenticationQueues[type]!.runNormalRequest(
           () async {
+            // Shallow-copy the request to avoid cookie header pollution across retries:
+            // CookieManager merges headers from both the existing request and the cookie jar,
+            // so reusing the same RequestOptions would accumulate stale cookies.
+            final reqCopy = req.copyWith();
             // Work around Dio bug: FormData objects can only be used once
-            final requestData = req.data;
-            if (requestData is FormData) {
-              req.data = requestData.clone();
+            if (reqCopy.data is FormData) {
+              reqCopy.data = (reqCopy.data as FormData).clone();
             }
 
-            final response = await dio.fetch(req);
+            final response = await dio.fetch(reqCopy);
             if (isLegacyAuthenticationRequired(response)) {
               throw Exception(
                   "Authentication required for request: ${response.realUri}");
@@ -226,13 +232,16 @@ class FudanSession {
 
         return _authenticationQueues[type]!.runNormalRequest(
           () async {
+            // Shallow-copy the request to avoid cookie header pollution across retries:
+            // CookieManager merges headers from both the existing request and the cookie jar,
+            // so reusing the same RequestOptions would accumulate stale cookies.
+            final reqCopy = req.copyWith();
             // Work around Dio bug: FormData objects can only be used once
-            final requestData = req.data;
-            if (requestData is FormData) {
-              req.data = requestData.clone();
+            if (reqCopy.data is FormData) {
+              reqCopy.data = (reqCopy.data as FormData).clone();
             }
 
-            final response = await dio.fetch(req);
+            final response = await dio.fetch(reqCopy);
             if (isLegacyAuthenticationRequired(response)) {
               throw Exception(
                   "Authentication required for request: ${response.realUri}");
