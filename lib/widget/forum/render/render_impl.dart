@@ -27,7 +27,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_highlighting/flutter_highlighting.dart';
 import 'package:flutter_highlighting/themes/atom-one-dark.dart';
 import 'package:flutter_highlighting/themes/atom-one-light.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:highlighting/languages/all.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -100,8 +100,8 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
         LinkTapCallback? onTapLink,
         ImageLongPressCallback? onLongPressImage}) {
       double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
-      final imageBuilder = (MarkdownImageConfig config) {
-        String url = config.uri.toString();
+      final imageBuilder = (Uri uri, String? title, String? alt) {
+        String url = uri.toString();
         // render stickers first
         if (url.startsWith("danxi_")) {
           // backward compatibility: <=1.4.3, danxi_ is used; after that, dx_ is used
@@ -192,7 +192,7 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
             MarkdownHoleMentionSupport.tag:
                 MarkdownHoleMentionSupport(translucentCard, isPreviewWidget),
           },
-          sizedImageBuilder: imageBuilder);
+          imageBuilder: imageBuilder);
     };
 
 final BaseRender kMarkdownRender = kMarkdownRenderFactory(kFontSize);
