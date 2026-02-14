@@ -36,25 +36,6 @@ import 'package:nil/nil.dart';
 
 const double kFontSize = 16.0;
 const double kFontLargerSize = 24.0;
-
-// FIXME: Workaround for https://github.com/dart-lang/tools/issues/2108.
-// [md.ExtensionSet.gitHubFlavored] places [md.UnorderedListWithCheckboxSyntax]
-// before the built-in [md.SetextHeaderSyntax], causing "text\n-" to be parsed
-// as a list item instead of a setext heading. This extension set removes the
-// checkbox list syntaxes to avoid the priority issue.
-// Remove this workaround once the upstream issue is fixed.
-final _gitHubFlavoredWorkaround = md.ExtensionSet(
-  [
-    const md.FencedCodeBlockSyntax(),
-    const md.TableSyntax(),
-    const md.FootnoteDefSyntax(),
-  ],
-  [
-    md.InlineHtmlSyntax(),
-    md.StrikethroughSyntax(),
-    md.AutolinkExtensionSyntax(),
-  ],
-);
 /*BaseRender kHtmlRender = (BuildContext context, String? content,
     ImageTapCallback? onTapImage, LinkTapCallback? onTapLink) {
   double imageWidth = ViewportUtils.getMainNavigatorWidth(context) * 0.75;
@@ -190,7 +171,6 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
 
       return MarkdownBody(
           softLineBreak: true,
-          extensionSet: _gitHubFlavoredWorkaround,
           data: content!,
           styleSheet: _markdownStyleOverride(
               _getMarkdownStyleSheetFromPlatform(context), defaultFontSize),
@@ -241,7 +221,6 @@ final BaseRender kMarkdownSelectorRender = (BuildContext context,
   return SelectionArea(
     child: Markdown(
       softLineBreak: true,
-      extensionSet: _gitHubFlavoredWorkaround,
       data: content!,
       styleSheet: _markdownStyleOverride(
           _getMarkdownStyleSheetFromPlatform(context), kFontLargerSize),
