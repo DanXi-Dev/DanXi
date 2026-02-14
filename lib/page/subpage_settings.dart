@@ -100,7 +100,7 @@ class SettingsPageState extends State<SettingsPage> {
     LicenseItem("flutter_typeahead", LICENSE_BSD_2_0_CLAUSE,
         "https://github.com/AbdulRahmanAlHamali/flutter_typeahead"),
     LicenseItem("flutter_markdown_plus", LICENSE_BSD_3_0_CLAUSE,
-        "https://github.com/foresightmobile/flutter_markdown_plus"),
+        "https://github.com/w568w/flutter_markdown_plus"),
     LicenseItem("image_picker", LICENSE_APACHE_2_0,
         "https://github.com/flutter/plugins/tree/master/packages/image_picker/image_picker"),
     LicenseItem("Kotlin Stdlib Jdk7", LICENSE_APACHE_2_0,
