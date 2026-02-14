@@ -67,7 +67,7 @@ class NextCourseFeature extends Feature {
   LiveCourseModel getNextCourse(TimeTable table) {
     Event? thisCourse;
     Event? nextCourse;
-    int courseLeft = 0;
+    Set<int> countedSlots = {};
     TimeNow now = table.now();
     DayEvents dayEvents = table.toDayEvents(now.week,
         compact: TableDisplayType.FULL)[now.weekday];
@@ -82,12 +82,11 @@ class NextCourseFeature extends Feature {
         thisCourse = element;
       }
       if (exactStartTime.isAfter(DateTime.now())) {
-        // Only get the next course once.
         nextCourse ??= element;
-        courseLeft++;
+        countedSlots.add(element.time.slot);
       }
     }
-    return LiveCourseModel(thisCourse, nextCourse, courseLeft);
+    return LiveCourseModel(thisCourse, nextCourse, countedSlots.length);
   }
 
   @override
