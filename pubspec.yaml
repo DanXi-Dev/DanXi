@@ -81,7 +81,7 @@ dependencies:
       url: https://github.com/wenelsahra/platform_device_id.git
       path: platform_device_id
   uuid: ^4.3.3
-  screen_capture_event: ^1.0.0+1
+  no_screenshot: ^0.9.0
   otp: ^3.0.2
   lunar: ^1.2.20
   flutter_fgbg: ^0.7.0

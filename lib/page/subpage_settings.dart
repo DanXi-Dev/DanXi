@@ -204,8 +204,8 @@ class SettingsPageState extends State<SettingsPage> {
         "https://github.com/ajinasokan/flutter_fgbg"),
     LicenseItem("lazy_load_indexed_stack", LICENSE_MIT,
         "https://github.com/okaryo/lazy_load_indexed_stack"),
-    LicenseItem("screen_capture_event", LICENSE_MIT,
-        "https://github.com/nizwar/screen_capture_event"),
+    LicenseItem("no_screenshot", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/FlutterPlaza/no_screenshot"),
     LicenseItem("otp", LICENSE_MIT, "https://github.com/Daegalus/dart-otp"),
     LicenseItem(
         "js", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dart-lang/sdk"),

@@ -1370,6 +1370,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  no_screenshot:
+    dependency: "direct main"
+    description:
+      name: no_screenshot
+      sha256: "63bc5a51e85b1e147960dc0a3e98f16125590c0703f236466ece50264dc5fd27"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.0"
   node_preamble:
     dependency: transitive
     description:
@@ -1924,14 +1932,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
-  screen_capture_event:
-    dependency: "direct main"
-    description:
-      name: screen_capture_event
-      sha256: adfe2f17273d562f5b3dcc04f8731dff2bd7e9b7230c7a7372be1e10aecd1004
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.0"
   share_plus:
     dependency: "direct main"
     description:
