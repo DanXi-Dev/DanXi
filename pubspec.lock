@@ -41,14 +41,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.13.10"
-  android_id:
-    dependency: transitive
-    description:
-      name: android_id
-      sha256: "5c2d3a259afcd173dbe367ba452817bd530c4df75d251d652c69b8d3c8ac0d36"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.6"
   app_links:
     dependency: "direct main"
     description:
@@ -405,10 +397,10 @@ packages:
     dependency: "direct main"
     description:
       name: device_info_plus
-      sha256: "98f28b42168cc509abc92f88518882fd58061ea372d7999aecc424345c7bff6a"
+      sha256: "4df8babf73058181227e18b08e6ea3520cf5fc5d796888d33b7cb0f33f984b7c"
       url: "https://pub.dev"
     source: hosted
-    version: "11.5.0"
+    version: "12.3.0"
   device_info_plus_platform_interface:
     dependency: transitive
     description:
@@ -840,10 +832,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_platform_widgets
-      sha256: "22a86564cb6cc0b93637c813ca91b0b1f61c2681a31e0f9d77590c1fa9f12020"
+      sha256: aa110ef638076831d060047911a62810d02b4695db58e7682b716c4c4eee65bc
       url: "https://pub.dev"
     source: hosted
-    version: "9.0.0"
+    version: "10.0.1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -857,7 +849,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "9479b2c4fafdc1ea7ee92b3eec8d6cb1b2103089"
+      resolved-ref: "195470c23cf8dd775d4177b1ea72aed0315d5e63"
       url: "https://github.com/w568w/flutter_progress_dialog.git"
     source: git
     version: "0.2.0"
@@ -1370,6 +1362,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  no_screenshot:
+    dependency: "direct main"
+    description:
+      name: no_screenshot
+      sha256: "63bc5a51e85b1e147960dc0a3e98f16125590c0703f236466ece50264dc5fd27"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.0"
   node_preamble:
     dependency: transitive
     description:
@@ -1590,10 +1590,10 @@ packages:
     dependency: transitive
     description:
       name: petitparser
-      sha256: "1a97266a94f7350d30ae522c0af07890c70b8e62c71e8e3920d1db4d23c057d1"
+      sha256: "91bd59303e9f769f108f8df05e371341b15d59e995e6806aefab827b58336675"
       url: "https://pub.dev"
     source: hosted
-    version: "7.0.1"
+    version: "7.0.2"
   photo_view:
     dependency: "direct main"
     description:
@@ -1610,55 +1610,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.6"
-  platform_device_id:
-    dependency: "direct main"
-    description:
-      path: platform_device_id
-      ref: HEAD
-      resolved-ref: "014eb1dba61f93ac0830a963bb36ad0dec242e6c"
-      url: "https://github.com/wenelsahra/platform_device_id.git"
-    source: git
-    version: "2.0.0"
-  platform_device_id_linux:
-    dependency: transitive
-    description:
-      name: platform_device_id_linux
-      sha256: "994b1608593e527a629af2d5aeb241c60d308d3434bc78b0f6fcb3c1a02dff43"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
-  platform_device_id_macos:
-    dependency: transitive
-    description:
-      name: platform_device_id_macos
-      sha256: "968db2a504c611294b12a031b3734432d6df10553a0d3ae3b33ed21abfdbaba0"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
-  platform_device_id_platform_interface:
-    dependency: transitive
-    description:
-      name: platform_device_id_platform_interface
-      sha256: c61607594252aaddacf3e4c4371ab08f2ef85ff427817fa6e48a169429610c46
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
-  platform_device_id_web:
-    dependency: transitive
-    description:
-      name: platform_device_id_web
-      sha256: "58e124594e1165db7f108395a780b1d1e1cd403021978e5228cf4289fbe736d5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
-  platform_device_id_windows:
-    dependency: transitive
-    description:
-      name: platform_device_id_windows
-      sha256: dbf8dcf03ad8555320ebae2403a3081b79f137f37661874e161fe2de0a84eeeb
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   plugin_platform_interface:
     dependency: transitive
     description:
@@ -1924,14 +1875,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
-  screen_capture_event:
-    dependency: "direct main"
-    description:
-      name: screen_capture_event
-      sha256: adfe2f17273d562f5b3dcc04f8731dff2bd7e9b7230c7a7372be1e10aecd1004
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.0"
   share_plus:
     dependency: "direct main"
     description:
@@ -2483,5 +2426,5 @@ packages:
     source: hosted
     version: "2.2.4"
 sdks:
-  dart: ">=3.10.3 <4.0.0"
-  flutter: ">=3.38.4"
+  dart: ">=3.11.0 <4.0.0"
+  flutter: ">=3.41.0"

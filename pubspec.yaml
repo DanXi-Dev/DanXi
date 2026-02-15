@@ -74,14 +74,8 @@ dependencies:
   meta: ">=1.3.0 <2.0.0"
   flutter_layout_grid: ^2.0.1
   flutter_math_fork: ^0.7.4
-  # fixme: platform_device_id has been unmaintained since 2021, which depends on deprecated device_info package.
-  # Since Flutter 3.29+ drops V1 embedding support, which device_info uses, we have to use this fork.
-  platform_device_id:
-    git:
-      url: https://github.com/wenelsahra/platform_device_id.git
-      path: platform_device_id
   uuid: ^4.3.3
-  screen_capture_event: ^1.0.0+1
+  no_screenshot: ^0.9.0
   otp: ^3.0.2
   lunar: ^1.2.20
   flutter_fgbg: ^0.7.0
@@ -91,8 +85,7 @@ dependencies:
   material_color_generator: ^1.1.0
   flutter_swiper_view: ^1.1.8
   mutex: ^3.0.1
-  # fixme: blocked by platform_device_id
-  device_info_plus: ^11.0.0
+  device_info_plus: ^12.3.0
   receive_intent:
     git:
       url: https://github.com/w568w/receive_intent.git
@@ -102,7 +95,7 @@ dependencies:
   encrypt: any
   device_identity: ^1.0.0
   tutorial_coach_mark: ^1.2.9
-  flutter_platform_widgets: ^9.0.0
+  flutter_platform_widgets: ^10.0.0
   intl: any
   json_annotation: ^4.9.0
   flutter_cache_manager: any

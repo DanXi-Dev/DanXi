@@ -10,8 +10,8 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_inappwebview_windows
   flutter_secure_storage_windows
   gal
+  no_screenshot
   permission_handler_windows
-  platform_device_id_windows
   screen_brightness_windows
   share_plus
   url_launcher_windows

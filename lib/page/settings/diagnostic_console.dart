@@ -41,10 +41,10 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart'
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:intl/intl.dart';
-import 'package:platform_device_id/platform_device_id.dart';
+import 'package:device_identity/device_identity.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:uuid/uuid.dart';
 
 class DiagnosticConsole extends StatefulWidget {
   final Map<String, dynamic>? arguments;
@@ -90,18 +90,46 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     _console.writeln(
         "Forum Token stored: ${context.read<SettingsProvider>().forumToken}");
 
-    String? deviceId;
     try {
-      deviceId = await PlatformDeviceId.getDeviceId;
+      final deviceInfo = DeviceInfoPlugin();
+      if (PlatformX.isAndroid) {
+        _console.writeln("Device Id source: DeviceIdentity (Android)");
+        try {
+          _console.writeln("  androidId: ${await DeviceIdentity.androidId}");
+        } catch (e) {
+          _console.writeln("  androidId: error ($e)");
+        }
+        try {
+          _console.writeln("  oaid: ${await DeviceIdentity.oaid}");
+        } catch (e) {
+          _console.writeln("  oaid: error ($e)");
+        }
+      } else if (PlatformX.isIOS) {
+        final iosInfo = await deviceInfo.iosInfo;
+        _console.writeln(
+            "Device Id source: identifierForVendor = ${iosInfo.identifierForVendor}");
+      } else if (PlatformX.isMacOS) {
+        final macInfo = await deviceInfo.macOsInfo;
+        _console
+            .writeln("Device Id source: systemGUID = ${macInfo.systemGUID}");
+      } else if (PlatformX.isWindows) {
+        final winInfo = await deviceInfo.windowsInfo;
+        _console.writeln("Device Id source: deviceId = ${winInfo.deviceId}");
+      } else if (PlatformX.isLinux) {
+        final linuxInfo = await deviceInfo.linuxInfo;
+        _console
+            .writeln("Device Id source: machineId = ${linuxInfo.machineId}");
+      } else if (PlatformX.isWeb) {
+        final webInfo = await deviceInfo.webBrowserInfo;
+        _console
+            .writeln("Device Id source: userAgent = ${webInfo.userAgent}");
+      }
     } catch (error, stackTrace) {
       _console.writeln("Met error when retrieving Device Id! Error is:$error");
       _console.writeln(stackTrace);
     }
-    if (deviceId == null) {
-      _console.writeln("Your Device Id(Random UUID): ${const Uuid().v4()}");
-    } else {
-      _console.writeln("Your Device Id(Real ID): $deviceId");
-    }
+    final resolvedId = await PlatformX.getUniqueDeviceId();
+    _console.writeln("Resolved Device Id: $resolvedId");
   }
 
   Future<void> diagnoseGoogleAds() async {}

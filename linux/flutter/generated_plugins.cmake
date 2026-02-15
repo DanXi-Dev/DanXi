@@ -9,8 +9,8 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_inappwebview_linux
   flutter_secure_storage_linux
   gtk
+  no_screenshot
   open_file_linux
-  platform_device_id_linux
   url_launcher_linux
 )
 
