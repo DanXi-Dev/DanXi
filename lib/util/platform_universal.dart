@@ -24,7 +24,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/src/platform.dart' as platform_impl;
 import 'package:permission_handler/permission_handler.dart';
-import 'package:platform_device_id/platform_device_id.dart';
 import 'package:uuid/uuid.dart';
 
 /// A universal implementation of [Platform] in dart:io and [kIsWeb] in dart:core.
@@ -52,9 +51,28 @@ class PlatformX {
   static Future<String> getUniqueDeviceId() async {
     String? deviceId;
     try {
-      deviceId = await PlatformDeviceId.getDeviceId;
+      final deviceInfo = DeviceInfoPlugin();
+      if (isAndroid) {
+        // Android: device_info_plus does not expose ANDROID_ID,
+        // so we rely on DeviceIdentity instead.
+      } else if (isIOS) {
+        final iosInfo = await deviceInfo.iosInfo;
+        deviceId = iosInfo.identifierForVendor;
+      } else if (isMacOS) {
+        final macInfo = await deviceInfo.macOsInfo;
+        deviceId = macInfo.systemGUID;
+      } else if (isWindows) {
+        final winInfo = await deviceInfo.windowsInfo;
+        deviceId = winInfo.deviceId;
+      } else if (isLinux) {
+        final linuxInfo = await deviceInfo.linuxInfo;
+        deviceId = linuxInfo.machineId;
+      } else if (isWeb) {
+        final webInfo = await deviceInfo.webBrowserInfo;
+        deviceId = webInfo.userAgent;
+      }
     } catch (_) {}
-    if (PlatformX.isAndroid) {
+    if (isAndroid) {
       if (deviceId?.isNotEmpty != true) {
         try {
           deviceId ??= await DeviceIdentity.androidId;

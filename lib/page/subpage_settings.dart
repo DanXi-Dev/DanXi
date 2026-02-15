@@ -161,8 +161,6 @@ class SettingsPageState extends State<SettingsPage> {
     LicenseItem("http", LICENSE_BSD, "https://github.com/dart-lang/http"),
     LicenseItem(
         "ical", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dartclub/ical"),
-    LicenseItem("platform_device_id", LICENSE_BSD_3_0_CLAUSE,
-        "https://github.com/BestBurning/platform_device_id"),
     LicenseItem("in_app_review", LICENSE_MIT,
         "https://github.com/britannio/in_app_review"),
     LicenseItem("intl", LICENSE_BSD, "https://github.com/dart-lang/intl"),

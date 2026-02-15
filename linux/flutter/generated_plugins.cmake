@@ -11,7 +11,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   gtk
   no_screenshot
   open_file_linux
-  platform_device_id_linux
   url_launcher_linux
 )
 
