@@ -95,7 +95,7 @@ dependencies:
   encrypt: any
   device_identity: ^1.0.0
   tutorial_coach_mark: ^1.2.9
-  flutter_platform_widgets: ^9.0.0
+  flutter_platform_widgets: ^10.0.0
   intl: any
   json_annotation: ^4.9.0
   flutter_cache_manager: any

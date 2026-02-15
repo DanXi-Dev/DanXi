@@ -832,10 +832,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_platform_widgets
-      sha256: "22a86564cb6cc0b93637c813ca91b0b1f61c2681a31e0f9d77590c1fa9f12020"
+      sha256: aa110ef638076831d060047911a62810d02b4695db58e7682b716c4c4eee65bc
       url: "https://pub.dev"
     source: hosted
-    version: "9.0.0"
+    version: "10.0.1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -849,7 +849,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "9479b2c4fafdc1ea7ee92b3eec8d6cb1b2103089"
+      resolved-ref: "195470c23cf8dd775d4177b1ea72aed0315d5e63"
       url: "https://github.com/w568w/flutter_progress_dialog.git"
     source: git
     version: "0.2.0"
@@ -2426,5 +2426,5 @@ packages:
     source: hosted
     version: "2.2.4"
 sdks:
-  dart: ">=3.10.3 <4.0.0"
-  flutter: ">=3.38.4"
+  dart: ">=3.11.0 <4.0.0"
+  flutter: ">=3.41.0"
