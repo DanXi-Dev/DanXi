@@ -147,8 +147,10 @@ class WebVPNInterceptor extends Interceptor {
       debugPrint(
           "Requesting through WebVPN: ${options.method} ${options.path}");
       final proxiedResponse = await FudanSession.request(
-          options, validateResponse,
-          manualLoginUrl: WEBVPN_LOGIN_URL);
+        options, validateResponse,
+        manualLoginUrl: WEBVPN_LOGIN_URL,
+        manualLoginMethod: "GET",
+      );
       return handler.resolve(proxiedResponse, true);
     } on DioException catch (e) {
       return handler.reject(e, true);
