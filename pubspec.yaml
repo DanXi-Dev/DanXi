@@ -125,6 +125,13 @@ dependency_overrides:
       ref: patch-2
       path: flutter_secure_storage_linux
 
+  # fixme: This fixes #645. This can be removed after the master branch fixes it.
+  flutter_inappwebview_linux:
+    git:
+      url: https://github.com/sseu-buhzzi/flutter_inappwebview.git
+      ref: 20260215/fix-webkit-check-version
+      path: flutter_inappwebview_linux
+
 dev_dependencies:
   build_runner: ^2.1.2
   pubspec_generator: ^5.0.0
