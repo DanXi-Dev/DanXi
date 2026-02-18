@@ -22,7 +22,6 @@ import 'package:dan_xi/repository/fdu/ecard_repository.dart';
 import 'package:dan_xi/repository/fdu/ehall_repository.dart';
 import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/browser_util.dart';
-import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -233,6 +232,12 @@ class LoginDialog extends HookConsumerWidget {
         } catch (primaryError, primaryStackTrace) {
           if (primaryError is DioException) {
             progressDialog.dismiss(showAnim: false);
+            rethrow;
+          }
+          if (primaryError is CredentialsInvalidException) {
+            progressDialog.dismiss(showAnim: false);
+            // Credentials are confirmed invalid, skipping fallback to the
+            // `CardRepository`.
             rethrow;
           }
           try {

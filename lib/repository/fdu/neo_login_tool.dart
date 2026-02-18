@@ -5,13 +5,14 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/cookie/persistent_cookie_jar.dart';
-import 'package:dan_xi/util/shared_preferences.dart';
+import 'package:dan_xi/repository/fdu/uis_login_tool.dart' as uis;
 import 'package:dan_xi/util/condition_variable.dart';
 import 'package:dan_xi/util/io/cookie_manager_fix.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import 'package:dio5_log/dio_log.dart';
 import 'package:dio_redirect_interceptor/dio_redirect_interceptor.dart';
@@ -319,6 +320,17 @@ class FudanAuthenticationAPIV2 {
   /// Error patterns from ID.
   static const String CAPTCHA_CODE_NEEDED = "请输入验证码";
 
+  /// Error patterns from invalid credentials.
+  /* {
+    "code": 4020, "userName": null, "mobile": null, "mail": null,
+    "moduleCode": "userAndPwd",
+    "requestNumber": "123456789abcdef0123456789abcdef0",
+    "message": "认证失败,您还有3次重试机会。原因分析： 用户名或密码错误 ",
+    "data": null, "loginToken": null, "moduleCodes": [],
+    "authChainCode": null, "pageLevelNo": 0, "second": null
+  } */
+  static const String CREDENTIALS_INVALID = "用户名或密码错误";
+
   static Future<Response<dynamic>> authenticate(
       PersonInfo info, Uri serviceUrl, String? serviceRequestMethod) async {
     Response<dynamic> firstResponse;
@@ -487,6 +499,9 @@ class FudanAuthenticationAPIV2 {
 
     final loginToken = response.data!["loginToken"] as String?;
     if (loginToken == null) {
+      if (message?.contains(CREDENTIALS_INVALID) ?? false) {
+        throw CredentialsInvalidException();
+      }
       throw EnhancedAuthenticationRequiredException(loginUrl, targetHost);
     }
     return loginToken;
@@ -665,11 +680,11 @@ class EnhancedAuthenticationRequiredException
   EnhancedAuthenticationRequiredException(this.loginUrl, this.targetHost);
 }
 
-class CredentialsInvalidException implements AuthenticationV1FailedException {}
+class CredentialsInvalidException implements AuthenticationV1FailedException, uis.CredentialsInvalidException {}
 
-class NetworkMaintenanceException implements AuthenticationV1FailedException {}
+class NetworkMaintenanceException implements AuthenticationV1FailedException, uis.NetworkMaintenanceException {}
 
-class WeakPasswordException implements AuthenticationV1FailedException {}
+class WeakPasswordException implements AuthenticationV1FailedException, uis.WeakPasswordException {}
 
 /// A specialized queue that manages login requests to prevent concurrent authentication attempts.
 ///
