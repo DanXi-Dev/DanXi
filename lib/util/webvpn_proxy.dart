@@ -26,22 +26,7 @@ class WebvpnRequestException implements Exception {
 /// # Order of interceptors
 /// This interceptor should be added BEFORE [RedirectInterceptor] but AFTER any other interceptors.
 class WebVPNInterceptor extends Interceptor {
-  static final Map<String, String> _vpnPrefix = {
-    "www.fduhole.com":
-        "https://$WEBVPN_HOST/{scheme}/77726476706e69737468656265737421e7e056d221347d5871048ce29b5a2e",
-    "auth.fduhole.com":
-        "https://$WEBVPN_HOST/{scheme}/77726476706e69737468656265737421f1e2559469366c45760785a9d6562c38",
-    "danke.fduhole.com":
-        "https://$WEBVPN_HOST/{scheme}/77726476706e69737468656265737421f4f64f97227e6e546b0086a09d1b203a73",
-    "forum.fduhole.com":
-        "https://$WEBVPN_HOST/{scheme}/77726476706e69737468656265737421f6f853892a7e6e546b0086a09d1b203a46",
-    "image.fduhole.com":
-        "https://$WEBVPN_HOST/{scheme}/77726476706e69737468656265737421f9fa409b227e6e546b0086a09d1b203ab8",
-    "yjsxk.fudan.edu.cn":
-        "https://$WEBVPN_HOST/{scheme}/77726476706e69737468656265737421e9fd52842c7e6e457a0987e29d51367bba7b",
-    "10.64.130.6":
-        "https://$WEBVPN_HOST/{scheme}/77726476706e69737468656265737421a1a70fca737e39032e46df",
-  };
+  static final _hostCache = <String, String>{};
   static const String DIRECT_CONNECT_TEST_URL = "https://forum.fduhole.com";
   static const String EXTRA_ROUTE_TYPE = "webvpn_route_type";
   static const String EXTRA_ORIGINAL_URL = "webvpn_original_url";
@@ -49,24 +34,73 @@ class WebVPNInterceptor extends Interceptor {
   static final Uri WEBVPN_LOGIN_URL =
       Uri.parse("https://$WEBVPN_HOST/login?cas_login=true");
   static const String WEBVPN_REDIRECTED_TO_LOGIN_PREFIX = "https://$WEBVPN_HOST/login";
+  static const String _WRDVPN_VPN_IS_THE_BEST = "wrdvpnisthebest!";
 
   static Future<bool>? tryDirectSession;
   static bool? _canConnectDirectly;
 
   /// Try to translate a URL to its WebVPN equivalent. Return `null` if the URL is not supported by WebVPN.
   static String? tryTranslateUrlToWebVPN(String url) {
-    Uri? u = Uri.tryParse(url);
-    if (u == null) {
+    Uri? uri = Uri.tryParse(url);
+    if (uri == null) {
       return null;
     }
 
-    final uriScheme = u.scheme.isEmpty ? "http" : u.scheme;
+    final uriScheme = uri.scheme.isEmpty ? "http" : uri.scheme;
     if (uriScheme != "http" && uriScheme != "https") {
       return null;
     }
 
-    final encodedPath = _encodeUrlToPath(uriScheme, url);
-    return "https://$WEBVPN_HOST$encodedPath";
+    final scheme = uri.scheme;
+    final host = uri.host;
+    final formattedHost = host.contains(":") ? "[$host]" : host;
+    final key = _WRDVPN_VPN_IS_THE_BEST;
+    final iv = _WRDVPN_VPN_IS_THE_BEST;
+    final encodedHost = scheme == "connection"
+        ? formattedHost
+        : _hostCache.putIfAbsent(host, () => _encrypt(formattedHost, key, iv));
+
+    final port = uri.port;
+    final componentsSb = StringBuffer(uri.path);
+    if (uri.hasQuery) componentsSb..write("?")..write(uri.query);
+    if (uri.hasFragment) componentsSb..write("#")..write(uri.fragment);
+    final components = componentsSb.toString();
+    final segment = uri.hasPort ? "$scheme-$port" : scheme;
+
+    final encodedPath =
+        "https://$WEBVPN_HOST/$segment/$encodedHost$components";
+    return encodedPath;
+  }
+
+  static final aesEngine = AESEngine();
+  static String _encrypt(String text, String keyText, String ivText) {
+    final originalLength = text.length;
+    final paddedText = _padText(text);
+
+    final textBytes = utf8.encode(paddedText);
+    final keyBytes = utf8.encode(keyText);
+    final ivBytes = utf8.encode(ivText);
+
+    final cipher = CFBBlockCipher(aesEngine, 16);
+    cipher.init(true, ParametersWithIV(KeyParameter(keyBytes), ivBytes));
+
+    final encryptedBytes = Uint8List(textBytes.lengthInBytes);
+    var offset = 0;
+    while (offset < encryptedBytes.lengthInBytes) {
+      offset += cipher.processBlock(textBytes, offset, encryptedBytes, offset);
+    }
+
+    final ivHex = utf8.encode(ivText).toHexString();
+    final encryptedHex = encryptedBytes.toHexString();
+    return ivHex + encryptedHex.substring(0, 2 * originalLength);
+  }
+
+  static String _padText(String text, {String encodingName = "utf8"}) {
+    final blockSize = encodingName == "utf8" ? 16 : 32;
+    // Caveats: the length of String might not be the length of UTF-8 bytes. But
+    // the JS method in WebVPN is indeed written this way.
+    final remainder = text.length % blockSize;
+    return remainder == 0 ? text : text + "0" * (blockSize - remainder);
   }
 
   /// Check if we are able to connect to the service directly (without WebVPN).
@@ -181,78 +215,6 @@ class WebVPNInterceptor extends Interceptor {
           "Direct connection timeout, trying to connect through proxy next time: $err");
     }
     return handler.next(err);
-  }
-
-  static const String _WRDVPN_KEY = "wrdvpnisthebest!";
-  static const String _WRDVPN_IV = "wrdvpnisthebest!";
-  static final _protocolRegex = RegExp(r"^https?://");
-  static final _ipv6Regex = RegExp(r"\[[0-9a-fA-F:]+?\]");
-
-  static String _encodeUrlToPath(
-    String protocol,
-    String search, {
-    String key = _WRDVPN_KEY,
-    String iv = _WRDVPN_IV,
-  }) {
-    final resourcePath = search.replaceFirst(_protocolRegex, "");
-    final ipv6Match = _ipv6Regex.firstMatch(resourcePath);
-    final ipv6 = ipv6Match?.group(0) ?? "";
-
-    final remainingAfterIpv6 = resourcePath.substring(ipv6.length);
-    final List<String> parts = remainingAfterIpv6.split("?")[0].split(":");
-    final port = parts.length > 1 ? parts[1].split("/")[0] : "";
-
-    final hostAndPath = port.isEmpty
-        ? remainingAfterIpv6
-        : resourcePath.replaceFirst(":$port", "", ipv6.length);
-    final String encoded;
-    if (protocol == "connection") {
-      encoded = ipv6.isEmpty ? hostAndPath : ipv6 + hostAndPath;
-    } else {
-      final slashIndex = hostAndPath.indexOf("/");
-      if (slashIndex == -1) {
-        final host = ipv6.isEmpty ? hostAndPath : ipv6;
-        encoded = _encrypt(host, key, iv);
-      } else {
-        final host = ipv6.isEmpty ? hostAndPath.substring(0, slashIndex) : ipv6;
-        final path = hostAndPath.substring(slashIndex);
-        final encrypted = _encrypt(host, key, iv);
-        encoded = encrypted + path;
-      }
-    }
-
-    return port.isEmpty ? "/$protocol/$encoded" : "/$protocol-$port/$encoded";
-  }
-
-  static String _encrypt(String text, String keyText, String ivText) {
-    final originalLength = text.length;
-    final paddedText = _padText(text);
-
-    final textBytes = utf8.encode(paddedText);
-    final keyBytes = utf8.encode(keyText);
-    final ivBytes = utf8.encode(ivText);
-
-    final engine = AESEngine();
-    final cipher = CFBBlockCipher(engine, 16);
-    cipher.init(true, ParametersWithIV(KeyParameter(keyBytes), ivBytes));
-
-    final encryptedBytes = Uint8List(textBytes.lengthInBytes);
-    var offset = 0;
-    while (offset < encryptedBytes.lengthInBytes) {
-      offset += cipher.processBlock(textBytes, offset, encryptedBytes, offset);
-    }
-
-    final ivHex = utf8.encode(ivText).toHexString();
-    final encryptedHex = encryptedBytes.toHexString();
-    return ivHex + encryptedHex.substring(0, 2 * originalLength);
-  }
-
-  static String _padText(String text, {String encodingName = "utf8"}) {
-    final blockSize = encodingName == "utf8" ? 16 : 32;
-    // Caveats: the length of String might not be the length of UTF-8 bytes. But
-    // the JS method in WebVPN is indeed written this way.
-    final remainder = text.length % blockSize;
-    return remainder == 0 ? text : text + "0" * (blockSize - remainder);
   }
 }
 
