@@ -144,6 +144,11 @@ extension ListEx<T> on List<T>? {
   }
 }
 
+extension IntListEx on List<int> {
+  String toHexString() =>
+      map((byte) => byte.toRadixString(16).padLeft(2, "0")).join();
+}
+
 typedef FilterFunction<T> = bool Function(T element);
 
 extension HSL on Color {
