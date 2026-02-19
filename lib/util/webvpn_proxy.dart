@@ -3,10 +3,11 @@ import 'dart:convert';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_redirect_interceptor/dio_redirect_interceptor.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:pointycastle/export.dart';
 
 class WebvpnRequestException implements Exception {
   final String? message;
@@ -64,19 +65,8 @@ class WebVPNInterceptor extends Interceptor {
       return null;
     }
 
-    if (_vpnPrefix.containsKey(u.host)) {
-      final vpnPrefix = _vpnPrefix[u.host]!;
-      final urlPrefix = "$uriScheme://${u.host}";
-      if (url.startsWith(urlPrefix)) {
-        final translatedUrl =
-            url.replaceFirst(urlPrefix, vpnPrefix.replaceFirst("{scheme}", uriScheme));
-        return translatedUrl;
-      } else {
-        return null;
-      }
-    } else {
-      return null;
-    }
+    final encodedPath = _encodeUrlToPath(uriScheme, url);
+    return "https://$WEBVPN_HOST$encodedPath";
   }
 
   /// Check if we are able to connect to the service directly (without WebVPN).
@@ -191,6 +181,78 @@ class WebVPNInterceptor extends Interceptor {
           "Direct connection timeout, trying to connect through proxy next time: $err");
     }
     return handler.next(err);
+  }
+
+  static const String _WRDVPN_KEY = "wrdvpnisthebest!";
+  static const String _WRDVPN_IV = "wrdvpnisthebest!";
+  static final _protocolRegex = RegExp(r"^https?://");
+  static final _ipv6Regex = RegExp(r"\[[0-9a-fA-F:]+?\]");
+
+  static String _encodeUrlToPath(
+    String protocol,
+    String search, {
+    String key = _WRDVPN_KEY,
+    String iv = _WRDVPN_IV,
+  }) {
+    final resourcePath = search.replaceFirst(_protocolRegex, "");
+    final ipv6Match = _ipv6Regex.firstMatch(resourcePath);
+    final ipv6 = ipv6Match?.group(0) ?? "";
+
+    final remainingAfterIpv6 = resourcePath.substring(ipv6.length);
+    final List<String> parts = remainingAfterIpv6.split("?")[0].split(":");
+    final port = parts.length > 1 ? parts[1].split("/")[0] : "";
+
+    final hostAndPath = port.isEmpty
+        ? remainingAfterIpv6
+        : resourcePath.replaceFirst(":$port", "", ipv6.length);
+    final String encoded;
+    if (protocol == "connection") {
+      encoded = ipv6.isEmpty ? hostAndPath : ipv6 + hostAndPath;
+    } else {
+      final slashIndex = hostAndPath.indexOf("/");
+      if (slashIndex == -1) {
+        final host = ipv6.isEmpty ? hostAndPath : ipv6;
+        encoded = _encrypt(host, key, iv);
+      } else {
+        final host = ipv6.isEmpty ? hostAndPath.substring(0, slashIndex) : ipv6;
+        final path = hostAndPath.substring(slashIndex);
+        final encrypted = _encrypt(host, key, iv);
+        encoded = encrypted + path;
+      }
+    }
+
+    return port.isEmpty ? "/$protocol/$encoded" : "/$protocol-$port/$encoded";
+  }
+
+  static String _encrypt(String text, String keyText, String ivText) {
+    final originalLength = text.length;
+    final paddedText = _padText(text);
+
+    final textBytes = utf8.encode(paddedText);
+    final keyBytes = utf8.encode(keyText);
+    final ivBytes = utf8.encode(ivText);
+
+    final engine = AESEngine();
+    final cipher = CFBBlockCipher(engine, 16);
+    cipher.init(true, ParametersWithIV(KeyParameter(keyBytes), ivBytes));
+
+    final encryptedBytes = Uint8List(textBytes.lengthInBytes);
+    var offset = 0;
+    while (offset < encryptedBytes.lengthInBytes) {
+      offset += cipher.processBlock(textBytes, offset, encryptedBytes, offset);
+    }
+
+    final ivHex = utf8.encode(ivText).toHexString();
+    final encryptedHex = encryptedBytes.toHexString();
+    return ivHex + encryptedHex.substring(0, 2 * originalLength);
+  }
+
+  static String _padText(String text, {String encodingName = "utf8"}) {
+    final blockSize = encodingName == "utf8" ? 16 : 32;
+    // Caveats: the length of String might not be the length of UTF-8 bytes. But
+    // the JS method in WebVPN is indeed written this way.
+    final remainder = text.length % blockSize;
+    return remainder == 0 ? text : text + "0" * (blockSize - remainder);
   }
 }
 
