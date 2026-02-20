@@ -353,13 +353,14 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   }
 
   Future<void> setUserAgent() async {
-    String? ua = await Noticing.showInputDialog(context, "Input user agent");
+    final settingsProvider = context.read<SettingsProvider>();
+    String? ua = await Noticing.showInputDialog(
+      context,
+      "Input user agent",
+      initialText: settingsProvider.customUserAgent,
+    );
     if (ua == null || !mounted) return;
-    if (ua.isEmpty) {
-      context.read<SettingsProvider>().customUserAgent = null;
-    } else {
-      context.read<SettingsProvider>().customUserAgent = ua;
-    }
+    settingsProvider.customUserAgent = ua.isEmpty ? null : ua;
     Noticing.showNotice(context, "Restart app to take effects");
   }
 
