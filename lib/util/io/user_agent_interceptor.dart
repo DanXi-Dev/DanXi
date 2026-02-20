@@ -27,7 +27,7 @@ import 'package:dio_redirect_interceptor/dio_redirect_interceptor.dart';
 ///
 /// If [userAgent] is not provided, it defaults to the value from
 /// [StateProvider.onlineUserAgent], [SettingsProvider.customUserAgent],
-/// or a predefined constant [Constant.DEFAULT_USER_AGENT].
+/// or a predefined constant [Constant.defaultUserAgent].
 ///
 /// The [important] flag determines whether to always set the User-Agent
 /// header, even if it has already been set in the request options.
@@ -44,10 +44,8 @@ class UserAgentInterceptor extends Interceptor {
 
   static String? get defaultUsedUserAgent =>
       StateProvider.onlineUserAgent ??
-          SettingsProvider.getInstance().customUserAgent ??
-          (PlatformX.isMobile
-              ? Constant.DEFAULT_USER_AGENT_MOBILE
-              : Constant.DEFAULT_USER_AGENT);
+      SettingsProvider.getInstance().customUserAgent ??
+      Constant.defaultUserAgent;
 
   int getCurrentRedirectTime(RequestOptions options) {
     return options.extra[RedirectInterceptor.redirectCount] as int? ?? 1;
