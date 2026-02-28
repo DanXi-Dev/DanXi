@@ -138,16 +138,15 @@ class OTTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Note: these strings can be (and should be) localized. 
+    // But since other division names are not localized (yet), we leave them hardcoded for now. 
+    OTDivision homepageDivision = OTDivision(OTDivision.HOME_PAGE_DIVISION_ID, "主页", "展示所有板块", null);
+
     List<OTDivision> divisions =
-        context.select<ForumProvider, List<OTDivision>>(
-            (value) => value.divisionCache);
+        [homepageDivision, ...context.select<ForumProvider, List<OTDivision>>(
+            (value) => value.divisionCache)];
     OTDivision? division = context
         .select<ForumProvider, OTDivision?>((value) => value.currentDivision);
-
-    if (division?.division_id == OTDivision.HOME_PAGE_DIVISION_ID) {
-      division!.name = "主页";
-      division.description = "展示所有板块";
-    }
 
     int currentIndex = 0;
     if (division != null) {
@@ -359,7 +358,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
   /// Fields related to the display states.
   static int getDivisionId(BuildContext context) =>
-      context.read<ForumProvider>().currentDivision?.division_id ?? 1;
+      context.read<ForumProvider>().currentDivision?.division_id ?? OTDivision.HOME_PAGE_DIVISION_ID;
 
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
       context.read<ForumProvider>().userInfo?.config?.show_folded);

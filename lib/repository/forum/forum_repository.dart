@@ -289,7 +289,7 @@ class ForumRepository extends BaseRepositoryWithDio {
         await WebvpnProxy.requestWithProxy(dio, options);
     final result = response.data?.map((e) => OTDivision.fromJson(e)).toList();
     if (result != null) {
-      provider.divisionCache = [OTDivision.home_page_division, ...result];
+      provider.divisionCache = result;
     }
     return provider.divisionCache.isNotEmpty ? provider.divisionCache : null;
   }
@@ -310,7 +310,7 @@ class ForumRepository extends BaseRepositoryWithDio {
   Future<OTDivision?> loadSpecificDivision(int divisionId,
       {bool useCache = true}) async {
     if (divisionId == OTDivision.HOME_PAGE_DIVISION_ID) {
-      return OTDivision.home_page_division;
+      return OTDivision(OTDivision.HOME_PAGE_DIVISION_ID, null, null, null);
     }
 
     if (useCache) {
@@ -346,8 +346,9 @@ class ForumRepository extends BaseRepositoryWithDio {
           path: "$_BASE_URL/holes/_homepage",
           method: "GET",
           queryParameters: {
-            "offset": startTime.toUtc().toIso8601String(),
-            "size": length,
+            "start_time": startTime.toUtc().toIso8601String(),
+            "length": length,
+            "tag": tag,
             "order": sortOrder.getInternalString()
           },
           headers: _tokenHeader);

@@ -49,8 +49,4 @@ class OTDivision {
   // A special division id `-1` is used to represent the home page.
   // This is not the most elegant solution, but the simplest. 
   static const int HOME_PAGE_DIVISION_ID = 9999;
-
-  // Since the name and description has to be localized,
-  // we cannot specify these strings here. 
-  static OTDivision get home_page_division => OTDivision(HOME_PAGE_DIVISION_ID, null, null, null);
 }
