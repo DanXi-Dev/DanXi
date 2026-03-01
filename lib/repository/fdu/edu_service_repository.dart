@@ -97,66 +97,6 @@ class EduServiceRepository extends BaseRepositoryWithDio {
     });
   }
 
-  /// Get user's exam list
-  ///
-  /// ## API Detail
-  ///
-  /// This API uses the neo authentication to fetch exam information from the new endpoint.
-  /// The new endpoint returns HTML with an exam table.
-  ///
-  /// - Returns: A list of ``Exam``, including both finished and upcoming exams
-  ///
-  /// Exam status:
-  /// - Exams with class "finished hide" are completed exams
-  /// - Exams with class "unfinished" are upcoming/pending exams
-  ///
-  /// ## Example HTML Response:
-  /// ```html
-  /// <tr data-finished="false" class="unfinished">
-  ///     <td>
-  ///         <div class="time">2026-01-04 08:30~10:30</div>
-  ///         <div>
-  ///             <span>邯郸校区</span>
-  ///             <span>H邯郸校区第六教学楼</span>
-  ///             <span>H6506</span>
-  ///         </div>
-  ///     </td>
-  ///     <td>
-  ///         <div>
-  ///             <span>数字集成电路设计原理(H) </span>
-  ///             <span>ICSE30021h.01 </span>
-  ///             <span>（闭卷） </span>
-  ///         </div>
-  ///         <div>
-  ///             <span class="tag-span type2">期末</span>
-  ///         </div>
-  ///     </td>
-  ///     <td>请携带学生证或一卡通，待考试时核查。</td>
-  ///     <td>未结束</td>
-  /// </tr>
-  /// <tr data-finished="true" class="finished hide">
-  ///     <td>
-  ///         <div class="time ">2025-11-11 13:00~15:00</div>
-  ///         <div>
-  ///             <span>邯郸校区</span>
-  ///             <span>H邯郸校区第二教学楼</span>
-  ///             <span>H2115</span>
-  ///         </div>
-  ///     </td>
-  ///     <td>
-  ///         <div>
-  ///             <span>半导体器件原理(H) </span>
-  ///             <span>ICSE30020h.01 </span>
-  ///             <span>（半开卷） </span>
-  ///         </div>
-  ///         <div>
-  ///             <span class="tag-span type1">期中</span>
-  ///         </div>
-  ///     </td>
-  ///     <td>请携带学生证或一卡通，待考试时核查。</td>
-  ///     <td>已结束</td>
-  /// </tr>
-  /// ```
   Future<List<Exam>> loadExamList(String studentId) async {
     final options = RequestOptions(
       method: "GET",
@@ -420,6 +360,66 @@ class Exam {
     this.note,
   );
 
+  /// Get user's exam list
+  ///
+  /// ## API Detail
+  ///
+  /// This API uses the neo authentication to fetch exam information from the new endpoint.
+  /// The new endpoint returns HTML with an exam table.
+  ///
+  /// - Returns: A list of ``Exam``, including both finished and upcoming exams
+  ///
+  /// Exam status:
+  /// - Exams with class "finished hide" are completed exams
+  /// - Exams with class "unfinished" are upcoming/pending exams
+  ///
+  /// ## Example HTML Response:
+  /// ```html
+  /// <tr data-finished="false" class="unfinished">
+  ///     <td>
+  ///         <div class="time">2026-01-04 08:30~10:30</div>
+  ///         <div>
+  ///             <span>邯郸校区</span>
+  ///             <span>H邯郸校区第六教学楼</span>
+  ///             <span>H6506</span>
+  ///         </div>
+  ///     </td>
+  ///     <td>
+  ///         <div>
+  ///             <span>数字集成电路设计原理(H) </span>
+  ///             <span>ICSE30021h.01 </span>
+  ///             <span>（闭卷） </span>
+  ///         </div>
+  ///         <div>
+  ///             <span class="tag-span type2">期末</span>
+  ///         </div>
+  ///     </td>
+  ///     <td>请携带学生证或一卡通，待考试时核查。</td>
+  ///     <td>未结束</td>
+  /// </tr>
+  /// <tr data-finished="true" class="finished hide">
+  ///     <td>
+  ///         <div class="time ">2025-11-11 13:00~15:00</div>
+  ///         <div>
+  ///             <span>邯郸校区</span>
+  ///             <span>H邯郸校区第二教学楼</span>
+  ///             <span>H2115</span>
+  ///         </div>
+  ///     </td>
+  ///     <td>
+  ///         <div>
+  ///             <span>半导体器件原理(H) </span>
+  ///             <span>ICSE30020h.01 </span>
+  ///             <span>（半开卷） </span>
+  ///         </div>
+  ///         <div>
+  ///             <span class="tag-span type1">期中</span>
+  ///         </div>
+  ///     </td>
+  ///     <td>请携带学生证或一卡通，待考试时核查。</td>
+  ///     <td>已结束</td>
+  /// </tr>
+  /// ```
   factory Exam.fromJwglHtml(List<Bs4Element> cells) {
     String? courseId;
     String? courseName;
