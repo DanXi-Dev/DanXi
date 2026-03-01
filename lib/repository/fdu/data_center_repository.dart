@@ -17,15 +17,12 @@
 
 import 'dart:convert';
 
-import 'package:beautiful_soup_dart/beautiful_soup.dart';
-import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/base_repository.dart';
 import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
-import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/type_requires.dart';
 import 'package:dio/dio.dart';
-import 'package:html/dom.dart' as dom;
 
 class DataCenterRepository extends BaseRepositoryWithDio {
   static const String LOGIN_URL =
@@ -33,7 +30,7 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   static const String DINING_DETAIL_URL =
       "https://my.fudan.edu.cn/simple_list/stqk";
   static const String SCORE_DETAIL_URL =
-      "https://my.fudan.edu.cn/list/bks_xx_cj";
+      "https://my.fudan.edu.cn/data_tables/bks_xx_cj.json";
   static const String CARD_DETAIL_URL =
       "https://my.fudan.edu.cn/data_tables/ykt_xx.json";
   static const String ELECTRICITY_HISTORY_URL =
@@ -136,18 +133,30 @@ class DataCenterRepository extends BaseRepositoryWithDio {
   ///
   /// NOTE: Result's [type] is year + semester(e.g. "2020-2021 2"),
   /// and [id] doesn't contain the last 2 digits.
-  Future<List<ExamScore>> loadAllExamScore(PersonInfo? info) =>
-      UISLoginTool.tryAsyncWithAuth(
-          dio, LOGIN_URL, cookieJar!, info, () => _loadAllExamScore());
+  Future<List<ExamScore>> loadAllExamScore() async {
+    final options = RequestOptions(
+      method: "POST",
+      baseUrl: SCORE_DETAIL_URL,
+      // There are few people get more than 100 exam scores.
+      data: {"start": 0, "length": 100},
+    );
+    return FudanSession.request(options, (res) {
+      final Map<String, dynamic> data = require(
+        res.data,
+        () => FudanApiException(options.uri.toString()),
+      );
+      final List<dynamic> dataList = require(
+        data["data"],
+        () => FudanApiException(options.uri.toString()),
+      );
 
-  Future<List<ExamScore>> _loadAllExamScore() async {
-    Response<String> r = await dio.get(SCORE_DETAIL_URL);
-    BeautifulSoup soup = BeautifulSoup(r.data!);
-    dom.Element tableBody = soup.find("tbody")!.element!;
-    return tableBody
-        .getElementsByTagName("tr")
-        .map((e) => ExamScore.fromDataCenterHtml(e))
-        .toList();
+      final scores = dataList
+          .whereType<List<dynamic>>()
+          .map((json) => ExamScore.fromDataCenterHtml(json))
+          .toList(growable: false);
+
+      return scores;
+    }, type: FudanLoginType.Neo2FA);
   }
 
   Future<List<CardDetailInfo>> getCardDetailInfo() {

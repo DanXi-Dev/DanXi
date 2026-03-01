@@ -28,7 +28,6 @@ import 'package:dan_xi/repository/fdu/graduate_exam_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
@@ -107,8 +106,7 @@ Future<List<ExamScore>> examScoreList(Ref ref, String semesterId) async {
 
 @riverpod
 Future<List<ExamScore>> examScoreListFromDataCenter(Ref ref) async {
-  return await DataCenterRepository.getInstance()
-      .loadAllExamScore(sp.StateProvider.personInfo.value);
+  return await DataCenterRepository.getInstance().loadAllExamScore();
 }
 
 @Riverpod(keepAlive: true)

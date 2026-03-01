@@ -25,7 +25,6 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/type_requires.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
-import 'package:html/dom.dart' as dom;
 
 import 'neo_login_tool.dart';
 
@@ -523,16 +522,35 @@ class ExamScore {
 
   /// NOTE: Result's [type] is year + semester(e.g. "2020-2021 2"),
   /// and [id] doesn't contain the last 2 digits.
-  factory ExamScore.fromDataCenterHtml(dom.Element html) {
-    List<dom.Element> elements = html.getElementsByTagName("td");
-    return ExamScore(
-      elements[0].text.trim(),
-      elements[3].text.trim(),
-      '${elements[1].text.trim()} ${elements[2].text.trim()}',
-      elements[4].text.trim(),
-      elements[5].text.trim(),
-      null,
+  /// [score] could be int, float, or null.
+  /// Example:
+  ///
+  ///{
+  ///  "draw": 2,
+  ///  "recordsTotal": 51,
+  ///  "recordsFiltered": 51,
+  ///  "data": [
+  ///    ["PTSS110058", "2022-2023", "2022-2023学年1学期", "形势与政策I", 0.5, "P", 0],
+  ///    ["GEMH10013", "2022-2023", "2022-2023学年1学期", "心理健康与大学生活", 1, "P", null],
+  ///    ["GEPE10054", "2023-2024", "2023-2024学年2学期", "游泳（二）", 1, "C+", 2.4],
+  ///    ["CSEC20004", "2023-2024", "2023-2024学年2学期", "逆向工程原理", 3, "A", 4]
+  ///  ]
+  ///};
+  factory ExamScore.fromDataCenterHtml(List<dynamic> json) {
+    final String? id = json[0];
+    final String? name = json[3];
+    final num? credit = json[4];
+    final String? level = json[5];
+    final num? scoreNum = json[6];
+    final examScore = ExamScore(
+      id.toString(),
+      name.toString(),
+      null.toString(),
+      credit.toString(),
+      level.toString(),
+      scoreNum?.toString() ?? "",
     );
+    return examScore;
   }
 
   /// Parse from graduate student score JSON.
