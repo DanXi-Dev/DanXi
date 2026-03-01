@@ -538,6 +538,8 @@ class ExamScore {
   ///};
   factory ExamScore.fromDataCenterHtml(List<dynamic> json) {
     final String? id = json[0];
+    final String? year = json[1];
+    final String? yearAndSeason = json[2];
     final String? name = json[3];
     final num? credit = json[4];
     final String? level = json[5];
@@ -545,7 +547,7 @@ class ExamScore {
     final examScore = ExamScore(
       id.toString(),
       name.toString(),
-      null.toString(),
+      (yearAndSeason ?? year).toString(),
       credit.toString(),
       level.toString(),
       scoreNum?.toString() ?? "",
