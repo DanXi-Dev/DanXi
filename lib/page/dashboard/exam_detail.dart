@@ -406,17 +406,20 @@ class ExamList extends HookConsumerWidget {
 
   List<Widget> _getListWidgetsGrade(BuildContext context, WidgetRef ref,
       List<ExamScore> scores, {bool isFallback = false, bool isGraduate = false}) {
-    Widget buildLimitedCard() => Card(
-        color: Theme.of(context).colorScheme.error,
-        child: ListTile(
-          visualDensity: VisualDensity.comfortable,
-          title: Text(
-            S.of(context).limited_mode_title,
-            style: const TextStyle(color: Colors.white),
-          ),
-          subtitle: Text(S.of(context).limited_mode_description,
-              style: const TextStyle(color: Colors.white)),
-        ));
+    Widget buildLimitedCard() {
+      final colorScheme = Theme.of(context).colorScheme;
+      return Card(
+          color: colorScheme.errorContainer,
+          child: ListTile(
+            visualDensity: VisualDensity.comfortable,
+            title: Text(
+              S.of(context).limited_mode_title,
+              style: TextStyle(color: colorScheme.onErrorContainer),
+            ),
+            subtitle: Text(S.of(context).limited_mode_description,
+                style: TextStyle(color: colorScheme.onErrorContainer)),
+          ));
+    }
 
     List<Widget> widgets = [];
     if (isFallback) {
