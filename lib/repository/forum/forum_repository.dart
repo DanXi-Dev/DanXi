@@ -358,7 +358,7 @@ class ForumRepository extends BaseRepositoryWithDio {
           method: "GET",
           queryParameters: {
             "start_time": startTime.toUtc().toIso8601String(),
-            "division_id": divisionId ?? 0, // 0 = don't filter by division
+            "division_id": divisionId,
             "length": length,
             "tag": tag,
             "order": sortOrder.getInternalString()
