@@ -682,6 +682,15 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
           divisionList.first.division_id;
     }
 
+    int defaultChoice = widget.requireDivision ? divisionList.indexWhere(
+      (e) =>
+          e.division_id ==
+          context
+              .read<ForumProvider>()
+              .editorCache[widget.editorObject]
+              ?.divisionId,
+    ) : 0;
+
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -695,7 +704,7 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
               enabled: true,
               wrapped: false,
               singleChoice: true,
-              defaultChoice: 0,
+              defaultChoice: defaultChoice >= 0 ? defaultChoice : 0,
               onChoice: (Tag tag, list) {
                 OTDivision division = divisionList.firstWhere(
                   (element) => element.name == tag.tagTitle,

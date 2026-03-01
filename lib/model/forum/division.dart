@@ -46,7 +46,7 @@ class OTDivision {
   @override
   int get hashCode => division_id!;
 
-  // A special division id `-1` is used to represent the home page.
+  // A special division id `9999` is used to represent the home page.
   // This is not the most elegant solution, but the simplest. 
   static const int HOME_PAGE_DIVISION_ID = 9999;
 }

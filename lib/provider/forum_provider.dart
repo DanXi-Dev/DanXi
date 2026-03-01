@@ -48,8 +48,14 @@ class ForumProvider with ChangeNotifier {
   /// The current division id;
   int? divisionId;
 
-  OTDivision? get currentDivision => _divisionCache
+  OTDivision? get currentDivision {
+    if (divisionId == OTDivision.HOME_PAGE_DIVISION_ID) {
+      return OTDivision(OTDivision.HOME_PAGE_DIVISION_ID, null, null, null);
+    }
+
+    return _divisionCache
       .firstWhereOrNull((element) => element.division_id == divisionId);
+  } 
 
   set currentDivisionId(int? divisionId) {
     this.divisionId = divisionId;
