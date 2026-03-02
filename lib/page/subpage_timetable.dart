@@ -645,8 +645,10 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
           PlatformIconButton(
             padding: EdgeInsets.zero,
             icon: AutoSizeText(
-                "${_selectionInfo!.schoolYear} ${_selectionInfo!.season.code}",
-                minFontSize: 10),
+              "${_selectionInfo!.calendarYear}\n${_selectionInfo!.season.getDisplayedName(context)}",
+              minFontSize: 10,
+              textAlign: TextAlign.center,
+            ),
             onPressed: () => showPlatformModalSheet(
               context: context,
               builder: (menuContext) => PlatformContextMenu(

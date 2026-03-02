@@ -424,6 +424,19 @@ class SemesterInfo {
     final (schoolYear, season) = yearAndSeason;
     return this.schoolYear == schoolYear && this.season == season;
   }
+
+  String get calendarYear {
+    final yearParts = schoolYear.split("-");
+    if (yearParts.length < 2) {
+      throw FudanApiException(schoolYear);
+    }
+    return switch (season) {
+      SemesterSeason.AUTUMN => yearParts[0],
+      SemesterSeason.SPRING ||
+      SemesterSeason.SUMMER ||
+      SemesterSeason.WINTER => yearParts[1],
+    };
+  }
 }
 
 class Exam {
