@@ -299,6 +299,32 @@ class SemesterInfo {
     return SemesterInfo(id, schoolYear, season);
   }
 
+  factory SemesterInfo.fromLessonSearchElement(Bs4Element element) {
+    final attrDataValue = requireNotNull(
+      element.getAttrValue("value"),
+      () => FudanApiException(element.outerHtml),
+    );
+    final int idInt = require(
+      int.tryParse(attrDataValue),
+      () => FudanApiException(attrDataValue),
+    );
+    final id = idInt.toString();
+    final name = requireNotNull(
+      element.text,
+      () => FudanApiException(element.outerHtml),
+    );
+    final (schoolYearNullable, seasonNullable) = _parseYearAndSeason(name);
+    final schoolYear = requireNotNull(
+      schoolYearNullable,
+      () => FudanApiException(name),
+    );
+    final season = requireNotNull(
+      seasonNullable,
+      () => FudanApiException(name),
+    );
+    return SemesterInfo(id, schoolYear, season);
+  }
+
   static final _nameRegex = RegExp(
     "\\D*(\\d{4}-\\d{4})\\D+(\\d+|autumn|fall|秋|一|上|spring|春|二|下|summer|夏|暑|三|winter|冬|寒|四)\\D*",
     caseSensitive: false,
@@ -336,6 +362,19 @@ class SemesterInfo {
     final yearAndSeason = _parseYearAndSeason(name);
     final (schoolYear, season) = yearAndSeason;
     return this.schoolYear == schoolYear && this.season == season;
+  }
+
+  String get calendarYear {
+    final yearParts = schoolYear.split("-");
+    if (yearParts.length < 2) {
+      throw FudanApiException(schoolYear);
+    }
+    return switch (season) {
+      SemesterSeason.AUTUMN => yearParts[0],
+      SemesterSeason.SPRING ||
+      SemesterSeason.SUMMER ||
+      SemesterSeason.WINTER => yearParts[1],
+    };
   }
 }
 
