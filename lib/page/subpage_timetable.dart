@@ -599,7 +599,7 @@ class SemesterSelectionButton extends StatefulWidget {
 }
 
 class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
-  SemesterBundle? _semesterBundle;
+  List<SemesterInfo>? _allSemesters;
   SemesterInfo? _selectionInfo;
   late Future<void> _future;
 
@@ -610,27 +610,31 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
   }
 
   Future<void> loadSemesterInfo() async {
-    _semesterBundle =
-        await TimeTableRepository.getInstance().loadSemestersForTimeTable();
+    final repository = TimeTableRepository.getInstance();
+    final (semesterBundle, allSemesters) = await (
+        repository.loadSemestersForTimeTable(),
+        repository.loadAllSemesters(),
+    ).wait;
+    _allSemesters = allSemesters;
 
     String chosenSemester;
     try {
       // Check if the stored chosen semester is valid (i.e. not null AND exists in the list)
       chosenSemester = SettingsProvider.getInstance().timetableSemester!;
-      _selectionInfo = _semesterBundle!.semesters
+      _selectionInfo = allSemesters
           .firstWhere((element) => element.semesterId == chosenSemester);
     } catch (_) {
       // If not, reset it to default...
-      chosenSemester = _semesterBundle!.defaultSemesterId;
+      chosenSemester = semesterBundle.defaultSemesterId;
       SettingsProvider.getInstance().timetableSemester = chosenSemester;
       // ... and retry
-      _selectionInfo = _semesterBundle!.semesters
+      _selectionInfo = allSemesters
           .firstWhere((element) => element.semesterId == chosenSemester);
     }
     SettingsProvider.getInstance().semesterStartDates =
-        _semesterBundle!.startDates;
+        semesterBundle.startDates;
     SettingsProvider.getInstance().thisSemesterStartDate =
-        _semesterBundle!.startDates.parseStartDate(chosenSemester);
+        semesterBundle.startDates.parseStartDate(chosenSemester);
   }
 
   @override
@@ -649,7 +653,7 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
                 cancelButton: CupertinoActionSheetAction(
                     child: Text(S.of(menuContext).cancel),
                     onPressed: () => Navigator.of(menuContext).pop()),
-                actions: _semesterBundle!.semesters
+                actions: _allSemesters!
                     .map((e) => PlatformContextMenuItem(
                         menuContext: menuContext,
                         onPressed: () {
