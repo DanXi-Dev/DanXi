@@ -28,7 +28,6 @@ import 'package:dan_xi/repository/fdu/graduate_exam_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:dan_xi/widget/libraries/with_scrollbar.dart';
@@ -107,8 +106,7 @@ Future<List<ExamScore>> examScoreList(Ref ref, String semesterId) async {
 
 @riverpod
 Future<List<ExamScore>> examScoreListFromDataCenter(Ref ref) async {
-  return await DataCenterRepository.getInstance()
-      .loadAllExamScore(sp.StateProvider.personInfo.value);
+  return await DataCenterRepository.getInstance().loadAllExamScore();
 }
 
 @Riverpod(keepAlive: true)
@@ -324,28 +322,15 @@ class ExamList extends HookConsumerWidget {
         return _buildGradeLayout(context, ref, data, null, isFallback: true);
       case AsyncError(:final error, :final stackTrace):
         return ErrorPageWidget(
-          errorMessage: S.of(context).data_center_unavailable_2026_0117,
+          errorMessage:
+              '${S.of(context).failed}\n${S.of(context).need_campus_network}\n\nError:\n${ErrorPageWidget.generateUserFriendlyDescription(S.of(context), error)}',
           error: error,
           trace: stackTrace,
           onTap: () => ref.invalidate(examScoreListFromDataCenterProvider),
           buttonText: S.of(context).retry,
         );
       default:
-        return Center(
-          // Revert it and the above to the single progress indicator after the
-          // data center source is fixed.
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              PlatformCircularProgressIndicator(),
-              const SizedBox(height: 64),
-              Text(
-                S.of(context).data_center_unavailable_2026_0117,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        );
+        return Center(child: PlatformCircularProgressIndicator());
     }
   }
 
@@ -421,17 +406,20 @@ class ExamList extends HookConsumerWidget {
 
   List<Widget> _getListWidgetsGrade(BuildContext context, WidgetRef ref,
       List<ExamScore> scores, {bool isFallback = false, bool isGraduate = false}) {
-    Widget buildLimitedCard() => Card(
-        color: Theme.of(context).colorScheme.error,
-        child: ListTile(
-          visualDensity: VisualDensity.comfortable,
-          title: Text(
-            S.of(context).limited_mode_title,
-            style: const TextStyle(color: Colors.white),
-          ),
-          subtitle: Text(S.of(context).limited_mode_description,
-              style: const TextStyle(color: Colors.white)),
-        ));
+    Widget buildLimitedCard() {
+      final colorScheme = Theme.of(context).colorScheme;
+      return Card(
+          color: colorScheme.errorContainer,
+          child: ListTile(
+            visualDensity: VisualDensity.comfortable,
+            title: Text(
+              S.of(context).limited_mode_title,
+              style: TextStyle(color: colorScheme.onErrorContainer),
+            ),
+            subtitle: Text(S.of(context).limited_mode_description,
+                style: TextStyle(color: colorScheme.onErrorContainer)),
+          ));
+    }
 
     List<Widget> widgets = [];
     if (isFallback) {
