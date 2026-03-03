@@ -17,6 +17,8 @@ subprojects {
                 project.plugins.hasPlugin("com.android.library")) {
             project.android.compileSdkVersion = 36
 
+            project.java.toolchain.languageVersion = JavaLanguageVersion.of(23)
+
             // override Java version to 23
             project.android.compileOptions.sourceCompatibility = JavaVersion.VERSION_23
             project.android.compileOptions.targetCompatibility = JavaVersion.VERSION_23
