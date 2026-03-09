@@ -246,7 +246,7 @@ class OTHoleWidget extends StatelessWidget {
                       ]),
                     ]),
               ]),
-              onTap: () { 
+              onTap: () {
                 HapticFeedbackUtil.light();
                 smartNavigatorPush(context, "/bbs/postDetail",
                   arguments: {"post": postElement});
@@ -423,91 +423,95 @@ class OTFloorWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      ColoredBox(
-                          color: nameColor,
-                          child: const SizedBox(width: 2, height: 12)),
-                      const SizedBox(width: 8),
-                      if (floor.anonyname ==
-                          parentHole?.floors?.first_floor?.anonyname) ...[
-                        LeadingChip(color: nameColor),
-                        const SizedBox(width: 4),
-                      ],
-                      Text(
-                        floor.anonyname!,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: nameColor),
-                      ),
-                      const SizedBox(
-                        width: 4,
-                      ),
-                      if (floor.deleted == true) ...[
-                        const SizedBox(width: 4),
-                        LeadingChip(
-                          color: Theme.of(context).colorScheme.primary,
-                          label: S.of(context).deleted,
+                  Expanded(
+                    child: Wrap(
+                      direction: Axis.horizontal,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        ColoredBox(
+                            color: nameColor,
+                            child: const SizedBox(width: 2, height: 12)),
+                        const SizedBox(width: 8),
+                        if (floor.anonyname ==
+                            parentHole?.floors?.first_floor?.anonyname) ...[
+                          LeadingChip(color: nameColor),
+                          const SizedBox(width: 4),
+                        ],
+                        Text(
+                          floor.anonyname!,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: nameColor),
                         ),
-                      ],
-                      if (floor.special_tag?.isNotEmpty == true) ...[
-                        const SizedBox(width: 4),
-                        LeadingChip(
-                          color: Colors.red,
-                          label: floor.special_tag!,
+                        const SizedBox(
+                          width: 4,
                         ),
+                        if (floor.deleted == true) ...[
+                          const SizedBox(width: 4),
+                          LeadingChip(
+                            color: Theme.of(context).colorScheme.primary,
+                            label: S.of(context).deleted,
+                          ),
+                        ],
+                        if (floor.special_tag?.isNotEmpty == true) ...[
+                          const SizedBox(width: 4),
+                          LeadingChip(
+                            color: Colors.red,
+                            label: floor.special_tag!,
+                          ),
+                        ],
+                        // We will only show the hidden tag if this hole is hidden
+                        // and this floor is the first floor.
+                        if (parentHole?.hidden == true &&
+                            floor.floor_id ==
+                                parentHole?.floors?.first_floor?.floor_id) ...[
+                          const SizedBox(width: 4),
+                          LeadingChip(
+                            color: Colors.red,
+                            label: S.of(context).hole_hidden,
+                          ),
+                        ],
+                        // Ditto.
+                        if (parentHole?.isForceDeleted == true &&
+                            floor.floor_id ==
+                                parentHole?.floors?.first_floor?.floor_id) ...[
+                          const SizedBox(width: 4),
+                          LeadingChip(
+                            color: Colors.red,
+                            label: S.of(context).hole_force_deleted,
+                          ),
+                        ],
+                        // Show locked tag if the hole is locked and this is the first floor
+                        if (parentHole?.locked == true &&
+                            floor.floor_id ==
+                                parentHole?.floors?.first_floor?.floor_id) ...[
+                          const SizedBox(width: 4),
+                          LeadingChip(
+                            color: Theme.of(context).colorScheme.primary,
+                            label: S.of(context).hole_locked,
+                          ),
+                        ],
+                        // Show frozen tag if the hole is frozen and this is the first floor
+                        if (parentHole?.frozen == true &&
+                            floor.floor_id ==
+                                parentHole?.floors?.first_floor?.floor_id) ...[
+                          const SizedBox(width: 4),
+                          LeadingChip(
+                            color: Theme.of(context).colorScheme.primary,
+                            label: S.of(context).hole_frozen,
+                          ),
+                        ],
+                        // Show pinned tag if this hole is in the pinned list and this is the first floor
+                        if (isPinned &&
+                            floor.floor_id ==
+                                parentHole?.floors?.first_floor?.floor_id) ...[
+                          const SizedBox(width: 4),
+                          LeadingChip(
+                            color: Theme.of(context).colorScheme.primary,
+                            label: S.of(context).pinned,
+                          ),
+                        ],
                       ],
-                      // We will only show the hidden tag if this hole is hidden
-                      // and this floor is the first floor.
-                      if (parentHole?.hidden == true &&
-                          floor.floor_id ==
-                              parentHole?.floors?.first_floor?.floor_id) ...[
-                        const SizedBox(width: 4),
-                        LeadingChip(
-                          color: Colors.red,
-                          label: S.of(context).hole_hidden,
-                        ),
-                      ],
-                      // Ditto.
-                      if (parentHole?.isForceDeleted == true &&
-                          floor.floor_id ==
-                              parentHole?.floors?.first_floor?.floor_id) ...[
-                        const SizedBox(width: 4),
-                        LeadingChip(
-                          color: Colors.red,
-                          label: S.of(context).hole_force_deleted,
-                        ),
-                      ],
-                      // Show locked tag if the hole is locked and this is the first floor
-                      if (parentHole?.locked == true &&
-                          floor.floor_id ==
-                              parentHole?.floors?.first_floor?.floor_id) ...[
-                        const SizedBox(width: 4),
-                        LeadingChip(
-                          color: Theme.of(context).colorScheme.primary,
-                          label: S.of(context).hole_locked,
-                        ),
-                      ],
-                      // Show frozen tag if the hole is frozen and this is the first floor
-                      if (parentHole?.frozen == true &&
-                          floor.floor_id ==
-                              parentHole?.floors?.first_floor?.floor_id) ...[
-                        const SizedBox(width: 4),
-                        LeadingChip(
-                          color: Theme.of(context).colorScheme.primary,
-                          label: S.of(context).hole_frozen,
-                        ),
-                      ],
-                      // Show pinned tag if this hole is in the pinned list and this is the first floor
-                      if (isPinned &&
-                          floor.floor_id ==
-                              parentHole?.floors?.first_floor?.floor_id) ...[
-                        const SizedBox(width: 4),
-                        LeadingChip(
-                          color: Theme.of(context).colorScheme.primary,
-                          label: S.of(context).pinned,
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
                   if (showToolBars && !floor.deleted!)
                     OTFloorToolBar(
