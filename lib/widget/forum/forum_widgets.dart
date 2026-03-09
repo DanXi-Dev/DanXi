@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/forum/floor.dart';
@@ -29,13 +30,13 @@ import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/forum/human_duration.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/watermark.dart';
-import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/widget/forum/render/base_render.dart';
 import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
@@ -128,6 +129,43 @@ class OTHoleWidget extends StatelessWidget {
     final TextStyle infoStyle =
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
 
+    final chips = [
+      if (isPinned)
+        LeadingChip(
+          color: Theme.of(context).colorScheme.primary,
+          label: S.of(context).pinned,
+        ),
+      if (postElement.floors?.first_floor?.special_tag?.isNotEmpty == true)
+        LeadingChip(
+          color: Colors.red,
+          label: postElement.floors!.first_floor!.special_tag!,
+        ),
+
+      if (postElement.hidden == true)
+        LeadingChip(
+          color: Theme.of(context).colorScheme.primary,
+          label: S.of(context).hole_hidden,
+        ),
+
+      if (postElement.isForceDeleted)
+        LeadingChip(
+          color: Theme.of(context).colorScheme.primary,
+          label: S.of(context).hole_force_deleted,
+        ),
+
+      if (postElement.locked == true)
+        LeadingChip(
+          color: Theme.of(context).colorScheme.primary,
+          label: S.of(context).hole_locked,
+        ),
+
+      if (postElement.frozen == true)
+        LeadingChip(
+          color: Theme.of(context).colorScheme.primary,
+          label: S.of(context).hole_frozen,
+        ),
+    ];
+
     return Card(
       color: translucent
           ? Theme.of(context).cardTheme.color?.withValues(alpha: 0.8)
@@ -144,64 +182,28 @@ class OTHoleWidget extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                              child: generateTagWidgets(context, postElement,
-                                  (String? tagName) {
-                            smartNavigatorPush(context, '/bbs/discussions',
-                                arguments: {"tagFilter": tagName},
-                                forcePushOnMainNavigator: true);
-                          },
-                                  context
-                                      .read<SettingsProvider>()
-                                      .useAccessibilityColoring)),
-                          Row(
-                            //mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              if (isPinned)
-                                LeadingChip(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  label: S.of(context).pinned,
-                                ),
-                              if (postElement.floors?.first_floor?.special_tag
-                                      ?.isNotEmpty ==
-                                  true) ...[
-                                const SizedBox(width: 4),
-                                LeadingChip(
-                                  color: Colors.red,
-                                  label: postElement
-                                      .floors!.first_floor!.special_tag!,
-                                ),
-                              ],
-                              if (postElement.hidden == true) ...[
-                                const SizedBox(width: 4),
-                                LeadingChip(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  label: S.of(context).hole_hidden,
-                                ),
-                              ],
-                              if (postElement.isForceDeleted) ...[
-                                const SizedBox(width: 4),
-                                LeadingChip(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  label: S.of(context).hole_force_deleted,
-                                ),
-                              ],
-                              if (postElement.locked == true) ...[
-                                const SizedBox(width: 4),
-                                LeadingChip(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  label: S.of(context).hole_locked,
-                                )
-                              ],
-                              if (postElement.frozen == true) ...[
-                                const SizedBox(width: 4),
-                                LeadingChip(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  label: S.of(context).hole_frozen,
-                                )
-                              ]
-                            ],
+                            flex: postElement.tags?.length.clamp(1, 4) ?? 1,
+                            child: generateTagWidgets(context, postElement,
+                                (String? tagName) {
+                                  smartNavigatorPush(context,
+                                      '/bbs/discussions',
+                                      arguments: {"tagFilter": tagName},
+                                      forcePushOnMainNavigator: true);
+                                },
+                                context
+                                    .read<SettingsProvider>()
+                                    .useAccessibilityColoring)),
+                          Expanded(
+                            flex: chips.length.clamp(1, 4),
+                            child: Wrap(
+                              direction: Axis.horizontal,
+                              alignment: WrapAlignment.end,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: chips.expandIndexed((index, chip) => [
+                                if (index != 0) const SizedBox(width: 4),
+                                chip,
+                              ]).toList(growable: false),
+                            ),
                           ),
                         ]),
                     const SizedBox(height: 4),
