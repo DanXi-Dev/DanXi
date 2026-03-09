@@ -98,6 +98,61 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
   );
 }
 
+/// Generates status chips for a hole or floor card.
+///
+/// [floor] should be null if this is called to generate chips for a hole card.
+/// [hole] is usually not null.
+List<Widget> generateChipWidgets(
+  BuildContext context,
+  OTHole? hole,
+  OTFloor? floor,
+  bool isPinned,
+) {
+  final inHoleCard = floor == null;
+  final isOp = inHoleCard || hole?.floors?.first_floor == floor;
+  floor ??= hole?.floors?.first_floor;
+  return [
+    if (!inHoleCard && floor?.deleted == true)
+      LeadingChip(
+        color: Theme.of(context).colorScheme.primary,
+        label: S.of(context).deleted,
+      ),
+
+    if (floor?.special_tag?.isNotEmpty == true)
+      LeadingChip(color: Colors.red, label: floor?.special_tag!),
+
+    // We will only show the hidden tag if this hole is hidden
+    // and this floor is the first floor.
+    if (isOp && hole?.hidden == true)
+      LeadingChip(color: Colors.red, label: S.of(context).hole_hidden),
+
+    // Ditto.
+    if (isOp && hole?.isForceDeleted == true)
+      LeadingChip(color: Colors.red, label: S.of(context).hole_force_deleted),
+
+    // Show locked tag if the hole is locked and this is the first floor
+    if (isOp && hole?.locked == true)
+      LeadingChip(
+        color: Theme.of(context).colorScheme.primary,
+        label: S.of(context).hole_locked,
+      ),
+
+    // Show frozen tag if the hole is frozen and this is the first floor
+    if (isOp && hole?.frozen == true)
+      LeadingChip(
+        color: Theme.of(context).colorScheme.primary,
+        label: S.of(context).hole_frozen,
+      ),
+
+    // Show pinned tag if this hole is in the pinned list and this is the first floor
+    if (isOp && isPinned)
+      LeadingChip(
+        color: Theme.of(context).colorScheme.primary,
+        label: S.of(context).pinned,
+      ),
+  ];
+}
+
 class OTHoleWidget extends StatelessWidget {
   final OTHole postElement;
   final bool translucent;
@@ -129,42 +184,7 @@ class OTHoleWidget extends StatelessWidget {
     final TextStyle infoStyle =
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
 
-    final chips = [
-      if (isPinned)
-        LeadingChip(
-          color: Theme.of(context).colorScheme.primary,
-          label: S.of(context).pinned,
-        ),
-      if (postElement.floors?.first_floor?.special_tag?.isNotEmpty == true)
-        LeadingChip(
-          color: Colors.red,
-          label: postElement.floors!.first_floor!.special_tag!,
-        ),
-
-      if (postElement.hidden == true)
-        LeadingChip(
-          color: Theme.of(context).colorScheme.primary,
-          label: S.of(context).hole_hidden,
-        ),
-
-      if (postElement.isForceDeleted)
-        LeadingChip(
-          color: Theme.of(context).colorScheme.primary,
-          label: S.of(context).hole_force_deleted,
-        ),
-
-      if (postElement.locked == true)
-        LeadingChip(
-          color: Theme.of(context).colorScheme.primary,
-          label: S.of(context).hole_locked,
-        ),
-
-      if (postElement.frozen == true)
-        LeadingChip(
-          color: Theme.of(context).colorScheme.primary,
-          label: S.of(context).hole_frozen,
-        ),
-    ];
+    final chips = generateChipWidgets(context, postElement, null, isPinned);
 
     return Card(
       color: translucent
@@ -447,71 +467,12 @@ class OTFloorWidget extends StatelessWidget {
                         const SizedBox(
                           width: 4,
                         ),
-                        if (floor.deleted == true) ...[
-                          const SizedBox(width: 4),
-                          LeadingChip(
-                            color: Theme.of(context).colorScheme.primary,
-                            label: S.of(context).deleted,
-                          ),
-                        ],
-                        if (floor.special_tag?.isNotEmpty == true) ...[
-                          const SizedBox(width: 4),
-                          LeadingChip(
-                            color: Colors.red,
-                            label: floor.special_tag!,
-                          ),
-                        ],
-                        // We will only show the hidden tag if this hole is hidden
-                        // and this floor is the first floor.
-                        if (parentHole?.hidden == true &&
-                            floor.floor_id ==
-                                parentHole?.floors?.first_floor?.floor_id) ...[
-                          const SizedBox(width: 4),
-                          LeadingChip(
-                            color: Colors.red,
-                            label: S.of(context).hole_hidden,
-                          ),
-                        ],
-                        // Ditto.
-                        if (parentHole?.isForceDeleted == true &&
-                            floor.floor_id ==
-                                parentHole?.floors?.first_floor?.floor_id) ...[
-                          const SizedBox(width: 4),
-                          LeadingChip(
-                            color: Colors.red,
-                            label: S.of(context).hole_force_deleted,
-                          ),
-                        ],
-                        // Show locked tag if the hole is locked and this is the first floor
-                        if (parentHole?.locked == true &&
-                            floor.floor_id ==
-                                parentHole?.floors?.first_floor?.floor_id) ...[
-                          const SizedBox(width: 4),
-                          LeadingChip(
-                            color: Theme.of(context).colorScheme.primary,
-                            label: S.of(context).hole_locked,
-                          ),
-                        ],
-                        // Show frozen tag if the hole is frozen and this is the first floor
-                        if (parentHole?.frozen == true &&
-                            floor.floor_id ==
-                                parentHole?.floors?.first_floor?.floor_id) ...[
-                          const SizedBox(width: 4),
-                          LeadingChip(
-                            color: Theme.of(context).colorScheme.primary,
-                            label: S.of(context).hole_frozen,
-                          ),
-                        ],
-                        // Show pinned tag if this hole is in the pinned list and this is the first floor
-                        if (isPinned &&
-                            floor.floor_id ==
-                                parentHole?.floors?.first_floor?.floor_id) ...[
-                          const SizedBox(width: 4),
-                          LeadingChip(
-                            color: Theme.of(context).colorScheme.primary,
-                            label: S.of(context).pinned,
-                          ),
-                        ],
+                        ...generateChipWidgets(
+                          context,
+                          parentHole,
+                          floor,
+                          isPinned,
+                        ).expand((chip) => [const SizedBox(width: 4), chip]),
                       ],
                     ),
                   ),
