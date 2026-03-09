@@ -94,6 +94,7 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
     direction: Axis.horizontal,
     spacing: 4,
     runSpacing: 4,
+    crossAxisAlignment: WrapCrossAlignment.center,
     children: tags,
   );
 }
@@ -218,11 +219,10 @@ class OTHoleWidget extends StatelessWidget {
                             child: Wrap(
                               direction: Axis.horizontal,
                               alignment: WrapAlignment.end,
+                              spacing: 4,
+                              runSpacing: 4,
                               crossAxisAlignment: WrapCrossAlignment.center,
-                              children: chips.expandIndexed((index, chip) => [
-                                if (index != 0) const SizedBox(width: 4),
-                                chip,
-                              ]).toList(growable: false),
+                              children: chips,
                             ),
                           ),
                         ]),
@@ -448,31 +448,29 @@ class OTFloorWidget extends StatelessWidget {
                   Expanded(
                     child: Wrap(
                       direction: Axis.horizontal,
+                      spacing: 4,
+                      runSpacing: 4,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         ColoredBox(
                             color: nameColor,
                             child: const SizedBox(width: 2, height: 12)),
-                        const SizedBox(width: 8),
+                        const SizedBox(),
                         if (floor.anonyname ==
-                            parentHole?.floors?.first_floor?.anonyname) ...[
+                            parentHole?.floors?.first_floor?.anonyname)
                           LeadingChip(color: nameColor),
-                          const SizedBox(width: 4),
-                        ],
                         Text(
                           floor.anonyname!,
                           style: TextStyle(
                               fontWeight: FontWeight.bold, color: nameColor),
                         ),
-                        const SizedBox(
-                          width: 4,
-                        ),
+                        const SizedBox(),
                         ...generateChipWidgets(
                           context,
                           parentHole,
                           floor,
                           isPinned,
-                        ).expand((chip) => [const SizedBox(width: 4), chip]),
+                        ),
                       ],
                     ),
                   ),
