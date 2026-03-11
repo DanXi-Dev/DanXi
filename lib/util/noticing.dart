@@ -179,7 +179,7 @@ class Noticing {
                           foregroundColor:
                               WidgetStateProperty.all<Color>(Colors.red))
                       : null),
-              child: PlatformText(confirmText ?? S.of(context).i_see),
+              child: PlatformText(confirmText ?? S.of(context).ok),
               onPressed: () => Navigator.pop(context, controller.text)),
         ],
       ),
