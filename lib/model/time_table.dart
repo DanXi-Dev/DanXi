@@ -319,15 +319,25 @@ class Course {
       ..times = courseTimes;
   }
 
-  Course copy() {
+  Course copyWith({
+    List<String>? teacherNames,
+    String? courseId,
+    String? courseName,
+    String? roomId,
+    String? roomName,
+    List<int>? availableWeeks,
+    List<CourseTime>? times,
+  }) {
     return Course()
-      ..teacherNames = teacherNames
-      ..courseId = courseId
-      ..courseName = courseName
-      ..roomId = roomId
-      ..roomName = roomName
-      ..availableWeeks = availableWeeks
-      ..times = times;
+      ..teacherNames = (teacherNames ?? this.teacherNames)?.toList()
+      ..courseId = courseId ?? this.courseId
+      ..courseName = courseName ?? this.courseName
+      ..roomId = roomId ?? this.roomId
+      ..roomName = roomName ?? this.roomName
+      ..availableWeeks = (availableWeeks ?? this.availableWeeks)?.toList()
+      ..times = (times ?? this.times)
+          ?.map((element) => CourseTime(element.weekDay, element.slot))
+          .toList();
   }
 
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);

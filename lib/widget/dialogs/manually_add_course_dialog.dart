@@ -37,7 +37,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
   void initState() {
     super.initState();
 
-    newCourse = widget.initialCourse?.copy() ?? Course();
+    newCourse = widget.initialCourse?.copyWith() ?? Course();
     newCourse.times ??= [];
 
     courseNameController = TextEditingController(text: newCourse.courseName);
