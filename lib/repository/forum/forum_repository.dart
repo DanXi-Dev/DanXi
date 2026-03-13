@@ -294,10 +294,15 @@ class ForumRepository extends BaseRepositoryWithDio {
     return provider.divisionCache.isNotEmpty ? provider.divisionCache : null;
   }
 
-  List<OTHole> getPinned(int divisionId) {
+  List<OTHole> getPinned(DivisionIdentifier division) {
+    // No API for pinned holes on homepage yet
+    if (division is! DivisionId){
+      return [];
+    }
+
     try {
       return provider.divisionCache
-              .firstWhere((element) => element.division_id == divisionId)
+              .firstWhere((element) => element.division_id == division.id)
               .pinned ??
           [];
     } catch (ignored) {
@@ -307,12 +312,13 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   List<OTDivision> getDivisions() => provider.divisionCache;
 
-  Future<OTDivision?> loadSpecificDivision(int divisionId,
+  Future<OTDivision?> loadSpecificDivision(DivisionIdentifier division,
       {bool useCache = true}) async {
-    if (divisionId == OTDivision.HOME_PAGE_DIVISION_ID) {
-      return OTDivision(OTDivision.HOME_PAGE_DIVISION_ID, null, null, null);
+    if (division is! DivisionId) {
+      return null;
     }
-
+    
+    int divisionId = division.id;
     if (useCache) {
       try {
         final OTDivision cached = provider.divisionCache
@@ -334,14 +340,14 @@ class ForumRepository extends BaseRepositoryWithDio {
     return newDivision;
   }
 
-  Future<List<OTHole>?> loadHoles(DateTime startTime, int? divisionId,
+  Future<List<OTHole>?> loadHoles(DateTime startTime, DivisionIdentifier division,
       {int length = Constant.POST_COUNT_PER_PAGE,
       String? tag,
       SortOrder? sortOrder}) async {
     sortOrder ??= SortOrder.LAST_REPLIED;
 
     RequestOptions options;
-    if (divisionId == OTDivision.HOME_PAGE_DIVISION_ID) {
+    if (division is Homepage) {
       options = RequestOptions(
           path: "$_BASE_URL/holes/_homepage",
           method: "GET",
@@ -352,18 +358,22 @@ class ForumRepository extends BaseRepositoryWithDio {
             "order": sortOrder.getInternalString()
           },
           headers: _tokenHeader);
-    } else {
+    } else if (division is DivisionId) {
+      int divisionId = division.id;
       options = RequestOptions(
           path: "$_BASE_URL/holes",
           method: "GET",
           queryParameters: {
             "start_time": startTime.toUtc().toIso8601String(),
-            "division_id": divisionId ?? 0, // 0 = don't filter by division
+            "division_id": divisionId,
             "length": length,
             "tag": tag,
             "order": sortOrder.getInternalString()
           },
           headers: _tokenHeader);
+    } else {
+      // Unknown division identifier
+      return null;
     }
 
     final Response<List<dynamic>> response =

@@ -140,7 +140,7 @@ class OTTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     // Note: these strings can be (and should be) localized. 
     // But since other division names are not localized (yet), we leave them hardcoded for now. 
-    OTDivision homepageDivision = OTDivision(OTDivision.HOME_PAGE_DIVISION_ID, "主页", "展示所有板块", null);
+    OTDivision homepageDivision = OTDivision(null, "主页", "展示所有板块", null);
 
     List<OTDivision> divisions =
         [homepageDivision, ...context.select<ForumProvider, List<OTDivision>>(
@@ -162,10 +162,15 @@ class OTTitle extends StatelessWidget {
           singleChoice: true,
           defaultChoice: currentIndex,
           onChoice: (Tag tag, list) {
-            division =
+            if (tag.tagTitle == homepageDivision.name) {
+              division = homepageDivision;
+              context.read<ForumProvider>().currentDivisionId = Homepage();
+            } else {
+              division =
                 divisions.firstWhere((element) => element.name == tag.tagTitle);
             context.read<ForumProvider>().currentDivisionId =
-                division?.division_id;
+                DivisionId(division!.division_id!);
+            }
             ChangeDivisionEvent(division!).fire();
           },
           tagList: divisions
@@ -357,8 +362,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
       TimeBasedLoadAdaptLayer(Constant.POST_COUNT_PER_PAGE, 1);
 
   /// Fields related to the display states.
-  static int getDivisionId(BuildContext context) =>
-      context.read<ForumProvider>().currentDivision?.division_id ?? OTDivision.HOME_PAGE_DIVISION_ID;
+  static DivisionIdentifier getDivisionId(BuildContext context) =>
+      context.read<ForumProvider>().currentDivisionId ?? Homepage();
 
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
       context.read<ForumProvider>().userInfo?.config?.show_folded);
@@ -374,8 +379,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     // If no token, NotLoginError will be thrown.
     if (!context.read<ForumProvider>().isUserInitialized) {
       await ForumRepository.getInstance().initializeRepo();
-      context.read<ForumProvider>().currentDivisionId =
-          OTDivision.HOME_PAGE_DIVISION_ID;
+      context.read<ForumProvider>().currentDivisionId = Homepage();
     }
 
     bool answered =
@@ -433,7 +437,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           final requestDivisionId =
               _tagFilter == null ? getDivisionId(context) : null;
           return ForumRepository.getInstance().loadHoles(
-              time, requestDivisionId,
+              time, requestDivisionId!,
               tag: _tagFilter,
               sortOrder: context.read<SettingsProvider>().forumSortOrder);
         }).call(page);
@@ -492,8 +496,13 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   }
 
   Widget _autoSilenceNotice() {
+    final division = getDivisionId(context);
+    if (division is! DivisionId) {
+      return const SizedBox();
+    }
+
     final DateTime? silenceDate = ForumRepository.getInstance()
-        .getSilenceDateForDivision(getDivisionId(context))
+        .getSilenceDateForDivision(division.id)
         ?.toLocal();
     if (silenceDate == null || silenceDate.isBefore(DateTime.now())) {
       return const SizedBox();

@@ -46,19 +46,22 @@ class ForumProvider with ChangeNotifier {
   final Map<String?, CourseReviewEditorText> courseReviewEditorCache = {};
 
   /// The current division id;
-  int? divisionId;
+  DivisionIdentifier? _currentDivision;
 
   OTDivision? get currentDivision {
-    if (divisionId == OTDivision.HOME_PAGE_DIVISION_ID) {
-      return OTDivision(OTDivision.HOME_PAGE_DIVISION_ID, null, null, null);
+    if (_currentDivision is! DivisionId) {
+      return null;
     }
 
+    int divisionId = (_currentDivision as DivisionId).id;
     return _divisionCache
       .firstWhereOrNull((element) => element.division_id == divisionId);
   } 
 
-  set currentDivisionId(int? divisionId) {
-    this.divisionId = divisionId;
+  DivisionIdentifier? get currentDivisionId => _currentDivision;
+
+  set currentDivisionId(DivisionIdentifier? division) {
+    _currentDivision = division;
     notifyListeners();
   }
 

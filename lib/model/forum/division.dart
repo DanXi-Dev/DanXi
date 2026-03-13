@@ -22,6 +22,17 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'division.g.dart';
 
+sealed class DivisionIdentifier {}
+
+class Homepage extends DivisionIdentifier {
+  Homepage();
+}
+
+class DivisionId extends DivisionIdentifier {
+  int id;
+  DivisionId(this.id);
+}
+
 @JsonSerializable()
 class OTDivision {
   int? division_id;
@@ -45,8 +56,4 @@ class OTDivision {
 
   @override
   int get hashCode => division_id!;
-
-  // A special division id `9999` is used to represent the home page.
-  // This is not the most elegant solution, but the simplest. 
-  static const int HOME_PAGE_DIVISION_ID = 9999;
 }

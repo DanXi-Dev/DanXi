@@ -98,12 +98,11 @@ final PostInterceptor _kStopWordInterceptor = (context, text) async {
 class OTEditor {
   static Future<bool> createNewPost(
     BuildContext context,
-    int divisionId, {
+    int? divisionId, {
     OTEditorType? editorType,
     PostInterceptor? interceptor,
   }) async {
     final object = EditorObject(0, EditorObjectType.NEW_POST);
-    final requireDivision = divisionId == OTDivision.HOME_PAGE_DIVISION_ID;
     final PostEditorText? content = await _showEditor(
       context,
       S.of(context).new_post,
@@ -111,7 +110,7 @@ class OTEditor {
       editorType: editorType,
       object: object,
       // If the editor is called from homepage, then we have the user select a division here in editor.
-      requireDivision: requireDivision,
+      requireDivision: divisionId == null,
       interceptor: _kStopWordInterceptor.mergeWith(interceptor),
     );
 
@@ -119,9 +118,8 @@ class OTEditor {
       return false;
     }
 
-    if (requireDivision && content?.divisionId != null) {
-      divisionId = content!.divisionId!;
-    }
+    // If not specified, then use the value from editor
+    divisionId ??= content!.divisionId!;
 
     ProgressFuture progressDialog = showProgressDialog(
       loadingText: S.of(context).posting,
@@ -129,7 +127,7 @@ class OTEditor {
     );
     try {
       await ForumRepository.getInstance().newHole(
-        divisionId,
+        divisionId!,
         content!.text,
         tags: content.tags,
       );
