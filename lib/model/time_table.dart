@@ -323,6 +323,17 @@ class Course {
       ..times = courseTimes;
   }
 
+  Course copy() {
+    return Course()
+      ..teacherNames = teacherNames
+      ..courseId = courseId
+      ..courseName = courseName
+      ..roomId = roomId
+      ..roomName = roomName
+      ..availableWeeks = availableWeeks
+      ..times = times;
+  }
+
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseToJson(this);

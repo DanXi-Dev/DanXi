@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/time_table.dart';
@@ -10,9 +11,14 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
 class ManuallyAddCourseDialog extends StatefulWidget {
-  const ManuallyAddCourseDialog(this.courseAvailableList, {super.key});
+  const ManuallyAddCourseDialog(
+    this.courseAvailableList, {
+    super.key,
+    this.initialCourse,
+  });
 
   final List<int> courseAvailableList;
+  final Course? initialCourse;
 
   @override
   State<ManuallyAddCourseDialog> createState() =>
@@ -20,13 +26,39 @@ class ManuallyAddCourseDialog extends StatefulWidget {
 }
 
 class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
-  Course newCourse = Course()..times = [];
+  late Course newCourse;
   List<Widget> selectedCourseTimeInfo = [];
 
-  TextEditingController courseNameController = TextEditingController();
-  TextEditingController courseIdController = TextEditingController();
-  TextEditingController courseRoomNameController = TextEditingController();
-  TextEditingController courseTeacherNameController = TextEditingController();
+  late TextEditingController courseNameController;
+  late TextEditingController courseIdController;
+  late TextEditingController courseRoomNameController;
+  late TextEditingController courseTeacherNameController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    newCourse = widget.initialCourse?.copy() ?? Course();
+    newCourse.times ??= [];
+
+    courseNameController = TextEditingController(text: newCourse.courseName);
+    courseIdController = TextEditingController(text: newCourse.courseId);
+    courseRoomNameController = TextEditingController(text: newCourse.roomName);
+    courseTeacherNameController = TextEditingController(
+        text: _teacherNamesToString(newCourse.teacherNames),
+    );
+
+    final times = newCourse.times;
+    if (times != null) {
+      times.groupListsBy((time) => time.weekDay).forEach(_addCourseTimeInfo);
+    }
+
+    final availableWeeks = newCourse.availableWeeks;
+    if (availableWeeks != null) {
+      widget.courseAvailableList.clear();
+      widget.courseAvailableList.addAll(availableWeeks);
+    }
+  }
 
   Course newCourseListGenerator(
       TextEditingController courseNameController,
@@ -38,7 +70,9 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
     newCourse.courseName = courseNameController.text;
     newCourse.courseId = courseIdController.text;
     newCourse.roomId = Course.MANUALLY_ADDED_ROOM_ID;
-    newCourse.teacherNames = courseTeacherNameController.text.split(" ");
+    newCourse.teacherNames = _teacherNamesFromString(
+      courseTeacherNameController.text,
+    );
     newCourse.availableWeeks = courseAvailableList;
     newCourse.roomName = courseRoomNameController.text;
 
@@ -50,11 +84,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
         context: context, builder: (context) => const AddCourseDialogSub());
     if (courseTime != null) {
       newCourse.times!.addAll(courseTime);
-      selectedCourseTimeInfo.add(
-        ListTile(
-            title: Text(
-                "${Constant.WeekDays[courseTime[0].weekDay]} ${slotsOfADayGenerator(courseTime)}")),
-      );
+      _addCourseTimeInfo(courseTime[0].weekDay, courseTime);
       setState(() {});
     }
   }
@@ -234,6 +264,24 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
               }
             }),
       ],
+    );
+  }
+
+  String? _teacherNamesToString(List<String>? teacherNames) {
+    return teacherNames?.join(" ");
+  }
+
+  List<String>? _teacherNamesFromString(String? text) {
+    return text?.split(" ");
+  }
+
+  void _addCourseTimeInfo(int weekDay, List<CourseTime> times) {
+    selectedCourseTimeInfo.add(
+      ListTile(
+        title: Text(
+          "${Constant.WeekDays[weekDay]} ${slotsOfADayGenerator(times)}",
+        ),
+      ),
     );
   }
 }
