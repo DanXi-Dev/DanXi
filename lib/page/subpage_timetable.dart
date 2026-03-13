@@ -479,7 +479,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                     Text(event.course.courseId!),
                 ],
               )),
-              if (event.course.roomId == "999999") ...[
+              if (event.course.isManuallyAdded) ...[
                 PlatformIconButton(
                   icon: Icon(PlatformX.isMaterial(context)
                       ? Icons.delete

@@ -25,7 +25,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
 
   TextEditingController courseNameController = TextEditingController();
   TextEditingController courseIdController = TextEditingController();
-  TextEditingController courseRoomIdController = TextEditingController();
+  TextEditingController courseRoomNameController = TextEditingController();
   TextEditingController courseTeacherNameController = TextEditingController();
 
   Course newCourseListGenerator(
@@ -37,7 +37,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
       Course newCourse) {
     newCourse.courseName = courseNameController.text;
     newCourse.courseId = courseIdController.text;
-    newCourse.roomId = "999999";
+    newCourse.roomId = Course.MANUALLY_ADDED_ROOM_ID;
     newCourse.teacherNames = courseTeacherNameController.text.split(" ");
     newCourse.availableWeeks = courseAvailableList;
     newCourse.roomName = courseRoomNameController.text;
@@ -71,7 +71,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
   void dispose() {
     courseNameController.dispose();
     courseIdController.dispose();
-    courseRoomIdController.dispose();
+    courseRoomNameController.dispose();
     courseTeacherNameController.dispose();
     super.dispose();
   }
@@ -106,7 +106,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
             ),
             if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
             TextField(
-              controller: courseRoomIdController,
+              controller: courseRoomNameController,
               keyboardType: TextInputType.text,
               decoration: InputDecoration(
                   labelText: S.of(context).course_room_name,
@@ -227,7 +227,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                     newCourseListGenerator(
                         courseNameController,
                         courseIdController,
-                        courseRoomIdController,
+                        courseRoomNameController,
                         courseTeacherNameController,
                         widget.courseAvailableList,
                         newCourse));
