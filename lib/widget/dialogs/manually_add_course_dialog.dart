@@ -279,7 +279,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
     selectedCourseTimeInfo.add(
       ListTile(
         title: Text(
-          "${Constant.WeekDays[weekDay]} ${slotsOfADayGenerator(times)}",
+          "${Constant.weekDay(weekDay)} ${slotsOfADayGenerator(times)}",
         ),
       ),
     );

@@ -59,7 +59,7 @@ class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
                                   ? Icons.done
                                   : CupertinoIcons.checkmark_alt)
                               : Text(
-                                  Constant.WeekDays[e],
+                                  Constant.weekDay(e),
                                   style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w900),

@@ -81,10 +81,6 @@ class TimeTable {
     return startDate ?? Constant.DEFAULT_SEMESTER_START_DATE;
   }
 
-  /// A Monday.
-  ///
-  /// It is randomly selected, without special meaning. You can use any Monday to replace it.
-  static final DateTime kMonday = DateTime(2021, 3, 22);
   static const int MINUTES_OF_COURSE = 45;
   static const int MAX_WEEK = 18;
 
@@ -246,7 +242,7 @@ class TimeTable {
           (compact == TableDisplayType.STANDARD && i <= DateTime.friday - 1) ||
           table[i]!.isNotEmpty) {
         result.add(DayEvents(
-            day: DateFormat.E().format(kMonday.add(Duration(days: i))),
+            day: Constant.weekDay(i),
             events: table[i]!,
             weekday: i));
       }
