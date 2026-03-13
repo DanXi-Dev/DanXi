@@ -42,7 +42,7 @@ class AnnouncementRepository {
 
   /// Get cached HTTP client with lazy initialization
   Dio get _httpClient {
-    _dio ??= DioUtils.newDioWithProxy();
+    _dio ??= DioUtils.newDioWithProxy(track: true);
     return _dio!;
   }
 
