@@ -85,22 +85,22 @@ class TimeTable {
   static const int MAX_WEEK = 18;
 
   /// The start time of each slot in a day.
-  static final List<VagueTime> kCourseSlotStartTime = [
-    const VagueTime(hour: 8, minute: 0),
-    const VagueTime(hour: 8, minute: 55),
-    const VagueTime(hour: 9, minute: 55),
-    const VagueTime(hour: 10, minute: 50),
-    const VagueTime(hour: 11, minute: 45),
-    const VagueTime(hour: 13, minute: 30),
-    const VagueTime(hour: 14, minute: 25),
-    const VagueTime(hour: 15, minute: 25),
-    const VagueTime(hour: 16, minute: 20),
-    const VagueTime(hour: 17, minute: 15),
-    const VagueTime(hour: 18, minute: 30),
-    const VagueTime(hour: 19, minute: 25),
-    const VagueTime(hour: 20, minute: 20),
-    const VagueTime(hour: 21, minute: 15),
-    const VagueTime(hour: 22, minute: 10),
+  static final List<VagueTime> kCourseSlotStartTime = const [
+    VagueTime(hour: 8, minute: 0),
+    VagueTime(hour: 8, minute: 55),
+    VagueTime(hour: 9, minute: 55),
+    VagueTime(hour: 10, minute: 50),
+    VagueTime(hour: 11, minute: 45),
+    VagueTime(hour: 13, minute: 30),
+    VagueTime(hour: 14, minute: 25),
+    VagueTime(hour: 15, minute: 25),
+    VagueTime(hour: 16, minute: 20),
+    VagueTime(hour: 17, minute: 15),
+    VagueTime(hour: 18, minute: 30),
+    VagueTime(hour: 19, minute: 25),
+    VagueTime(hour: 20, minute: 20),
+    VagueTime(hour: 21, minute: 15),
+    VagueTime(hour: 22, minute: 10),
   ];
 
   /// All courses in the timetable.
@@ -338,7 +338,7 @@ class Course {
 }
 
 @JsonSerializable()
-class CourseTime {
+class CourseTime implements Comparable<CourseTime> {
   //Monday is 0, Morning lesson is 0
   int weekDay, slot;
 
@@ -348,6 +348,15 @@ class CourseTime {
       _$CourseTimeFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseTimeToJson(this);
+
+  @override
+  int compareTo(CourseTime other) {
+    var result = weekDay.compareTo(other.weekDay);
+    if (result == 0) {
+      result = slot.compareTo(other.slot);
+    }
+    return result;
+  }
 }
 
 /// Representation of the [slot]-th lesson on the [weekday]-th day of week in the [week]-th weeks of this semester.

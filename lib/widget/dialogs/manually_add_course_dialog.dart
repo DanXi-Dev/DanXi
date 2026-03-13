@@ -27,7 +27,6 @@ class ManuallyAddCourseDialog extends StatefulWidget {
 
 class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
   late Course newCourse;
-  List<Widget> selectedCourseTimeInfo = [];
 
   late TextEditingController courseNameController;
   late TextEditingController courseIdController;
@@ -45,13 +44,8 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
     courseIdController = TextEditingController(text: newCourse.courseId);
     courseRoomNameController = TextEditingController(text: newCourse.roomName);
     courseTeacherNameController = TextEditingController(
-        text: _teacherNamesToString(newCourse.teacherNames),
+          text: _teacherNamesToString(newCourse.teacherNames),
     );
-
-    final times = newCourse.times;
-    if (times != null) {
-      times.groupListsBy((time) => time.weekDay).forEach(_addCourseTimeInfo);
-    }
 
     final availableWeeks = newCourse.availableWeeks;
     if (availableWeeks != null) {
@@ -83,18 +77,15 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
     List<CourseTime>? courseTime = await showPlatformDialog<List<CourseTime>>(
         context: context, builder: (context) => const AddCourseDialogSub());
     if (courseTime != null) {
-      newCourse.times!.addAll(courseTime);
-      _addCourseTimeInfo(courseTime[0].weekDay, courseTime);
-      setState(() {});
+      setState(() {
+        newCourse.times = (newCourse.times!.toSet()..addAll(courseTime))
+            .sorted();
+      });
     }
   }
 
   String slotsOfADayGenerator(List<CourseTime> courseTime) {
-    List<String>? outCome = [];
-    for (var element in courseTime) {
-      outCome.add((element.slot + 1).toString());
-    }
-    return outCome.join(",");
+    return courseTime.map((element) => element.slot + 1).join(",");
   }
 
   @override
@@ -217,9 +208,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
               ),
               autofocus: false,
             ),
-            Column(
-              children: selectedCourseTimeInfo,
-            ),
+            Column(children: _buildCourseTimeTiles(newCourse.times!)),
             PlatformX.isMaterial(context)
                 ? ElevatedButton(
                     onPressed: onButtonPressed,
@@ -275,13 +264,35 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
     return text?.split(" ");
   }
 
-  void _addCourseTimeInfo(int weekDay, List<CourseTime> times) {
-    selectedCourseTimeInfo.add(
-      ListTile(
-        title: Text(
-          "${Constant.weekDay(weekDay)} ${slotsOfADayGenerator(times)}",
-        ),
-      ),
-    );
+  List<Widget> _buildCourseTimeTiles(List<CourseTime> times) {
+    return times
+        .groupListsBy((time) => time.weekDay)
+        .entries
+        .map((entry) {
+          final weekDay = entry.key;
+          final times = entry.value;
+          return Dismissible(
+            key: ValueKey(weekDay),
+            child: ListTile(
+              title: Text(
+                "${Constant.weekDay(weekDay)} ${slotsOfADayGenerator(times)}",
+              ),
+              trailing: IconButton(
+                onPressed: () => setState(() => _removeCourseTimeTile(weekDay)),
+                icon: Icon(
+                  PlatformX.isMaterial(context)
+                      ? Icons.delete_outline
+                      : CupertinoIcons.delete,
+                ),
+              ),
+            ),
+            onDismissed: (_) => setState(() => _removeCourseTimeTile(weekDay)),
+          );
+        })
+        .toList(growable: false);
+  }
+
+  void _removeCourseTimeTile(int weekDay) {
+    newCourse.times!.removeWhere((time) => time.weekDay == weekDay);
   }
 }

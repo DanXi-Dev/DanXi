@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -18,20 +19,23 @@ class AddCourseDialogSub extends StatefulWidget {
 
 class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
   int selectedWeekDay = 0;
-  List<bool> selectedSlots = List.generate(15, (index) => false);
+  final selectedSlots = List.filled(
+    TimeTable.kCourseSlotStartTime.length,
+    false,
+  );
   List<CourseTime>? newCourseTime;
 
   List<CourseTime>? newCourseTimeGenerator(
-      int selectedWeekDay, List<bool> selectedSlots) {
-    List<CourseTime>? newCourseTime = [];
-    int index = 0;
-    for (var element in selectedSlots) {
-      if (element == true) {
-        newCourseTime.add(CourseTime(selectedWeekDay, index));
-      }
-      index++;
-    }
-    return newCourseTime;
+    int selectedWeekDay,
+    List<bool> selectedSlots,
+  ) {
+    return selectedSlots
+        .mapIndexed(
+          (index, selected) =>
+              selected ? CourseTime(selectedWeekDay, index) : null,
+        )
+        .nonNulls
+        .toList(growable: false);
   }
 
   @override
