@@ -120,11 +120,38 @@ class DioUtils {
     return true;
   }
 
+  static final List<WeakReference<Dio>> _trackedDioList = [];
+
   /// Create a new [Dio] instance with the proxy set to the one in [SettingsProvider].
-  static Dio newDioWithProxy([BaseOptions? options]) {
+  ///
+  /// If [track] is true, the instance will be tracked and updated when
+  /// [applyProxyToAllTracked] is called.
+  static Dio newDioWithProxy({BaseOptions? options, bool track = false}) {
     Dio dio = Dio(options);
-    setProxy(dio, SettingsProvider.getInstance().proxy);
+    final proxy = SettingsProvider.getInstance().proxy;
+    setProxy(dio, proxy);
+    if (track) {
+      _trackedDioList.add(WeakReference(dio));
+    }
     return dio;
+  }
+
+  static String? _lastAppliedProxy = "";
+
+  /// Apply the [proxy] to all tracked [Dio] instances.
+  static void applyProxyToAllTracked(String? proxy) {
+    if (proxy == _lastAppliedProxy) {
+      return;
+    }
+    _trackedDioList.removeWhere((ref) {
+      final dio = ref.target;
+      if (dio == null) {
+        return true;
+      }
+      setProxy(dio, proxy);
+      return false;
+    });
+    _lastAppliedProxy = proxy;
   }
 
   /// Fetch with the [options], but when T is JSON-like and the response is not,

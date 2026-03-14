@@ -56,8 +56,9 @@ import 'package:share_plus/share_plus.dart';
 class ImageViewerPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
   @protected
-  final Dio dio =
-      DioUtils.newDioWithProxy(BaseOptions(responseType: ResponseType.bytes));
+  final Dio dio = DioUtils.newDioWithProxy(
+    options: BaseOptions(responseType: ResponseType.bytes),
+  );
 
   static const List<String> IMAGE_SUFFIX = [
     '.jpg',

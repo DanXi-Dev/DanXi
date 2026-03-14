@@ -58,9 +58,12 @@ class EmptyClassroomRepository extends BaseRepositoryWithDio {
   }
 
   /// Dio instance that does not use WebVPN proxy to check LAN connection.
-  Dio directDio = DioUtils.newDioWithProxy(BaseOptions(
+  Dio directDio = DioUtils.newDioWithProxy(
+    options: BaseOptions(
       connectTimeout: const Duration(seconds: 3),
-      receiveTimeout: const Duration(seconds: 3)));
+      receiveTimeout: const Duration(seconds: 3),
+    )
+  );
 
   static final _instance = EmptyClassroomRepository._();
 

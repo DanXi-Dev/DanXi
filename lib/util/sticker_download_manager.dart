@@ -46,7 +46,7 @@ Future<String> stickerFilePath(Ref ref, String stickerId) async {
   return path;
 }
 
-final _dio = DioUtils.newDioWithProxy();
+final _dio = DioUtils.newDioWithProxy(track: true);
 
 Future<void> _performDownload(RemoteSticker sticker) async {
   final response = await _dio.get<Uint8List>(

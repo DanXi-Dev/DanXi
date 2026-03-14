@@ -122,7 +122,7 @@ class WebVPNInterceptor extends Interceptor {
         receiveTimeout: const Duration(seconds: 1),
         sendTimeout: const Duration(seconds: 1));
     // A low-timeout dio
-    Dio fastDio = DioUtils.newDioWithProxy(dioOptions);
+    Dio fastDio = DioUtils.newDioWithProxy(options: dioOptions);
 
     try {
       await fastDio.get(DIRECT_CONNECT_TEST_URL);

@@ -33,7 +33,7 @@ import 'package:flutter/cupertino.dart';
 /// * [JWToken]
 /// * [ForumProvider]
 class JWTInterceptor extends QueuedInterceptor {
-  final Dio _dio = DioUtils.newDioWithProxy();
+  final Dio _dio = DioUtils.newDioWithProxy(track: true);
   final String refreshUrl;
   final Function tokenGetter;
   final Function? tokenSetter;
