@@ -344,14 +344,10 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                 return courseList;
               }
               final newCourseList = courseList.toList();
-              final index = newCourseList.indexWhere(
-                (course) => course.courseId == newCourse.courseId,
+              newCourseList.removeWhere(
+                (course) => course.courseId == event.course.courseId,
               );
-              if (index == -1) {
-                newCourseList.add(newCourse);
-              } else {
-                newCourseList[index] = newCourse;
-              }
+              newCourseList.add(newCourse);
               SettingsProvider.getInstance().manualAddedCourses = newCourseList;
               return newCourseList;
             });
