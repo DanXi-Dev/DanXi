@@ -75,11 +75,13 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
   }
 
   void onButtonPressed() async {
-    List<CourseTime>? courseTime = await showPlatformDialog<List<CourseTime>>(
-        context: context, builder: (context) => const AddCourseDialogSub());
-    if (courseTime != null) {
+    final courseTimes = await showPlatformDialog<List<CourseTime>>(
+      context: context,
+      builder: (context) => const _SelectSlotsDialog(),
+    );
+    if (courseTimes != null) {
       setState(() {
-        newCourse.times = (newCourse.times!.toSet()..addAll(courseTime))
+        newCourse.times = (newCourse.times!.toSet()..addAll(courseTimes))
             .sorted();
       });
     }
@@ -291,14 +293,14 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
 }
 
 /// Slots selector for the course.
-class AddCourseDialogSub extends StatefulWidget {
-  const AddCourseDialogSub({super.key});
+class _SelectSlotsDialog extends StatefulWidget {
+  const _SelectSlotsDialog();
 
   @override
-  State<AddCourseDialogSub> createState() => _AddCourseDialogSubState();
+  State<_SelectSlotsDialog> createState() => _SelectSlotsDialogState();
 }
 
-class _AddCourseDialogSubState extends State<AddCourseDialogSub> {
+class _SelectSlotsDialogState extends State<_SelectSlotsDialog> {
   int selectedWeekDay = 0;
   final selectedSlots = List.filled(
     TimeTable.kCourseSlotStartTime.length,
