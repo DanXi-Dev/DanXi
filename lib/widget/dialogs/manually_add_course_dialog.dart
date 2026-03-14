@@ -44,7 +44,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
     courseIdController = TextEditingController(text: newCourse.courseId);
     courseRoomNameController = TextEditingController(text: newCourse.roomName);
     courseTeacherNameController = TextEditingController(
-          text: _teacherNamesToString(newCourse.teacherNames),
+      text: newCourse.teacherNames?.join(" "),
     );
 
     final availableWeeks = newCourse.availableWeeks;
@@ -53,6 +53,8 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
       widget.courseAvailableList.addAll(availableWeeks);
     }
   }
+
+  static final _blanksRegex = RegExp(r"\s+");
 
   Course newCourseListGenerator(
       TextEditingController courseNameController,
@@ -64,8 +66,8 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
     newCourse.courseName = courseNameController.text;
     newCourse.courseId = courseIdController.text;
     newCourse.roomId = Course.MANUALLY_ADDED_ROOM_ID;
-    newCourse.teacherNames = _teacherNamesFromString(
-      courseTeacherNameController.text,
+    newCourse.teacherNames = courseTeacherNameController.text.trim().split(
+      _blanksRegex,
     );
     newCourse.availableWeeks = courseAvailableList;
     newCourse.roomName = courseRoomNameController.text;
@@ -254,14 +256,6 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
             }),
       ],
     );
-  }
-
-  String? _teacherNamesToString(List<String>? teacherNames) {
-    return teacherNames?.join(" ");
-  }
-
-  List<String>? _teacherNamesFromString(String? text) {
-    return text?.split(" ");
   }
 
   List<Widget> _buildCourseTimeTiles(List<CourseTime> times) {
