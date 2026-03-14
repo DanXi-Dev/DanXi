@@ -23,7 +23,6 @@ import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/util/vague_time.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
-import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'time_table.g.dart';
@@ -358,6 +357,17 @@ class CourseTime implements Comparable<CourseTime> {
       _$CourseTimeFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseTimeToJson(this);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CourseTime &&
+          runtimeType == other.runtimeType &&
+          weekDay == other.weekDay &&
+          slot == other.slot;
+
+  @override
+  int get hashCode => Object.hash(weekDay, slot);
 
   @override
   int compareTo(CourseTime other) {
