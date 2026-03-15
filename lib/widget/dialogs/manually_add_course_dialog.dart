@@ -241,7 +241,9 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
             }
             final courses = context.read<SettingsProvider>().manualAddedCourses;
             final conflictingCourse = courses.firstWhereOrNull(
-              (elem) => elem.courseId == courseId,
+              (elem) =>
+                  elem.courseId == courseId &&
+                  elem.courseId != widget.initialCourse?.courseId,
             );
             if (conflictingCourse != null) {
               _showWarningDialog(
