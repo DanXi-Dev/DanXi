@@ -222,8 +222,9 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
       ),
       actions: [
         PlatformDialogAction(
-            child: Text(S.of(context).cancel),
-            onPressed: () => {Navigator.pop(context)}),
+          child: Text(S.of(context).cancel),
+          onPressed: () => Navigator.pop(context),
+        ),
         PlatformDialogAction(
             child: Text(S.of(context).ok),
             onPressed: () {
