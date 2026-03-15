@@ -455,6 +455,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     super.dispose();
     _shareSubscription.cancel();
     _addCourseSubscription.cancel();
+    _editCourseSubscription.cancel();
   }
 
   @override
