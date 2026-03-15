@@ -4,6 +4,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -53,8 +54,6 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
     }
   }
 
-  static final _blanksRegex = RegExp(r"\s+");
-
   Course newCourseListGenerator(
       TextEditingController courseNameController,
       TextEditingController courseIdController,
@@ -65,9 +64,8 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
     newCourse.courseName = courseNameController.text;
     newCourse.courseId = courseIdController.text;
     newCourse.roomId = Course.MANUALLY_ADDED_ROOM_ID;
-    newCourse.teacherNames = courseTeacherNameController.text.trim().split(
-      _blanksRegex,
-    );
+    newCourse.teacherNames = courseTeacherNameController.text
+        .splitByWhitespace();
     newCourse.availableWeeks = courseAvailableList;
     newCourse.roomName = courseRoomNameController.text;
 
