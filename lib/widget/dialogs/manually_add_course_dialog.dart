@@ -225,34 +225,45 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
           onPressed: () => Navigator.pop(context),
         ),
         PlatformDialogAction(
-            child: Text(S.of(context).ok),
-            onPressed: () {
-              if (widget.courseAvailableList.isEmpty ||
-                  newCourse.times!.isEmpty) {
-                showPlatformDialog(
-                    context: context,
-                    builder: (BuildContext context) => PlatformAlertDialog(
-                          title: Text(S.of(context).warning),
-                          content: Text(S.of(context).invalid_course_info),
-                          actions: [
-                            PlatformDialogAction(
-                              child: Text(S.of(context).ok),
-                              onPressed: () => Navigator.pop(context),
-                            )
-                          ],
-                        ));
-              } else {
-                Navigator.pop(
-                    context,
-                    newCourseListGenerator(
-                        courseNameController,
-                        courseIdController,
-                        courseRoomNameController,
-                        courseTeacherNameController,
-                        widget.courseAvailableList,
-                        newCourse));
-              }
-            }),
+          child: Text(S.of(context).ok),
+          onPressed: () {
+            if (widget.courseAvailableList.isEmpty ||
+                newCourse.times!.isEmpty) {
+              _showWarningDialog(S.of(context).invalid_course_info);
+              return;
+            }
+            final courseId = courseIdController.text;
+            if (courseId.trim().isEmpty) {
+              _showWarningDialog(S.of(context).invalid_course_id_empty);
+              return;
+            }
+            final courses = context.read<SettingsProvider>().manualAddedCourses;
+            final conflictingCourse = courses.firstWhereOrNull(
+              (elem) => elem.courseId == courseId,
+            );
+            if (conflictingCourse != null) {
+              _showWarningDialog(
+                S
+                    .of(context)
+                    .invalid_course_id_conflicting(
+                      conflictingCourse.courseName ?? "_no_name_$courseId",
+                    ),
+              );
+              return;
+            }
+            Navigator.pop(
+              context,
+              newCourseListGenerator(
+                courseNameController,
+                courseIdController,
+                courseRoomNameController,
+                courseTeacherNameController,
+                widget.courseAvailableList,
+                newCourse,
+              ),
+            );
+          },
+        ),
       ],
     );
   }
@@ -283,6 +294,22 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
           );
         })
         .toList(growable: false);
+  }
+
+  Future<void> _showWarningDialog(String content) {
+    return showPlatformDialog(
+      context: context,
+      builder: (BuildContext context) => PlatformAlertDialog(
+        title: Text(S.of(context).warning),
+        content: Text(content),
+        actions: [
+          PlatformDialogAction(
+            child: Text(S.of(context).ok),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
+    );
   }
 
   void _removeCourseTimeTile(int weekDay) {

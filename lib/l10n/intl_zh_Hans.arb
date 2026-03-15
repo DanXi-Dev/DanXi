@@ -197,6 +197,8 @@
   "input_your_email": "输入您的邮箱",
   "input_your_email_password": "输入您的旦挞账号/密码",
   "input_your_email_secure_code": "请输入您的邮箱验证码",
+  "invalid_course_id_conflicting": "课程 ID 重复。此 ID 与“{name}”冲突，请输入一唯一 ID",
+  "invalid_course_id_empty": "课程 ID 不能为空且必须唯一",
   "invalid_course_info": "请提供完整的课程时间信息",
   "ivanfei_description": "茶楼前端",
   "japanese_language": "日语",
