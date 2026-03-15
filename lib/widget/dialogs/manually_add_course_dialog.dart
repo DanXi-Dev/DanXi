@@ -49,6 +49,8 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
 
     final availableWeeks = newCourse.availableWeeks;
     if (availableWeeks != null) {
+      // Populate staged course times from the initial course, and drop the old
+      // ones.
       widget.courseAvailableList.clear();
       widget.courseAvailableList.addAll(availableWeeks);
     }
@@ -66,7 +68,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
     newCourse.roomId = Course.MANUALLY_ADDED_ROOM_ID;
     newCourse.teacherNames = courseTeacherNameController.text
         .splitByWhitespace();
-    newCourse.availableWeeks = courseAvailableList;
+    newCourse.availableWeeks = [...courseAvailableList];
     newCourse.roomName = courseRoomNameController.text;
 
     return newCourse;

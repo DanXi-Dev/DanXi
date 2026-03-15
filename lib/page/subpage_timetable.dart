@@ -20,6 +20,7 @@ import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -343,11 +344,12 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
               if (newCourse == null) {
                 return courseList;
               }
-              final newCourseList = courseList.toList();
-              newCourseList.removeWhere(
-                (course) => course.courseId == event.course.courseId,
-              );
-              newCourseList.add(newCourse);
+              final newCourseList = [
+                ...courseList.whereNot(
+                  (course) => course.courseId == event.course.courseId,
+                ),
+                newCourse,
+              ];
               SettingsProvider.getInstance().manualAddedCourses = newCourseList;
               return newCourseList;
             });
