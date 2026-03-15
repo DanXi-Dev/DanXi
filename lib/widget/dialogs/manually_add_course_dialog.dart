@@ -38,7 +38,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
     super.initState();
 
     newCourse = widget.initialCourse?.copyWith() ?? Course();
-    newCourse.times ??= [];
+    newCourse.times = newCourse.times?.toSet().sorted() ?? List.empty();
 
     courseNameController = TextEditingController(text: newCourse.courseName);
     courseIdController = TextEditingController(text: newCourse.courseId);
@@ -79,8 +79,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
     );
     if (courseTimes != null) {
       setState(() {
-        newCourse.times = (newCourse.times!.toSet()..addAll(courseTimes))
-            .sorted();
+        newCourse.times = (newCourse.times! + courseTimes).toSet().sorted();
       });
     }
   }
@@ -287,7 +286,9 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
   }
 
   void _removeCourseTimeTile(int weekDay) {
-    newCourse.times!.removeWhere((time) => time.weekDay == weekDay);
+    newCourse.times = newCourse.times!
+        .whereNot((time) => time.weekDay == weekDay)
+        .toList(growable: false);
   }
 }
 
