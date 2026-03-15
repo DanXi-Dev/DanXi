@@ -304,7 +304,6 @@ class _SelectSlotsDialogState extends State<_SelectSlotsDialog> {
     TimeTable.kCourseSlotStartTime.length,
     false,
   );
-  List<CourseTime>? newCourseTime;
 
   List<CourseTime>? newCourseTimeGenerator(
     int selectedWeekDay,
@@ -325,74 +324,92 @@ class _SelectSlotsDialogState extends State<_SelectSlotsDialog> {
       content: Column(
         children: [
           Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: List.generate(7, (index) => index)
-                  .map((e) => GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedWeekDay = e;
-                          });
-                        },
-                        child: CircleAvatar(
-                          radius: 24.0,
-                          backgroundColor: Color(
-                              context.read<SettingsProvider>().primarySwatch),
-                          foregroundColor: Colors.white,
-                          child: e == selectedWeekDay
-                              ? Icon(PlatformX.isMaterial(context)
-                                  ? Icons.done
-                                  : CupertinoIcons.checkmark_alt)
-                              : Text(
-                                  Constant.weekDay(e),
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w900),
-                                ),
+            spacing: 10,
+            runSpacing: 10,
+            children: List.generate(
+              7,
+              (index) => GestureDetector(
+                onTap: () {
+                  setState(() {
+                    selectedWeekDay = index;
+                  });
+                },
+                child: CircleAvatar(
+                  radius: 24.0,
+                  backgroundColor: Color(
+                    context.read<SettingsProvider>().primarySwatch,
+                  ),
+                  foregroundColor: Colors.white,
+                  child: index == selectedWeekDay
+                      ? Icon(
+                          PlatformX.isMaterial(context)
+                              ? Icons.done
+                              : CupertinoIcons.checkmark_alt,
+                        )
+                      : Text(
+                          Constant.weekDay(index),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
-                      ))
-                  .toList()),
+                ),
+              ),
+              growable: false,
+            ),
+          ),
           const SizedBox(height: 20),
           Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: List.generate(14, (index) => index)
-                  .map((e) => GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedSlots[e] = !selectedSlots[e];
-                          });
-                        },
-                        child: CircleAvatar(
-                          radius: 24.0,
-                          backgroundColor: Color(
-                              context.read<SettingsProvider>().primarySwatch),
-                          foregroundColor: Colors.white,
-                          child: selectedSlots[e] == true
-                              ? Icon(PlatformX.isMaterial(context)
+            spacing: 10,
+            runSpacing: 10,
+            children: selectedSlots
+                .mapIndexed(
+                  (index, _) => GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedSlots[index] = !selectedSlots[index];
+                      });
+                    },
+                    child: CircleAvatar(
+                      radius: 24.0,
+                      backgroundColor: Color(
+                        context.read<SettingsProvider>().primarySwatch,
+                      ),
+                      foregroundColor: Colors.white,
+                      child: selectedSlots[index] == true
+                          ? Icon(
+                              PlatformX.isMaterial(context)
                                   ? Icons.done
-                                  : CupertinoIcons.checkmark_alt)
-                              : Text(
-                                  (e + 1).toString(),
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w900),
-                                ),
-                        ),
-                      ))
-                  .toList()),
+                                  : CupertinoIcons.checkmark_alt,
+                            )
+                          : Text(
+                              (index + 1).toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                    ),
+                  ),
+                )
+                .toList(growable: false),
+          ),
         ],
       ),
       actions: [
         PlatformDialogAction(
-            child: Text(S.of(context).cancel),
-            onPressed: () => Navigator.pop(context)),
+          child: Text(S.of(context).cancel),
+          onPressed: () => Navigator.pop(context),
+        ),
         PlatformDialogAction(
-            child: Text(S.of(context).add),
-            onPressed: () {
-              Navigator.pop(context,
-                  newCourseTimeGenerator(selectedWeekDay, selectedSlots));
-            }),
+          child: Text(S.of(context).add),
+          onPressed: () {
+            Navigator.pop(
+              context,
+              newCourseTimeGenerator(selectedWeekDay, selectedSlots),
+            );
+          },
+        ),
       ],
     );
   }
