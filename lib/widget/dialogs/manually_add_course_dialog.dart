@@ -164,7 +164,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
               title: Wrap(
                 spacing: 10,
                 runSpacing: 10,
-                children: List.generate(18, (index) => index + 1)
+                children: List.generate(TimeTable.MAX_WEEK, (index) => index + 1)
                     .map((e) => GestureDetector(
                           onTap: () {
                             if (widget.courseAvailableList.contains(e)) {
@@ -191,8 +191,8 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                                         color: Colors.white),
                                   ),
                           ),
-                        ))
-                    .toList(),
+                      ))
+                    .toList(growable: false),
               ),
             ),
             if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
