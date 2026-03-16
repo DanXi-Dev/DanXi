@@ -39,6 +39,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/watermark.dart';
+import 'package:dan_xi/widget/forum/ai_summary_sheet.dart';
 import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:dan_xi/widget/forum/ottag_selector.dart';
 import 'package:dan_xi/widget/forum/post_render.dart';
@@ -121,6 +122,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   final List<OTFloor> _selectedFloors = [];
   bool shouldScrollToEnd = false;
   OTFloor? locateFloor;
+  bool _isOpeningSummary = false;
+  int? _highlightFloorId;
+  Future<List<OTFloor>>? _loadAllContentFuture;
 
   final PagedListViewController<OTFloor> _listViewController =
       PagedListViewController<OTFloor>();
@@ -382,6 +386,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   Future<void> refreshListView(
       {bool scrollToEnd = false, bool queueDataClear = true}) async {
     _allDataLoaded = false;
+    _loadAllContentFuture = null;
     await _listViewController.notifyUpdate(queueDataClear: queueDataClear);
 
     if (scrollToEnd) {
@@ -399,6 +404,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   Widget build(BuildContext context) {
+    final bool showAiSummaryEntry = _shouldShowAiSummaryEntry();
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (mounted) {
         if (locateFloor != null) {
@@ -489,6 +496,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       iosContentPadding: false,
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      material: (context, platform) => MaterialScaffoldData(
+        floatingActionButton: showAiSummaryEntry
+            ? FloatingActionButton.extended(
+                onPressed: _isOpeningSummary ? null : _openAiSummarySheet,
+                icon: const Icon(Icons.auto_awesome),
+                label: Text(S.of(context).ai_summary_title),
+              )
+            : null,
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      ),
       appBar: PlatformAppBarX(
         title: TopController(
           controller: PrimaryScrollController.of(context),
@@ -639,54 +656,173 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       ),
       body: Builder(
         // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-        builder: (context) => Container(
-          decoration: _backgroundImage == null
-              ? null
-              : BoxDecoration(
-                  image: DecorationImage(
-                      image: _backgroundImage!, fit: BoxFit.cover)),
-          child: switch (_renderModel) {
-            Normal() => RefreshIndicator(
-                edgeOffset: MediaQuery.of(context).padding.top,
-                color: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
-                onRefresh: () async {
-                  HapticFeedback.mediumImpact();
+        builder: (context) {
+          final Widget content = Container(
+            decoration: _backgroundImage == null
+                ? null
+                : BoxDecoration(
+                    image: DecorationImage(
+                        image: _backgroundImage!, fit: BoxFit.cover)),
+            child: switch (_renderModel) {
+              Normal() => RefreshIndicator(
+                  edgeOffset: MediaQuery.of(context).padding.top,
+                  color: Theme.of(context).colorScheme.secondary,
+                  backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
+                  onRefresh: () async {
+                    HapticFeedback.mediumImpact();
 
-                  // when users pull to refresh under "only this person" mode,
-                  // the mode should be quited since if the floor is deep
-                  // the initial request won't fetch them, and the page will be blank.
-                  if ((_renderModel as Normal).selectedPerson !=
-                      (_renderModel as Normal)
-                          .hole
-                          .floors
-                          ?.first_floor
-                          ?.anonyname) {
-                    (_renderModel as Normal).selectedPerson = null;
-                  }
-                  await refreshListView();
-                },
-                child: pagedListView),
-            _ => pagedListView,
-          },
-        ),
+                    // when users pull to refresh under "only this person" mode,
+                    // the mode should be quited since if the floor is deep
+                    // the initial request won't fetch them, and the page will be blank.
+                    if ((_renderModel as Normal).selectedPerson !=
+                        (_renderModel as Normal)
+                            .hole
+                            .floors
+                            ?.first_floor
+                            ?.anonyname) {
+                      (_renderModel as Normal).selectedPerson = null;
+                    }
+                    await refreshListView();
+                  },
+                  child: pagedListView),
+              _ => pagedListView,
+            },
+          );
+
+          if (!showAiSummaryEntry || PlatformX.isMaterial(context)) {
+            return content;
+          }
+          return Stack(
+            children: [
+              Positioned.fill(child: content),
+              Positioned(
+                right: 16,
+                bottom: 16 + MediaQuery.of(context).padding.bottom,
+                child: _buildAiSummaryFloatingButton(context),
+              ),
+            ],
+          );
+        },
       ),
     ).withWatermarkRegion();
   }
 
-  // Load all floors, in case we have to scroll to end or to a specific floor.
-  Future<List<OTFloor>> _loadAllContent() async {
-    final allFloors = await ForumRepository.getInstance()
-        .loadFloors((_renderModel as Normal).hole, offset: 0, size: 0);
-
-    if (allFloors == null) {
-      throw Exception("Failed to fetch all floors");
+  bool _shouldShowAiSummaryEntry() {
+    if (_renderModel case Normal(hole: var hole)) {
+      return hole.ai_summary_available == true;
     }
+    return false;
+  }
 
-    _listViewController.replaceAllDataWith(allFloors);
-    _allDataLoaded = true;
+  Widget _buildAiSummaryFloatingButton(BuildContext context) {
+    // Only used for Cupertino — Material uses MaterialScaffoldData.floatingActionButton
+    return CupertinoButton.filled(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      onPressed: _isOpeningSummary ? null : _openAiSummarySheet,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(CupertinoIcons.sparkles, size: 18),
+          const SizedBox(width: 6),
+          Text(S.of(context).ai_summary_title),
+        ],
+      ),
+    );
+  }
 
-    return allFloors;
+  Future<void> _openAiSummarySheet() async {
+    if (_renderModel is! Normal) return;
+    if (_isOpeningSummary) return;
+    setState(() => _isOpeningSummary = true);
+    final hole = (_renderModel as Normal).hole;
+    final totalFloors = (hole.reply ?? 0) + 1;
+    await showPlatformModalSheet(
+      context: context,
+      material: MaterialModalSheetData(
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        barrierColor: Colors.black54,
+        useSafeArea: true,
+      ),
+      cupertino: CupertinoModalSheetData(barrierColor: Colors.black54),
+      builder: (sheetContext) => FloorHighlightScope(
+        onHighlight: _triggerHighlight,
+        onLocate: _locateFloor,
+        child: AiSummarySheet(
+          holeId: hole.hole_id!,
+          totalFloors: totalFloors,
+          floorResolver: _resolveFloor,
+        ),
+      ),
+    );
+    if (mounted) {
+      setState(() => _isOpeningSummary = false);
+    }
+  }
+
+  Future<OTFloor?> _resolveFloor(int floorNumber) async {
+    final allFloors = await _loadAllContent();
+    // Try matching by floor_id first, then by index (1-based floor number)
+    var target = allFloors.firstWhereOrNull((f) => f.floor_id == floorNumber);
+    if (target == null) {
+      final index = floorNumber - 1;
+      if (index >= 0 && index < allFloors.length) {
+        target = allFloors[index];
+      }
+    }
+    return target;
+  }
+
+  Future<void> _locateFloor(OTFloor floor) async {
+    // Close all remaining modals (AI summary sheet, preview sheets, etc.)
+    Navigator.of(context).popUntil((route) => route is! PopupRoute);
+    // Wait for dismiss animations
+    await Future.delayed(const Duration(milliseconds: 350));
+    if (!mounted) return;
+    await _listViewController.scrollToItem(floor);
+    if (floor.floor_id != null) _triggerHighlight(floor.floor_id!);
+  }
+
+  void _triggerHighlight(int floorId) {
+    if (!mounted) return;
+    setState(() => _highlightFloorId = floorId);
+    // Match the 1.5s fade animation duration
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) setState(() => _highlightFloorId = null);
+    });
+  }
+
+  // Load all floors, in case we have to scroll to end or to a specific floor.
+  // Deduplicates concurrent calls by reusing the same future.
+  Future<List<OTFloor>> _loadAllContent() {
+    if (_allDataLoaded) {
+      return Future.value(
+        List.generate(
+          _listViewController.length(),
+          (index) => _listViewController.getElementAt(index),
+        ),
+      );
+    }
+    return _loadAllContentFuture ??= _doLoadAllContent();
+  }
+
+  Future<List<OTFloor>> _doLoadAllContent() async {
+    try {
+      final allFloors = await ForumRepository.getInstance()
+          .loadFloors((_renderModel as Normal).hole, offset: 0, size: 0);
+
+      if (allFloors == null) {
+        throw Exception("Failed to fetch all floors");
+      }
+
+      _listViewController.replaceAllDataWith(allFloors);
+      _allDataLoaded = true;
+
+      return allFloors;
+    } catch (e) {
+      _loadAllContentFuture = null;
+      rethrow;
+    }
   }
 
   Widget _buildFavoredActionButton() {
@@ -1472,6 +1608,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           )
         ],
       );
+    } else if (_highlightFloorId != null &&
+        floor.floor_id == _highlightFloorId) {
+      return _HighlightFadeWrapper(child: floorWidget);
     } else {
       return floorWidget;
     }
@@ -1573,4 +1712,57 @@ class IconWithNumberTextButton extends StatelessWidget {
           Text(text, style: TextStyle(fontSize: 8))
         ],
       );
+}
+
+class _HighlightFadeWrapper extends StatefulWidget {
+  final Widget child;
+
+  const _HighlightFadeWrapper({required this.child});
+
+  @override
+  State<_HighlightFadeWrapper> createState() => _HighlightFadeWrapperState();
+}
+
+class _HighlightFadeWrapperState extends State<_HighlightFadeWrapper>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        widget.child,
+        Positioned.fill(
+          child: IgnorePointer(
+            child: FadeTransition(
+              opacity: Tween<double>(begin: 1.0, end: 0.0).animate(
+                CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+              ),
+              child: Container(
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.35),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

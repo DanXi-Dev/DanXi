@@ -650,16 +650,12 @@ class OTFloorMentionWidget extends StatelessWidget {
 
   static Future<bool?> showFloorDetail(BuildContext context, OTFloor floor,
       [String? extraTips]) {
-    bool inThatFloorPage = false;
-    PagedListViewController<OTFloor>? pagedListViewController;
-    try {
-      // Find the PagedListViewController
-      pagedListViewController = context
-          .findAncestorWidgetOfExactType<PagedListView<OTFloor>>()!
-          .pagedController!;
-      // If this floor is directly in the hole
-      inThatFloorPage = (pagedListViewController.indexOf(floor) != -1);
-    } catch (_) {}
+    final scope = FloorHighlightScope.of(context);
+    final pagedListViewController = context
+        .findAncestorWidgetOfExactType<PagedListView<OTFloor>>()
+        ?.pagedController;
+    final inThatFloorPage = pagedListViewController != null &&
+        pagedListViewController.indexOf(floor) != -1;
 
     return showPlatformModalSheet<bool?>(
         context: context,
@@ -699,13 +695,20 @@ class OTFloorMentionWidget extends StatelessWidget {
                           // This is to prevent looking up deactivated context after [pop].
                           Navigator.pop(cxt);
                           // If this floor is directly in the hole
-                          if (inThatFloorPage &&
-                              pagedListViewController != null) {
-                            // Scroll to the corresponding post
+                          if (inThatFloorPage) {
+                            // Scroll to the corresponding post, then highlight
                             pagedListViewController.scheduleLoadedCallback(
-                                () async => await pagedListViewController!
-                                    .scrollToItem(floor),
-                                rebuild: true);
+                                () async {
+                              await pagedListViewController
+                                  .scrollToItem(floor);
+                              if (floor.floor_id != null) {
+                                scope?.onHighlight(floor.floor_id!);
+                              }
+                            }, rebuild: true);
+                          } else if (scope?.onLocate != null) {
+                            // Fallback: use scope to scroll + highlight
+                            // (e.g. from inside a modal that can't find PagedListView)
+                            await scope!.onLocate!(floor);
                           } else {
                             // If this floor is in another hole
                             await jumpToFloorInNewPage(context, floor);
@@ -724,14 +727,18 @@ class OTFloorMentionWidget extends StatelessWidget {
               ),
             ],
           ).withWatermarkRegion();
+          // Propagate the scope so nested showFloorDetail calls at any depth
+          // can still scroll + highlight instead of opening a new page.
+          final Widget content = scope != null
+              ? FloorHighlightScope(
+                  onHighlight: scope.onHighlight,
+                  onLocate: scope.onLocate,
+                  child: cardBody)
+              : cardBody;
           if (PlatformX.isCupertino(context)) {
-            return SafeArea(
-              child: Card(
-                child: cardBody,
-              ),
-            );
+            return SafeArea(child: Card(child: content));
           } else {
-            return SafeArea(child: cardBody);
+            return SafeArea(child: content);
           }
         });
   }
@@ -1070,3 +1077,26 @@ class OTMessageItemState extends State<OTMessageItem> {
 }
 
 enum OTMentionType { FLOOR, HOLE }
+
+/// Provides callbacks for scrolling to and highlighting a floor.
+/// Place this above the [PagedListView] in the widget tree.
+/// Also wrap modal content with this so nested [showFloorDetail] calls
+/// can scroll + highlight even without direct [PagedListView] access.
+class FloorHighlightScope extends InheritedWidget {
+  final void Function(int floorId) onHighlight;
+  final Future<void> Function(OTFloor floor)? onLocate;
+
+  const FloorHighlightScope({
+    super.key,
+    required this.onHighlight,
+    this.onLocate,
+    required super.child,
+  });
+
+  static FloorHighlightScope? of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<FloorHighlightScope>();
+
+  @override
+  bool updateShouldNotify(FloorHighlightScope oldWidget) =>
+      onHighlight != oldWidget.onHighlight || onLocate != oldWidget.onLocate;
+}

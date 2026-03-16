@@ -39,6 +39,7 @@ class OTHole {
   bool? frozen;
   int? favorite_count;
   int? subscription_count;
+  bool? ai_summary_available;
 
   factory OTHole.fromJson(Map<String, dynamic> json) => _$OTHoleFromJson(json);
 
