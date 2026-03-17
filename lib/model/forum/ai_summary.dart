@@ -62,17 +62,17 @@ class AiSummaryData {
       holeId: (json['hole_id'] as num?)?.toInt(),
       summary: json['summary'] as String?,
       branches: (json['branches'] as List<dynamic>?)
-              ?.cast<Map<String, dynamic>>()
+              ?.whereType<Map<String, dynamic>>()
               .map(AiSummaryBranch.fromJson)
               .toList() ??
           const [],
       interactions: (json['interactions'] as List<dynamic>?)
-              ?.cast<Map<String, dynamic>>()
+              ?.whereType<Map<String, dynamic>>()
               .map(AiSummaryInteraction.fromJson)
               .toList() ??
           const [],
       keywords: (json['keywords'] as List<dynamic>?)
-              ?.cast<String>()
+              ?.whereType<String>()
               .toList() ??
           const [],
       generatedAt: json['generated_at'] as String?,

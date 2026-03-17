@@ -56,7 +56,9 @@ class _AiSummarySheetState extends State<AiSummarySheet> {
   Timer? _pollTimer;
   int _feedbackTapCount = 0;
   bool _showTraceId = false;
+  int _pollCount = 0;
   static const Duration _pollInterval = Duration(seconds: 2);
+  static const int _maxPollAttempts = 60;
 
   @override
   void initState() {
@@ -78,7 +80,7 @@ class _AiSummarySheetState extends State<AiSummarySheet> {
             ? trimmed!
             : S.of(context).ai_summary_empty;
       case 2002:
-        // Unavailable by policy/content type. Prefer stable local copy.
+        // Unavailable by policy/content type.
         return S.of(context).no_summary;
       case 3001:
       case 3002:
@@ -103,9 +105,7 @@ class _AiSummarySheetState extends State<AiSummarySheet> {
       final code = response.code;
 
       if (code == 1001 || code == 1002) {
-        if (data != null) _data = data;
         _schedulePoll();
-        // _loading is already true from the setState above; no need to set again
         return;
       }
       if (code == 1000) {
@@ -189,6 +189,14 @@ class _AiSummarySheetState extends State<AiSummarySheet> {
 
   void _schedulePoll() {
     _pollTimer?.cancel();
+    _pollCount++;
+    if (_pollCount > _maxPollAttempts) {
+      setState(() {
+        _loading = false;
+        _error = S.of(context).ai_summary_server_error;
+      });
+      return;
+    }
     _pollTimer = Timer(_pollInterval, () {
       if (!mounted) return;
       _loadSummary();

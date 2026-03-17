@@ -792,8 +792,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     });
   }
 
-  // Load all floors, in case we have to scroll to end or to a specific floor.
-  // Deduplicates concurrent calls by reusing the same future.
   Future<List<OTFloor>> _loadAllContent() {
     if (_allDataLoaded) {
       return Future.value(
