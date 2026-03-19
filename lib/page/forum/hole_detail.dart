@@ -124,6 +124,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   OTFloor? locateFloor;
   bool _isOpeningSummary = false;
   int? _highlightFloorId;
+  Timer? _highlightTimer;
   Future<List<OTFloor>>? _loadAllContentFuture;
 
   final PagedListViewController<OTFloor> _listViewController =
@@ -398,6 +399,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   void dispose() {
+    _highlightTimer?.cancel();
     StateProvider.needScreenshotWarning = false;
     super.dispose();
   }
@@ -734,29 +736,32 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     if (_renderModel is! Normal) return;
     if (_isOpeningSummary) return;
     setState(() => _isOpeningSummary = true);
-    final hole = (_renderModel as Normal).hole;
-    final totalFloors = (hole.reply ?? 0) + 1;
-    await showPlatformModalSheet(
-      context: context,
-      material: MaterialModalSheetData(
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        barrierColor: Colors.black54,
-        useSafeArea: true,
-      ),
-      cupertino: CupertinoModalSheetData(barrierColor: Colors.black54),
-      builder: (sheetContext) => FloorHighlightScope(
-        onHighlight: _triggerHighlight,
-        onLocate: _locateFloor,
-        child: AiSummarySheet(
-          holeId: hole.hole_id!,
-          totalFloors: totalFloors,
-          floorResolver: _resolveFloor,
+    try {
+      final hole = (_renderModel as Normal).hole;
+      final totalFloors = (hole.reply ?? 0) + 1;
+      await showPlatformModalSheet(
+        context: context,
+        material: MaterialModalSheetData(
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          barrierColor: Colors.black54,
+          useSafeArea: true,
         ),
-      ),
-    );
-    if (mounted) {
-      setState(() => _isOpeningSummary = false);
+        cupertino: CupertinoModalSheetData(barrierColor: Colors.black54),
+        builder: (sheetContext) => FloorHighlightScope(
+          onHighlight: _triggerHighlight,
+          onLocate: _locateFloor,
+          child: AiSummarySheet(
+            holeId: hole.hole_id!,
+            totalFloors: totalFloors,
+            floorResolver: _resolveFloor,
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isOpeningSummary = false);
+      }
     }
   }
 
@@ -774,7 +779,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   Future<void> _locateFloor(OTFloor floor) async {
-    // Close all remaining modals (AI summary sheet, preview sheets, etc.)
     Navigator.of(context).popUntil((route) => route is! PopupRoute);
     // Wait for dismiss animations
     await Future.delayed(const Duration(milliseconds: 350));
@@ -785,9 +789,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   void _triggerHighlight(int floorId) {
     if (!mounted) return;
+    _highlightTimer?.cancel();
     setState(() => _highlightFloorId = floorId);
-    // Match the 1.5s fade animation duration
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    _highlightTimer = Timer(const Duration(milliseconds: 1500), () {
       if (mounted) setState(() => _highlightFloorId = null);
     });
   }

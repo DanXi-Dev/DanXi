@@ -1,5 +1,5 @@
 /*
- *     Copyright (C) 2021  DanXi-Dev
+ *     Copyright (C) 2026  DanXi-Dev
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -15,128 +15,98 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// Lightweight models for AI summary API responses.
+// ignore_for_file: non_constant_identifier_names
+
+import 'package:json_annotation/json_annotation.dart';
+
+part 'ai_summary.g.dart';
+
+@JsonSerializable()
 class AiSummaryResponse {
-  final int? code;
-  final String? message;
-  final AiSummaryData? data;
+  int? code;
+  String? message;
+  AiSummaryData? data;
 
-  const AiSummaryResponse({this.code, this.message, this.data});
+  AiSummaryResponse({this.code, this.message, this.data});
 
-  factory AiSummaryResponse.fromJson(Map<String, dynamic> json) {
-    return AiSummaryResponse(
-      code: (json['code'] as num?)?.toInt(),
-      message: json['message'] as String?,
-      data: json['data'] is Map<String, dynamic>
-          ? AiSummaryData.fromJson(json['data'] as Map<String, dynamic>)
-          : null,
-    );
-  }
+  factory AiSummaryResponse.fromJson(Map<String, dynamic> json) =>
+      _$AiSummaryResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AiSummaryResponseToJson(this);
 }
 
+@JsonSerializable()
 class AiSummaryData {
-  final int? holeId;
-  final String? summary;
-  final List<AiSummaryBranch> branches;
-  final List<AiSummaryInteraction> interactions;
-  final List<String> keywords;
-  final String? generatedAt;
-  final String? cacheExpiresAt;
-  final bool? isCached;
-  final String? traceId;
+  int? hole_id;
+  String? summary;
+  List<AiSummaryBranch>? branches;
+  List<AiSummaryInteraction>? interactions;
+  List<String>? keywords;
+  String? generated_at;
+  String? cache_expires_at;
+  bool? is_cached;
+  String? trace_id;
 
-  const AiSummaryData({
-    this.holeId,
+  AiSummaryData({
+    this.hole_id,
     this.summary,
-    this.branches = const [],
-    this.interactions = const [],
-    this.keywords = const [],
-    this.generatedAt,
-    this.cacheExpiresAt,
-    this.isCached,
-    this.traceId,
+    this.branches,
+    this.interactions,
+    this.keywords,
+    this.generated_at,
+    this.cache_expires_at,
+    this.is_cached,
+    this.trace_id,
   });
 
-  factory AiSummaryData.fromJson(Map<String, dynamic> json) {
-    return AiSummaryData(
-      holeId: (json['hole_id'] as num?)?.toInt(),
-      summary: json['summary'] as String?,
-      branches: (json['branches'] as List<dynamic>?)
-              ?.whereType<Map<String, dynamic>>()
-              .map(AiSummaryBranch.fromJson)
-              .toList() ??
-          const [],
-      interactions: (json['interactions'] as List<dynamic>?)
-              ?.whereType<Map<String, dynamic>>()
-              .map(AiSummaryInteraction.fromJson)
-              .toList() ??
-          const [],
-      keywords: (json['keywords'] as List<dynamic>?)
-              ?.whereType<String>()
-              .toList() ??
-          const [],
-      generatedAt: json['generated_at'] as String?,
-      cacheExpiresAt: json['cache_expires_at'] as String?,
-      isCached: json['is_cached'] as bool?,
-      traceId: json['trace_id'] as String?,
-    );
-  }
+  factory AiSummaryData.fromJson(Map<String, dynamic> json) =>
+      _$AiSummaryDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AiSummaryDataToJson(this);
 }
 
+@JsonSerializable()
 class AiSummaryBranch {
-  final int? id;
-  final String? label;
-  final String? content;
-  final String? color;
-  final List<int> representativeFloors;
+  int? id;
+  String? label;
+  String? content;
+  String? color;
+  List<int>? representative_floors;
 
-  const AiSummaryBranch({
+  AiSummaryBranch({
     this.id,
     this.label,
     this.content,
     this.color,
-    this.representativeFloors = const [],
+    this.representative_floors,
   });
 
-  factory AiSummaryBranch.fromJson(Map<String, dynamic> json) {
-    return AiSummaryBranch(
-      id: (json['id'] as num?)?.toInt(),
-      label: json['label'] as String?,
-      content: json['content'] as String?,
-      color: json['color'] as String?,
-      representativeFloors: (json['representative_floors'] as List<dynamic>?)
-              ?.map((e) => (e as num).toInt())
-              .toList() ??
-          const [],
-    );
-  }
+  factory AiSummaryBranch.fromJson(Map<String, dynamic> json) =>
+      _$AiSummaryBranchFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AiSummaryBranchToJson(this);
 }
 
+@JsonSerializable()
 class AiSummaryInteraction {
-  final int? fromFloor;
-  final String? fromUser;
-  final int? toFloor;
-  final String? toUser;
-  final String? interactionType;
-  final String? content;
+  int? from_floor;
+  String? from_user;
+  int? to_floor;
+  String? to_user;
+  String? interaction_type;
+  String? content;
 
-  const AiSummaryInteraction({
-    this.fromFloor,
-    this.fromUser,
-    this.toFloor,
-    this.toUser,
-    this.interactionType,
+  AiSummaryInteraction({
+    this.from_floor,
+    this.from_user,
+    this.to_floor,
+    this.to_user,
+    this.interaction_type,
     this.content,
   });
 
-  factory AiSummaryInteraction.fromJson(Map<String, dynamic> json) {
-    return AiSummaryInteraction(
-      fromFloor: (json['from_floor'] as num?)?.toInt(),
-      fromUser: json['from_user'] as String?,
-      toFloor: (json['to_floor'] as num?)?.toInt(),
-      toUser: json['to_user'] as String?,
-      interactionType: json['interaction_type'] as String?,
-      content: json['content'] as String?,
-    );
-  }
+  factory AiSummaryInteraction.fromJson(Map<String, dynamic> json) =>
+      _$AiSummaryInteractionFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AiSummaryInteractionToJson(this);
 }
