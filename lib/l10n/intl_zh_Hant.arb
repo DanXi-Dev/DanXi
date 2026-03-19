@@ -197,6 +197,8 @@
   "input_your_email": "輸入您的電子郵件",
   "input_your_email_password": "輸入您的旦撻帳戶／密碼",
   "input_your_email_secure_code": "請輸入您的電子郵件驗證碼",
+  "invalid_course_id_conflicting": "課程 ID 重複。此 ID 與「{name}」衝突，請輸入一唯一 ID",
+  "invalid_course_id_empty": "課程 ID 不能爲空且必須唯一",
   "invalid_course_info": "請提供完整的課程時間資訊",
   "ivanfei_description": "茶樓前端",
   "japanese_language": "日文",

@@ -197,6 +197,8 @@
   "input_your_email": "メールアドレスを入力してください",
   "input_your_email_password": "旦タのアカウント/パスワードを入力してください",
   "input_your_email_secure_code": "メール認証コードを入力してください",
+  "invalid_course_id_conflicting": "コースＩＤが重複しています。「{name}」と衝突しているため、別のＩＤを入力してください",
+  "invalid_course_id_empty": "コースＩＤは必須項目です。また、重複しない唯一のＩＤを入力してください",
   "invalid_course_info": "コーススロットに関する有効な情報を提供してください",
   "ivanfei_description": "フォーラムのフロントエンド開発者",
   "japanese_language": "日本語",

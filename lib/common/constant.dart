@@ -35,6 +35,7 @@ import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 /// Store some important constants, such as app id, default color styles, etc.
 class Constant {
@@ -577,7 +578,14 @@ class Constant {
   ]
   ''';
 
-  static const WeekDays = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+  /// A Monday.
+  ///
+  /// It is randomly selected, without special meaning. You can use any Monday
+  /// to replace it.
+  static final DateTime kMonday = DateTime(2021, 3, 22);
+  static String weekDay(int index) {
+    return DateFormat.E().format(kMonday.add(Duration(days: index)));
+  }
 }
 
 enum Language {

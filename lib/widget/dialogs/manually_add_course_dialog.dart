@@ -1,18 +1,24 @@
+import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/time_table.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/platform_universal.dart';
-import 'package:dan_xi/widget/dialogs/manually_add_course_dialog_sub.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 
 class ManuallyAddCourseDialog extends StatefulWidget {
-  const ManuallyAddCourseDialog(this.courseAvailableList, {super.key});
+  const ManuallyAddCourseDialog(
+    this.courseAvailableList, {
+    super.key,
+    this.initialCourse,
+  });
 
   final List<int> courseAvailableList;
+  final Course? initialCourse;
 
   @override
   State<ManuallyAddCourseDialog> createState() =>
@@ -20,13 +26,35 @@ class ManuallyAddCourseDialog extends StatefulWidget {
 }
 
 class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
-  Course newCourse = Course()..times = [];
-  List<Widget> selectedCourseTimeInfo = [];
+  late Course newCourse;
 
-  TextEditingController courseNameController = TextEditingController();
-  TextEditingController courseIdController = TextEditingController();
-  TextEditingController courseRoomIdController = TextEditingController();
-  TextEditingController courseTeacherNameController = TextEditingController();
+  late TextEditingController courseNameController;
+  late TextEditingController courseIdController;
+  late TextEditingController courseRoomNameController;
+  late TextEditingController courseTeacherNameController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    newCourse = widget.initialCourse?.copyWith() ?? Course();
+    newCourse.times = newCourse.times?.toSet().sorted() ?? List.empty();
+
+    courseNameController = TextEditingController(text: newCourse.courseName);
+    courseIdController = TextEditingController(text: newCourse.courseId);
+    courseRoomNameController = TextEditingController(text: newCourse.roomName);
+    courseTeacherNameController = TextEditingController(
+      text: newCourse.teacherNames?.join(" "),
+    );
+
+    final availableWeeks = newCourse.availableWeeks;
+    if (availableWeeks != null) {
+      // Populate staged course times from the initial course, and drop the old
+      // ones.
+      widget.courseAvailableList.clear();
+      widget.courseAvailableList.addAll(availableWeeks);
+    }
+  }
 
   Course newCourseListGenerator(
       TextEditingController courseNameController,
@@ -37,41 +65,36 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
       Course newCourse) {
     newCourse.courseName = courseNameController.text;
     newCourse.courseId = courseIdController.text;
-    newCourse.roomId = "999999";
-    newCourse.teacherNames = courseTeacherNameController.text.split(" ");
-    newCourse.availableWeeks = courseAvailableList;
+    newCourse.roomId = Course.MANUALLY_ADDED_ROOM_ID;
+    newCourse.teacherNames = courseTeacherNameController.text
+        .splitByWhitespace();
+    newCourse.availableWeeks = [...courseAvailableList];
     newCourse.roomName = courseRoomNameController.text;
 
     return newCourse;
   }
 
   void onButtonPressed() async {
-    List<CourseTime>? courseTime = await showPlatformDialog<List<CourseTime>>(
-        context: context, builder: (context) => const AddCourseDialogSub());
-    if (courseTime != null) {
-      newCourse.times!.addAll(courseTime);
-      selectedCourseTimeInfo.add(
-        ListTile(
-            title: Text(
-                "${Constant.WeekDays[courseTime[0].weekDay]} ${slotsOfADayGenerator(courseTime)}")),
-      );
-      setState(() {});
+    final courseTimes = await showPlatformDialog<List<CourseTime>>(
+      context: context,
+      builder: (context) => const _SelectSlotsDialog(),
+    );
+    if (courseTimes != null) {
+      setState(() {
+        newCourse.times = (newCourse.times! + courseTimes).toSet().sorted();
+      });
     }
   }
 
   String slotsOfADayGenerator(List<CourseTime> courseTime) {
-    List<String>? outCome = [];
-    for (var element in courseTime) {
-      outCome.add((element.slot + 1).toString());
-    }
-    return outCome.join(",");
+    return courseTime.map((element) => element.slot + 1).join(",");
   }
 
   @override
   void dispose() {
     courseNameController.dispose();
     courseIdController.dispose();
-    courseRoomIdController.dispose();
+    courseRoomNameController.dispose();
     courseTeacherNameController.dispose();
     super.dispose();
   }
@@ -106,7 +129,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
             ),
             if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
             TextField(
-              controller: courseRoomIdController,
+              controller: courseRoomNameController,
               keyboardType: TextInputType.text,
               decoration: InputDecoration(
                   labelText: S.of(context).course_room_name,
@@ -143,7 +166,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
               title: Wrap(
                 spacing: 10,
                 runSpacing: 10,
-                children: List.generate(18, (index) => index + 1)
+                children: List.generate(TimeTable.MAX_WEEK, (index) => index + 1)
                     .map((e) => GestureDetector(
                           onTap: () {
                             if (widget.courseAvailableList.contains(e)) {
@@ -170,8 +193,8 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
                                         color: Colors.white),
                                   ),
                           ),
-                        ))
-                    .toList(),
+                      ))
+                    .toList(growable: false),
               ),
             ),
             if (!PlatformX.isMaterial(context)) const SizedBox(height: 2),
@@ -187,9 +210,7 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
               ),
               autofocus: false,
             ),
-            Column(
-              children: selectedCourseTimeInfo,
-            ),
+            Column(children: _buildCourseTimeTiles(newCourse.times!)),
             PlatformX.isMaterial(context)
                 ? ElevatedButton(
                     onPressed: onButtonPressed,
@@ -202,37 +223,226 @@ class _ManuallyAddCourseDialogState extends State<ManuallyAddCourseDialog> {
       ),
       actions: [
         PlatformDialogAction(
-            child: Text(S.of(context).cancel),
-            onPressed: () => {Navigator.pop(context)}),
+          child: Text(S.of(context).cancel),
+          onPressed: () => Navigator.pop(context),
+        ),
         PlatformDialogAction(
+          child: Text(S.of(context).ok),
+          onPressed: () {
+            if (widget.courseAvailableList.isEmpty ||
+                newCourse.times!.isEmpty) {
+              _showWarningDialog(S.of(context).invalid_course_info);
+              return;
+            }
+            final courseId = courseIdController.text;
+            if (courseId.trim().isEmpty) {
+              _showWarningDialog(S.of(context).invalid_course_id_empty);
+              return;
+            }
+            final courses = context.read<SettingsProvider>().manualAddedCourses;
+            final conflictingCourse = courses.firstWhereOrNull(
+              (elem) =>
+                  elem.courseId == courseId &&
+                  elem.courseId != widget.initialCourse?.courseId,
+            );
+            if (conflictingCourse != null) {
+              _showWarningDialog(
+                S
+                    .of(context)
+                    .invalid_course_id_conflicting(
+                      conflictingCourse.courseName ?? "_no_name_$courseId",
+                    ),
+              );
+              return;
+            }
+            Navigator.pop(
+              context,
+              newCourseListGenerator(
+                courseNameController,
+                courseIdController,
+                courseRoomNameController,
+                courseTeacherNameController,
+                widget.courseAvailableList,
+                newCourse,
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildCourseTimeTiles(List<CourseTime> times) {
+    return times
+        .groupListsBy((time) => time.weekDay)
+        .entries
+        .map((entry) {
+          final weekDay = entry.key;
+          final times = entry.value;
+          return Dismissible(
+            key: ValueKey(weekDay),
+            child: ListTile(
+              title: Text(
+                "${Constant.weekDay(weekDay)} ${slotsOfADayGenerator(times)}",
+              ),
+              trailing: IconButton(
+                onPressed: () => setState(() => _removeCourseTimeTile(weekDay)),
+                icon: Icon(
+                  PlatformX.isMaterial(context)
+                      ? Icons.delete_outline
+                      : CupertinoIcons.delete,
+                ),
+              ),
+            ),
+            onDismissed: (_) => setState(() => _removeCourseTimeTile(weekDay)),
+          );
+        })
+        .toList(growable: false);
+  }
+
+  Future<void> _showWarningDialog(String content) {
+    return showPlatformDialog(
+      context: context,
+      builder: (BuildContext context) => PlatformAlertDialog(
+        title: Text(S.of(context).warning),
+        content: Text(content),
+        actions: [
+          PlatformDialogAction(
             child: Text(S.of(context).ok),
-            onPressed: () {
-              if (widget.courseAvailableList.isEmpty ||
-                  newCourse.times!.isEmpty) {
-                showPlatformDialog(
-                    context: context,
-                    builder: (BuildContext context) => PlatformAlertDialog(
-                          title: Text(S.of(context).warning),
-                          content: Text(S.of(context).invalid_course_info),
-                          actions: [
-                            PlatformDialogAction(
-                              child: Text(S.of(context).ok),
-                              onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _removeCourseTimeTile(int weekDay) {
+    newCourse.times = newCourse.times!
+        .whereNot((time) => time.weekDay == weekDay)
+        .toList(growable: false);
+  }
+}
+
+/// Slots selector for the course.
+class _SelectSlotsDialog extends StatefulWidget {
+  const _SelectSlotsDialog();
+
+  @override
+  State<_SelectSlotsDialog> createState() => _SelectSlotsDialogState();
+}
+
+class _SelectSlotsDialogState extends State<_SelectSlotsDialog> {
+  int selectedWeekDay = 0;
+  final selectedSlots = List.filled(
+    TimeTable.kCourseSlotStartTime.length,
+    false,
+  );
+
+  List<CourseTime>? newCourseTimeGenerator(
+    int selectedWeekDay,
+    List<bool> selectedSlots,
+  ) {
+    return selectedSlots
+        .mapIndexed(
+          (index, selected) =>
+              selected ? CourseTime(selectedWeekDay, index) : null,
+        )
+        .nonNulls
+        .toList(growable: false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PlatformAlertDialog(
+      content: Column(
+        children: [
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: List.generate(
+              7,
+              (index) => GestureDetector(
+                onTap: () {
+                  setState(() {
+                    selectedWeekDay = index;
+                  });
+                },
+                child: CircleAvatar(
+                  radius: 24.0,
+                  backgroundColor: Color(
+                    context.read<SettingsProvider>().primarySwatch,
+                  ),
+                  foregroundColor: Colors.white,
+                  child: index == selectedWeekDay
+                      ? Icon(
+                          PlatformX.isMaterial(context)
+                              ? Icons.done
+                              : CupertinoIcons.checkmark_alt,
+                        )
+                      : Text(
+                          Constant.weekDay(index),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                ),
+              ),
+              growable: false,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: selectedSlots
+                .mapIndexed(
+                  (index, _) => GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedSlots[index] = !selectedSlots[index];
+                      });
+                    },
+                    child: CircleAvatar(
+                      radius: 24.0,
+                      backgroundColor: Color(
+                        context.read<SettingsProvider>().primarySwatch,
+                      ),
+                      foregroundColor: Colors.white,
+                      child: selectedSlots[index] == true
+                          ? Icon(
+                              PlatformX.isMaterial(context)
+                                  ? Icons.done
+                                  : CupertinoIcons.checkmark_alt,
                             )
-                          ],
-                        ));
-              } else {
-                Navigator.pop(
-                    context,
-                    newCourseListGenerator(
-                        courseNameController,
-                        courseIdController,
-                        courseRoomIdController,
-                        courseTeacherNameController,
-                        widget.courseAvailableList,
-                        newCourse));
-              }
-            }),
+                          : Text(
+                              (index + 1).toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                    ),
+                  ),
+                )
+                .toList(growable: false),
+          ),
+        ],
+      ),
+      actions: [
+        PlatformDialogAction(
+          child: Text(S.of(context).cancel),
+          onPressed: () => Navigator.pop(context),
+        ),
+        PlatformDialogAction(
+          child: Text(S.of(context).add),
+          onPressed: () {
+            Navigator.pop(
+              context,
+              newCourseTimeGenerator(selectedWeekDay, selectedSlots),
+            );
+          },
+        ),
       ],
     );
   }

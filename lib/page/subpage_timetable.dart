@@ -20,6 +20,7 @@ import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
 import 'package:dan_xi/generated/l10n.dart';
@@ -123,10 +124,18 @@ class ShareTimetableEvent {}
 
 class ManuallyAddCourseEvent {}
 
+class EditCourseEvent {
+  final Course course;
+
+  EditCourseEvent(this.course);
+}
+
 class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
   final StateStreamListener<ShareTimetableEvent> _shareSubscription =
       StateStreamListener();
   final StateStreamListener<ManuallyAddCourseEvent> _addCourseSubscription =
+      StateStreamListener();
+  final StateStreamListener<EditCourseEvent> _editCourseSubscription =
       StateStreamListener();
 
   static const String KEY_MANUALLY_ADDED_COURSE = "new_courses";
@@ -319,6 +328,35 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
           refresh();
         }),
         hashCode);
+    _editCourseSubscription.bindOnlyInvalid(
+      Constant.eventBus.on<EditCourseEvent>().listen((event) async {
+        if (_table == null) return;
+        if (!mounted) return;
+        newCourses =
+            await showPlatformDialog<Course?>(
+              context: context,
+              builder: (_) => ManuallyAddCourseDialog(
+                courseAvailableList,
+                initialCourse: event.course,
+              ),
+            ).then((newCourse) {
+              final courseList = getCourseList();
+              if (newCourse == null) {
+                return courseList;
+              }
+              final newCourseList = [
+                ...courseList.whereNot(
+                  (course) => course.courseId == event.course.courseId,
+                ),
+                newCourse,
+              ];
+              SettingsProvider.getInstance().manualAddedCourses = newCourseList;
+              return newCourseList;
+            });
+        refresh();
+      }),
+      hashCode,
+    );
   }
 
   TutorialCoachMark createTutorial() => TutorialCoachMark(
@@ -419,6 +457,7 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
     super.dispose();
     _shareSubscription.cancel();
     _addCourseSubscription.cancel();
+    _editCourseSubscription.cancel();
   }
 
   @override
@@ -479,7 +518,18 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
                     Text(event.course.courseId!),
                 ],
               )),
-              if (event.course.roomId == "999999") ...[
+              if (event.course.isManuallyAdded) ...[
+                PlatformIconButton(
+                  icon: Icon(
+                    PlatformX.isMaterial(context)
+                        ? Icons.edit
+                        : CupertinoIcons.pencil,
+                  ),
+                  onPressed: () async {
+                    EditCourseEvent(event.course).fire();
+                    Navigator.of(context).pop();
+                  },
+                ),
                 PlatformIconButton(
                   icon: Icon(PlatformX.isMaterial(context)
                       ? Icons.delete
