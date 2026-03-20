@@ -939,6 +939,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             if (confirmed != true || !mounted) return;
 
             ForumProvider provider = context.read<ForumProvider>();
+
+            // We are unable to trace that a floor opened in Homepage belongs to
+            // which division originally, so we can only forbid pin/unpin operation
+            // on Homepage until the server provides such support.
+            if (provider.currentDivisionId is Homepage) {
+              Noticing.showModalNotice(context,
+                  message: "不允许从主页操作");
+              return;
+            }
+
             int divisionId = provider.currentDivision!.division_id!;
             List<int> pinned = provider.currentDivision!.pinned!
                 .map((hole) => hole.hole_id!)
@@ -953,7 +963,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             if (result != null && result < 300) {
               // refresh the division's pinned holes
               final _ = await ForumRepository.getInstance()
-                  .loadSpecificDivision(divisionId, useCache: false);
+                  .loadSpecificDivision(DivisionId(divisionId), useCache: false);
               if (mounted) {
                 Noticing.showMaterialNotice(
                     context, S.of(context).operation_successful);

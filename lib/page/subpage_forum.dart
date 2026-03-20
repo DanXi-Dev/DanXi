@@ -538,8 +538,9 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     _fieldInitComplete = false;
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<CreateNewPostEvent>().listen((_) async {
+          final currentDivision = getDivisionId(context);
           final bool success =
-              await OTEditor.createNewPost(context, getDivisionId(context),
+              await OTEditor.createNewPost(context, currentDivision is DivisionId ? currentDivision.id : null,
                   interceptor: (_, PostEditorText? text) async {
             if (text?.tags.isEmpty ?? true) {
               return await Noticing.showConfirmationDialog(
