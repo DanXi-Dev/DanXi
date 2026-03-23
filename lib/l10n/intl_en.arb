@@ -200,6 +200,8 @@
   "input_your_email": "Input your email",
   "input_your_email_password": "Input your Danta Account",
   "input_your_email_secure_code": "Input your OTP code",
+  "invalid_course_id_conflicting": "Please provide a unique course ID; the current one conflicts with \"{name}\"",
+  "invalid_course_id_empty": "Please provide a unique, non-empty course ID",
   "invalid_course_info": "Please provide valid information about course slots",
   "ivanfei_description": "Forum Frontend Developer",
   "japanese_language": "Japanese",
