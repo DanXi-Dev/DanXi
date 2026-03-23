@@ -493,7 +493,7 @@ class ForumRepository extends BaseRepositoryWithDio {
       path: "$_BASE_URL/holes/$holeId/summary",
       method: "GET",
       queryParameters: {
-        if (forceRefresh != null) "force_refresh": forceRefresh,
+        "force_refresh": ?forceRefresh,
       },
       headers: _tokenHeader,
     );
