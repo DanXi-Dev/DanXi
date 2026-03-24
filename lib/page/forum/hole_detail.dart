@@ -406,8 +406,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final bool showAiSummaryEntry = _shouldShowAiSummaryEntry;
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (mounted) {
         if (locateFloor != null) {
@@ -499,7 +497,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       iosContentBottomPadding: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       material: (context, platform) => MaterialScaffoldData(
-        floatingActionButton: showAiSummaryEntry
+        floatingActionButton: _shouldShowAiSummaryEntry
             ? FloatingActionButton.extended(
                 onPressed: _isOpeningSummary ? null : _openAiSummarySheet,
                 icon: const Icon(Icons.auto_awesome),
@@ -691,7 +689,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             },
           );
 
-          if (!showAiSummaryEntry || PlatformX.isMaterial(context)) {
+          if (!_shouldShowAiSummaryEntry || PlatformX.isMaterial(context)) {
             return content;
           }
           return Stack(
@@ -796,28 +794,30 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     });
   }
 
-  Future<List<OTFloor>> _loadAllContent() {
+  Future<List<OTFloor>> _loadAllContent() async {
     if (_allDataLoaded) {
-      return Future.value(
-        List.generate(
-          _listViewController.length(),
-          (index) => _listViewController.getElementAt(index),
-        ),
+      return List.generate(
+        _listViewController.length(),
+        (index) => _listViewController.getElementAt(index),
       );
     }
-    return _loadAllContentFuture ??= ForumRepository.getInstance()
-        .loadFloors((_renderModel as Normal).hole, offset: 0, size: 0)
-        .then((allFloors) {
-      if (allFloors == null) {
-        throw Exception("Failed to fetch all floors");
-      }
-      _listViewController.replaceAllDataWith(allFloors);
-      _allDataLoaded = true;
-      return allFloors;
-    }).catchError((Object e) {
+    try {
+      return await (_loadAllContentFuture ??= _fetchAllContent());
+    } catch (_) {
       _loadAllContentFuture = null;
-      throw e;
-    });
+      rethrow;
+    }
+  }
+
+  Future<List<OTFloor>> _fetchAllContent() async {
+    final allFloors = await ForumRepository.getInstance()
+        .loadFloors((_renderModel as Normal).hole, offset: 0, size: 0);
+    if (allFloors == null) {
+      throw Exception("Failed to fetch all floors");
+    }
+    _listViewController.replaceAllDataWith(allFloors);
+    _allDataLoaded = true;
+    return allFloors;
   }
 
   Widget _buildFavoredActionButton() {

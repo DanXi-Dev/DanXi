@@ -62,7 +62,7 @@ Future<AiSummaryData> aiSummary(Ref ref, int holeId) async {
     if (disposed) throw StateError('disposed');
 
     final code = response.code;
-    if (code == 1000) return response.data ?? AiSummaryData();
+    if (code == 1000) return response.data!;
     if (code != 1001 && code != 1002) {
       throw AiSummaryApiException(code, response.message);
     }
@@ -85,7 +85,8 @@ class AiSummarySheet extends ConsumerWidget {
     this.floorResolver,
   });
 
-  static String _resolveError(BuildContext context, Object error) {
+  static String _resolveError(
+      BuildContext context, Object error, StackTrace stackTrace) {
     if (error is AiSummaryApiException) {
       final trimmed = error.message?.trim();
       switch (error.code) {
@@ -108,7 +109,8 @@ class AiSummarySheet extends ConsumerWidget {
         final code = (data['code'] as num?)?.toInt();
         final message = data['message'] as String?;
         if (code != null) {
-          return _resolveError(context, AiSummaryApiException(code, message));
+          return _resolveError(
+              context, AiSummaryApiException(code, message), stackTrace);
         }
       }
       final status = error.response?.statusCode;
@@ -117,7 +119,8 @@ class AiSummarySheet extends ConsumerWidget {
       }
     }
     return ErrorPageWidget.generateUserFriendlyDescription(
-        S.of(context), error);
+        S.of(context), error,
+        stackTrace: stackTrace);
   }
 
   @override
@@ -158,8 +161,8 @@ class AiSummarySheet extends ConsumerWidget {
                       children: switch (summary) {
                         AsyncData(:final value) =>
                           _buildContentWidgets(context, value),
-                        AsyncError(:final error) => [
-                            _buildError(context, ref, error),
+                        AsyncError(:final error, :final stackTrace) => [
+                            _buildError(context, ref, error, stackTrace),
                           ],
                         _ => [_buildLoading(context)],
                       },
@@ -464,14 +467,14 @@ class AiSummarySheet extends ConsumerWidget {
   }
 
   Widget _buildError(
-      BuildContext context, WidgetRef ref, Object error) {
+      BuildContext context, WidgetRef ref, Object error, StackTrace stackTrace) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            _resolveError(context, error),
+            _resolveError(context, error, stackTrace),
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 12),

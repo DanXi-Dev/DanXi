@@ -25,9 +25,17 @@ part 'ai_summary.g.dart';
 class AiSummaryResponse {
   final int code;
   final String message;
+  @JsonKey(fromJson: _dataFromJson)
   final AiSummaryData? data;
 
-  AiSummaryResponse({this.code = 0, this.message = '', this.data});
+  AiSummaryResponse({required this.code, required this.message, this.data});
+
+  static AiSummaryData? _dataFromJson(dynamic json) {
+    if (json is! Map<String, dynamic> || !json.containsKey('summary')) {
+      return null;
+    }
+    return AiSummaryData.fromJson(json);
+  }
 
   factory AiSummaryResponse.fromJson(Map<String, dynamic> json) =>
       _$AiSummaryResponseFromJson(json);
@@ -50,13 +58,13 @@ class AiSummaryData {
   final bool? is_cached;
 
   AiSummaryData({
-    this.hole_id = 0,
-    this.summary = '',
-    this.branches = const [],
-    this.interactions = const [],
-    this.keywords = const [],
-    this.generated_at = '',
-    this.trace_id = '',
+    required this.hole_id,
+    required this.summary,
+    required this.branches,
+    required this.interactions,
+    required this.keywords,
+    required this.generated_at,
+    required this.trace_id,
     this.cache_expires_at,
     this.is_cached,
   });
@@ -76,11 +84,11 @@ class AiSummaryBranch {
   final List<int> representative_floors;
 
   AiSummaryBranch({
-    this.id = 0,
-    this.label = '',
-    this.content = '',
-    this.color = '',
-    this.representative_floors = const [],
+    required this.id,
+    required this.label,
+    required this.content,
+    required this.color,
+    required this.representative_floors,
   });
 
   factory AiSummaryBranch.fromJson(Map<String, dynamic> json) =>
@@ -99,12 +107,12 @@ class AiSummaryInteraction {
   final String content;
 
   AiSummaryInteraction({
-    this.from_floor = 0,
-    this.from_user = '',
-    this.to_floor = 0,
-    this.to_user = '',
-    this.interaction_type = 'reply',
-    this.content = '',
+    required this.from_floor,
+    required this.from_user,
+    required this.to_floor,
+    required this.to_user,
+    required this.interaction_type,
+    required this.content,
   });
 
   factory AiSummaryInteraction.fromJson(Map<String, dynamic> json) =>
