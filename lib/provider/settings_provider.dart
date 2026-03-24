@@ -70,6 +70,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_TIMETABLE_SEMESTER = "timetable_semester";
   static const String KEY_CUSTOM_USER_AGENT = "custom_user_agent";
   static const String KEY_BANNER_ENABLED = "banner_enabled";
+  static const String KEY_AI_SUMMARY_ENABLED = "ai_summary_enabled";
   static const String KEY_PRIMARY_SWATCH = "primary_swatch";
   static const String KEY_PRIMARY_SWATCH_V2 = "primary_swatch_v2";
   static const String KEY_PREFERRED_LANGUAGE = "language";
@@ -657,6 +658,18 @@ class SettingsProvider with ChangeNotifier {
 
   set isBannerEnabled(bool value) {
     preferences!.setBool(KEY_BANNER_ENABLED, value);
+    notifyListeners();
+  }
+
+  bool get isAiSummaryEnabled {
+    if (preferences!.containsKey(KEY_AI_SUMMARY_ENABLED)) {
+      return preferences!.getBool(KEY_AI_SUMMARY_ENABLED)!;
+    }
+    return true;
+  }
+
+  set isAiSummaryEnabled(bool value) {
+    preferences!.setBool(KEY_AI_SUMMARY_ENABLED, value);
     notifyListeners();
   }
 

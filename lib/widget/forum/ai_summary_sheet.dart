@@ -26,6 +26,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:dan_xi/widget/libraries/chip_widgets.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +38,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'ai_summary_sheet.g.dart';
 
 class AiSummaryApiException implements Exception {
-  final int? code;
+  final int code;
   final String? message;
 
   AiSummaryApiException(this.code, this.message);
@@ -95,7 +96,7 @@ class AiSummarySheet extends ConsumerWidget {
         case 2002:
           return S.of(context).no_summary;
         default:
-          return S.of(context).operation_failed;
+          break;
       }
     }
     if (error is AiSummaryTimeoutException) {
@@ -113,16 +114,10 @@ class AiSummarySheet extends ConsumerWidget {
       final status = error.response?.statusCode;
       if (status != null) {
         if (status == 403) return S.of(context).ai_summary_no_permission;
-        if (status >= 500) return S.of(context).ai_summary_server_error;
-      }
-      if (error.type == DioExceptionType.connectionTimeout ||
-          error.type == DioExceptionType.sendTimeout ||
-          error.type == DioExceptionType.receiveTimeout ||
-          error.type == DioExceptionType.connectionError) {
-        return S.of(context).ai_summary_network_error;
       }
     }
-    return S.of(context).operation_failed;
+    return ErrorPageWidget.generateUserFriendlyDescription(
+        S.of(context), error);
   }
 
   @override
@@ -181,10 +176,10 @@ class AiSummarySheet extends ConsumerWidget {
 
   List<Widget> _buildContentWidgets(
       BuildContext context, AiSummaryData data) {
-    final hasContent = (data.summary?.trim().isNotEmpty ?? false) ||
-        (data.branches?.isNotEmpty ?? false) ||
-        (data.interactions?.isNotEmpty ?? false) ||
-        (data.keywords?.isNotEmpty ?? false);
+    final hasContent = data.summary.trim().isNotEmpty ||
+        data.branches.isNotEmpty ||
+        data.interactions.isNotEmpty ||
+        data.keywords.isNotEmpty;
 
     if (!hasContent) {
       return [
@@ -285,8 +280,8 @@ class AiSummarySheet extends ConsumerWidget {
   }
 
   Widget _buildSummary(BuildContext context, AiSummaryData data) {
-    final summary = data.summary?.trim();
-    if (summary == null || summary.isEmpty) return const SizedBox.shrink();
+    final summary = data.summary.trim();
+    if (summary.isEmpty) return const SizedBox.shrink();
     return _buildSectionCard(
       context,
       icon: PlatformX.isMaterial(context)
@@ -298,7 +293,7 @@ class AiSummarySheet extends ConsumerWidget {
   }
 
   Widget _buildBranches(BuildContext context, AiSummaryData data) {
-    final branches = data.branches ?? const [];
+    final branches = data.branches;
     if (branches.isEmpty) return const SizedBox.shrink();
     return _buildSectionCard(
       context,
@@ -320,7 +315,7 @@ class AiSummarySheet extends ConsumerWidget {
   }
 
   Widget _buildInteractions(BuildContext context, AiSummaryData data) {
-    final interactions = data.interactions ?? const [];
+    final interactions = data.interactions;
     if (interactions.isEmpty) return const SizedBox.shrink();
     return _buildSectionCard(
       context,
@@ -348,14 +343,14 @@ class AiSummarySheet extends ConsumerWidget {
                           TextSpan(
                             children: [
                               TextSpan(
-                                text: interaction.from_user ?? "-",
+                                text: interaction.from_user,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               TextSpan(text: " ${style.verb} "),
                               TextSpan(
-                                text: interaction.to_user ?? "-",
+                                text: interaction.to_user,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -366,11 +361,10 @@ class AiSummarySheet extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  if (interaction.content != null &&
-                      interaction.content!.isNotEmpty) ...[
+                  if (interaction.content.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text(
-                      interaction.content!,
+                      interaction.content,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
@@ -379,10 +373,10 @@ class AiSummarySheet extends ConsumerWidget {
                     spacing: 6,
                     runSpacing: 6,
                     children: [
-                      if (interaction.from_floor != null)
-                        _buildFloorChip(context, interaction.from_floor!),
-                      if (interaction.to_floor != null)
-                        _buildFloorChip(context, interaction.to_floor!),
+                      if (interaction.from_floor > 0)
+                        _buildFloorChip(context, interaction.from_floor),
+                      if (interaction.to_floor > 0)
+                        _buildFloorChip(context, interaction.to_floor),
                     ],
                   ),
                 ],
@@ -395,7 +389,7 @@ class AiSummarySheet extends ConsumerWidget {
   }
 
   Widget _buildKeywords(BuildContext context, AiSummaryData data) {
-    final keywords = data.keywords ?? const [];
+    final keywords = data.keywords;
     if (keywords.isEmpty) return const SizedBox.shrink();
     return _buildSectionCard(
       context,
@@ -496,8 +490,8 @@ class AiSummarySheet extends ConsumerWidget {
     );
   }
 
-  static Color _parseHexColor(BuildContext context, String? value) {
-    if (value == null || value.isEmpty) {
+  static Color _parseHexColor(BuildContext context, String value) {
+    if (value.isEmpty) {
       return Theme.of(context).colorScheme.primary;
     }
     var hex = value.replaceAll('#', '');
@@ -508,8 +502,8 @@ class AiSummarySheet extends ConsumerWidget {
   }
 
   static _InteractionStyle _interactionStyle(
-      BuildContext context, String? type) {
-    final normalized = (type ?? "").toLowerCase();
+      BuildContext context, String type) {
+    final normalized = type.toLowerCase();
     switch (normalized) {
       case "support":
         return _InteractionStyle(
@@ -656,10 +650,10 @@ class _FeedbackBar extends HookWidget {
               ],
             ),
           ),
-          if (showTraceId.value && data.trace_id != null)
+          if (showTraceId.value && data.trace_id.isNotEmpty)
             GestureDetector(
               onLongPress: () {
-                Clipboard.setData(ClipboardData(text: data.trace_id!));
+                Clipboard.setData(ClipboardData(text: data.trace_id));
                 Noticing.showNotice(
                   context,
                   S.of(context).ai_summary_trace_copied,
@@ -668,7 +662,7 @@ class _FeedbackBar extends HookWidget {
               child: Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
-                  "Trace: ${data.trace_id!}",
+                  "Trace: ${data.trace_id}",
                   style: TextStyle(
                     fontSize: 10,
                     color:
@@ -706,7 +700,7 @@ class _LazyBranchTileState extends State<_LazyBranchTile> {
     if (expanded && _futures == null) {
       setState(() {
         _futures =
-            (widget.branch.representative_floors ?? const []).map((floor) {
+            widget.branch.representative_floors.map((floor) {
           return widget.floorResolver != null
               ? widget.floorResolver!(floor)
               : ForumRepository.getInstance().loadFloorById(floor);
@@ -732,13 +726,12 @@ class _LazyBranchTileState extends State<_LazyBranchTile> {
           ),
         ),
         title: Text(
-          widget.branch.label ?? "-",
+          widget.branch.label,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        subtitle: widget.branch.content != null &&
-                widget.branch.content!.isNotEmpty
+        subtitle: widget.branch.content.isNotEmpty
             ? Text(
-                widget.branch.content!,
+                widget.branch.content,
                 style: Theme.of(context).textTheme.bodySmall,
               )
             : null,

@@ -541,7 +541,6 @@
   "enhanced_auth_cancelled": "验证未完成，部分功能可能暂时无法使用。",
   "no_summary": "该帖暂不支持 AI 总结。",
   "ai_summary_title": "AI 总结",
-  "ai_summary_entry": "✨ AI 总结 · 点击查看讨论要点",
   "ai_summary_core": "核心摘要",
   "ai_summary_branches": "讨论分支",
   "ai_summary_interactions": "热门互动",
@@ -549,7 +548,6 @@
   "ai_summary_loading": "加载中",
   "ai_summary_loading_with_count": "AI 正在分析 {count} 层楼的讨论内容...",
   "ai_summary_empty": "暂无总结内容",
-  "ai_summary_floor_not_found": "未找到该楼层",
   "ai_summary_interaction_reply": "回复了",
   "ai_summary_interaction_support": "支持了",
   "ai_summary_interaction_rebuttal": "反驳了",
@@ -557,7 +555,8 @@
   "ai_summary_interaction_question": "质疑了",
   "ai_summary_no_permission": "你暂无使用 AI 总结的权限",
   "ai_summary_server_error": "服务暂时不可用，请稍后再试",
-  "ai_summary_network_error": "网络连接失败，请检查网络后重试",
   "ai_summary_disclaimer": "AI 生成，仅供参考 · 校内科研测试，不对外提供服务",
-  "ai_summary_trace_copied": "Trace ID 已复制"
+  "ai_summary_trace_copied": "Trace ID 已复制",
+  "ai_summary_enable": "AI 总结",
+  "ai_summary_enable_description": "在帖子详情页显示 AI 总结按钮"
 }

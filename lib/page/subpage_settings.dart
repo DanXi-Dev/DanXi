@@ -852,6 +852,20 @@ class SettingsPageState extends State<SettingsPage> {
                     selector: (_, model) => model.isBannerEnabled),
                 Selector<SettingsProvider, bool>(
                     builder: (_, bool value, __) => SwitchListTile.adaptive(
+                          title: Text(S.of(context).ai_summary_enable),
+                          secondary: const Icon(Icons.auto_awesome),
+                          subtitle:
+                              Text(S.of(context).ai_summary_enable_description),
+                          value: value,
+                          onChanged: (bool value) {
+                            HapticFeedbackUtil.light();
+                            SettingsProvider.getInstance().isAiSummaryEnabled =
+                                value;
+                          },
+                        ),
+                    selector: (_, model) => model.isAiSummaryEnabled),
+                Selector<SettingsProvider, bool>(
+                    builder: (_, bool value, __) => SwitchListTile.adaptive(
                           title: Text(S.of(context).forum_clean_mode),
                           secondary: const Icon(Icons.ac_unit),
                           subtitle:

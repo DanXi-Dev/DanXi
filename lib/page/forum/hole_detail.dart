@@ -406,7 +406,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final bool showAiSummaryEntry = _shouldShowAiSummaryEntry();
+    final bool showAiSummaryEntry = _shouldShowAiSummaryEntry;
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (mounted) {
@@ -709,9 +709,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     ).withWatermarkRegion();
   }
 
-  bool _shouldShowAiSummaryEntry() {
+  bool get _shouldShowAiSummaryEntry {
     if (_renderModel case Normal(hole: var hole)) {
-      return hole.ai_summary_available == true;
+      return hole.ai_summary_available == true &&
+          SettingsProvider.getInstance().isAiSummaryEnabled;
     }
     return false;
   }
@@ -779,8 +780,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   Future<void> _locateFloor(OTFloor floor) async {
-    Navigator.of(context).popUntil((route) => route is! PopupRoute);
-    // Wait for dismiss animations
+    Navigator.of(context).pop();
     await Future.delayed(const Duration(milliseconds: 350));
     if (!mounted) return;
     await _listViewController.scrollToItem(floor);
@@ -805,26 +805,19 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         ),
       );
     }
-    return _loadAllContentFuture ??= _doLoadAllContent();
-  }
-
-  Future<List<OTFloor>> _doLoadAllContent() async {
-    try {
-      final allFloors = await ForumRepository.getInstance()
-          .loadFloors((_renderModel as Normal).hole, offset: 0, size: 0);
-
+    return _loadAllContentFuture ??= ForumRepository.getInstance()
+        .loadFloors((_renderModel as Normal).hole, offset: 0, size: 0)
+        .then((allFloors) {
       if (allFloors == null) {
         throw Exception("Failed to fetch all floors");
       }
-
       _listViewController.replaceAllDataWith(allFloors);
       _allDataLoaded = true;
-
       return allFloors;
-    } catch (e) {
+    }).catchError((Object e) {
       _loadAllContentFuture = null;
-      rethrow;
-    }
+      throw e;
+    });
   }
 
   Widget _buildFavoredActionButton() {

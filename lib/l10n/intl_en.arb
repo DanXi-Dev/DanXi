@@ -547,7 +547,6 @@
   "enhanced_auth_cancelled": "Verification incomplete. Some features may be temporarily unavailable.",
   "no_summary": "AI Summary is not available for this post.",
   "ai_summary_title": "AI Summary",
-  "ai_summary_entry": "✨ AI Summary · Tap to view key points",
   "ai_summary_core": "Core Summary",
   "ai_summary_branches": "Discussion Branches",
   "ai_summary_interactions": "Interactions",
@@ -555,7 +554,6 @@
   "ai_summary_loading": "Loading...",
   "ai_summary_loading_with_count": "AI is analyzing {count} floors...",
   "ai_summary_empty": "Summary is not available yet.",
-  "ai_summary_floor_not_found": "Floor not found",
   "ai_summary_interaction_reply": "replied to",
   "ai_summary_interaction_support": "supported",
   "ai_summary_interaction_rebuttal": "rebutted",
@@ -563,7 +561,8 @@
   "ai_summary_interaction_question": "questioned",
   "ai_summary_no_permission": "You don't have permission to use AI Summary.",
   "ai_summary_server_error": "Service temporarily unavailable. Please try again later.",
-  "ai_summary_network_error": "Network error. Please check your connection and try again.",
   "ai_summary_disclaimer": "AI-generated, for reference only. Internal research testing, not a public service.",
-  "ai_summary_trace_copied": "Trace ID copied"
+  "ai_summary_trace_copied": "Trace ID copied",
+  "ai_summary_enable": "AI Summary",
+  "ai_summary_enable_description": "Show AI summary button on post detail page"
 }

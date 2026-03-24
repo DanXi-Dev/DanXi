@@ -23,11 +23,11 @@ part 'ai_summary.g.dart';
 
 @JsonSerializable()
 class AiSummaryResponse {
-  int? code;
-  String? message;
-  AiSummaryData? data;
+  final int code;
+  final String message;
+  final AiSummaryData? data;
 
-  AiSummaryResponse({this.code, this.message, this.data});
+  AiSummaryResponse({this.code = 0, this.message = '', this.data});
 
   factory AiSummaryResponse.fromJson(Map<String, dynamic> json) =>
       _$AiSummaryResponseFromJson(json);
@@ -37,26 +37,28 @@ class AiSummaryResponse {
 
 @JsonSerializable()
 class AiSummaryData {
-  int? hole_id;
-  String? summary;
-  List<AiSummaryBranch>? branches;
-  List<AiSummaryInteraction>? interactions;
-  List<String>? keywords;
-  String? generated_at;
-  String? cache_expires_at;
-  bool? is_cached;
-  String? trace_id;
+  final int hole_id;
+  final String summary;
+  final List<AiSummaryBranch> branches;
+  final List<AiSummaryInteraction> interactions;
+  final List<String> keywords;
+  final String generated_at;
+  final String trace_id;
+
+  // Reserved for future backend implementation.
+  final String? cache_expires_at;
+  final bool? is_cached;
 
   AiSummaryData({
-    this.hole_id,
-    this.summary,
-    this.branches,
-    this.interactions,
-    this.keywords,
-    this.generated_at,
+    this.hole_id = 0,
+    this.summary = '',
+    this.branches = const [],
+    this.interactions = const [],
+    this.keywords = const [],
+    this.generated_at = '',
+    this.trace_id = '',
     this.cache_expires_at,
     this.is_cached,
-    this.trace_id,
   });
 
   factory AiSummaryData.fromJson(Map<String, dynamic> json) =>
@@ -67,18 +69,18 @@ class AiSummaryData {
 
 @JsonSerializable()
 class AiSummaryBranch {
-  int? id;
-  String? label;
-  String? content;
-  String? color;
-  List<int>? representative_floors;
+  final int id;
+  final String label;
+  final String content;
+  final String color;
+  final List<int> representative_floors;
 
   AiSummaryBranch({
-    this.id,
-    this.label,
-    this.content,
-    this.color,
-    this.representative_floors,
+    this.id = 0,
+    this.label = '',
+    this.content = '',
+    this.color = '',
+    this.representative_floors = const [],
   });
 
   factory AiSummaryBranch.fromJson(Map<String, dynamic> json) =>
@@ -89,20 +91,20 @@ class AiSummaryBranch {
 
 @JsonSerializable()
 class AiSummaryInteraction {
-  int? from_floor;
-  String? from_user;
-  int? to_floor;
-  String? to_user;
-  String? interaction_type;
-  String? content;
+  final int from_floor;
+  final String from_user;
+  final int to_floor;
+  final String to_user;
+  final String interaction_type;
+  final String content;
 
   AiSummaryInteraction({
-    this.from_floor,
-    this.from_user,
-    this.to_floor,
-    this.to_user,
-    this.interaction_type,
-    this.content,
+    this.from_floor = 0,
+    this.from_user = '',
+    this.to_floor = 0,
+    this.to_user = '',
+    this.interaction_type = 'reply',
+    this.content = '',
   });
 
   factory AiSummaryInteraction.fromJson(Map<String, dynamic> json) =>
