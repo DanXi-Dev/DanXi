@@ -19,6 +19,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/model/forum/ai_summary.dart';
 import 'package:dan_xi/model/forum/audit.dart';
 import 'package:dan_xi/model/forum/division.dart';
 import 'package:dan_xi/model/forum/floor.dart';
@@ -482,6 +483,42 @@ class ForumRepository extends BaseRepositoryWithDio {
     final Response<List<dynamic>> response =
         await WebvpnProxy.requestWithProxy(dio, options);
     return response.data?.map((e) => OTFloor.fromJson(e)).toList();
+  }
+
+  Future<AiSummaryResponse> loadAiSummary(
+    int holeId, {
+    bool? forceRefresh,
+  }) async {
+    final options = RequestOptions(
+      path: "$_BASE_URL/holes/$holeId/summary",
+      method: "GET",
+      queryParameters: {
+        "force_refresh": ?forceRefresh,
+      },
+      headers: _tokenHeader,
+    );
+    final Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
+    return AiSummaryResponse.fromJson(response.data ?? {});
+  }
+
+  Future<void> submitAiSummaryFeedback(
+    int holeId, {
+    required String feedbackType,
+    String? reason,
+  }) async {
+    final trimmedReason = reason?.trim();
+    final options = RequestOptions(
+      path: "$_BASE_URL/holes/$holeId/summary/feedback",
+      method: "POST",
+      data: {
+        "hole_id": holeId,
+        "feedback_type": feedbackType,
+        if (trimmedReason?.isNotEmpty == true) "reason": trimmedReason,
+      },
+      headers: _tokenHeader,
+    );
+    await WebvpnProxy.requestWithProxy(dio, options);
   }
 
   Future<List<OTTag>?> loadTags({bool useCache = true}) async {
