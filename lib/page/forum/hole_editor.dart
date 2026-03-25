@@ -119,6 +119,8 @@ class OTEditor {
     }
 
     // If not specified, then use the value from editor
+    // It is guaranteed by the selection widget that the divisionId is not null,
+    // as long as the division list is non-empty.
     divisionId ??= content!.divisionId!;
 
     ProgressFuture progressDialog = showProgressDialog(
@@ -127,7 +129,7 @@ class OTEditor {
     );
     try {
       await ForumRepository.getInstance().newHole(
-        divisionId!,
+        divisionId,
         content!.text,
         tags: content.tags,
       );

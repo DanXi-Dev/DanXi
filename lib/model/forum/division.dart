@@ -22,15 +22,17 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'division.g.dart';
 
-sealed class DivisionIdentifier {}
+sealed class DivisionIdentifier {
+  const DivisionIdentifier();
+}
 
 class Homepage extends DivisionIdentifier {
-  Homepage();
+  const Homepage();
 }
 
 class DivisionId extends DivisionIdentifier {
-  int id;
-  DivisionId(this.id);
+  final int id;
+  const DivisionId(this.id);
 }
 
 @JsonSerializable()

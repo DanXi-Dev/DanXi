@@ -312,12 +312,8 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   List<OTDivision> getDivisions() => provider.divisionCache;
 
-  Future<OTDivision?> loadSpecificDivision(DivisionIdentifier division,
+  Future<OTDivision?> loadSpecificDivision(DivisionId division,
       {bool useCache = true}) async {
-    if (division is! DivisionId) {
-      return null;
-    }
-    
     int divisionId = division.id;
     if (useCache) {
       try {

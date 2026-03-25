@@ -943,7 +943,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             // We are unable to trace that a floor opened in Homepage belongs to
             // which division originally, so we can only forbid pin/unpin operation
             // on Homepage until the server provides such support.
-            if (provider.currentDivisionId is Homepage) {
+            if (provider.currentDivisionId is! DivisionId) {
               Noticing.showModalNotice(context,
                   message: "不允许从主页操作");
               return;
