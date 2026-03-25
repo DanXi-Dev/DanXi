@@ -138,11 +138,16 @@ class OTTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Note: these strings can be (and should be) localized. 
+    // But since other division names are not localized (yet), we leave them hardcoded for now. 
+    OTDivision homepageDivision = OTDivision(null, "主页", "展示所有板块", null);
+
     List<OTDivision> divisions =
-        context.select<ForumProvider, List<OTDivision>>(
-            (value) => value.divisionCache);
+        [homepageDivision, ...context.select<ForumProvider, List<OTDivision>>(
+            (value) => value.divisionCache)];
     OTDivision? division = context
         .select<ForumProvider, OTDivision?>((value) => value.currentDivision);
+
     int currentIndex = 0;
     if (division != null) {
       currentIndex = divisions.indexOf(division);
@@ -157,10 +162,15 @@ class OTTitle extends StatelessWidget {
           singleChoice: true,
           defaultChoice: currentIndex,
           onChoice: (Tag tag, list) {
-            division =
+            if (tag.tagTitle == homepageDivision.name) {
+              division = homepageDivision;
+              context.read<ForumProvider>().currentDivisionId = Homepage();
+            } else {
+              division =
                 divisions.firstWhere((element) => element.name == tag.tagTitle);
             context.read<ForumProvider>().currentDivisionId =
-                division?.division_id;
+                DivisionId(division!.division_id!);
+            }
             ChangeDivisionEvent(division!).fire();
           },
           tagList: divisions
@@ -352,8 +362,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
       TimeBasedLoadAdaptLayer(Constant.POST_COUNT_PER_PAGE, 1);
 
   /// Fields related to the display states.
-  static int getDivisionId(BuildContext context) =>
-      context.read<ForumProvider>().currentDivision?.division_id ?? 1;
+  static DivisionIdentifier getDivisionId(BuildContext context) =>
+      context.read<ForumProvider>().currentDivisionId ?? Homepage();
 
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
       context.read<ForumProvider>().userInfo?.config?.show_folded);
@@ -369,8 +379,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     // If no token, NotLoginError will be thrown.
     if (!context.read<ForumProvider>().isUserInitialized) {
       await ForumRepository.getInstance().initializeRepo();
-      context.read<ForumProvider>().currentDivisionId =
-          ForumRepository.getInstance().getDivisions().firstOrNull?.division_id;
+      context.read<ForumProvider>().currentDivisionId = Homepage();
     }
 
     bool answered =
@@ -428,7 +437,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           final requestDivisionId =
               _tagFilter == null ? getDivisionId(context) : null;
           return ForumRepository.getInstance().loadHoles(
-              time, requestDivisionId,
+              time, requestDivisionId!,
               tag: _tagFilter,
               sortOrder: context.read<SettingsProvider>().forumSortOrder);
         }).call(page);
@@ -487,8 +496,13 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   }
 
   Widget _autoSilenceNotice() {
+    final division = getDivisionId(context);
+    if (division is! DivisionId) {
+      return const SizedBox();
+    }
+
     final DateTime? silenceDate = ForumRepository.getInstance()
-        .getSilenceDateForDivision(getDivisionId(context))
+        .getSilenceDateForDivision(division.id)
         ?.toLocal();
     if (silenceDate == null || silenceDate.isBefore(DateTime.now())) {
       return const SizedBox();
@@ -524,8 +538,9 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     _fieldInitComplete = false;
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<CreateNewPostEvent>().listen((_) async {
+          final currentDivision = getDivisionId(context);
           final bool success =
-              await OTEditor.createNewPost(context, getDivisionId(context),
+              await OTEditor.createNewPost(context, currentDivision is DivisionId ? currentDivision.id : null,
                   interceptor: (_, PostEditorText? text) async {
             if (text?.tags.isEmpty ?? true) {
               return await Noticing.showConfirmationDialog(
