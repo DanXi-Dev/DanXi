@@ -525,6 +525,8 @@
   "clear_history_confirm": "是否清除本機瀏覽記錄？清除後無法恢復。",
   "export_log_confirmation": "匯出前請確認：\n1. 在本次應用執行期間內最近發生過錯誤。如果沒有，請先重現錯誤，然後立刻返回此處重新匯出日誌；\n2. 要求你分享日誌的是可信的開發者。日誌中可能包含你的個人敏感資訊（包括登入憑證），請謹慎分享。\n\n確認匯出日誌？",
   "export_log_exporting": "匯出日誌中…",
+  "open_image_folder": "打開所在資料夾",
+  "open_image_folder_failed": "無法打開圖片所在資料夾",
   "export_log_to_path": "日誌檔案已匯出到暫存檔案：{path}，請自行處理該檔案。",
   "export_log_success": "匯出成功",
   "hole_frozen": "已凍結",
