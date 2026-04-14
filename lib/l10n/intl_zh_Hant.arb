@@ -555,7 +555,7 @@
   "ai_summary_interaction_question": "質疑了",
   "ai_summary_no_permission": "你暫無使用 AI 總結的權限",
   "ai_summary_server_error": "服務暫時不可用，請稍後再試",
-  "ai_summary_disclaimer": "AI 生成，僅供參考 · 校內科研測試，不對外提供服務",
+  "ai_summary_disclaimer": "AI 輔助總結，僅供參考 · 校內科研測試，不對外提供服務",
   "ai_summary_trace_copied": "Trace ID 已複製",
   "ai_summary_enable": "AI 總結",
   "ai_summary_enable_description": "在帖子詳情頁顯示 AI 總結按鈕"
