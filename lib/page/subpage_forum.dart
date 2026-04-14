@@ -174,7 +174,10 @@ class OTTitle extends StatelessWidget {
             ChangeDivisionEvent(division!).fire();
           },
           tagList: divisions
-              .map((e) => Tag(e.name, null, checkedIcon: null))
+              .map((e) => Tag(
+                  e.name,
+                  e.name == homepageDivision.name ? Icons.all_inclusive : null,
+                  checkedIcon: null))
               .toList()),
     );
   }
