@@ -217,6 +217,29 @@ class ForumSubpage extends PlatformSubpage<ForumSubpage> {
           RefreshListEvent().fire();
         }
 
+        final SortOrder currentSortOrder =
+            cxt.select<SettingsProvider, SortOrder?>(
+                    (value) => value.forumSortOrder) ??
+                SortOrder.LAST_REPLIED;
+        final PopupMenuOption lastRepliedOption = PopupMenuOption(
+            label: S.of(cxt).last_replied,
+            cupertino: (context, platform) => CupertinoPopupMenuOptionData(
+                isDefaultAction: currentSortOrder == SortOrder.LAST_REPLIED),
+            onTap: (_) => onChangeSortOrder(cxt, SortOrder.LAST_REPLIED));
+        final PopupMenuOption lastCreatedOption = PopupMenuOption(
+            label: S.of(cxt).last_created,
+            cupertino: (context, platform) => CupertinoPopupMenuOptionData(
+                isDefaultAction: currentSortOrder == SortOrder.LAST_CREATED),
+            onTap: (_) => onChangeSortOrder(cxt, SortOrder.LAST_CREATED));
+        final List<PopupMenuOption> sortOptions = [
+          lastRepliedOption,
+          lastCreatedOption
+        ];
+        final PopupMenuOption currentSortOption =
+            currentSortOrder == SortOrder.LAST_CREATED
+                ? lastCreatedOption
+                : lastRepliedOption;
+
         return [
           if (cxt.select<ForumProvider, bool>(
               (value) => value.userInfo?.is_admin ?? false)) ...[
@@ -231,19 +254,18 @@ class ForumSubpage extends PlatformSubpage<ForumSubpage> {
           AppBarButtonItem(
               S.of(cxt).sort_order,
               PlatformPopupMenuX(
-                options: [
-                  PopupMenuOption(
-                      label: S.of(cxt).last_replied,
-                      onTap: (_) =>
-                          onChangeSortOrder(cxt, SortOrder.LAST_REPLIED)),
-                  PopupMenuOption(
-                      label: S.of(cxt).last_created,
-                      onTap: (_) =>
-                          onChangeSortOrder(cxt, SortOrder.LAST_CREATED))
-                ],
+                options: sortOptions,
                 cupertino: (context, platform) => CupertinoPopupMenuData(
                     cancelButtonData: CupertinoPopupMenuCancelButtonData(
                         child: Text(S.of(context).cancel))),
+                material: (context, platform) => MaterialPopupMenuData(
+                    initialValue: currentSortOption,
+                    itemBuilder: (context) => sortOptions
+                        .map((option) => CheckedPopupMenuItem<PopupMenuOption>(
+                            value: option,
+                            checked: option == currentSortOption,
+                            child: Text(option.label ?? '')))
+                        .toList()),
                 icon: Icon(PlatformX.isMaterial(cxt)
                     ? Icons.filter_list
                     : CupertinoIcons.sort_down_circle),
