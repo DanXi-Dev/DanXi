@@ -78,7 +78,8 @@ class FlutterTagging<T extends Taggable> extends StatefulWidget {
     BuildContext context,
     Animation<double> animation,
     Widget child,
-  )? transitionBuilder;
+  )?
+  transitionBuilder;
 
   /// The configuration of suggestion box.
   final SuggestionsBoxConfiguration<T> suggestionsBoxConfiguration;
@@ -122,28 +123,29 @@ class FlutterTagging<T extends Taggable> extends StatefulWidget {
   final List<T> initialItems;
 
   /// Creates a [FlutterTagging] widget.
-  const FlutterTagging(
-      {required this.initialItems,
-      required this.findSuggestions,
-      required this.configureChip,
-      required this.configureSuggestion,
-      this.onChanged,
-      this.additionCallback,
-      this.errorBuilder,
-      this.loadingBuilder,
-      this.emptyBuilder,
-      this.wrapConfiguration = const WrapConfiguration(),
-      this.textFieldConfiguration = const TextFieldConfiguration(),
-      this.suggestionsBoxConfiguration = const SuggestionsBoxConfiguration(),
-      this.transitionBuilder,
-      this.debounceDuration = const Duration(milliseconds: 300),
-      this.hideOnEmpty = false,
-      this.hideOnError = false,
-      this.hideOnLoading = false,
-      this.animationDuration = const Duration(milliseconds: 500),
-      this.onAdded,
-      super.key,
-      this.customChipBuilder});
+  const FlutterTagging({
+    required this.initialItems,
+    required this.findSuggestions,
+    required this.configureChip,
+    required this.configureSuggestion,
+    this.onChanged,
+    this.additionCallback,
+    this.errorBuilder,
+    this.loadingBuilder,
+    this.emptyBuilder,
+    this.wrapConfiguration = const WrapConfiguration(),
+    this.textFieldConfiguration = const TextFieldConfiguration(),
+    this.suggestionsBoxConfiguration = const SuggestionsBoxConfiguration(),
+    this.transitionBuilder,
+    this.debounceDuration = const Duration(milliseconds: 300),
+    this.hideOnEmpty = false,
+    this.hideOnError = false,
+    this.hideOnLoading = false,
+    this.animationDuration = const Duration(milliseconds: 500),
+    this.onAdded,
+    super.key,
+    this.customChipBuilder,
+  });
 
   @override
   FlutterTaggingState<T> createState() => FlutterTaggingState<T>();
@@ -160,7 +162,7 @@ class FlutterTaggingState<T extends Taggable> extends State<FlutterTagging<T>> {
     super.initState();
     _suggestionsController =
         widget.suggestionsBoxConfiguration.suggestionsBoxController ??
-            SuggestionsController<T>();
+        SuggestionsController<T>();
   }
 
   @override
@@ -185,35 +187,36 @@ class FlutterTaggingState<T extends Taggable> extends State<FlutterTagging<T>> {
           autoFlipDirection:
               widget.suggestionsBoxConfiguration.autoFlipDirection,
           direction: widget.suggestionsBoxConfiguration.direction,
-          hideWithKeyboard:
+          hideOnUnfocus:
               widget.suggestionsBoxConfiguration.hideSuggestionsOnKeyboardHide,
           retainOnLoading:
               widget.suggestionsBoxConfiguration.keepSuggestionsOnLoading,
           hideOnSelect: !widget
-              .suggestionsBoxConfiguration.keepSuggestionsOnSuggestionSelected,
+              .suggestionsBoxConfiguration
+              .keepSuggestionsOnSuggestionSelected,
           suggestionsController: _suggestionsController,
           decorationBuilder:
               widget.suggestionsBoxConfiguration.suggestionsBoxDecoration,
-          offset: Offset(0,
-              widget.suggestionsBoxConfiguration.suggestionsBoxVerticalOffset),
+          offset: Offset(
+            0,
+            widget.suggestionsBoxConfiguration.suggestionsBoxVerticalOffset,
+          ),
           errorBuilder: widget.errorBuilder,
           transitionBuilder: widget.transitionBuilder,
           loadingBuilder: (context) =>
               widget.loadingBuilder?.call(context) ??
-              const SizedBox(
-                height: 3.0,
-                child: LinearProgressIndicator(),
-              ),
+              const SizedBox(height: 3.0, child: LinearProgressIndicator()),
           emptyBuilder: widget.emptyBuilder,
           controller: _textController,
           focusNode: _focusNode,
           builder: (context, controller, focusNode) {
             return TextField(
-                controller: controller,
-                focusNode: focusNode,
-                enabled: widget.textFieldConfiguration.enabled,
-                autofocus: true,
-                decoration: widget.textFieldConfiguration.decoration);
+              controller: controller,
+              focusNode: focusNode,
+              enabled: widget.textFieldConfiguration.enabled,
+              autofocus: true,
+              decoration: widget.textFieldConfiguration.decoration,
+            );
           },
           suggestionsCallback: (query) async {
             final suggestions = await widget.findSuggestions(query);
