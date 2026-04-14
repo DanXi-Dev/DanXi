@@ -311,6 +311,11 @@ class Constant {
             "assets/graphics/HydrogenC.jpg",
             "https://github.com/HydrogenC",
             S.of(context).hydrogenc_description),
+        Developer(
+            "sseu-buhzzi",
+            "assets/graphics/sseu-buhzzi.png",
+            "https://github.com/sseu-buhzzi",
+            ""),
       ];
 
   /// Add a Chinese symbol(￥) at the end of [num].
