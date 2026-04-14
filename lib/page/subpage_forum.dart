@@ -437,10 +437,10 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
             time = DateTime.parse(lastElement.time_updated!);
           }
 
-          final requestDivisionId =
+          final DivisionIdentifier? requestDivisionId =
               _tagFilter == null ? getDivisionId(context) : null;
           return ForumRepository.getInstance().loadHoles(
-              time, requestDivisionId!,
+              time, requestDivisionId,
               tag: _tagFilter,
               sortOrder: context.read<SettingsProvider>().forumSortOrder);
         }).call(page);
@@ -459,8 +459,10 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
         // Filter blocked posts
         List<OTTag> hiddenTags =
             SettingsProvider.getInstance().hiddenTags ?? [];
-        loadedPost?.removeWhere((element) => element.tags!.any((thisTag) =>
-            hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
+        loadedPost?.removeWhere((element) =>
+            element.tags?.any((thisTag) =>
+                hiddenTags.any((blockTag) => thisTag.name == blockTag.name)) ??
+            false);
         // Filter hidden posts
         List<int> hiddenPosts = SettingsProvider.getInstance().hiddenHoles;
         loadedPost?.removeWhere((element) =>

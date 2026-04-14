@@ -337,7 +337,7 @@ class ForumRepository extends BaseRepositoryWithDio {
     return newDivision;
   }
 
-  Future<List<OTHole>?> loadHoles(DateTime startTime, DivisionIdentifier division,
+  Future<List<OTHole>?> loadHoles(DateTime startTime, DivisionIdentifier? division,
       {int length = Constant.POST_COUNT_PER_PAGE,
       String? tag,
       SortOrder? sortOrder}) async {
@@ -354,14 +354,13 @@ class ForumRepository extends BaseRepositoryWithDio {
             "order": sortOrder.getInternalString()
           },
           headers: _tokenHeader);
-    } else if (division is DivisionId) {
-      int divisionId = division.id;
+    } else if (division == null || division is DivisionId) {
       options = RequestOptions(
           path: "$_BASE_URL/holes",
           method: "GET",
           queryParameters: {
             "start_time": startTime.toUtc().toIso8601String(),
-            "division_id": divisionId,
+            if (division is DivisionId) "division_id": division.id,
             "length": length,
             "tag": tag,
             "order": sortOrder.getInternalString()
