@@ -349,9 +349,8 @@ class ForumRepository extends BaseRepositoryWithDio {
           path: "$_BASE_URL/holes/_homepage",
           method: "GET",
           queryParameters: {
-            "start_time": startTime.toUtc().toIso8601String(),
-            "length": length,
-            "tag": tag,
+            "offset": startTime.toUtc().toIso8601String(),
+            "size": length,
             "order": sortOrder.getInternalString()
           },
           headers: _tokenHeader);
