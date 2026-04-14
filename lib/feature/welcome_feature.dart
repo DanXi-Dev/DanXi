@@ -89,7 +89,7 @@ class WelcomeFeature extends Feature {
 
   @override
   Widget? get customSubtitle {
-    if (SettingsProvider.getInstance().debugMode) {
+    if (PlatformX.isDebugMode(context)) {
       return const Text(
         "Welcome, developer. [Debug Mode Enabled]",
         style: TextStyle(color: Colors.red),

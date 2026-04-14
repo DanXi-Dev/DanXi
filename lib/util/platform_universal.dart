@@ -23,7 +23,9 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/src/platform.dart' as platform_impl;
+import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 /// A universal implementation of [Platform] in dart:io and [kIsWeb] in dart:core.
@@ -165,5 +167,60 @@ class PlatformX {
     } else {
       return true;
     }
+  }
+
+  static Future<bool> openContainingFolder(String filePath) async {
+    Future<bool> runCommand(String executable, List<String> arguments) async {
+      try {
+        ProcessResult result = await Process.run(executable, arguments);
+        return result.exitCode == 0;
+      } on ProcessException {
+        return false;
+      }
+    }
+
+    if (isWeb) return false;
+    final File file = File(filePath);
+    final String absolutePath = file.absolute.path;
+    final String directoryPath = file.parent.absolute.path;
+    bool opened = false;
+
+    if (isWindows) {
+      opened = await runCommand('explorer', ['/select,$absolutePath']);
+      if (!opened) {
+        opened = await runCommand('explorer', ['/select,', absolutePath]);
+      }
+    } else if (isMacOS) {
+      opened = await runCommand('open', ['-R', absolutePath]);
+    } else if (isLinux) {
+      final String fileUri = Uri.file(absolutePath).toString();
+      opened = await runCommand('dbus-send', [
+        '--session',
+        '--dest=org.freedesktop.FileManager1',
+        '--type=method_call',
+        '--print-reply',
+        '/org/freedesktop/FileManager1',
+        'org.freedesktop.FileManager1.ShowItems',
+        'array:string:$fileUri',
+        'string:',
+      ]);
+    }
+
+    if (!opened) {
+      try {
+        opened = (await OpenFile.open(directoryPath)).type == ResultType.done;
+      } catch (_) {}
+    }
+
+    if (!opened) {
+      try {
+        opened = await launchUrl(
+          Uri.directory(directoryPath),
+          mode: LaunchMode.externalApplication,
+        );
+      } catch (_) {}
+    }
+
+    return opened;
   }
 }

@@ -18,7 +18,9 @@
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/util/lazy_future.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
@@ -273,6 +275,12 @@ class PagedListViewState<T> extends State<PagedListView<T>>
             setState(() {
               _futureData = _setFuture(useInitialData: false);
             });
+          },
+          onLongPress: () {
+            if (snapshot?.error == null) return;
+            HapticFeedbackUtil.medium();
+            Noticing.showErrorDialog(context, snapshot!.error,
+                trace: snapshot.stackTrace);
           }),
     );
   }
