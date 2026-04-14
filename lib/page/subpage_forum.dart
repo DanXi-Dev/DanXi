@@ -140,7 +140,7 @@ class OTTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     // Note: these strings can be (and should be) localized. 
     // But since other division names are not localized (yet), we leave them hardcoded for now. 
-    OTDivision homepageDivision = OTDivision(null, "主页", "展示所有板块", null);
+    OTDivision homepageDivision = OTDivision(null, "全站", "展示所有板块", null);
 
     List<OTDivision> divisions =
         [homepageDivision, ...context.select<ForumProvider, List<OTDivision>>(
