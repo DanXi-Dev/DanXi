@@ -470,25 +470,18 @@ class AiSummarySheet extends ConsumerWidget {
       BuildContext context, WidgetRef ref, Object error, StackTrace stackTrace) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            _resolveError(context, error, stackTrace),
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 12),
-          OutlinedButton(
-            onPressed: () async {
-              try {
-                await ForumRepository.getInstance()
-                    .loadAiSummary(holeId, forceRefresh: true);
-              } catch (_) {}
-              ref.invalidate(aiSummaryProvider(holeId));
-            },
-            child: Text(S.of(context).retry),
-          ),
-        ],
+      child: ErrorPageWidget(
+        buttonText: S.of(context).retry,
+        errorMessage: _resolveError(context, error, stackTrace),
+        error: error,
+        trace: stackTrace,
+        onTap: () async {
+          try {
+            await ForumRepository.getInstance()
+                .loadAiSummary(holeId, forceRefresh: true);
+          } catch (_) {}
+          ref.invalidate(aiSummaryProvider(holeId));
+        },
       ),
     );
   }
