@@ -41,10 +41,8 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart'
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:intl/intl.dart';
-import 'package:platform_device_id/platform_device_id.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:uuid/uuid.dart';
 
 class DiagnosticConsole extends StatefulWidget {
   final Map<String, dynamic>? arguments;
@@ -94,18 +92,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     _console.writeln(
         "Forum Token stored: ${context.read<SettingsProvider>().forumToken}");
 
-    String? deviceId;
-    try {
-      deviceId = await PlatformDeviceId.getDeviceId;
-    } catch (error, stackTrace) {
-      _console.writeln("Met error when retrieving Device Id! Error is:$error");
-      _console.writeln(stackTrace);
-    }
-    if (deviceId == null) {
-      _console.writeln("Your Device Id(Random UUID): ${const Uuid().v4()}");
-    } else {
-      _console.writeln("Your Device Id(Real ID): $deviceId");
-    }
+    _console.writeln('Device identifier diagnostics disabled in FOSS build.');
   }
 
   Future<void> diagnoseGoogleAds() async {}
@@ -329,13 +316,14 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   }
 
   Future<void> setUserAgent() async {
-    String? ua = await Noticing.showInputDialog(context, "Input user agent");
+    final settingsProvider = context.read<SettingsProvider>();
+    String? ua = await Noticing.showInputDialog(
+      context,
+      "Input user agent",
+      initialText: settingsProvider.customUserAgent,
+    );
     if (ua == null || !mounted) return;
-    if (ua.isEmpty) {
-      context.read<SettingsProvider>().customUserAgent = null;
-    } else {
-      context.read<SettingsProvider>().customUserAgent = ua;
-    }
+    settingsProvider.customUserAgent = ua.isEmpty ? null : ua;
     Noticing.showNotice(context, "Restart app to take effects");
   }
 

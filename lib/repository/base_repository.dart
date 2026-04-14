@@ -41,7 +41,7 @@ abstract class BaseRepositoryWithDio {
   @protected
   Dio get dio {
     if (!_dios.containsKey(linkHost)) {
-      _dios[linkHost] = DioUtils.newDioWithProxy();
+      _dios[linkHost] = DioUtils.newDioWithProxy(track: true);
       _dios[linkHost]!.options = BaseOptions(
           receiveDataWhenStatusError: true,
           connectTimeout: const Duration(seconds: 2),

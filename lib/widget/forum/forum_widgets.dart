@@ -29,13 +29,13 @@ import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/forum/human_duration.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/viewport_utils.dart';
 import 'package:dan_xi/util/watermark.dart';
-import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/widget/forum/render/base_render.dart';
 import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
@@ -93,8 +93,64 @@ Widget generateTagWidgets(BuildContext context, OTHole? e,
     direction: Axis.horizontal,
     spacing: 4,
     runSpacing: 4,
+    crossAxisAlignment: WrapCrossAlignment.center,
     children: tags,
   );
+}
+
+/// Generates status chips for a hole or floor card.
+///
+/// [floor] should be null if this is called to generate chips for a hole card.
+/// [hole] is usually not null.
+List<Widget> generateChipWidgets(
+  BuildContext context,
+  OTHole? hole,
+  OTFloor? floor,
+  bool isPinned,
+) {
+  final inHoleCard = floor == null;
+  final isOp = inHoleCard || hole?.floors?.first_floor == floor;
+  floor ??= hole?.floors?.first_floor;
+  return [
+    if (!inHoleCard && floor?.deleted == true)
+      LeadingChip(
+        color: Theme.of(context).colorScheme.primary,
+        label: S.of(context).deleted,
+      ),
+
+    if (floor?.special_tag?.isNotEmpty == true)
+      LeadingChip(color: Colors.red, label: floor?.special_tag!),
+
+    // We will only show the hidden tag if this hole is hidden
+    // and this floor is the first floor.
+    if (isOp && hole?.hidden == true)
+      LeadingChip(color: Colors.red, label: S.of(context).hole_hidden),
+
+    // Ditto.
+    if (isOp && hole?.isForceDeleted == true)
+      LeadingChip(color: Colors.red, label: S.of(context).hole_force_deleted),
+
+    // Show locked tag if the hole is locked and this is the first floor
+    if (isOp && hole?.locked == true)
+      LeadingChip(
+        color: Theme.of(context).colorScheme.primary,
+        label: S.of(context).hole_locked,
+      ),
+
+    // Show frozen tag if the hole is frozen and this is the first floor
+    if (isOp && hole?.frozen == true)
+      LeadingChip(
+        color: Theme.of(context).colorScheme.primary,
+        label: S.of(context).hole_frozen,
+      ),
+
+    // Show pinned tag if this hole is in the pinned list and this is the first floor
+    if (isOp && isPinned)
+      LeadingChip(
+        color: Theme.of(context).colorScheme.primary,
+        label: S.of(context).pinned,
+      ),
+  ];
 }
 
 class OTHoleWidget extends StatelessWidget {
@@ -128,6 +184,8 @@ class OTHoleWidget extends StatelessWidget {
     final TextStyle infoStyle =
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
 
+    final chips = generateChipWidgets(context, postElement, null, isPinned);
+
     return Card(
       color: translucent
           ? Theme.of(context).cardTheme.color?.withValues(alpha: 0.8)
@@ -144,64 +202,27 @@ class OTHoleWidget extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                              child: generateTagWidgets(context, postElement,
-                                  (String? tagName) {
-                            smartNavigatorPush(context, '/bbs/discussions',
-                                arguments: {"tagFilter": tagName},
-                                forcePushOnMainNavigator: true);
-                          },
-                                  context
-                                      .read<SettingsProvider>()
-                                      .useAccessibilityColoring)),
-                          Row(
-                            //mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              if (isPinned)
-                                LeadingChip(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  label: S.of(context).pinned,
-                                ),
-                              if (postElement.floors?.first_floor?.special_tag
-                                      ?.isNotEmpty ==
-                                  true) ...[
-                                const SizedBox(width: 4),
-                                LeadingChip(
-                                  color: Colors.red,
-                                  label: postElement
-                                      .floors!.first_floor!.special_tag!,
-                                ),
-                              ],
-                              if (postElement.hidden == true) ...[
-                                const SizedBox(width: 4),
-                                LeadingChip(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  label: S.of(context).hole_hidden,
-                                ),
-                              ],
-                              if (postElement.isForceDeleted) ...[
-                                const SizedBox(width: 4),
-                                LeadingChip(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  label: S.of(context).hole_force_deleted,
-                                ),
-                              ],
-                              if (postElement.locked == true) ...[
-                                const SizedBox(width: 4),
-                                LeadingChip(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  label: S.of(context).hole_locked,
-                                )
-                              ],
-                              if (postElement.frozen == true) ...[
-                                const SizedBox(width: 4),
-                                LeadingChip(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  label: S.of(context).hole_frozen,
-                                )
-                              ]
-                            ],
+                            flex: postElement.tags?.length.clamp(1, 4) ?? 1,
+                            child: generateTagWidgets(context, postElement,
+                                (String? tagName) {
+                                  smartNavigatorPush(context,
+                                      '/bbs/discussions',
+                                      arguments: {"tagFilter": tagName},
+                                      forcePushOnMainNavigator: true);
+                                },
+                                context
+                                    .read<SettingsProvider>()
+                                    .useAccessibilityColoring)),
+                          Expanded(
+                            flex: chips.length.clamp(1, 4),
+                            child: Wrap(
+                              direction: Axis.horizontal,
+                              alignment: WrapAlignment.end,
+                              spacing: 4,
+                              runSpacing: 4,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: chips,
+                            ),
                           ),
                         ]),
                     const SizedBox(height: 4),
@@ -246,7 +267,7 @@ class OTHoleWidget extends StatelessWidget {
                       ]),
                     ]),
               ]),
-              onTap: () { 
+              onTap: () {
                 HapticFeedbackUtil.light();
                 smartNavigatorPush(context, "/bbs/postDetail",
                   arguments: {"post": postElement});
@@ -423,91 +444,34 @@ class OTFloorWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      ColoredBox(
-                          color: nameColor,
-                          child: const SizedBox(width: 2, height: 12)),
-                      const SizedBox(width: 8),
-                      if (floor.anonyname ==
-                          parentHole?.floors?.first_floor?.anonyname) ...[
-                        LeadingChip(color: nameColor),
-                        const SizedBox(width: 4),
-                      ],
-                      Text(
-                        floor.anonyname!,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: nameColor),
-                      ),
-                      const SizedBox(
-                        width: 4,
-                      ),
-                      if (floor.deleted == true) ...[
-                        const SizedBox(width: 4),
-                        LeadingChip(
-                          color: Theme.of(context).colorScheme.primary,
-                          label: S.of(context).deleted,
+                  Expanded(
+                    child: Wrap(
+                      direction: Axis.horizontal,
+                      spacing: 4,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        ColoredBox(
+                            color: nameColor,
+                            child: const SizedBox(width: 2, height: 12)),
+                        const SizedBox(),
+                        if (floor.anonyname ==
+                            parentHole?.floors?.first_floor?.anonyname)
+                          LeadingChip(color: nameColor),
+                        Text(
+                          floor.anonyname!,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: nameColor),
+                        ),
+                        const SizedBox(),
+                        ...generateChipWidgets(
+                          context,
+                          parentHole,
+                          floor,
+                          isPinned,
                         ),
                       ],
-                      if (floor.special_tag?.isNotEmpty == true) ...[
-                        const SizedBox(width: 4),
-                        LeadingChip(
-                          color: Colors.red,
-                          label: floor.special_tag!,
-                        ),
-                      ],
-                      // We will only show the hidden tag if this hole is hidden
-                      // and this floor is the first floor.
-                      if (parentHole?.hidden == true &&
-                          floor.floor_id ==
-                              parentHole?.floors?.first_floor?.floor_id) ...[
-                        const SizedBox(width: 4),
-                        LeadingChip(
-                          color: Colors.red,
-                          label: S.of(context).hole_hidden,
-                        ),
-                      ],
-                      // Ditto.
-                      if (parentHole?.isForceDeleted == true &&
-                          floor.floor_id ==
-                              parentHole?.floors?.first_floor?.floor_id) ...[
-                        const SizedBox(width: 4),
-                        LeadingChip(
-                          color: Colors.red,
-                          label: S.of(context).hole_force_deleted,
-                        ),
-                      ],
-                      // Show locked tag if the hole is locked and this is the first floor
-                      if (parentHole?.locked == true &&
-                          floor.floor_id ==
-                              parentHole?.floors?.first_floor?.floor_id) ...[
-                        const SizedBox(width: 4),
-                        LeadingChip(
-                          color: Theme.of(context).colorScheme.primary,
-                          label: S.of(context).hole_locked,
-                        ),
-                      ],
-                      // Show frozen tag if the hole is frozen and this is the first floor
-                      if (parentHole?.frozen == true &&
-                          floor.floor_id ==
-                              parentHole?.floors?.first_floor?.floor_id) ...[
-                        const SizedBox(width: 4),
-                        LeadingChip(
-                          color: Theme.of(context).colorScheme.primary,
-                          label: S.of(context).hole_frozen,
-                        ),
-                      ],
-                      // Show pinned tag if this hole is in the pinned list and this is the first floor
-                      if (isPinned &&
-                          floor.floor_id ==
-                              parentHole?.floors?.first_floor?.floor_id) ...[
-                        const SizedBox(width: 4),
-                        LeadingChip(
-                          color: Theme.of(context).colorScheme.primary,
-                          label: S.of(context).pinned,
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
                   if (showToolBars && !floor.deleted!)
                     OTFloorToolBar(
@@ -686,16 +650,12 @@ class OTFloorMentionWidget extends StatelessWidget {
 
   static Future<bool?> showFloorDetail(BuildContext context, OTFloor floor,
       [String? extraTips]) {
-    bool inThatFloorPage = false;
-    PagedListViewController<OTFloor>? pagedListViewController;
-    try {
-      // Find the PagedListViewController
-      pagedListViewController = context
-          .findAncestorWidgetOfExactType<PagedListView<OTFloor>>()!
-          .pagedController!;
-      // If this floor is directly in the hole
-      inThatFloorPage = (pagedListViewController.indexOf(floor) != -1);
-    } catch (_) {}
+    final scope = FloorHighlightScope.of(context);
+    final pagedListViewController = context
+        .findAncestorWidgetOfExactType<PagedListView<OTFloor>>()
+        ?.pagedController;
+    final inThatFloorPage = pagedListViewController != null &&
+        pagedListViewController.indexOf(floor) != -1;
 
     return showPlatformModalSheet<bool?>(
         context: context,
@@ -735,13 +695,20 @@ class OTFloorMentionWidget extends StatelessWidget {
                           // This is to prevent looking up deactivated context after [pop].
                           Navigator.pop(cxt);
                           // If this floor is directly in the hole
-                          if (inThatFloorPage &&
-                              pagedListViewController != null) {
-                            // Scroll to the corresponding post
+                          if (inThatFloorPage) {
+                            // Scroll to the corresponding post, then highlight
                             pagedListViewController.scheduleLoadedCallback(
-                                () async => await pagedListViewController!
-                                    .scrollToItem(floor),
-                                rebuild: true);
+                                () async {
+                              await pagedListViewController
+                                  .scrollToItem(floor);
+                              if (floor.floor_id != null) {
+                                scope?.onHighlight(floor.floor_id!);
+                              }
+                            }, rebuild: true);
+                          } else if (scope?.onLocate != null) {
+                            // Fallback: use scope to scroll + highlight
+                            // (e.g. from inside a modal that can't find PagedListView)
+                            await scope!.onLocate!(floor);
                           } else {
                             // If this floor is in another hole
                             await jumpToFloorInNewPage(context, floor);
@@ -760,14 +727,18 @@ class OTFloorMentionWidget extends StatelessWidget {
               ),
             ],
           ).withWatermarkRegion();
+          // Propagate the scope so nested showFloorDetail calls at any depth
+          // can still scroll + highlight instead of opening a new page.
+          final Widget content = scope != null
+              ? FloorHighlightScope(
+                  onHighlight: scope.onHighlight,
+                  onLocate: scope.onLocate,
+                  child: cardBody)
+              : cardBody;
           if (PlatformX.isCupertino(context)) {
-            return SafeArea(
-              child: Card(
-                child: cardBody,
-              ),
-            );
+            return SafeArea(child: Card(child: content));
           } else {
-            return SafeArea(child: cardBody);
+            return SafeArea(child: content);
           }
         });
   }
@@ -1106,3 +1077,26 @@ class OTMessageItemState extends State<OTMessageItem> {
 }
 
 enum OTMentionType { FLOOR, HOLE }
+
+/// Provides callbacks for scrolling to and highlighting a floor.
+/// Place this above the [PagedListView] in the widget tree.
+/// Also wrap modal content with this so nested [showFloorDetail] calls
+/// can scroll + highlight even without direct [PagedListView] access.
+class FloorHighlightScope extends InheritedWidget {
+  final void Function(int floorId) onHighlight;
+  final Future<void> Function(OTFloor floor)? onLocate;
+
+  const FloorHighlightScope({
+    super.key,
+    required this.onHighlight,
+    this.onLocate,
+    required super.child,
+  });
+
+  static FloorHighlightScope? of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<FloorHighlightScope>();
+
+  @override
+  bool updateShouldNotify(FloorHighlightScope oldWidget) =>
+      onHighlight != oldWidget.onHighlight || onLocate != oldWidget.onLocate;
+}

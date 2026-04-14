@@ -23,7 +23,7 @@ import 'package:http/http.dart';
 
 /// [HttpFileService], but backed by dio and supports webvpn.
 class HttpFileServiceWithWebvpn extends FileService {
-  final Dio _dio = DioUtils.newDioWithProxy();
+  final Dio _dio = DioUtils.newDioWithProxy(track: true);
 
   HttpFileServiceWithWebvpn() {
     _dio.interceptors.add(WebVPNInterceptor());

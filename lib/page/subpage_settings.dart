@@ -97,8 +97,8 @@ class SettingsPageState extends State<SettingsPage> {
         "https://github.com/dart-lang/markdown"),
     LicenseItem("flutter_typeahead", LICENSE_BSD_2_0_CLAUSE,
         "https://github.com/AbdulRahmanAlHamali/flutter_typeahead"),
-    LicenseItem("flutter_markdown", LICENSE_BSD_3_0_CLAUSE,
-        "https://github.com/flutter/packages/tree/master/packages/flutter_markdown"),
+    LicenseItem("flutter_markdown_plus", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/w568w/flutter_markdown_plus"),
     LicenseItem("image_picker", LICENSE_APACHE_2_0,
         "https://github.com/flutter/plugins/tree/master/packages/image_picker/image_picker"),
     LicenseItem("Kotlin Stdlib Jdk7", LICENSE_APACHE_2_0,
@@ -159,10 +159,6 @@ class SettingsPageState extends State<SettingsPage> {
     LicenseItem("http", LICENSE_BSD, "https://github.com/dart-lang/http"),
     LicenseItem(
         "ical", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dartclub/ical"),
-    LicenseItem("platform_device_id", LICENSE_BSD_3_0_CLAUSE,
-        "https://github.com/BestBurning/platform_device_id"),
-    // LicenseItem("in_app_review", LICENSE_MIT,
-    //     "https://github.com/britannio/in_app_review"),
     LicenseItem("intl", LICENSE_BSD, "https://github.com/dart-lang/intl"),
     LicenseItem("json_serializable", LICENSE_BSD,
         "https://github.com/google/json_serializable.dart/tree/master/json_serializable"),
@@ -202,8 +198,8 @@ class SettingsPageState extends State<SettingsPage> {
         "https://github.com/ajinasokan/flutter_fgbg"),
     LicenseItem("lazy_load_indexed_stack", LICENSE_MIT,
         "https://github.com/okaryo/lazy_load_indexed_stack"),
-    LicenseItem("screen_capture_event", LICENSE_MIT,
-        "https://github.com/nizwar/screen_capture_event"),
+    LicenseItem("no_screenshot", LICENSE_BSD_3_0_CLAUSE,
+        "https://github.com/FlutterPlaza/no_screenshot"),
     LicenseItem("otp", LICENSE_MIT, "https://github.com/Daegalus/dart-otp"),
     LicenseItem(
         "js", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dart-lang/sdk"),
@@ -218,14 +214,10 @@ class SettingsPageState extends State<SettingsPage> {
         "https://github.com/feicien/flutter_swiper_view"),
     LicenseItem("mutex", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/hoylen/dart-mutex"),
-    LicenseItem("receive_intent", LICENSE_GPL_3_0,
-        "https://github.com/w568w/receive_intent"),
     LicenseItem("flutter_secure_storage", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/mogol/flutter_secure_storage"),
     LicenseItem("encrypt_shared_preferences", LICENSE_APACHE_2_0,
         "https://github.com/xaldarof/encrypted-shared-preferences"),
-    LicenseItem("device_identity", LICENSE_MIT,
-        "https://github.com/50431040/device_identity"),
     LicenseItem("tutorial_coach_mark", LICENSE_MIT,
         "https://github.com/RafaelBarbosatec/tutorial_coach_mark"),
     LicenseItem("toml", LICENSE_MIT, "https://github.com/just95/toml.dart"),
@@ -850,6 +842,20 @@ class SettingsPageState extends State<SettingsPage> {
                                   },
                         ),
                     selector: (_, model) => model.isBannerEnabled),
+                Selector<SettingsProvider, bool>(
+                    builder: (_, bool value, __) => SwitchListTile.adaptive(
+                          title: Text(S.of(context).ai_summary_enable),
+                          secondary: const Icon(Icons.auto_awesome),
+                          subtitle:
+                              Text(S.of(context).ai_summary_enable_description),
+                          value: value,
+                          onChanged: (bool value) {
+                            HapticFeedbackUtil.light();
+                            SettingsProvider.getInstance().isAiSummaryEnabled =
+                                value;
+                          },
+                        ),
+                    selector: (_, model) => model.isAiSummaryEnabled),
                 Selector<SettingsProvider, bool>(
                     builder: (_, bool value, __) => SwitchListTile.adaptive(
                           title: Text(S.of(context).forum_clean_mode),

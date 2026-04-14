@@ -22,6 +22,19 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'division.g.dart';
 
+sealed class DivisionIdentifier {
+  const DivisionIdentifier();
+}
+
+class Homepage extends DivisionIdentifier {
+  const Homepage();
+}
+
+class DivisionId extends DivisionIdentifier {
+  final int id;
+  const DivisionId(this.id);
+}
+
 @JsonSerializable()
 class OTDivision {
   int? division_id;

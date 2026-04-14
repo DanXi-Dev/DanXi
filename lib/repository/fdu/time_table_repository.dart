@@ -26,6 +26,7 @@ import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/util/io/cache.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
+import 'package:dan_xi/util/type_requires.dart';
 import 'package:dio/dio.dart';
 
 class TimeTableRepository extends BaseRepositoryWithDio {
@@ -33,6 +34,8 @@ class TimeTableRepository extends BaseRepositoryWithDio {
       'https://fdjwgl.fudan.edu.cn/student/for-std/course-table/semester/{sem_id}/print-data';
   static const String TIMETABLE_URL =
       'https://fdjwgl.fudan.edu.cn/student/for-std/course-table';
+  static const String LESSON_SEARCH_URL =
+      'https://fdjwgl.fudan.edu.cn/student/for-all/lesson-search';
   static const String KEY_TIMETABLE_CACHE = "timetable";
 
   TimeTableRepository._();
@@ -68,6 +71,18 @@ class TimeTableRepository extends BaseRepositoryWithDio {
     );
     return FudanSession.request(options, (res) {
       return _parseSemesters(res.data!);
+    });
+  }
+
+  /// Load all semesters from the lesson search page, newest first.
+  Future<List<SemesterInfo>> loadAllSemesters() {
+    final options = RequestOptions(
+      method: "GET",
+      path: LESSON_SEARCH_URL,
+    );
+    return FudanSession.request(options, (res) {
+      final String data = require(res.data, () => FudanApiException(options.uri.toString()));
+      return _parseSemestersFromLessonSearch(data);
     });
   }
 
@@ -152,6 +167,24 @@ class TimeTableRepository extends BaseRepositoryWithDio {
       defaultSemesterId,
       SemesterStartDates(startDates),
     );
+  }
+
+  List<SemesterInfo> _parseSemestersFromLessonSearch(String html) {
+    final soup = BeautifulSoup(html);
+    final optionElements = soup.findAll("select#semester option[name=\"semesterAssoc\"]");
+
+    final semesters = optionElements
+        .map((element) {
+          try {
+            return SemesterInfo.fromLessonSearchElement(element);
+          } on FudanApiException {
+            return null;
+          }
+        })
+        .nonNulls
+        .toList(growable: false);
+
+    return semesters;
   }
 
   String _parseDefaultSemesterId(String semesterHtml) {

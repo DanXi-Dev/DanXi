@@ -23,7 +23,6 @@ import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/util/vague_time.dart';
 import 'package:dan_xi/widget/time_table/day_events.dart';
 import 'package:dan_xi/widget/time_table/schedule_view.dart';
-import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'time_table.g.dart';
@@ -81,30 +80,26 @@ class TimeTable {
     return startDate ?? Constant.DEFAULT_SEMESTER_START_DATE;
   }
 
-  /// A Monday.
-  ///
-  /// It is randomly selected, without special meaning. You can use any Monday to replace it.
-  static final DateTime kMonday = DateTime(2021, 3, 22);
   static const int MINUTES_OF_COURSE = 45;
   static const int MAX_WEEK = 18;
 
   /// The start time of each slot in a day.
-  static final List<VagueTime> kCourseSlotStartTime = [
-    const VagueTime(hour: 8, minute: 0),
-    const VagueTime(hour: 8, minute: 55),
-    const VagueTime(hour: 9, minute: 55),
-    const VagueTime(hour: 10, minute: 50),
-    const VagueTime(hour: 11, minute: 45),
-    const VagueTime(hour: 13, minute: 30),
-    const VagueTime(hour: 14, minute: 25),
-    const VagueTime(hour: 15, minute: 25),
-    const VagueTime(hour: 16, minute: 20),
-    const VagueTime(hour: 17, minute: 15),
-    const VagueTime(hour: 18, minute: 30),
-    const VagueTime(hour: 19, minute: 25),
-    const VagueTime(hour: 20, minute: 20),
-    const VagueTime(hour: 21, minute: 15),
-    const VagueTime(hour: 22, minute: 10),
+  static final List<VagueTime> kCourseSlotStartTime = const [
+    VagueTime(hour: 8, minute: 0),
+    VagueTime(hour: 8, minute: 55),
+    VagueTime(hour: 9, minute: 55),
+    VagueTime(hour: 10, minute: 50),
+    VagueTime(hour: 11, minute: 45),
+    VagueTime(hour: 13, minute: 30),
+    VagueTime(hour: 14, minute: 25),
+    VagueTime(hour: 15, minute: 25),
+    VagueTime(hour: 16, minute: 20),
+    VagueTime(hour: 17, minute: 15),
+    VagueTime(hour: 18, minute: 30),
+    VagueTime(hour: 19, minute: 25),
+    VagueTime(hour: 20, minute: 20),
+    VagueTime(hour: 21, minute: 15),
+    VagueTime(hour: 22, minute: 10),
   ];
 
   /// All courses in the timetable.
@@ -246,7 +241,7 @@ class TimeTable {
           (compact == TableDisplayType.STANDARD && i <= DateTime.friday - 1) ||
           table[i]!.isNotEmpty) {
         result.add(DayEvents(
-            day: DateFormat.E().format(kMonday.add(Duration(days: i))),
+            day: Constant.weekDay(i),
             events: table[i]!,
             weekday: i));
       }
@@ -269,6 +264,8 @@ enum TableDisplayType {
 
 @JsonSerializable()
 class Course {
+  static const MANUALLY_ADDED_ROOM_ID = "999999";
+
   List<String>? teacherNames;
   String? courseId;
   String? courseName;
@@ -321,13 +318,36 @@ class Course {
       ..times = courseTimes;
   }
 
+  Course copyWith({
+    List<String>? teacherNames,
+    String? courseId,
+    String? courseName,
+    String? roomId,
+    String? roomName,
+    List<int>? availableWeeks,
+    List<CourseTime>? times,
+  }) {
+    return Course()
+      ..teacherNames = (teacherNames ?? this.teacherNames)?.toList()
+      ..courseId = courseId ?? this.courseId
+      ..courseName = courseName ?? this.courseName
+      ..roomId = roomId ?? this.roomId
+      ..roomName = roomName ?? this.roomName
+      ..availableWeeks = (availableWeeks ?? this.availableWeeks)?.toList()
+      ..times = (times ?? this.times)
+          ?.map((element) => CourseTime(element.weekDay, element.slot))
+          .toList();
+  }
+
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseToJson(this);
+
+  bool get isManuallyAdded => roomId == MANUALLY_ADDED_ROOM_ID;
 }
 
 @JsonSerializable()
-class CourseTime {
+class CourseTime implements Comparable<CourseTime> {
   //Monday is 0, Morning lesson is 0
   int weekDay, slot;
 
@@ -337,6 +357,26 @@ class CourseTime {
       _$CourseTimeFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseTimeToJson(this);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CourseTime &&
+          runtimeType == other.runtimeType &&
+          weekDay == other.weekDay &&
+          slot == other.slot;
+
+  @override
+  int get hashCode => Object.hash(weekDay, slot);
+
+  @override
+  int compareTo(CourseTime other) {
+    var result = weekDay.compareTo(other.weekDay);
+    if (result == 0) {
+      result = slot.compareTo(other.slot);
+    }
+    return result;
+  }
 }
 
 /// Representation of the [slot]-th lesson on the [weekday]-th day of week in the [week]-th weeks of this semester.

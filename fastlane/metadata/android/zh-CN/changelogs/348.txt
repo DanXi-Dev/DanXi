@@ -1,0 +1,1 @@
+本次更新带来若干实用新功能，并修复了近期反馈的一批稳定性与兼容性问题。完整更新日志请看 https://github.com/DanXi-Dev/DanXi/releases。

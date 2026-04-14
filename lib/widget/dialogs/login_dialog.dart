@@ -20,9 +20,9 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/repository/fdu/ecard_repository.dart';
 import 'package:dan_xi/repository/fdu/ehall_repository.dart';
-import 'package:dan_xi/repository/fdu/uis_login_tool.dart';
+import 'package:dan_xi/repository/fdu/neo_login_tool.dart' as neo;
+import 'package:dan_xi/repository/fdu/uis_login_tool.dart' as uis;
 import 'package:dan_xi/util/browser_util.dart';
-import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -195,7 +195,8 @@ class LoginDialog extends HookConsumerWidget {
     try {
       await _tryLogin(context, nameController.text, pwdController.text, group);
     } catch (error, stack) {
-      if (error is CredentialsInvalidException) {
+      if (error is uis.CredentialsInvalidException ||
+          error is neo.CredentialsInvalidException) {
         pwdController.text = "";
       }
       if (!context.mounted) return;
@@ -233,6 +234,13 @@ class LoginDialog extends HookConsumerWidget {
         } catch (primaryError, primaryStackTrace) {
           if (primaryError is DioException) {
             progressDialog.dismiss(showAnim: false);
+            rethrow;
+          }
+          if (primaryError is uis.CredentialsInvalidException ||
+              primaryError is neo.CredentialsInvalidException) {
+            progressDialog.dismiss(showAnim: false);
+            // Credentials are confirmed invalid, skipping fallback to the
+            // `CardRepository`.
             rethrow;
           }
           try {

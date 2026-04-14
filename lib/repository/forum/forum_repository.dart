@@ -19,6 +19,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dan_xi/common/constant.dart';
+import 'package:dan_xi/model/forum/ai_summary.dart';
 import 'package:dan_xi/model/forum/audit.dart';
 import 'package:dan_xi/model/forum/division.dart';
 import 'package:dan_xi/model/forum/floor.dart';
@@ -294,10 +295,15 @@ class ForumRepository extends BaseRepositoryWithDio {
     return provider.divisionCache.isNotEmpty ? provider.divisionCache : null;
   }
 
-  List<OTHole> getPinned(int divisionId) {
+  List<OTHole> getPinned(DivisionIdentifier division) {
+    // No API for pinned holes on homepage yet
+    if (division is! DivisionId){
+      return [];
+    }
+
     try {
       return provider.divisionCache
-              .firstWhere((element) => element.division_id == divisionId)
+              .firstWhere((element) => element.division_id == division.id)
               .pinned ??
           [];
     } catch (ignored) {
@@ -307,8 +313,9 @@ class ForumRepository extends BaseRepositoryWithDio {
 
   List<OTDivision> getDivisions() => provider.divisionCache;
 
-  Future<OTDivision?> loadSpecificDivision(int divisionId,
+  Future<OTDivision?> loadSpecificDivision(DivisionId division,
       {bool useCache = true}) async {
+    int divisionId = division.id;
     if (useCache) {
       try {
         final OTDivision cached = provider.divisionCache
@@ -330,22 +337,40 @@ class ForumRepository extends BaseRepositoryWithDio {
     return newDivision;
   }
 
-  Future<List<OTHole>?> loadHoles(DateTime startTime, int? divisionId,
+  Future<List<OTHole>?> loadHoles(DateTime startTime, DivisionIdentifier division,
       {int length = Constant.POST_COUNT_PER_PAGE,
       String? tag,
       SortOrder? sortOrder}) async {
     sortOrder ??= SortOrder.LAST_REPLIED;
-    final options = RequestOptions(
-        path: "$_BASE_URL/holes",
-        method: "GET",
-        queryParameters: {
-          "start_time": startTime.toUtc().toIso8601String(),
-          "division_id": divisionId ?? 0, // 0 = don't filter by division
-          "length": length,
-          "tag": tag,
-          "order": sortOrder.getInternalString()
-        },
-        headers: _tokenHeader);
+
+    RequestOptions options;
+    if (division is Homepage) {
+      options = RequestOptions(
+          path: "$_BASE_URL/holes/_homepage",
+          method: "GET",
+          queryParameters: {
+            "offset": startTime.toUtc().toIso8601String(),
+            "size": length,
+            "order": sortOrder.getInternalString()
+          },
+          headers: _tokenHeader);
+    } else if (division is DivisionId) {
+      int divisionId = division.id;
+      options = RequestOptions(
+          path: "$_BASE_URL/holes",
+          method: "GET",
+          queryParameters: {
+            "start_time": startTime.toUtc().toIso8601String(),
+            "division_id": divisionId,
+            "length": length,
+            "tag": tag,
+            "order": sortOrder.getInternalString()
+          },
+          headers: _tokenHeader);
+    } else {
+      // Unknown division identifier
+      return null;
+    }
 
     final Response<List<dynamic>> response =
         await WebvpnProxy.requestWithProxy(dio, options);
@@ -482,6 +507,42 @@ class ForumRepository extends BaseRepositoryWithDio {
     final Response<List<dynamic>> response =
         await WebvpnProxy.requestWithProxy(dio, options);
     return response.data?.map((e) => OTFloor.fromJson(e)).toList();
+  }
+
+  Future<AiSummaryResponse> loadAiSummary(
+    int holeId, {
+    bool? forceRefresh,
+  }) async {
+    final options = RequestOptions(
+      path: "$_BASE_URL/holes/$holeId/summary",
+      method: "GET",
+      queryParameters: {
+        "force_refresh": ?forceRefresh,
+      },
+      headers: _tokenHeader,
+    );
+    final Response<Map<String, dynamic>> response =
+        await WebvpnProxy.requestWithProxy(dio, options);
+    return AiSummaryResponse.fromJson(response.data ?? {});
+  }
+
+  Future<void> submitAiSummaryFeedback(
+    int holeId, {
+    required String feedbackType,
+    String? reason,
+  }) async {
+    final trimmedReason = reason?.trim();
+    final options = RequestOptions(
+      path: "$_BASE_URL/holes/$holeId/summary/feedback",
+      method: "POST",
+      data: {
+        "hole_id": holeId,
+        "feedback_type": feedbackType,
+        if (trimmedReason?.isNotEmpty == true) "reason": trimmedReason,
+      },
+      headers: _tokenHeader,
+    );
+    await WebvpnProxy.requestWithProxy(dio, options);
   }
 
   Future<List<OTTag>?> loadTags({bool useCache = true}) async {

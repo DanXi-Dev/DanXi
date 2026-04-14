@@ -61,7 +61,8 @@ import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:provider/provider.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:quick_actions/quick_actions.dart';
-import 'package:screen_capture_event/screen_capture_event.dart';
+import 'package:no_screenshot/no_screenshot.dart';
+import 'package:no_screenshot/screenshot_snapshot.dart';
 
 const forumChannel = MethodChannel('fduhole');
 
@@ -86,8 +87,8 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> with WidgetsBindingObserver {
-  final ScreenCaptureEvent? screenListener =
-      PlatformX.isMobile ? ScreenCaptureEvent() : null;
+  final NoScreenshot _noScreenshot = NoScreenshot.instance;
+  StreamSubscription<ScreenshotSnapshot>? _screenshotSubscription;
 
   /// Listener to the failure of logging in caused by different reasons.
   ///
@@ -151,7 +152,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _credentialsInvalidSubscription.cancel();
     _enhancedAuthSubscription.cancel();
     _uniLinksSubscription.cancel();
-    screenListener?.dispose();
+    _screenshotSubscription?.cancel();
+    _noScreenshot.stopScreenshotListening();
+    _noScreenshot.stopScreenRecordingListening();
     super.dispose();
   }
 
@@ -686,25 +689,20 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     //   });
     // }
 
-    screenListener?.addScreenRecordListener((recorded) async {
-      if (StateProvider.needScreenshotWarning &&
-          StateProvider.isForeground &&
-          !StateProvider.showingScreenshotWarning) {
-        StateProvider.showingScreenshotWarning = true;
-        await showScreenshotWarning(context);
-        StateProvider.showingScreenshotWarning = false;
+    _screenshotSubscription =
+        _noScreenshot.screenshotStream.listen((snapshot) async {
+      if (snapshot.wasScreenshotTaken || snapshot.isScreenRecording) {
+        if (StateProvider.needScreenshotWarning &&
+            StateProvider.isForeground &&
+            !StateProvider.showingScreenshotWarning) {
+          StateProvider.showingScreenshotWarning = true;
+          await showScreenshotWarning(context);
+          StateProvider.showingScreenshotWarning = false;
+        }
       }
     });
-    screenListener?.addScreenShotListener((filePath) async {
-      if (StateProvider.needScreenshotWarning &&
-          StateProvider.isForeground &&
-          !StateProvider.showingScreenshotWarning) {
-        StateProvider.showingScreenshotWarning = true;
-        await showScreenshotWarning(context);
-        StateProvider.showingScreenshotWarning = false;
-      }
-    });
-    screenListener?.watch();
+    _noScreenshot.startScreenshotListening();
+    _noScreenshot.startScreenRecordingListening();
   }
 
   static dynamic showScreenshotWarning(BuildContext context) =>

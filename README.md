@@ -129,7 +129,7 @@ Tools • Dart 3.11.0 • DevTools 2.54.1
 
 确定配置正确后，你需要首先在项目根目录下运行 
 
-```
+```shell
 flutter pub get
 flutter pub global activate intl_utils
 dart run intl_utils:generate

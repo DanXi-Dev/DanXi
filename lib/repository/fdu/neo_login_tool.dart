@@ -5,13 +5,13 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/cookie/persistent_cookie_jar.dart';
-import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dan_xi/util/condition_variable.dart';
 import 'package:dan_xi/util/io/cookie_manager_fix.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/io/queued_interceptor.dart';
 import 'package:dan_xi/util/io/user_agent_interceptor.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
+import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import 'package:dio5_log/dio_log.dart';
 import 'package:dio_redirect_interceptor/dio_redirect_interceptor.dart';
@@ -70,17 +70,20 @@ class FudanSession {
 
   static Dio get dio {
     if (_dio == null) {
-      _dio = DioUtils.newDioWithProxy(BaseOptions(
-        receiveDataWhenStatusError: true,
-        connectTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 5),
-        sendTimeout: const Duration(seconds: 5),
-        // Disable Dio's built-in redirect handling as it has issues
-        // RedirectInterceptor provides proper redirect tracking
-        followRedirects: false,
-        // Allow 3xx status codes to avoid exceptions, since we handle redirects manually
-        validateStatus: (status) => status != null && status < 400,
-      ));
+      _dio = DioUtils.newDioWithProxy(
+        options: BaseOptions(
+          receiveDataWhenStatusError: true,
+          connectTimeout: const Duration(seconds: 5),
+          receiveTimeout: const Duration(seconds: 5),
+          sendTimeout: const Duration(seconds: 5),
+          // Disable Dio's built-in redirect handling as it has issues
+          // RedirectInterceptor provides proper redirect tracking
+          followRedirects: false,
+          // Allow 3xx status codes to avoid exceptions, since we handle redirects manually
+          validateStatus: (status) => status != null && status < 400,
+        ),
+        track: true,
+      );
 
       // 1. Request throttling (must be first)
       _dio!.interceptors.add(LimitedQueuedInterceptor.getInstance());
@@ -157,13 +160,16 @@ class FudanSession {
       case FudanLoginType.Neo2FA:
         return _authenticationQueues[type]!.runNormalRequest(
           () async {
+            // Shallow-copy the request to avoid cookie header pollution across retries:
+            // CookieManager merges headers from both the existing request and the cookie jar,
+            // so reusing the same RequestOptions would accumulate stale cookies.
+            final reqCopy = req.copyWith();
             // Work around Dio bug: FormData objects can only be used once
-            final requestData = req.data;
-            if (requestData is FormData) {
-              req.data = requestData.clone();
+            if (reqCopy.data is FormData) {
+              reqCopy.data = (reqCopy.data as FormData).clone();
             }
 
-            final response = await dio.fetch(req);
+            final response = await dio.fetch(reqCopy);
             if (isNeoAuthenticationRequired(response)) {
               throw Exception(
                   "Authentication required for request: ${response.realUri}");
@@ -194,13 +200,16 @@ class FudanSession {
       case FudanLoginType.UISNeo:
         return _authenticationQueues[type]!.runNormalRequest(
           () async {
+            // Shallow-copy the request to avoid cookie header pollution across retries:
+            // CookieManager merges headers from both the existing request and the cookie jar,
+            // so reusing the same RequestOptions would accumulate stale cookies.
+            final reqCopy = req.copyWith();
             // Work around Dio bug: FormData objects can only be used once
-            final requestData = req.data;
-            if (requestData is FormData) {
-              req.data = requestData.clone();
+            if (reqCopy.data is FormData) {
+              reqCopy.data = (reqCopy.data as FormData).clone();
             }
 
-            final response = await dio.fetch(req);
+            final response = await dio.fetch(reqCopy);
             if (isLegacyAuthenticationRequired(response)) {
               throw Exception(
                   "Authentication required for request: ${response.realUri}");
@@ -226,13 +235,16 @@ class FudanSession {
 
         return _authenticationQueues[type]!.runNormalRequest(
           () async {
+            // Shallow-copy the request to avoid cookie header pollution across retries:
+            // CookieManager merges headers from both the existing request and the cookie jar,
+            // so reusing the same RequestOptions would accumulate stale cookies.
+            final reqCopy = req.copyWith();
             // Work around Dio bug: FormData objects can only be used once
-            final requestData = req.data;
-            if (requestData is FormData) {
-              req.data = requestData.clone();
+            if (reqCopy.data is FormData) {
+              reqCopy.data = (reqCopy.data as FormData).clone();
             }
 
-            final response = await dio.fetch(req);
+            final response = await dio.fetch(reqCopy);
             if (isLegacyAuthenticationRequired(response)) {
               throw Exception(
                   "Authentication required for request: ${response.realUri}");
@@ -309,6 +321,17 @@ class FudanAuthenticationAPIV2 {
 
   /// Error patterns from ID.
   static const String CAPTCHA_CODE_NEEDED = "请输入验证码";
+
+  /// Error patterns from invalid credentials.
+  /* {
+    "code": 4020, "userName": null, "mobile": null, "mail": null,
+    "moduleCode": "userAndPwd",
+    "requestNumber": "123456789abcdef0123456789abcdef0",
+    "message": "认证失败,您还有3次重试机会。原因分析： 用户名或密码错误 ",
+    "data": null, "loginToken": null, "moduleCodes": [],
+    "authChainCode": null, "pageLevelNo": 0, "second": null
+  } */
+  static const String CREDENTIALS_INVALID = "用户名或密码错误";
 
   static Future<Response<dynamic>> authenticate(
       PersonInfo info, Uri serviceUrl, String? serviceRequestMethod) async {
@@ -478,6 +501,9 @@ class FudanAuthenticationAPIV2 {
 
     final loginToken = response.data!["loginToken"] as String?;
     if (loginToken == null) {
+      if (message?.contains(CREDENTIALS_INVALID) ?? false) {
+        throw CredentialsInvalidException();
+      }
       throw EnhancedAuthenticationRequiredException(loginUrl, targetHost);
     }
     return loginToken;

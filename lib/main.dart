@@ -54,6 +54,7 @@ import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
+import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -104,6 +105,9 @@ Future<void> main() async {
   // Init SettingsProvider. SettingsProvider is a singleton class that stores
   // all the settings of the app.
   await SettingsProvider.getInstance().init();
+  SettingsProvider.getInstance().addListener(() {
+    DioUtils.applyProxyToAllTracked(SettingsProvider.getInstance().proxy);
+  });
 
   // Restore persisted session cookies before any network requests.
   // This must run after SettingsProvider.init() because it depends on

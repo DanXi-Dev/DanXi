@@ -1,0 +1,1 @@
+This release includes several practical improvements and fixes for recent stability and compatibility issues. See full release notes at https://github.com/DanXi-Dev/DanXi/releases.

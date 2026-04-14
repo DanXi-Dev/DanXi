@@ -138,11 +138,16 @@ class OTTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Note: these strings can be (and should be) localized. 
+    // But since other division names are not localized (yet), we leave them hardcoded for now. 
+    OTDivision homepageDivision = OTDivision(null, "全站", "展示所有板块", null);
+
     List<OTDivision> divisions =
-        context.select<ForumProvider, List<OTDivision>>(
-            (value) => value.divisionCache);
+        [homepageDivision, ...context.select<ForumProvider, List<OTDivision>>(
+            (value) => value.divisionCache)];
     OTDivision? division = context
         .select<ForumProvider, OTDivision?>((value) => value.currentDivision);
+
     int currentIndex = 0;
     if (division != null) {
       currentIndex = divisions.indexOf(division);
@@ -157,14 +162,22 @@ class OTTitle extends StatelessWidget {
           singleChoice: true,
           defaultChoice: currentIndex,
           onChoice: (Tag tag, list) {
-            division =
+            if (tag.tagTitle == homepageDivision.name) {
+              division = homepageDivision;
+              context.read<ForumProvider>().currentDivisionId = Homepage();
+            } else {
+              division =
                 divisions.firstWhere((element) => element.name == tag.tagTitle);
             context.read<ForumProvider>().currentDivisionId =
-                division?.division_id;
+                DivisionId(division!.division_id!);
+            }
             ChangeDivisionEvent(division!).fire();
           },
           tagList: divisions
-              .map((e) => Tag(e.name, null, checkedIcon: null))
+              .map((e) => Tag(
+                  e.name,
+                  e.name == homepageDivision.name ? Icons.all_inclusive : null,
+                  checkedIcon: null))
               .toList()),
     );
   }
@@ -352,8 +365,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
       TimeBasedLoadAdaptLayer(Constant.POST_COUNT_PER_PAGE, 1);
 
   /// Fields related to the display states.
-  static int getDivisionId(BuildContext context) =>
-      context.read<ForumProvider>().currentDivision?.division_id ?? 1;
+  static DivisionIdentifier getDivisionId(BuildContext context) =>
+      context.read<ForumProvider>().currentDivisionId ?? Homepage();
 
   FoldBehavior? get foldBehavior => foldBehaviorFromInternalString(
       context.read<ForumProvider>().userInfo?.config?.show_folded);
@@ -369,8 +382,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     // If no token, NotLoginError will be thrown.
     if (!context.read<ForumProvider>().isUserInitialized) {
       await ForumRepository.getInstance().initializeRepo();
-      context.read<ForumProvider>().currentDivisionId =
-          ForumRepository.getInstance().getDivisions().firstOrNull?.division_id;
+      context.read<ForumProvider>().currentDivisionId = Homepage();
     }
 
     bool answered =
@@ -399,14 +411,18 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
               .loadUserHoles(time, sortOrder: SortOrder.LAST_CREATED);
         }).call(page);
 
+        // If not more posts, notify ListView that we reached the end.
+        if (loadedPost?.isEmpty ?? false) return [];
+
+        // Update the cursor before filtering so that it advances
+        // even if all items are filtered out.
+        if (loadedPost != null) adaptLayer.updateCursor(loadedPost);
+
         // Filter away hidden posts (I know this is O(n^2), but the list won't be too large so I assume it's OK)
         loadedPost = loadedPost?.filter((element) =>
             !SettingsProvider.getInstance()
                 .hiddenMyPosts
                 .contains(element.hole_id));
-
-        // If not more posts, notify ListView that we reached the end.
-        if (loadedPost?.isEmpty ?? false) return [];
 
         // About this line, see [PagedListView].
         return loadedPost == null || loadedPost.isEmpty
@@ -424,13 +440,17 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           final requestDivisionId =
               _tagFilter == null ? getDivisionId(context) : null;
           return ForumRepository.getInstance().loadHoles(
-              time, requestDivisionId,
+              time, requestDivisionId!,
               tag: _tagFilter,
               sortOrder: context.read<SettingsProvider>().forumSortOrder);
         }).call(page);
 
         // If not more posts, notify ListView that we reached the end.
         if (loadedPost?.isEmpty ?? false) return [];
+
+        // Update the cursor before filtering so that it advances
+        // even if all items are filtered out.
+        if (loadedPost != null) adaptLayer.updateCursor(loadedPost);
 
         // Remove posts of which the first floor is empty (aka hidden)
         loadedPost?.removeWhere(
@@ -458,6 +478,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
   /// Refresh the whole list.
   Future<void> refreshList({bool queueDataClear = true}) async {
+    adaptLayer.reset();
     try {
       if (_postsType == PostsType.FAVORED_DISCUSSION) {
         await ForumRepository.getInstance().getFavoriteHoleId();
@@ -478,8 +499,13 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   }
 
   Widget _autoSilenceNotice() {
+    final division = getDivisionId(context);
+    if (division is! DivisionId) {
+      return const SizedBox();
+    }
+
     final DateTime? silenceDate = ForumRepository.getInstance()
-        .getSilenceDateForDivision(getDivisionId(context))
+        .getSilenceDateForDivision(division.id)
         ?.toLocal();
     if (silenceDate == null || silenceDate.isBefore(DateTime.now())) {
       return const SizedBox();
@@ -515,8 +541,9 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     _fieldInitComplete = false;
     _postSubscription.bindOnlyInvalid(
         Constant.eventBus.on<CreateNewPostEvent>().listen((_) async {
+          final currentDivision = getDivisionId(context);
           final bool success =
-              await OTEditor.createNewPost(context, getDivisionId(context),
+              await OTEditor.createNewPost(context, currentDivision is DivisionId ? currentDivision.id : null,
                   interceptor: (_, PostEditorText? text) async {
             if (text?.tags.isEmpty ?? true) {
               return await Noticing.showConfirmationDialog(
@@ -850,17 +877,44 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
 /// This class is a workaround between Open Tree Hole's time-based content retrieval style
 /// and [PagedListView]'s page-based loading style.
+///
+/// # Caveats
+/// There is a footgun case where if client-side filtering removes all items from a page,
+/// the cursor will stall (because data[-1] remains the same) and the same page will be
+/// requested repeatedly.
+///
+/// To solve this, [TimeBasedLoadAdaptLayer] tracks the last seen element independently,
+/// so that the cursor can always advance. See [updateCursor] for details.
 class TimeBasedLoadAdaptLayer<T> {
   final int pageSize;
   final int startPage;
 
+  /// The last element returned by the API, tracked independently of [PagedListView]'s
+  /// data list. This ensures the time cursor advances even when all items in a page
+  /// are filtered out by the client.
+  T? _lastSeenElement;
+
   TimeBasedLoadAdaptLayer(this.pageSize, this.startPage);
+
+  /// Update the cursor with the raw API response data.
+  /// Should be called after each successful API response.
+  void updateCursor(List<T> rawData) {
+    if (rawData.isNotEmpty) {
+      _lastSeenElement = rawData.last;
+    }
+  }
+
+  /// Reset the cursor. Should be called when the list is refreshed.
+  void reset() {
+    _lastSeenElement = null;
+  }
 
   DataReceiver<T> generateReceiver(PagedListViewController<T> controller,
       TimeBasedDataReceiver<T> receiver) {
     return (int pageIndex) async {
       int nextPageEnd = pageSize * (pageIndex - startPage + 1);
-      if (controller.length() == 0 || pageIndex == startPage) {
+      if ((controller.length() == 0 && _lastSeenElement == null) ||
+          pageIndex == startPage) {
         // If this is the first page, call with nothing.
         return receiver.call(null);
       } else if (nextPageEnd < controller.length()) {
@@ -869,8 +923,11 @@ class TimeBasedLoadAdaptLayer<T> {
         return receiver
             .call(controller.getElementAt(nextPageEnd - startPage - 1));
       } else {
-        // If requesting a brand new page, just loaded it with info of the last item.
-        return receiver.call(controller.getElementAt(controller.length() - 1));
+        // If requesting a brand new page, prefer the independently tracked cursor
+        // over the controller's last element, as the controller may not have advanced
+        // due to client-side filtering.
+        return receiver.call(
+            _lastSeenElement ?? controller.getElementAt(controller.length() - 1));
       }
     };
   }

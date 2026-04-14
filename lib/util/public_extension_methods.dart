@@ -18,6 +18,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/material.dart';
@@ -61,8 +62,14 @@ extension StringEx on String {
         .every((element) => regex.hasMatch(element));
   }
 
+  static final _whitespaceRegex = RegExp("\\s+");
+
   String trimAndNormalizeWhitespace() =>
-      trim().replaceAll(RegExp("\\s+"), " ");
+      trim().replaceAll(_whitespaceRegex, " ");
+
+  List<String> splitByWhitespace() => split(
+    _whitespaceRegex,
+  ).whereNot((part) => part.isEmpty).toList(growable: false);
 }
 
 extension ObjectEx on dynamic {
@@ -142,6 +149,11 @@ extension ListEx<T> on List<T>? {
     }
     return newList;
   }
+}
+
+extension IntListEx on List<int> {
+  String toHexString() =>
+      map((byte) => byte.toRadixString(16).padLeft(2, "0")).join();
 }
 
 typedef FilterFunction<T> = bool Function(T element);
