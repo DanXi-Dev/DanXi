@@ -405,7 +405,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
             .generateReceiver(listViewController, (lastElement) {
           DateTime time = DateTime.now();
           if (lastElement != null) {
-            time = DateTime.parse(lastElement.time_updated!);
+            time = DateTime.parse(lastElement.time_created!);
           }
           return ForumRepository.getInstance()
               .loadUserHoles(time, sortOrder: SortOrder.LAST_CREATED);
@@ -432,9 +432,15 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
       case PostsType.NORMAL_POSTS:
         List<OTHole>? loadedPost = await adaptLayer
             .generateReceiver(listViewController, (lastElement) {
+          final SortOrder sortOrder =
+              context.read<SettingsProvider>().forumSortOrder ??
+                  SortOrder.LAST_REPLIED;
           DateTime time = DateTime.now();
           if (lastElement != null) {
-            time = DateTime.parse(lastElement.time_updated!);
+            time = DateTime.parse(switch (sortOrder) {
+              SortOrder.LAST_CREATED => lastElement.time_created!,
+              SortOrder.LAST_REPLIED => lastElement.time_updated!
+            });
           }
 
           final DivisionIdentifier? requestDivisionId =
@@ -442,7 +448,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           return ForumRepository.getInstance().loadHoles(
               time, requestDivisionId,
               tag: _tagFilter,
-              sortOrder: context.read<SettingsProvider>().forumSortOrder);
+              sortOrder: sortOrder);
         }).call(page);
 
         // If not more posts, notify ListView that we reached the end.
