@@ -1,0 +1,1 @@
+本次更新修复了前一版本发布以来的一些报告问题，建议更新。完整更新日志请看 https://github.com/DanXi-Dev/DanXi/releases。

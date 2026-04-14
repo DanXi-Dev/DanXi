@@ -1,0 +1,1 @@
+This release addresses a few issues reported since the previous version and is recommended for all users. Full release notes: https://github.com/DanXi-Dev/DanXi/releases.
