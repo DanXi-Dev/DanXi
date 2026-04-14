@@ -3,7 +3,6 @@
 
 # 旦挞
 
-[![CI](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/ci_ios.yml)
 [![Deploy to GitHub Pages](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml/badge.svg)](https://github.com/DanXi-Dev/DanXi/actions/workflows/deploy_to_gh-pages.yml)
 
 （原名旦夕、旦兮）
@@ -102,10 +101,10 @@ LIBGL_ALWAYS_SOFTWARE=1 ./danxi
 
 ```shell
 $ flutter --version
-Flutter 3.41.0 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 44a626f4f0 (2 天前) • 2026-02-10 10:16:12 -0800
-Engine • hash cc8e596aa65130a0678cc59613ed1c5125184db4 (revision 3452d735bd) (2 days ago) • 2026-02-09 22:03:17.000Z
-Tools • Dart 3.11.0 • DevTools 2.54.1
+Flutter 3.41.6 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision db50e20168 (3 周前) • 2026-03-25 16:21:00 -0700
+Engine • hash 5cdd32777948fa7a648fac915f8da7120ac7e97a (revision 425cfb54d0) (19 days ago) • 2026-03-25 20:14:42.000Z
+Tools • Dart 3.11.4 • DevTools 2.54.2
 ```
 
 ## 编译说明
