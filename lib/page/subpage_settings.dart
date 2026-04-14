@@ -713,7 +713,7 @@ class SettingsPageState extends State<SettingsPage> {
 
                       // FDUHOLE
                       _buildForumSettingsCard(context),
-                      if (SettingsProvider.getInstance().debugMode)
+                      if (PlatformX.isDebugMode(context))
                         //Theme Selection
                         Card(
                           child: ListTile(
@@ -731,7 +731,7 @@ class SettingsPageState extends State<SettingsPage> {
                                     .changeToMaterialPlatform(),
                           ),
                         ),
-                      if (SettingsProvider.getInstance().debugMode)
+                      if (PlatformX.isDebugMode(context))
                         Card(
                             child: ListTile(
                                 title: const Text("Fancy Watermark"),
@@ -971,7 +971,7 @@ class SettingsPageState extends State<SettingsPage> {
                     });
                   },
                 ),
-                if (SettingsProvider.getInstance().debugMode)
+                if (PlatformX.isDebugMode(context))
                   ListTile(
                       leading: const Icon(Icons.speed),
                       title: const Text("Light Rendering"),

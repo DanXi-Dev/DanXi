@@ -217,6 +217,29 @@ class ForumSubpage extends PlatformSubpage<ForumSubpage> {
           RefreshListEvent().fire();
         }
 
+        final SortOrder currentSortOrder =
+            cxt.select<SettingsProvider, SortOrder?>(
+                    (value) => value.forumSortOrder) ??
+                SortOrder.LAST_REPLIED;
+        final PopupMenuOption lastRepliedOption = PopupMenuOption(
+            label: S.of(cxt).last_replied,
+            cupertino: (context, platform) => CupertinoPopupMenuOptionData(
+                isDefaultAction: currentSortOrder == SortOrder.LAST_REPLIED),
+            onTap: (_) => onChangeSortOrder(cxt, SortOrder.LAST_REPLIED));
+        final PopupMenuOption lastCreatedOption = PopupMenuOption(
+            label: S.of(cxt).last_created,
+            cupertino: (context, platform) => CupertinoPopupMenuOptionData(
+                isDefaultAction: currentSortOrder == SortOrder.LAST_CREATED),
+            onTap: (_) => onChangeSortOrder(cxt, SortOrder.LAST_CREATED));
+        final List<PopupMenuOption> sortOptions = [
+          lastRepliedOption,
+          lastCreatedOption
+        ];
+        final PopupMenuOption currentSortOption =
+            currentSortOrder == SortOrder.LAST_CREATED
+                ? lastCreatedOption
+                : lastRepliedOption;
+
         return [
           if (cxt.select<ForumProvider, bool>(
               (value) => value.userInfo?.is_admin ?? false)) ...[
@@ -231,19 +254,18 @@ class ForumSubpage extends PlatformSubpage<ForumSubpage> {
           AppBarButtonItem(
               S.of(cxt).sort_order,
               PlatformPopupMenuX(
-                options: [
-                  PopupMenuOption(
-                      label: S.of(cxt).last_replied,
-                      onTap: (_) =>
-                          onChangeSortOrder(cxt, SortOrder.LAST_REPLIED)),
-                  PopupMenuOption(
-                      label: S.of(cxt).last_created,
-                      onTap: (_) =>
-                          onChangeSortOrder(cxt, SortOrder.LAST_CREATED))
-                ],
+                options: sortOptions,
                 cupertino: (context, platform) => CupertinoPopupMenuData(
                     cancelButtonData: CupertinoPopupMenuCancelButtonData(
                         child: Text(S.of(context).cancel))),
+                material: (context, platform) => MaterialPopupMenuData(
+                    initialValue: currentSortOption,
+                    itemBuilder: (context) => sortOptions
+                        .map((option) => CheckedPopupMenuItem<PopupMenuOption>(
+                            value: option,
+                            checked: option == currentSortOption,
+                            child: Text(option.label ?? '')))
+                        .toList()),
                 icon: Icon(PlatformX.isMaterial(cxt)
                     ? Icons.filter_list
                     : CupertinoIcons.sort_down_circle),
@@ -405,7 +427,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
             .generateReceiver(listViewController, (lastElement) {
           DateTime time = DateTime.now();
           if (lastElement != null) {
-            time = DateTime.parse(lastElement.time_updated!);
+            time = DateTime.parse(lastElement.time_created!);
           }
           return ForumRepository.getInstance()
               .loadUserHoles(time, sortOrder: SortOrder.LAST_CREATED);
@@ -432,17 +454,23 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
       case PostsType.NORMAL_POSTS:
         List<OTHole>? loadedPost = await adaptLayer
             .generateReceiver(listViewController, (lastElement) {
+          final SortOrder sortOrder =
+              context.read<SettingsProvider>().forumSortOrder ??
+                  SortOrder.LAST_REPLIED;
           DateTime time = DateTime.now();
           if (lastElement != null) {
-            time = DateTime.parse(lastElement.time_updated!);
+            time = DateTime.parse(switch (sortOrder) {
+              SortOrder.LAST_CREATED => lastElement.time_created!,
+              SortOrder.LAST_REPLIED => lastElement.time_updated!
+            });
           }
 
-          final requestDivisionId =
+          final DivisionIdentifier? requestDivisionId =
               _tagFilter == null ? getDivisionId(context) : null;
           return ForumRepository.getInstance().loadHoles(
-              time, requestDivisionId!,
+              time, requestDivisionId,
               tag: _tagFilter,
-              sortOrder: context.read<SettingsProvider>().forumSortOrder);
+              sortOrder: sortOrder);
         }).call(page);
 
         // If not more posts, notify ListView that we reached the end.
@@ -459,8 +487,10 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
         // Filter blocked posts
         List<OTTag> hiddenTags =
             SettingsProvider.getInstance().hiddenTags ?? [];
-        loadedPost?.removeWhere((element) => element.tags!.any((thisTag) =>
-            hiddenTags.any((blockTag) => thisTag.name == blockTag.name)));
+        loadedPost?.removeWhere((element) =>
+            element.tags?.any((thisTag) =>
+                hiddenTags.any((blockTag) => thisTag.name == blockTag.name)) ??
+            false);
         // Filter hidden posts
         List<int> hiddenPosts = SettingsProvider.getInstance().hiddenHoles;
         loadedPost?.removeWhere((element) =>
