@@ -54,9 +54,11 @@ class BBSHiddenTagsPreferencePageState
         title: Text(S.of(context).forum_hidden_tags_title),
       ),
       body: SafeArea(
-        child: OTTagSelector(
-          initialTags: tags,
-          onChanged: () => SettingsProvider.getInstance().hiddenTags = tags,
+        child: SingleChildScrollView(
+          child: OTTagSelector(
+            initialTags: tags,
+            onChanged: () => SettingsProvider.getInstance().hiddenTags = tags,
+          ),
         ),
       ),
     );

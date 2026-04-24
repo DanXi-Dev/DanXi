@@ -17,6 +17,7 @@
 
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/forum_provider.dart';
+import 'package:dan_xi/model/forum/division.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
@@ -38,7 +39,7 @@ class StateProvider {
 
   static void initialize(BuildContext context) {
     ForumProvider provider = context.read<ForumProvider>();
-    provider.currentDivisionId = null;
+    provider.currentDivisionId = const Homepage();
     isLoggedIn.value = false;
     personInfo.value = null;
     isForeground = true;

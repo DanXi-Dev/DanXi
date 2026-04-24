@@ -17,6 +17,8 @@ subprojects {
                 project.plugins.hasPlugin("com.android.library")) {
             project.android.compileSdkVersion = 36
 
+            project.java.toolchain.languageVersion = JavaLanguageVersion.of(23)
+
             // override Java version to 23
             project.android.compileOptions.sourceCompatibility = JavaVersion.VERSION_23
             project.android.compileOptions.targetCompatibility = JavaVersion.VERSION_23
@@ -38,11 +40,11 @@ subprojects {
     }
 }
 
-// override the kotlin language version for each dependencies to 2.3.10
+// override the kotlin language version for each dependencies to 2.3.20
 configurations.all {
     resolutionStrategy.eachDependency { details ->
         if (details.requested.group == 'org.jetbrains.kotlin' && details.requested.name == 'kotlin-gradle-plugin') {
-            details.useVersion '2.3.10'
+            details.useVersion '2.3.20'
         }
     }
 }

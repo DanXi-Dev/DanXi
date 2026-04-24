@@ -56,8 +56,9 @@ import 'package:share_plus/share_plus.dart';
 class ImageViewerPage extends StatefulWidget {
   final Map<String, dynamic>? arguments;
   @protected
-  final Dio dio =
-      DioUtils.newDioWithProxy(BaseOptions(responseType: ResponseType.bytes));
+  final Dio dio = DioUtils.newDioWithProxy(
+    options: BaseOptions(responseType: ResponseType.bytes),
+  );
 
   static const List<String> IMAGE_SUFFIX = [
     '.jpg',
@@ -185,7 +186,44 @@ class ImageViewerPageState extends State<ImageViewerPage> {
         Noticing.showNotice(context, S.of(context).image_save_failed);
       }
     } else if (context.mounted) {
-      Noticing.showNotice(context, image.absolute.path);
+      if (PlatformX.isDesktop) {
+        Future<void> openContainingFolderAction() async {
+          final bool opened =
+              await PlatformX.openContainingFolder(image.absolute.path);
+          if (!opened && context.mounted) {
+            await Noticing.showNotice(
+              context,
+              S.of(context).open_image_folder_failed,
+            );
+          }
+        }
+
+        if (PlatformX.isMaterial(context)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(image.absolute.path),
+              action: SnackBarAction(
+                label: S.of(context).open_image_folder,
+                onPressed: () => unawaited(openContainingFolderAction()),
+              ),
+            ),
+          );
+        } else {
+          await Noticing.showNotice(
+            context,
+            image.absolute.path,
+            useSnackBar: false,
+            customActions: [
+              CustomDialogActionItem(
+                S.of(context).open_image_folder,
+                () => unawaited(openContainingFolderAction()),
+              )
+            ],
+          );
+        }
+      } else {
+        Noticing.showNotice(context, image.absolute.path);
+      }
     }
   }
 

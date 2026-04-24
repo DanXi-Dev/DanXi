@@ -70,17 +70,20 @@ class FudanSession {
 
   static Dio get dio {
     if (_dio == null) {
-      _dio = DioUtils.newDioWithProxy(BaseOptions(
-        receiveDataWhenStatusError: true,
-        connectTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 5),
-        sendTimeout: const Duration(seconds: 5),
-        // Disable Dio's built-in redirect handling as it has issues
-        // RedirectInterceptor provides proper redirect tracking
-        followRedirects: false,
-        // Allow 3xx status codes to avoid exceptions, since we handle redirects manually
-        validateStatus: (status) => status != null && status < 400,
-      ));
+      _dio = DioUtils.newDioWithProxy(
+        options: BaseOptions(
+          receiveDataWhenStatusError: true,
+          connectTimeout: const Duration(seconds: 5),
+          receiveTimeout: const Duration(seconds: 5),
+          sendTimeout: const Duration(seconds: 5),
+          // Disable Dio's built-in redirect handling as it has issues
+          // RedirectInterceptor provides proper redirect tracking
+          followRedirects: false,
+          // Allow 3xx status codes to avoid exceptions, since we handle redirects manually
+          validateStatus: (status) => status != null && status < 400,
+        ),
+        track: true,
+      );
 
       // 1. Request throttling (must be first)
       _dio!.interceptors.add(LimitedQueuedInterceptor.getInstance());

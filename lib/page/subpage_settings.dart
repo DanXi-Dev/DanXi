@@ -721,7 +721,7 @@ class SettingsPageState extends State<SettingsPage> {
 
                       // FDUHOLE
                       _buildForumSettingsCard(context),
-                      if (SettingsProvider.getInstance().debugMode)
+                      if (PlatformX.isDebugMode(context))
                         //Theme Selection
                         Card(
                           child: ListTile(
@@ -739,7 +739,7 @@ class SettingsPageState extends State<SettingsPage> {
                                     .changeToMaterialPlatform(),
                           ),
                         ),
-                      if (SettingsProvider.getInstance().debugMode)
+                      if (PlatformX.isDebugMode(context))
                         Card(
                             child: ListTile(
                                 title: const Text("Fancy Watermark"),
@@ -850,6 +850,20 @@ class SettingsPageState extends State<SettingsPage> {
                                   },
                         ),
                     selector: (_, model) => model.isBannerEnabled),
+                Selector<SettingsProvider, bool>(
+                    builder: (_, bool value, __) => SwitchListTile.adaptive(
+                          title: Text(S.of(context).ai_summary_enable),
+                          secondary: const Icon(Icons.auto_awesome),
+                          subtitle:
+                              Text(S.of(context).ai_summary_enable_description),
+                          value: value,
+                          onChanged: (bool value) {
+                            HapticFeedbackUtil.light();
+                            SettingsProvider.getInstance().isAiSummaryEnabled =
+                                value;
+                          },
+                        ),
+                    selector: (_, model) => model.isAiSummaryEnabled),
                 Selector<SettingsProvider, bool>(
                     builder: (_, bool value, __) => SwitchListTile.adaptive(
                           title: Text(S.of(context).forum_clean_mode),
@@ -965,7 +979,7 @@ class SettingsPageState extends State<SettingsPage> {
                     });
                   },
                 ),
-                if (SettingsProvider.getInstance().debugMode)
+                if (PlatformX.isDebugMode(context))
                   ListTile(
                       leading: const Icon(Icons.speed),
                       title: const Text("Light Rendering"),

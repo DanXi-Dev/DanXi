@@ -107,7 +107,9 @@ class TagContainerState extends State<TagContainer> {
     widget.fontSize == null ? fontSize = 16 : fontSize = widget.fontSize;
     widget.iconSize == null ? iconSize = 22 : iconSize = widget.iconSize;
     if (widget.defaultChoice! >= 0 && tagList!.length > widget.defaultChoice!) {
-      tagList![widget.defaultChoice!].isSelected = true;
+      if (tagList!.every((element) => !element.isSelected)){
+        tagList![widget.defaultChoice!].isSelected = true;
+      }
     }
     fillRandomColor = widget.fillRandomColor;
     fillRandomColor
