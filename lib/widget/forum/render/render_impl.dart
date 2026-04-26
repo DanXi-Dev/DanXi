@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/sticker_download_manager.dart';
@@ -109,7 +110,7 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
         if (url.startsWith("dx_")) {
           return HookConsumer(
             builder: (context, ref, child) {
-              final sticker = ref.watch(stickerBytesProvider(url));
+              final sticker = ref.watch(stickerFilePathProvider(url));
               return sticker.when(
                 loading: () => const SizedBox(
                   width: 50,
@@ -133,9 +134,9 @@ final kMarkdownRenderFactory = (double? defaultFontSize) =>
                     ),
                   ),
                 ),
-                data: (bytes) {
-                  return Image.memory(
-                    bytes,
+                data: (filePath) {
+                  return Image.file(
+                    File(filePath),
                     width: 50,
                     height: 50,
                     errorBuilder: (context, error, stackTrace) {

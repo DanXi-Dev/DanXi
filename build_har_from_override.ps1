@@ -15,6 +15,7 @@ $rootPubspecLockPath = Join-Path $repoRoot "pubspec.lock"
 $pubspecGeneratedPath = Join-Path $repoRoot "lib\common\pubspec.yaml.g.dart"
 $activeOverridePath = Join-Path $repoRoot "pubspec_overrides.yaml"
 $patchRoot = Join-Path $repoRoot "patches\ohos-build"
+$fileOverlayPath = Join-Path $patchRoot "file-overlays.psd1"
 $sourceReplacementPath = Join-Path $patchRoot "source-replacements.psd1"
 $pubspecReplacementPath = Join-Path $patchRoot "pubspec-replacements.psd1"
 $ohosRoot = Join-Path $repoRoot "ohos"
@@ -177,6 +178,23 @@ function Apply-TemporarySourcePatches {
       -Path (Join-Path $repoRoot $entry.Path) `
       -Find $entry.Find `
       -Replace $entry.Replace
+  }
+}
+
+function Apply-TemporaryFileOverlays {
+  $manifest = Import-PowerShellDataFile -Path $fileOverlayPath
+  if (-not $manifest.Overlays) {
+    return
+  }
+
+  foreach ($entry in @($manifest.Overlays)) {
+    $targetPath = Join-Path $repoRoot $entry.Path
+    $overlayPath = Join-Path $patchRoot $entry.Source
+    if (-not (Test-Path $overlayPath)) {
+      throw "Overlay file not found: $overlayPath"
+    }
+
+    Write-File -Path $targetPath -Content (Get-Content -Raw -Path $overlayPath)
   }
 }
 
@@ -429,6 +447,7 @@ try {
 
   $pubspec = Apply-PubspecTemporaryPatches -Content $pubspec
   Write-File -Path $rootPubspecPath -Content $pubspec
+  Apply-TemporaryFileOverlays
   Apply-TemporarySourcePatches
 
   $overrideContent = Get-Content -Raw $overrideOhosPath
