@@ -1,6 +1,6 @@
 param(
   [ValidateSet("debug", "release")]
-  [string]$BuildMode = "debug",
+  [string]$BuildMode = "release",
   [string]$Product = "default",
   [string]$FlutterSdkPath = $env:DANXI_OHOS_FLUTTER_ROOT,
   [switch]$EnableImpeller,
@@ -30,10 +30,16 @@ function Resolve-Hvigor {
   $cmd = Get-Command hvigorw -ErrorAction SilentlyContinue
   if ($cmd) { return $cmd.Source }
 
-  $devecoHvigor = "C:\Program Files\Huawei\DevEco Studio\tools\hvigor\bin\hvigorw.bat"
-  if (Test-Path $devecoHvigor) { return $devecoHvigor }
+  $candidates = @(
+    (Join-Path $env:LOCALAPPDATA "Huawei\DevEco Studio\tools\hvigor\bin\hvigorw.bat"),
+    "C:\Program Files\Huawei\DevEco Studio\tools\hvigor\bin\hvigorw.bat",
+    (Join-Path $env:DEVECO_HOME "tools\hvigor\bin\hvigorw.bat")
+  )
+  foreach ($c in $candidates) {
+    if ($c -and (Test-Path $c)) { return $c }
+  }
 
-  throw "hvigorw not found. Install DevEco Studio command line tools or add hvigorw to PATH."
+  throw "hvigorw not found. Install DevEco Studio command line tools, add hvigorw to PATH, or set DEVECO_HOME."
 }
 
 if (-not (Test-Path $harmonyRoot)) {

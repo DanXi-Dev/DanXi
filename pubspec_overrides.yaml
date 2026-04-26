@@ -1,0 +1,24 @@
+﻿dependency_overrides:
+  screen_brightness_ohos:
+    path: ./.vendor_ohos/screen_brightness_ohos-2.1.2
+  flutter_progress_dialog:
+    path: ./.vendor/flutter_progress_dialog
+  flutter_secure_storage_linux:
+    path: ./.vendor/flutter_secure_storage_linux
+  flutter_inappwebview_linux:
+    path: ./.vendor/flutter_inappwebview_linux
+  flutter_markdown_plus:
+    git:
+      url: https://github.com/w568w/flutter_markdown_plus.git
+      ref: main
+  ical:
+    git:
+      url: https://github.com/Basis-Health/ical.git
+      ref: dev
+  receive_intent:
+    git:
+      url: https://github.com/w568w/receive_intent.git
+  xiao_mi_push_plugin:
+    git:
+      url: https://github.com/w568w/FlutterXiaoMiPushPlugin.git
+      ref: master

@@ -175,7 +175,7 @@ abstract class PlatformSubpageState<T extends PlatformSubpage>
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: PlatformAppBar(
             cupertino: (_, __) => CupertinoNavigationBarData(
-              middle: MediaQuery(
+              title: MediaQuery(
                   data: MediaQueryData(
                       textScaler: MediaQuery.textScalerOf(context)),
                   child: TopController(child: widget.title(context))),

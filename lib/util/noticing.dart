@@ -57,7 +57,6 @@ class Noticing {
               ThemeData(brightness: invertBrightness).textTheme.titleMedium;
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        persist: false, // https://docs.flutter.dev/release/breaking-changes/snackbar-with-action-behavior-update
           content: LinkifyX(
         style: contentTextStyle,
         text: message,

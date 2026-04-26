@@ -42,10 +42,6 @@ struct Index {
   build() {
     Stack() {
       FlutterPage({ viewId: this.flutterViewId })
-      Text(`Harmony overlay, viewId=${this.flutterViewId}`)
-        .fontSize(12)
-        .fontColor(Color.Red)
-        .position({ x: 8, y: 8 })
     }
     .width('100%')
     .height('100%')

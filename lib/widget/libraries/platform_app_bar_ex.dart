@@ -91,7 +91,7 @@ class PlatformAppBarX extends PlatformAppBar {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      middle: MediaQuery(
+      title: MediaQuery(
           data: MediaQueryData(textScaler: MediaQuery.textScalerOf(context)),
           child: data?.title ?? title!),
     );

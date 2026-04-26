@@ -537,7 +537,7 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
           rowGap: 8,
           columnGap: 8,
           children: allStickerIds.map((stickerId) {
-            final sticker = ref.watch(stickerFilePathProvider(stickerId));
+            final sticker = ref.watch(stickerBytesProvider(stickerId));
             return Container(
               alignment: Alignment.center,
               child: InkWell(
@@ -590,8 +590,8 @@ class BBSEditorWidgetState extends State<BBSEditorWidget> {
                       ),
                     ),
                   ),
-                  data: (filePath) => Image.file(
-                    File(filePath),
+                  data: (bytes) => Image.memory(
+                    bytes,
                     width: 60,
                     height: 60,
                     fit: BoxFit.contain,

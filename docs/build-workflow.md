@@ -1,70 +1,55 @@
-# 构建流程说明
+# Build Workflow
 
-这份说明把当前仓库里分散的构建入口整理成一条可复现的本地流程。
+This repository now keeps the release build flow and the HarmonyOS build flow separate on purpose.
 
-## 我们现在的构建分层
+## Standard Flutter release flow
 
-1. 依赖与代码生成
-2. 平台打包
-3. 平台专属发布后处理
+Use `build_release.ps1` for Android, Windows, Linux, and other normal Flutter release targets.
 
-其中，桌面和移动端的通用 Flutter 构建走 [build_release.ps1](../build_release.ps1)，OHOS 走 [build_ohos.ps1](../build_ohos.ps1) 的独立链路。
+It runs the upstream preparation steps in order:
 
-## 通用 Flutter 构建
+```powershell
+flutter pub get --enforce-lockfile
+flutter pub global activate intl_utils
+dart run intl_utils:generate
+dart run build_runner build --delete-conflicting-outputs
+dart run build_release.dart --target windows --versionCode 349
+```
 
-当前探索出来的标准前置步骤已经内联到 [build_release.ps1](../build_release.ps1) 里，不再需要手工分开执行。
-
-它会自动完成依赖同步（默认开启 `--enforce-lockfile`）、`intl_utils` 本地化生成，然后再进入真正的平台打包。`build_runner` 由 `build_release.dart` 在同一条链路内执行。
-
-## 发布打包
-
-`build_release.dart` 负责真正的发布产物封装：
-
-- 读取 git 提交号并注入 `GIT_HASH`
-- 根据 `--target` 选择 `android`、`android-armv8`、`windows`、`aab` 或 `linux`
-- 生成并重命名最终产物到 `build/app/`
-- Windows 和 Linux 最终产物会再次压缩成 zip
-
-推荐直接使用脚本入口：
+Equivalent wrapper:
 
 ```powershell
 .\build_release.ps1 -Target windows -VersionCode 349
 ```
 
-如果你希望精确复用脚本里的执行语义，也可以直接调用：
+## HarmonyOS flow
+
+Before running the OHOS scripts, complete local signing for `Harmony/` in DevEco Studio and place the generated debug signing files under `Harmony/signing/`.
+
+Use the dedicated OHOS scripts only:
 
 ```powershell
-flutter pub get --enforce-lockfile
-dart run intl_utils:generate
-dart run build_release.dart --target windows --versionCode 349
+.\build_ohos.ps1 -BuildMode debug -SkipFlutterSdkUpdate
+.\run_ohos.ps1
 ```
 
-## 可复现脚本
+The OHOS flow is intentionally isolated because it:
 
-### 1. 发布脚本
+1. activates `pubspec_overrides.ohos.yaml`
+2. builds Flutter HAR artifacts with the OHOS Flutter SDK
+3. builds the ArkUI host project in `Harmony/`
 
-```powershell
-.\build_release.ps1 -Target android -VersionCode 349
-```
+The OHOS lane also carries a storage-specific runtime fix:
 
-这个脚本会先完成代码生成，再调用 `build_release.dart` 完成最终打包，适合本地和 CI 对齐。
+- `XSharedPreferences` does not use the encrypted storage plugin stack on OHOS.
+- It falls back to a pure Dart file-backed store because encrypted preference initialization was the historical cause of broken persisted config / cookie reads on HarmonyOS, which can surface as image-loading failures at runtime.
 
-如果你在临时调试依赖解析（不建议在正式发布链路中使用），可以显式关闭锁文件约束：
+The current OHOS Flutter `oh-3.35.7-release` checkout on this machine resolves to Dart `3.8.1`, so the OHOS lane reuses committed generated files instead of rerunning the full `build_runner` generator stack.
 
-```powershell
-.\build_release.ps1 -Target windows -VersionCode 349 -NoEnforceLockfile
-```
+See `docs/harmony.md` for the full OHOS setup, signing layout, and reproducibility checklist.
 
-## 现有约束
+## Repository policy
 
-- Android release 需要先恢复 `android/app/build.gradle` 里的 release 签名配置，并准备好 `android/key.properties`。
-- `VersionCode` 是发布产物命名的一部分，不建议留空。
-- 从 git 仓库根目录执行时，产物会携带当前 commit hash。
-
-## OHOS 单独说明
-
-OHOS 不是这条通用 Flutter 发布链路的一部分，它仍然使用独立脚本：
-
-- [build_ohos.ps1](../build_ohos.ps1)
-
-这条链路先构建 HAR，再构建 Harmony HAP，不能和上面的通用打包流程混用。HAR 构建目前仍由 `build_ohos.ps1` 内部调用，不作为对外入口展示。
+- Commit scripts, source patches, and docs.
+- Do not commit generated `hap` or `har` outputs.
+- Do not commit local signing files under `Harmony/signing/`.

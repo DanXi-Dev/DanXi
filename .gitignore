@@ -81,12 +81,22 @@ android/app/.cxx
 /.claude/*.local.*
 
 # Harmony temporary/generated
-/ohos/
-!/ohos/
 /.tmp_ohos_har_module/
+/ohos/.cache/
+/ohos/**/build/
+/ohos/**/oh_modules/
+/ohos/**/node_modules/
+/ohos/**/.hvigor/
+/ohos/**/local.properties/
 /Harmony/.hvigor/
 /Harmony/oh_modules/
 /Harmony/**/build/
+/Harmony/signing/*
+!/Harmony/signing/
+!/Harmony/signing/README.md
+!/Harmony/signing/.gitignore
+/har/
+**/*.hap
 /.vendor_ohos/*
 !/.vendor_ohos/screen_brightness_ohos-2.1.2/
 !/.vendor_ohos/screen_brightness_ohos-2.1.2/**
@@ -95,3 +105,5 @@ android/app/.cxx
 /.vendor_ohos/**/node_modules/
 /.vendor_ohos/**/.hvigor/
 /.vendor_ohos/**/local.properties
+/.vendor_ohos/**/oh-package-lock.json5
+/.vendor_ohos/**/libs/*.har

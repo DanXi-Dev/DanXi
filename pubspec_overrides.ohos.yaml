@@ -1,17 +1,36 @@
 dependency_overrides:
   app_links: 6.4.0
   linkify: 5.0.0
-  flutter_platform_widgets: 7.0.1
-  vector_math: 2.2.0
+  flutter_platform_widgets:
+    path: ./.vendor_ohos/flutter_platform_widgets-9.0.0
+  flex_color_picker:
+    path: ./.vendor_ohos/flex_color_picker-3.7.1
+  no_screenshot: 0.9.2
+  json_annotation: 4.9.0
+  json_serializable: 6.11.2
+  hooks_riverpod: 3.1.0
+  riverpod_annotation: 4.0.0
+  riverpod_generator: 4.0.0+1
   screen_brightness_ohos:
     path: ./.vendor_ohos/screen_brightness_ohos-2.1.2
   flutter_progress_dialog:
-    path: C:/Users/xy/AppData/Local/Pub/Cache/git/flutter_progress_dialog-cbacc685e38f917b183596c3be431cd58fdaef22
+    path: ./.vendor/flutter_progress_dialog
+  flutter_secure_storage_linux:
+    path: ./.vendor/flutter_secure_storage_linux
+  flutter_inappwebview_linux:
+    path: ./.vendor/flutter_inappwebview_linux
   flutter_markdown_plus:
-    path: C:/Users/xy/AppData/Local/Pub/Cache/git/flutter_markdown_plus-27b57cecd19d3dd3c3c3a2b4be0e28acf4fc09ab
+    git:
+      url: https://github.com/w568w/flutter_markdown_plus.git
+      ref: main
   ical:
-    path: C:/Users/xy/AppData/Local/Pub/Cache/git/ical-ce599e755381b7c8cf5393f64a34b931f5e6acb4
+    git:
+      url: https://github.com/Basis-Health/ical.git
+      ref: dev
   receive_intent:
-    path: C:/Users/xy/AppData/Local/Pub/Cache/git/receive_intent-33f9a8c1161a1c9f06e9d0f905acc7b55d3b64d9
+    git:
+      url: https://github.com/w568w/receive_intent.git
   xiao_mi_push_plugin:
-    path: C:/Users/xy/AppData/Local/Pub/Cache/git/FlutterXiaoMiPushPlugin-16ed4c3b4132ed0f402d1d25549ef7f8ef891665
+    git:
+      url: https://github.com/w568w/FlutterXiaoMiPushPlugin.git
+      ref: master

@@ -46,6 +46,12 @@ Future<String> stickerFilePath(Ref ref, String stickerId) async {
   return path;
 }
 
+@Riverpod(keepAlive: true)
+Future<Uint8List> stickerBytes(Ref ref, String stickerId) async {
+  final path = await ref.watch(stickerFilePathProvider(stickerId).future);
+  return File(path).readAsBytes();
+}
+
 final _dio = DioUtils.newDioWithProxy(track: true);
 
 Future<void> _performDownload(RemoteSticker sticker) async {
