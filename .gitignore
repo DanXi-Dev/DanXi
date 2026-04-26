@@ -53,6 +53,8 @@ app.*.map.json
 /android/app/release
 /android/local.properties
 /android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+/android/.gradle/
+/android/app/.cxx/
 
 # VSCode
 .vscode
@@ -84,6 +86,7 @@ android/app/.cxx
 
 # Harmony temporary/generated
 /.codex_tmp/
+/DanXi/.codex_tmp/
 /.tmp_hap_inspect/
 /.tmp_har_inspect/
 /.tmp_ohos_har_module/
