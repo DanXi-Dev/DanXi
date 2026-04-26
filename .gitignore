@@ -51,6 +51,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/local.properties
+/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
 
 # VSCode
 .vscode
@@ -81,6 +83,15 @@ android/app/.cxx
 /.claude/*.local.*
 
 # Harmony temporary/generated
+/.codex_tmp/
+/.tmp_hap_inspect/
+/.tmp_har_inspect/
+/.tmp_ohos_har_module/
+/.tmp*/
+/tmp/
+**/tmp/
+**/.tmp/
+**/.tmp*/
 /.tmp_ohos_har_module/
 /ohos/.cache/
 /ohos/**/build/
@@ -107,3 +118,4 @@ android/app/.cxx
 /.vendor_ohos/**/local.properties
 /.vendor_ohos/**/oh-package-lock.json5
 /.vendor_ohos/**/libs/*.har
+/Microsoft/

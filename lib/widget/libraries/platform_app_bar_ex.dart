@@ -1,4 +1,4 @@
-/*
+﻿/*
  *     Copyright (C) 2021  DanXi-Dev
  *
  *     This program is free software: you can redistribute it and/or modify
@@ -91,7 +91,7 @@ class PlatformAppBarX extends PlatformAppBar {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      title: MediaQuery(
+      middle: MediaQuery(
           data: MediaQueryData(textScaler: MediaQuery.textScalerOf(context)),
           child: data?.title ?? title!),
     );
