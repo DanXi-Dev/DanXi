@@ -82,8 +82,16 @@ android/app/.cxx
 
 # Harmony temporary/generated
 /ohos/
+!/ohos/
 /.tmp_ohos_har_module/
 /Harmony/.hvigor/
 /Harmony/oh_modules/
 /Harmony/**/build/
-/.vendor_ohos/
+/.vendor_ohos/*
+!/.vendor_ohos/screen_brightness_ohos-2.1.2/
+!/.vendor_ohos/screen_brightness_ohos-2.1.2/**
+/.vendor_ohos/**/build/
+/.vendor_ohos/**/oh_modules/
+/.vendor_ohos/**/node_modules/
+/.vendor_ohos/**/.hvigor/
+/.vendor_ohos/**/local.properties
