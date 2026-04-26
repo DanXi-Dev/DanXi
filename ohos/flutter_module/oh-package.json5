@@ -1,0 +1,12 @@
+{
+  "name": "@ohos/flutter_module",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "index.ets",
+  "author": "",
+  "license": "OpenValley",
+  "dependencies": {
+    "@ohos/flutter_ohos": "har/flutter.har",
+    "screen_brightness_ohos": "file:../../ohos/har/screen_brightness_ohos.har"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "app": {
+    "products": [
+      {
+        "name": "default",
+        "targetSdkVersion": "6.0.2(22)",
+        "compatibleSdkVersion": "6.0.2(22)",
+        "runtimeOS": "HarmonyOS"
+      }
+    ],
+    "buildModeSet": [
+      { "name": "debug" },
+      { "name": "release" }
+    ]
+  },
+  "modules": [
+    {
+      "name": "flutter_module",
+      "srcPath": "./flutter_module",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": ["default"]
+        }
+      ]
+    }
+  ]
+}

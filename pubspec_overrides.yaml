@@ -1,0 +1,4 @@
+# This file is intentionally kept neutral for the normal Flutter lane.
+# The HarmonyOS build flow writes a temporary active override file here
+# from `pubspec_overrides.ohos.yaml` during `build_har_from_override.ps1`
+# and restores this baseline afterward.
