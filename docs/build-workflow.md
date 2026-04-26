@@ -47,6 +47,7 @@ The OHOS lane also carries a storage-specific runtime fix:
 The current OHOS Flutter `oh-3.35.7-release` checkout on this machine resolves to Dart `3.8.1`, so the OHOS lane reuses committed generated files instead of rerunning the full `build_runner` generator stack.
 
 See `docs/harmony.md` for the full OHOS setup, signing layout, and reproducibility checklist.
+See `docs/ohos-pr-notes.md` for a reviewer-oriented explanation of the large OHOS diff and how the adaptation layer works.
 
 ## Repository policy
 
