@@ -69,6 +69,26 @@ sudo pacman -S danxi # 最新稳定版
 sudo pacman -S danxi-git # 最新 Git 版
 ```
 
+### NixOS
+
+使用 Nix flake 构建和运行：
+
+```shell
+# 直接运行（不安装）
+nix run github:DanXi-Dev/DanXi
+```
+
+```shell
+# 进入开发环境
+nix develop github:DanXi-Dev/DanXi
+```
+
+#### 构建 Android APK
+
+```shell
+nix develop . -c flutter build apk
+```
+
 ### 其他 Linux 发行版
 
 打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版 zip 压缩包，解压运行即可。
@@ -129,6 +149,18 @@ dart run build_runner build --delete-conflicting-outputs
 ```
 
 然后运行  `flutter run [ios/android]`即可运行应用。
+
+### Nix Flake 构建
+
+本项目提供 Nix flake，可在 NixOS 上一键构建：
+
+```shell
+# Linux 桌面版
+nix build .#default
+
+# Android APK（暂不支持，正在实现中）
+# nix build .#android
+```
 
 ## 赞助
 
