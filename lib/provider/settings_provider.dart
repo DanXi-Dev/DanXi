@@ -179,8 +179,11 @@ class SettingsProvider with ChangeNotifier {
   }
 
   set timetableSemester(String? value) {
-    value!;
-    preferences!.setString(KEY_TIMETABLE_SEMESTER, value);
+    if (value != null) {
+      preferences!.setString(KEY_TIMETABLE_SEMESTER, value);
+    } else {
+      preferences!.remove(KEY_TIMETABLE_SEMESTER);
+    }
     notifyListeners();
   }
 
@@ -357,8 +360,11 @@ class SettingsProvider with ChangeNotifier {
   }
 
   set thisSemesterStartDate(String? value) {
-    value!;
-    preferences!.setString(KEY_THIS_SEMESTER_START_DATE, value);
+    if (value != null) {
+      preferences!.setString(KEY_THIS_SEMESTER_START_DATE, value);
+    } else {
+      preferences!.remove(KEY_THIS_SEMESTER_START_DATE);
+    }
     notifyListeners();
   }
 
@@ -371,8 +377,11 @@ class SettingsProvider with ChangeNotifier {
   }
 
   set semesterStartDates(SemesterStartDates? value) {
-    value!;
-    preferences!.setString(KEY_SEMESTER_START_DATES, jsonEncode(value));
+    if (value != null) {
+      preferences!.setString(KEY_SEMESTER_START_DATES, jsonEncode(value));
+    } else {
+      preferences!.remove(KEY_SEMESTER_START_DATES);
+    }
     notifyListeners();
   }
 
