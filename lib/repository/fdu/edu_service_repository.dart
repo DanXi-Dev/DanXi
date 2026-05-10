@@ -29,9 +29,6 @@ import 'package:flutter/widgets.dart';
 import 'neo_login_tool.dart';
 
 class EduServiceRepository extends BaseRepositoryWithDio {
-  static const String COURSE_TABLE_URL =
-      'https://fdjwgl.fudan.edu.cn/student/for-std/course-table';
-
   static String getSemesterCourseTableUrl(String semesterId) =>
       'https://fdjwgl.fudan.edu.cn/student/for-std/course-table/semester/$semesterId/print-data';
 
