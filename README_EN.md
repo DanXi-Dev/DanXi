@@ -80,18 +80,18 @@ Using the Nix flake:
 
 ```shell
 # Run directly (without installing)
-nix run github:DanXi-Dev/DanXi
+nix run github:DanXi-Dev/DanXi?dir=packaging/nix
 ```
 
 ```shell
 # Enter development shell
-nix develop github:DanXi-Dev/DanXi
+nix develop github:DanXi-Dev/DanXi?dir=packaging/nix
 ```
 
 #### Build Android APK
 
 ```shell
-nix develop . -c flutter build apk
+nix develop ./packaging/nix -c flutter build apk
 ```
 
 ### Other Linux distributions
@@ -162,8 +162,8 @@ This project provides a Nix flake for one-command builds on NixOS:
 
 ```shell
 # Linux desktop
-nix build .#default
+nix build ./packaging/nix
 
 # Android APK (not yet supported, work in progress)
-# nix build .#android
+# nix build ./packaging/nix#android
 ```

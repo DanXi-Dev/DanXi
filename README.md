@@ -75,18 +75,18 @@ sudo pacman -S danxi-git # 最新 Git 版
 
 ```shell
 # 直接运行（不安装）
-nix run github:DanXi-Dev/DanXi
+nix run github:DanXi-Dev/DanXi?dir=packaging/nix
 ```
 
 ```shell
 # 进入开发环境
-nix develop github:DanXi-Dev/DanXi
+nix develop github:DanXi-Dev/DanXi?dir=packaging/nix
 ```
 
 #### 构建 Android APK
 
 ```shell
-nix develop . -c flutter build apk
+nix develop ./packaging/nix -c flutter build apk
 ```
 
 ### 其他 Linux 发行版
@@ -156,10 +156,10 @@ dart run build_runner build --delete-conflicting-outputs
 
 ```shell
 # Linux 桌面版
-nix build .#default
+nix build ./packaging/nix
 
 # Android APK（暂不支持，正在实现中）
-# nix build .#android
+# nix build ./packaging/nix#android
 ```
 
 ## 赞助
