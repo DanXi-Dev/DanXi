@@ -683,8 +683,11 @@ class SemesterSelectionButtonState extends State<SemesterSelectionButton> {
     }
     SettingsProvider.getInstance().semesterStartDates =
         semesterBundle.startDates;
-    SettingsProvider.getInstance().thisSemesterStartDate =
-        semesterBundle.startDates.parseStartDate(chosenSemester);
+    semesterBundle.startDates
+        .parseStartDate(chosenSemester)
+        ?.apply(
+          (sd) => SettingsProvider.getInstance().thisSemesterStartDate = sd,
+        );
   }
 
   @override
