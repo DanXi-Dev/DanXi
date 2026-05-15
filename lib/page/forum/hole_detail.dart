@@ -425,18 +425,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         }
 
         if (shouldScrollToEnd) {
-          try {
-            if (!_allDataLoaded) {
-              await _loadAllContent();
-            }
-            // scroll to end.
-            _listViewController.scheduleLoadedCallback(
-                () async => await _listViewController.scrollToEnd(),
-                rebuild: true);
-            shouldScrollToEnd = false;
-          } catch (_) {
-            // we don't care if we failed to scroll to the end.
-          }
+          await _loadAllAndScrollToEnd();
+          shouldScrollToEnd = false;
         }
       }
     });
@@ -539,6 +529,14 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             ),
             PlatformPopupMenuX(
               options: [
+                PopupMenuOption(
+                  label: S.of(context).scroll_to_new,
+                  onTap: (_) {
+                    _allDataLoaded = false;
+                    _loadAllContentFuture = null;
+                    _loadAllAndScrollToEnd();
+                  },
+                ),
                 PopupMenuOption(
                     label: S.of(context).scroll_to_end,
                     onTap: (_) {
@@ -818,6 +816,21 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     _listViewController.replaceAllDataWith(allFloors);
     _allDataLoaded = true;
     return allFloors;
+  }
+
+  Future<void> _loadAllAndScrollToEnd() async {
+    try {
+      if (!_allDataLoaded) {
+        await _loadAllContent();
+      }
+      // scroll to end.
+      _listViewController.scheduleLoadedCallback(
+        () async => await _listViewController.scrollToEnd(),
+        rebuild: true,
+      );
+    } catch (_) {
+      // we don't care if we failed to scroll to the end.
+    }
   }
 
   Widget _buildFavoredActionButton() {

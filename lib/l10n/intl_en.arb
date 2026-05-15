@@ -356,6 +356,7 @@
   "screenshot_warning": "To ensure data security and to protect the privacy of other users, please do not send screenshots to any other platform. Thank you for your cooperation.",
   "screenshot_warning_title": "Screenshot Detected",
   "scroll_to_end": "Go to Bottom",
+  "scroll_to_new": "Go to New Posts",
   "search": "Search",
   "search_by_floor_tip": "Go to the floor {floorId}",
   "search_by_pid_tip": "Go to the post {pid}",

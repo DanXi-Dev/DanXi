@@ -350,6 +350,7 @@
   "screenshot_warning": "爲保障茶樓資訊安全及其他使用者的隱私，請勿將截圖傳送至任何平台，感謝您的配合。",
   "screenshot_warning_title": "偵測到截圖",
   "scroll_to_end": "前往底部",
+  "scroll_to_new": "前往新回覆",
   "search": "搜尋",
   "search_by_floor_tip": "跳轉至樓層「{floorId}」",
   "search_by_pid_tip": "跳轉至帖子「{pid}」",
