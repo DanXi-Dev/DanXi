@@ -83,12 +83,6 @@ nix run github:DanXi-Dev/DanXi?dir=packaging/nix
 nix develop github:DanXi-Dev/DanXi?dir=packaging/nix
 ```
 
-#### 构建 Android APK
-
-```shell
-nix develop ./packaging/nix -c flutter build apk
-```
-
 ### 其他 Linux 发行版
 
 打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版 zip 压缩包，解压运行即可。
@@ -152,14 +146,21 @@ dart run build_runner build --delete-conflicting-outputs
 
 ### Nix Flake 构建
 
-本项目提供 Nix flake，可在 NixOS 上一键构建：
+本项目提供 Nix flake，可在 NixOS 上构建（产物预设在 `./result/` 中）：
 
 ```shell
 # Linux 桌面版
 nix build ./packaging/nix
+```
 
-# Android APK（暂不支持，正在实现中）
-# nix build ./packaging/nix#android
+```shell
+# Android APK
+nix build ./packaging/nix#android
+```
+
+```shell
+# Android APK，另一种方式
+nix develop ./packaging/nix -c flutter build apk
 ```
 
 ## 赞助

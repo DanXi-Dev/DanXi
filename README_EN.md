@@ -88,12 +88,6 @@ nix run github:DanXi-Dev/DanXi?dir=packaging/nix
 nix develop github:DanXi-Dev/DanXi?dir=packaging/nix
 ```
 
-#### Build Android APK
-
-```shell
-nix develop ./packaging/nix -c flutter build apk
-```
-
 ### Other Linux distributions
 
 Go to [release page](https://github.com/DanXi-Dev/DanXi/releases), just download the zip file and
@@ -158,12 +152,19 @@ and then  `flutter run [ios/android]` to start the app.
 
 ### Build with Nix Flake
 
-This project provides a Nix flake for one-command builds on NixOS:
+This project provides a Nix flake for builds on NixOS (this output will be in `./result/`):
 
 ```shell
 # Linux desktop
 nix build ./packaging/nix
+```
 
-# Android APK (not yet supported, work in progress)
-# nix build ./packaging/nix#android
+```shell
+# Android APK
+nix build ./packaging/nix#android
+```
+
+```shell
+# Android APK, another method
+nix develop ./packaging/nix -c flutter build apk
 ```
