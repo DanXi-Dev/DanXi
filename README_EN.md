@@ -80,12 +80,12 @@ Using the Nix flake:
 
 ```shell
 # Run directly (without installing)
-nix run github:DanXi-Dev/DanXi?dir=packaging/nix
+nix run github:DanXi-nix/DanXi-nix
 ```
 
 ```shell
 # Enter development shell
-nix develop github:DanXi-Dev/DanXi?dir=packaging/nix
+nix develop github:DanXi-Dev/DanXi-nix
 ```
 
 ### Other Linux distributions
@@ -156,15 +156,16 @@ This project provides a Nix flake for builds on NixOS (this output will be in `.
 
 ```shell
 # Linux desktop
-nix build ./packaging/nix
+nix build github:DanXi-Dev/DanXi-nix
 ```
 
 ```shell
 # Android APK
-nix build ./packaging/nix#android
+nix build github:DanXi-Dev/DanXi-nix#android
 ```
 
 ```shell
+# cd DanXi-Dev/DanXi
 # Android APK, another method
-nix develop ./packaging/nix -c flutter build apk
+nix develop github:DanXi-Dev/DanXi-nix -c flutter build apk
 ```
