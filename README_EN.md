@@ -74,6 +74,20 @@ You can install it from [AUR](https://aur.archlinux.org/danxi-git.git) or [archl
 sudo pacman -S danxi-git
 ```
 
+### NixOS
+
+Using the Nix flake:
+
+```shell
+# Run directly (without installing)
+nix run github:DanXi-nix/DanXi-nix
+```
+
+```shell
+# Enter development shell
+nix develop github:DanXi-Dev/DanXi-nix
+```
+
 ### Other Linux distributions
 
 Go to [release page](https://github.com/DanXi-Dev/DanXi/releases), just download the zip file and
@@ -135,3 +149,23 @@ dart run build_runner build --delete-conflicting-outputs
 ```
 
 and then  `flutter run [ios/android]` to start the app.
+
+### Build with Nix Flake
+
+This project provides a Nix flake for builds on NixOS (this output will be in `./result/`):
+
+```shell
+# Linux desktop
+nix build github:DanXi-Dev/DanXi-nix
+```
+
+```shell
+# Android APK
+nix build github:DanXi-Dev/DanXi-nix#android
+```
+
+```shell
+# cd DanXi-Dev/DanXi
+# Android APK, another method
+nix develop github:DanXi-Dev/DanXi-nix -c flutter build apk
+```
