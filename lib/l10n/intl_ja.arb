@@ -348,6 +348,7 @@
   "screenshot_warning": "フォーラムの情報のセキュリティと他のユーザーのプライバシーを保護するために、スクリーンショットを他のプラットフォームに送信しないようにお願いします。ご協力ありがとうございました。",
   "screenshot_warning_title": "スクリーンショットを検知",
   "scroll_to_end": "底へ行く",
+  "scroll_to_new": "新しい投稿へ行く",
   "search": "検索",
   "search_by_floor_tip": "「{floorId}」返信へ",
   "search_by_pid_tip": "「{pid}」ポストへ",

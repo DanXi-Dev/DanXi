@@ -350,6 +350,7 @@
   "screenshot_warning": "为保障茶楼信息安全和其他用户的隐私，请不要将截图发送到任何平台，感谢您的配合。",
   "screenshot_warning_title": "检测到截图",
   "scroll_to_end": "去往底部",
+  "scroll_to_new": "去往新回复",
   "search": "搜索",
   "search_by_floor_tip": "跳转到楼层「{floorId}」",
   "search_by_pid_tip": "跳转到帖子「{pid}」",
