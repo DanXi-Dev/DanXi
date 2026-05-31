@@ -15,77 +15,91 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:collection/collection.dart';
 import 'package:dan_xi/model/claw/claw_channel.dart';
 import 'package:dan_xi/repository/claw/claw_repository.dart';
-import 'package:dan_xi/util/master_detail_view.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
-import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 
-class ClawChannelListPage extends StatefulWidget {
+final _channelsProvider = FutureProvider<List<ClawChannel>>((ref) async {
+  return await ClawRepository.getInstance().getChannels();
+});
+
+class ClawChannelListPage extends ConsumerWidget {
   final Map<String, dynamic>? arguments;
 
   const ClawChannelListPage({super.key, this.arguments});
 
   @override
-  State<ClawChannelListPage> createState() => _ClawChannelListPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final channels = ref.watch(_channelsProvider);
+    final currentChannelId = arguments?['current_channel_id'] as int?;
 
-class _ClawChannelListPageState extends State<ClawChannelListPage> {
-  Future<List<ClawChannel>> _loadChannels() {
-    return ClawRepository.getInstance().getChannels();
+    return PlatformScaffold(
+      // TODO: Use i18n.
+      appBar: PlatformAppBarX(title: const Text('DantaClaw Channels')),
+      body: switch (channels) {
+        AsyncData(:final value) => _buildList(context, value, currentChannelId),
+        AsyncError(:final error, :final stackTrace) =>
+          ErrorPageWidget.buildWidget(
+            context,
+            error,
+            stackTrace: stackTrace,
+            onTap: () => ref.invalidate(_channelsProvider),
+          ),
+        _ => const Center(child: PlatformCircularProgressIndicator()),
+      },
+    );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return PlatformScaffold(
-      appBar: PlatformAppBarX(title: const Text('DantaClaw Channels')),
-      body: FutureWidget<List<ClawChannel>>(
-        future: _loadChannels(),
-        loadingBuilder: const Center(
-          child: PlatformCircularProgressIndicator(),
-        ),
-        errorBuilder:
-            (BuildContext context, AsyncSnapshot<List<ClawChannel>> snapshot) {
-              return ErrorPageWidget.buildWidget(
-                context,
-                snapshot.error,
-                stackTrace: snapshot.stackTrace,
-                onTap: () => setState(() {}),
-              );
-            },
-        successBuilder:
-            (BuildContext context, AsyncSnapshot<List<ClawChannel>> snapshot) {
-              final channels = snapshot.data!;
-              if (channels.isEmpty) {
-                return const Center(child: Text('No channels.'));
-              }
-              // Show newest first.
-              final sorted = List<ClawChannel>.from(channels)
-                ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-              return ListView.separated(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                itemCount: sorted.length,
-                separatorBuilder: (_, _) =>
-                    const Divider(height: 1, indent: 16),
-                itemBuilder: (context, index) {
-                  final ch = sorted[index];
-                  final createdAt = ch.createdAt.isNotEmpty
-                      ? ch.createdAt.substring(0, 19).replaceFirst('T', ' ')
-                      : '';
-                  return ListTile(
-                    leading: CircleAvatar(child: Text('${ch.userSessionId}')),
-                    title: Text('Session ${ch.userSessionId}'),
-                    subtitle: Text(createdAt),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => Navigator.pop(context, ch.userSessionId),
-                  );
-                },
-              );
-            },
-      ),
+  Widget _buildList(
+    BuildContext context,
+    List<ClawChannel> channels,
+    int? currentChannelId,
+  ) {
+    if (channels.isEmpty) {
+      // TODO: Use i18n.
+      return const Center(child: Text('No channels.'));
+    }
+    final sortedChannels = channels.sorted(
+      (a, b) => b.createdAt.compareTo(a.createdAt),
+    );
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemCount: sortedChannels.length,
+      separatorBuilder: (_, _) => const Divider(height: 1, indent: 16),
+      itemBuilder: (context, index) {
+        final channel = sortedChannels[index];
+        final timeCreated = DateTime.tryParse(channel.createdAt);
+        final formatted =
+            timeCreated?.apply(
+              (date) => DateFormat.yMMMd().add_Hms().format(date),
+            ) ??
+            channel.createdAt;
+        final isActive = currentChannelId == channel.userSessionId;
+        return ListTile(
+          leading: CircleAvatar(child: Text('${channel.userSessionId}')),
+          // TODO: Use i18n.
+          title: Text('Session ${channel.userSessionId}'),
+          subtitle: Text(formatted),
+          trailing: isActive
+              ? Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Colors.green,
+                    shape: BoxShape.circle,
+                  ),
+                )
+              : null,
+          onTap: () => Navigator.pop(context, channel.userSessionId),
+        );
+      },
     );
   }
 }

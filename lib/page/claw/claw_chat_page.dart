@@ -17,8 +17,7 @@
 
 import 'dart:async';
 
-import 'package:dan_xi/model/claw/claw_message.dart';
-import 'package:dan_xi/repository/claw/claw_repository.dart';
+import 'package:dan_xi/provider/claw/claw_chat_provider.dart';
 import 'package:dan_xi/util/claw/ws_service.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -26,144 +25,50 @@ import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ClawChatPage extends StatefulWidget {
+class ClawChatPage extends HookConsumerWidget {
   final Map<String, dynamic>? arguments;
 
   const ClawChatPage({super.key, this.arguments});
 
   @override
-  State<ClawChatPage> createState() => _ClawChatPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final channelId = useState((arguments?['channel_id'] as int?) ?? 502);
+    final textController = useTextEditingController();
+    final scrollController = useScrollController();
 
-class _ClawChatPageState extends State<ClawChatPage> {
-  late int _channelId = (widget.arguments?['channel_id'] as int?) ?? 2;
-  final List<ClawMessage> _messages = [];
-  Object? _error;
-  bool _loading = true;
-  bool _sending = false;
+    final chatState = ref.watch(clawChatProvider);
+    final chatNotifier = ref.read(clawChatProvider.notifier);
 
-  final _textController = TextEditingController();
-  final _scrollController = ScrollController();
-  StreamSubscription<ClawMessage>? _wsSub;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadMessages();
-    _connectWs();
-  }
-
-  @override
-  void dispose() {
-    _wsSub?.cancel();
-    _textController.dispose();
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _connectWs() async {
-    final ws = ClawWebSocketService.getInstance();
-    await ws.connect();
-    _wsSub?.cancel();
-    _wsSub = ws.messages.listen(_onWsMessage);
-  }
-
-  void _onWsMessage(ClawMessage msg) {
-    if (msg.channelId != _channelId || !mounted) return;
-    setState(() {
-      _messages.add(msg);
-      _sending = false;
-    });
-    _scrollToBottom();
-  }
-
-  Future<void> _loadMessages() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-      _messages.clear();
-    });
-    try {
-      final msgs = await ClawRepository.getInstance().getMessages(
-        channelId: _channelId,
-        sort: 'asc',
-        size: 64,
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => chatNotifier.loadMessages(channelId.value),
       );
-      if (!mounted) return;
-      setState(() {
-        _messages.addAll(msgs);
-        _loading = false;
+      return null;
+    }, [channelId.value]);
+
+    useEffect(() {
+      final ws = ClawWebSocketService.getInstance();
+      ws.connect();
+      final sub = ws.messages.listen((msg) {
+        if (msg.channelId != channelId.value) return;
+        chatNotifier.onWsMessage(msg);
+        _scrollToBottomAnimated(scrollController);
       });
-      _scrollToBottom();
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _error = e;
-        _loading = false;
-      });
-    }
-  }
+      return sub.cancel;
+    }, [channelId.value]);
 
-  void _sendMessage() {
-    final text = _textController.text.trim();
-    if (text.isEmpty || _sending) return;
+    useEffect(() {
+      _scrollToBottom(scrollController);
+      return null;
+    }, [chatState.messages.length, channelId.value]);
 
-    _textController.clear();
-    setState(() => _sending = true);
-
-    final messageId =
-        'msg_${DateTime.now().millisecondsSinceEpoch}_${DateTime.now().microsecondsSinceEpoch.toRadixString(36)}';
-
-    ClawWebSocketService.getInstance().sendMessage(
-      channelId: _channelId,
-      content: text,
-      messageId: messageId,
-    );
-
-    final userMsg = ClawMessage(
-      id: 0,
-      type: 'message',
-      from: 'user',
-      content: text,
-      messageId: messageId,
-      channelId: _channelId,
-      timestamp: DateTime.now().millisecondsSinceEpoch,
-      media: {},
-    );
-    setState(() {
-      _messages.add(userMsg);
-    });
-    _scrollToBottom();
-  }
-
-  void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 256),
-          curve: Curves.easeOut,
-        );
-      }
-    });
-  }
-
-  Future<void> _switchChannel() async {
-    final selected = await smartNavigatorPush(context, '/claw/channels');
-    if (selected is int && selected != _channelId && mounted) {
-      setState(() => _channelId = selected);
-      // Keep WS connection alive, just reload history for new channel.
-      _loadMessages();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return PlatformScaffold(
       appBar: PlatformAppBarX(
-        title: Text('DantaClaw Channel $_channelId'),
+        title: Text('DantaClaw Channel ${channelId.value}'),
         trailingActions: [
           PlatformIconButton(
             icon: Icon(
@@ -171,35 +76,59 @@ class _ClawChatPageState extends State<ClawChatPage> {
                   ? Icons.list
                   : CupertinoIcons.list_bullet,
             ),
-            onPressed: _switchChannel,
+            onPressed: () => _switchChannel(context, channelId),
           ),
         ],
       ),
       body: Column(
         children: [
-          Expanded(child: _buildBody()),
-          _buildInputBar(),
+          Expanded(
+            child: _buildBody(
+              context,
+              channelId,
+              chatState,
+              chatNotifier,
+              scrollController,
+            ),
+          ),
+          _buildInputBar(context, textController, chatState.sending, (text) {
+            chatNotifier.sendMessage(channelId.value, text);
+          }),
         ],
       ),
     );
   }
 
-  Widget _buildBody() {
-    if (_loading) {
+  Widget _buildBody(
+    BuildContext context,
+    ValueNotifier<int> channelId,
+    ClawChatState state,
+    ClawChatNotifier notifier,
+    ScrollController scrollController,
+  ) {
+    if (state.loading) {
       return const Center(child: PlatformCircularProgressIndicator());
     }
-    if (_error != null) {
-      return ErrorPageWidget.buildWidget(context, _error, onTap: _loadMessages);
+    if (state.error case SomeError(:final error)) {
+      return ErrorPageWidget.buildWidget(
+        context,
+        error,
+        onTap: () => notifier.loadMessages(channelId.value),
+      );
     }
-    if (_messages.isEmpty) {
-      return Center(child: Text('No messages in channel $_channelId.'));
+    if (state.messages.isEmpty) {
+      return Center(
+        child: Text(
+          'No messages in channel ${channelId.value}. This might be an internal error.',
+        ),
+      );
     }
     return ListView.builder(
-      controller: _scrollController,
+      controller: scrollController,
       padding: const EdgeInsets.all(12),
-      itemCount: _messages.length,
+      itemCount: state.messages.length,
       itemBuilder: (context, index) {
-        final msg = _messages[index];
+        final msg = state.messages[index];
         final isUser = msg.isUser;
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
@@ -241,14 +170,26 @@ class _ClawChatPageState extends State<ClawChatPage> {
     );
   }
 
-  Widget _buildInputBar() {
+  Widget _buildInputBar(
+    BuildContext context,
+    TextEditingController controller,
+    bool sending,
+    void Function(String) onSend,
+  ) {
+    final onSendWrapper = (String text) {
+      text = text.trim();
+      if (text.isNotEmpty) {
+        controller.clear();
+        onSend(text);
+      }
+    };
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
       ),
       padding: EdgeInsets.only(
-        left: 12,
+        left: 16,
         right: 8,
         top: 8,
         bottom: MediaQuery.of(context).padding.bottom + 8,
@@ -257,10 +198,9 @@ class _ClawChatPageState extends State<ClawChatPage> {
         children: [
           Expanded(
             child: PlatformTextField(
-              controller: _textController,
-              // TODO: Use i18n.
+              controller: controller,
               hintText: 'Type a message...',
-              onSubmitted: (_) => _sendMessage(),
+              onSubmitted: sending ? null : onSendWrapper,
             ),
           ),
           const SizedBox(width: 8),
@@ -270,10 +210,50 @@ class _ClawChatPageState extends State<ClawChatPage> {
                   ? Icons.send
                   : CupertinoIcons.paperplane_fill,
             ),
-            onPressed: _sending ? null : _sendMessage,
+            onPressed: sending ? null : () => onSendWrapper(controller.text),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _switchChannel(
+    BuildContext context,
+    ValueNotifier<int> channelId,
+  ) async {
+    final selected = await smartNavigatorPush(
+      context,
+      '/claw/channels',
+      arguments: {'current_channel_id': channelId.value},
+    );
+    if (selected is int && selected != channelId.value) {
+      channelId.value = selected;
+    }
+  }
+
+  void _scrollToBottom(ScrollController controller) {
+    void scroll() {
+      if (!controller.hasClients) return;
+      final target = controller.position.maxScrollExtent;
+      if ((controller.position.pixels - target).abs() > 0.5) {
+        controller.jumpTo(target);
+        // ListView.builder may not have fully laid out all items yet.
+        // Retry on next frame.
+        WidgetsBinding.instance.addPostFrameCallback((_) => scroll());
+      }
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) => scroll());
+  }
+
+  void _scrollToBottomAnimated(ScrollController controller) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (controller.hasClients) {
+        controller.animateTo(
+          controller.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 256),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 }
