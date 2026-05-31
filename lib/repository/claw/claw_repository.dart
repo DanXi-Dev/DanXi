@@ -41,8 +41,10 @@ class ClawRepository {
     _dio.interceptors.add(DioLogInterceptor());
   }
 
+  final token = "<ACCESS_TOKEN>"; // TODO: Fill in it.
+
   Map<String, dynamic> get _headers {
-    return {'Authorization': 'Bearer <ACCESS_TOKEN>'}; // TODO: Fill in it.
+    return {'Authorization': 'Bearer $token'};
   }
 
   Future<List<ClawChannel>> getChannels() async {
