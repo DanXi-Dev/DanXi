@@ -15,6 +15,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:dan_xi/model/claw/claw_channel.dart';
 import 'package:dan_xi/model/claw/claw_message.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dio/dio.dart';
@@ -42,6 +43,17 @@ class ClawRepository {
 
   Map<String, dynamic> get _headers {
     return {'Authorization': 'Bearer <ACCESS_TOKEN>'}; // TODO: Fill in it.
+  }
+
+  Future<List<ClawChannel>> getChannels() async {
+    final response = await _dio.get<List<dynamic>>(
+      '$_baseUrl/channels',
+      options: Options(headers: _headers),
+    );
+    return response.data
+            ?.map((e) => ClawChannel.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [];
   }
 
   Future<List<ClawMessage>> getMessages({

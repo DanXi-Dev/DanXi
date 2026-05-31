@@ -17,9 +17,12 @@
 
 import 'package:dan_xi/model/claw/claw_message.dart';
 import 'package:dan_xi/repository/claw/claw_repository.dart';
+import 'package:dan_xi/util/master_detail_view.dart';
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/future_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -33,7 +36,7 @@ class ClawChatPage extends StatefulWidget {
 }
 
 class _ClawChatPageState extends State<ClawChatPage> {
-  static const int _channelId = 2;
+  late final int _channelId = (widget.arguments?['channel_id'] as int?) ?? 2;
 
   @override
   void initState() {
@@ -52,7 +55,19 @@ class _ClawChatPageState extends State<ClawChatPage> {
   Widget build(BuildContext context) {
     return PlatformScaffold(
       // TODO: Use i18n.
-      appBar: PlatformAppBarX(title: Text('DantaClaw Channel $_channelId')),
+      appBar: PlatformAppBarX(
+        title: Text('DantaClaw Channel $_channelId'),
+        trailingActions: [
+          PlatformIconButton(
+            icon: Icon(
+              PlatformX.isMaterial(context)
+                  ? Icons.list
+                  : CupertinoIcons.list_bullet,
+            ),
+            onPressed: () => smartNavigatorPush(context, '/claw/channels'),
+          ),
+        ],
+      ),
       body: FutureWidget<List<ClawMessage>>(
         future: _loadMessages(),
         loadingBuilder: const Center(
