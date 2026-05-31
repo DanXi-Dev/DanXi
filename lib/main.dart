@@ -21,6 +21,7 @@ import 'dart:ui';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/feature/feature_map.dart';
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/page/claw/claw_chat_page.dart';
 import 'package:dan_xi/page/danke/course_group_detail.dart';
 import 'package:dan_xi/page/danke/course_review_editor.dart';
 import 'package:dan_xi/page/dashboard/aao_notices.dart';
@@ -206,7 +207,8 @@ class DanxiApp extends StatelessWidget {
     '/danke/courseDetail': (context, {arguments}) =>
         CourseGroupDetail(arguments: arguments),
     '/danke/fullScreenEditor': (context, {arguments}) =>
-        CourseReviewEditorPage(arguments: arguments)
+        CourseReviewEditorPage(arguments: arguments),
+    '/claw/chat': (context, {arguments}) => ClawChatPage(arguments: arguments),
   };
 
   const DanxiApp({super.key});
