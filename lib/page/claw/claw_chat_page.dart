@@ -36,7 +36,7 @@ class ClawChatPage extends StatefulWidget {
 }
 
 class _ClawChatPageState extends State<ClawChatPage> {
-  late final int _channelId = (widget.arguments?['channel_id'] as int?) ?? 2;
+  late int _channelId = (widget.arguments?['channel_id'] as int?) ?? 2;
 
   @override
   void initState() {
@@ -64,7 +64,17 @@ class _ClawChatPageState extends State<ClawChatPage> {
                   ? Icons.list
                   : CupertinoIcons.list_bullet,
             ),
-            onPressed: () => smartNavigatorPush(context, '/claw/channels'),
+            onPressed: () async {
+              final selectedChannelId = await smartNavigatorPush(
+                context,
+                '/claw/channels',
+              );
+              if (selectedChannelId is int &&
+                  selectedChannelId != _channelId &&
+                  mounted) {
+                setState(() => _channelId = selectedChannelId);
+              }
+            },
           ),
         ],
       ),

@@ -80,13 +80,7 @@ class _ClawChannelListPageState extends State<ClawChannelListPage> {
                     title: Text('Session ${ch.userSessionId}'),
                     subtitle: Text(createdAt),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      smartNavigatorPush(
-                        context,
-                        '/claw/chat',
-                        arguments: {'channel_id': ch.userSessionId},
-                      );
-                    },
+                    onTap: () => Navigator.pop(context, ch.userSessionId),
                   );
                 },
               );
