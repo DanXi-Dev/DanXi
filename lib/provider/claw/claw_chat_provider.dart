@@ -54,6 +54,7 @@ class ClawChatNotifier extends Notifier<ClawChatState> {
   Future<void> loadMessages(int channelId) async {
     state = state.copyWith(loading: true, error: const NoError());
     try {
+      // TODO: Load from end and expand in need.
       final msgs = <ClawMessage>[];
       while (true) {
         final msgsSlice = await ClawRepository.getInstance().getMessages(
@@ -66,7 +67,10 @@ class ClawChatNotifier extends Notifier<ClawChatState> {
         }
         msgs.addAll(msgsSlice);
       }
-      state = ClawChatState(messages: msgs, loading: false);
+      state = ClawChatState(
+        messages: msgs.reversed.toList(growable: false),
+        loading: false,
+      );
     } catch (e) {
       state = state.copyWith(loading: false, error: SomeError(e));
     }
@@ -94,11 +98,11 @@ class ClawChatNotifier extends Notifier<ClawChatState> {
       timestamp: DateTime.now().millisecondsSinceEpoch,
       media: {},
     );
-    state = state.copyWith(messages: [...state.messages, userMsg]);
+    state = state.copyWith(messages: [userMsg, ...state.messages]);
   }
 
   void onWsMessage(ClawMessage msg) {
-    state = state.copyWith(messages: [...state.messages, msg], sending: false);
+    state = state.copyWith(messages: [msg, ...state.messages], sending: false);
   }
 }
 

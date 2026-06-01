@@ -44,27 +44,21 @@ class ClawChatPage extends HookConsumerWidget {
     final chatNotifier = ref.read(clawChatProvider.notifier);
 
     useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => chatNotifier.loadMessages(channelId.value),
-      );
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await chatNotifier.loadMessages(channelId.value);
+      });
       return null;
     }, [channelId.value]);
 
     useEffect(() {
       final ws = ClawWebSocketService.getInstance();
       ws.connect();
-      final sub = ws.messages.listen((msg) {
+      final subscription = ws.messages.listen((msg) {
         if (msg.channelId != channelId.value) return;
         chatNotifier.onWsMessage(msg);
-        _scrollToBottomAnimated(scrollController);
       });
-      return sub.cancel;
+      return subscription.cancel;
     }, [channelId.value]);
-
-    useEffect(() {
-      _scrollToBottom(scrollController);
-      return null;
-    }, [chatState.messages.length, channelId.value]);
 
     return PlatformScaffold(
       appBar: PlatformAppBarX(
@@ -125,6 +119,7 @@ class ClawChatPage extends HookConsumerWidget {
     }
     return ListView.builder(
       controller: scrollController,
+      reverse: true,
       padding: const EdgeInsets.all(12),
       itemCount: state.messages.length,
       itemBuilder: (context, index) {
@@ -229,31 +224,5 @@ class ClawChatPage extends HookConsumerWidget {
     if (selected is int && selected != channelId.value) {
       channelId.value = selected;
     }
-  }
-
-  void _scrollToBottom(ScrollController controller) {
-    void scroll() {
-      if (!controller.hasClients) return;
-      final target = controller.position.maxScrollExtent;
-      if ((controller.position.pixels - target).abs() > 0.5) {
-        controller.jumpTo(target);
-        // ListView.builder may not have fully laid out all items yet.
-        // Retry on next frame.
-        WidgetsBinding.instance.addPostFrameCallback((_) => scroll());
-      }
-    }
-    WidgetsBinding.instance.addPostFrameCallback((_) => scroll());
-  }
-
-  void _scrollToBottomAnimated(ScrollController controller) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (controller.hasClients) {
-        controller.animateTo(
-          controller.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 256),
-          curve: Curves.easeOut,
-        );
-      }
-    });
   }
 }
