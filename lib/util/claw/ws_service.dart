@@ -7,7 +7,7 @@ import 'package:dan_xi/model/claw/claw_ws_frame.dart';
 import 'package:dan_xi/repository/claw/claw_repository.dart';
 
 class ClawWebSocketService {
-  static const String _wsUrl = 'ws://127.0.0.1:8000/api/claw/ws';
+  static const String kWsUrl = 'ws://${ClawRepository.kHost}/api/claw/ws';
 
   WebSocket? _ws;
 
@@ -28,7 +28,7 @@ class ClawWebSocketService {
 
   Future<void> connect() async {
     if (_connected) return;
-    final ws = await WebSocket.connect(_wsUrl).timeout(
+    final ws = await WebSocket.connect(kWsUrl).timeout(
       const Duration(milliseconds: 16384),
       onTimeout: () =>
           throw TimeoutException('DantaClaw WebSocket connection timed out'),

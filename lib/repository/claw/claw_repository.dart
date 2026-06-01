@@ -22,7 +22,8 @@ import 'package:dio/dio.dart';
 import 'package:dio5_log/interceptor/diox_log_interceptor.dart';
 
 class ClawRepository {
-  static const String _baseUrl = 'http://127.0.0.1:8000/api/claw';
+  static const String kHost = '127.0.0.1:8000';
+  static const String kBaseUrl = 'http://$kHost/api/claw';
 
   final Dio _dio;
 
@@ -49,7 +50,7 @@ class ClawRepository {
 
   Future<List<ClawChannel>> getChannels() async {
     final response = await _dio.get<List<dynamic>>(
-      '$_baseUrl/channels',
+      '$kBaseUrl/channels',
       options: Options(headers: _headers),
     );
     return response.data
@@ -65,7 +66,7 @@ class ClawRepository {
     int size = 64,
   }) async {
     final response = await _dio.get<List<dynamic>>(
-      '$_baseUrl/messages',
+      '$kBaseUrl/messages',
       queryParameters: {
         'channel_id': channelId,
         'offset': offset,
