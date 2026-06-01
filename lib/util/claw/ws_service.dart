@@ -28,7 +28,11 @@ class ClawWebSocketService {
 
   Future<void> connect() async {
     if (_connected) return;
-    final ws = await WebSocket.connect(_wsUrl);
+    final ws = await WebSocket.connect(_wsUrl).timeout(
+      const Duration(milliseconds: 16384),
+      onTimeout: () =>
+          throw TimeoutException('DantaClaw WebSocket connection timed out'),
+    );
     _ws = ws;
 
     ws.listen(

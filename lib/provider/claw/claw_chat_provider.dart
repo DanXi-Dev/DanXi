@@ -1,20 +1,59 @@
+import 'dart:convert';
+
 import 'package:dan_xi/model/claw/claw_message.dart';
 import 'package:dan_xi/repository/claw/claw_repository.dart';
 import 'package:dan_xi/util/claw/ws_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+sealed class ChannelId {
+  const ChannelId._();
+
+  int get asInt;
+
+  factory ChannelId.fromIntOrNull(int? id) =>
+      (id != null && id > 0) ? SomeChannelId(id) : const NewChannelId();
+
+  @override
+  bool operator ==(Object other) => switch ((this, other)) {
+    (NewChannelId(), NewChannelId()) => true,
+    (SomeChannelId(id: final id0), SomeChannelId(id: final id1)) => id0 == id1,
+    _ => false,
+  };
+
+  @override
+  int get hashCode => asInt.hashCode;
+}
+
+class NewChannelId extends ChannelId {
+  const NewChannelId() : super._();
+
+  /// The backend uses channel_id 0 to indicate a new channel.
+  @override
+  int get asInt => 0;
+}
+
+class SomeChannelId extends ChannelId {
+  final int id;
+
+  const SomeChannelId(this.id) : assert(id > 0), super._();
+
+  @override
+  int get asInt => id;
+}
+
 sealed class ChatError {
-  const ChatError();
+  const ChatError._();
 }
 
 class NoError extends ChatError {
-  const NoError();
+  const NoError() : super._();
 }
 
 class SomeError extends ChatError {
   final Object error;
 
-  const SomeError(this.error);
+  const SomeError(this.error) : super._();
 }
 
 class ClawChatState {
@@ -51,21 +90,23 @@ class ClawChatNotifier extends Notifier<ClawChatState> {
   @override
   ClawChatState build() => const ClawChatState();
 
-  Future<void> loadMessages(int channelId) async {
+  Future<void> loadMessages(ChannelId channelId) async {
     state = state.copyWith(loading: true, error: const NoError());
     try {
       // TODO: Load from end and expand in need.
       final msgs = <ClawMessage>[];
-      while (true) {
-        final msgsSlice = await ClawRepository.getInstance().getMessages(
-          channelId: channelId,
-          sort: 'asc',
-          offset: msgs.length,
-        );
-        if (msgsSlice.isEmpty) {
-          break;
+      if (channelId case SomeChannelId(id: final channelId)) {
+        while (true) {
+          final msgsSlice = await ClawRepository.getInstance().getMessages(
+            channelId: channelId,
+            sort: 'asc',
+            offset: msgs.length,
+          );
+          if (msgsSlice.isEmpty) {
+            break;
+          }
+          msgs.addAll(msgsSlice);
         }
-        msgs.addAll(msgsSlice);
       }
       state = ClawChatState(
         messages: msgs.reversed.toList(growable: false),
@@ -76,14 +117,14 @@ class ClawChatNotifier extends Notifier<ClawChatState> {
     }
   }
 
-  void sendMessage(int channelId, String text) {
+  void sendMessage(ChannelId channelId, String text) {
     state = state.copyWith(sending: true);
 
     final messageId =
         'msg_${DateTime.now().millisecondsSinceEpoch}_${_msgCounter++}';
 
     ClawWebSocketService.getInstance().sendMessage(
-      channelId: channelId,
+      channelId: channelId.asInt,
       content: text,
       messageId: messageId,
     );
@@ -94,7 +135,7 @@ class ClawChatNotifier extends Notifier<ClawChatState> {
       from: 'user',
       content: text,
       messageId: messageId,
-      channelId: channelId,
+      channelId: channelId.asInt,
       timestamp: DateTime.now().millisecondsSinceEpoch,
       media: {},
     );

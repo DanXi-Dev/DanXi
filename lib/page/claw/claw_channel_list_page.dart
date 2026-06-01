@@ -17,6 +17,7 @@
 
 import 'package:collection/collection.dart';
 import 'package:dan_xi/model/claw/claw_channel.dart';
+import 'package:dan_xi/provider/claw/claw_chat_provider.dart';
 import 'package:dan_xi/repository/claw/claw_repository.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
@@ -38,7 +39,8 @@ class ClawChannelListPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final channels = ref.watch(_channelsProvider);
-    final currentChannelId = arguments?['current_channel_id'] as int?;
+    final currentChannelId = (arguments?['current_channel_id'] as Object?)
+        .apply((v) => v is SomeChannelId ? v : null);
 
     return PlatformScaffold(
       // TODO: Use i18n.
@@ -60,7 +62,7 @@ class ClawChannelListPage extends ConsumerWidget {
   Widget _buildList(
     BuildContext context,
     List<ClawChannel> channels,
-    int? currentChannelId,
+    SomeChannelId? currentChannelId,
   ) {
     if (channels.isEmpty) {
       // TODO: Use i18n.
@@ -79,7 +81,8 @@ class ClawChannelListPage extends ConsumerWidget {
         final formatted =
             dtCreated?.apply((dt) => DateFormat.yMMMd().add_Hms().format(dt)) ??
             channel.createdAt;
-        final isActive = currentChannelId == channel.userSessionId;
+        final isActive =
+            currentChannelId == ChannelId.fromIntOrNull(channel.userSessionId);
         return ListTile(
           leading: CircleAvatar(child: Text('${channel.userSessionId}')),
           // TODO: Use i18n.
@@ -95,7 +98,10 @@ class ClawChannelListPage extends ConsumerWidget {
                   ),
                 )
               : null,
-          onTap: () => Navigator.pop(context, channel.userSessionId),
+          onTap: () => Navigator.pop(
+            context,
+            ChannelId.fromIntOrNull(channel.userSessionId),
+          ),
         );
       },
     );

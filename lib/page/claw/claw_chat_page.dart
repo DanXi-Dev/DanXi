@@ -39,7 +39,9 @@ class ClawChatPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final channelId = useState((arguments?['channel_id'] as int?) ?? 502);
+    final channelId = useState(
+      arguments?['channel_id'] as ChannelId? ?? const NewChannelId(),
+    );
     final textController = useTextEditingController();
     final scrollController = useScrollController();
 
@@ -58,7 +60,12 @@ class ClawChatPage extends HookConsumerWidget {
       final ws = ClawWebSocketService.getInstance();
       ws.connect();
       final subscription = ws.messages.listen((msg) {
-        if (msg.channelId != channelId.value) return;
+        final currChannelId = channelId.value;
+        final msgChannelId = ChannelId.fromIntOrNull(msg.channelId);
+        if (currChannelId is NewChannelId) {
+          channelId.value = msgChannelId;
+        }
+        if (msgChannelId != currChannelId) return;
         chatNotifier.onWsMessage(msg);
       });
       return subscription.cancel;
@@ -67,8 +74,18 @@ class ClawChatPage extends HookConsumerWidget {
     final backgroundImage = SettingsProvider.getInstance().backgroundImage;
     return PlatformScaffold(
       appBar: PlatformAppBarX(
-        title: Text('DantaClaw Channel ${channelId.value}'),
+        // TODO: Use i18n.
+        title: Text(switch (channelId.value) {
+          NewChannelId() => 'New Chat',
+          SomeChannelId(:final id) => 'DantaClaw Chat $id',
+        }),
         trailingActions: [
+          PlatformIconButton(
+            icon: Icon(
+              PlatformX.isMaterial(context) ? Icons.add : CupertinoIcons.add,
+            ),
+            onPressed: () => channelId.value = const NewChannelId(),
+          ),
           PlatformIconButton(
             icon: Icon(
               PlatformX.isMaterial(context)
@@ -91,17 +108,13 @@ class ClawChatPage extends HookConsumerWidget {
         child: Column(
           children: [
             Expanded(
-              child: GestureDetector(
-                onTap: () => selectedMsgId.value = null,
-                onSecondaryTap: () => selectedMsgId.value = null,
-                child: _buildBody(
-                  context,
-                  channelId,
-                  chatState,
-                  chatNotifier,
-                  scrollController,
-                  selectedMsgId,
-                ),
+              child: _buildBody(
+                context,
+                channelId,
+                chatState,
+                chatNotifier,
+                scrollController,
+                selectedMsgId,
               ),
             ),
             _buildInputBar(context, textController, chatState.sending, (text) {
@@ -115,12 +128,38 @@ class ClawChatPage extends HookConsumerWidget {
 
   Widget _buildBody(
     BuildContext context,
-    ValueNotifier<int> channelId,
+    ValueNotifier<ChannelId> channelId,
     ClawChatState state,
     ClawChatNotifier notifier,
     ScrollController scrollController,
     ValueNotifier<String?> selectedMsgId,
   ) {
+    if (channelId.value is NewChannelId) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              PlatformX.isMaterial(context)
+                  ? Icons.chat_bubble_outline
+                  : CupertinoIcons.chat_bubble,
+              size: 128,
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.25),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'DantaClaw',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     if (state.loading) {
       return const Center(child: PlatformCircularProgressIndicator());
     }
@@ -141,14 +180,16 @@ class ClawChatPage extends HookConsumerWidget {
     return ListView.builder(
       controller: scrollController,
       reverse: true,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       itemCount: state.messages.length,
       itemBuilder: (context, index) {
         final msg = state.messages[index];
         final isUser = msg.isUser;
         final isSelected = msg.messageId == selectedMsgId.value;
+        final msgOnTap = () =>
+            selectedMsgId.value = isSelected ? null : msg.messageId;
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Column(
             crossAxisAlignment: isUser
                 ? CrossAxisAlignment.end
@@ -172,12 +213,8 @@ class ClawChatPage extends HookConsumerWidget {
                   type: MaterialType.transparency,
                   child: InkWell(
                     borderRadius: BorderRadius.circular(16),
-                    onTap: () {
-                      selectedMsgId.value = isSelected ? null : msg.messageId;
-                    },
-                    onSecondaryTap: () {
-                      selectedMsgId.value = isSelected ? null : msg.messageId;
-                    },
+                    onTap: msgOnTap,
+                    onSecondaryTap: msgOnTap,
                     onDoubleTap: isUser
                         ? null
                         : () => notifier.sendMessage(
@@ -332,14 +369,18 @@ class ClawChatPage extends HookConsumerWidget {
 
   Future<void> _switchChannel(
     BuildContext context,
-    ValueNotifier<int> channelId,
+    ValueNotifier<ChannelId> channelId,
   ) async {
     final selected = await smartNavigatorPush(
       context,
       '/claw/channels',
-      arguments: {'current_channel_id': channelId.value},
+      arguments: {
+        'current_channel_id': channelId.value is SomeChannelId
+            ? channelId.value
+            : null,
+      },
     );
-    if (selected is int && selected != channelId.value) {
+    if (selected is ChannelId && selected != channelId.value) {
       channelId.value = selected;
     }
   }
