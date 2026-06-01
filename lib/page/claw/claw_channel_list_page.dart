@@ -75,9 +75,9 @@ class ClawChannelListPage extends ConsumerWidget {
       separatorBuilder: (_, _) => const Divider(height: 1, indent: 16),
       itemBuilder: (context, index) {
         final channel = sortedChannels[index];
-        final timeCreated = DateTime.tryParse(channel.createdAt);
+        final dateCreated = DateTime.tryParse(channel.createdAt);
         final formatted =
-            timeCreated?.apply(
+            dateCreated?.apply(
               (date) => DateFormat.yMMMd().add_Hms().format(date),
             ) ??
             channel.createdAt;

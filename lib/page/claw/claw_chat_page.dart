@@ -17,7 +17,9 @@
 
 import 'dart:async';
 
+import 'package:dan_xi/model/claw/claw_message.dart';
 import 'package:dan_xi/provider/claw/claw_chat_provider.dart';
+import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/claw/ws_service.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -25,9 +27,11 @@ import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dan_xi/widget/libraries/platform_app_bar_ex.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class ClawChatPage extends HookConsumerWidget {
   final Map<String, dynamic>? arguments;
@@ -60,6 +64,7 @@ class ClawChatPage extends HookConsumerWidget {
       return subscription.cancel;
     }, [channelId.value]);
 
+    final backgroundImage = SettingsProvider.getInstance().backgroundImage;
     return PlatformScaffold(
       appBar: PlatformAppBarX(
         title: Text('DantaClaw Channel ${channelId.value}'),
@@ -74,21 +79,31 @@ class ClawChatPage extends HookConsumerWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: _buildBody(
-              context,
-              channelId,
-              chatState,
-              chatNotifier,
-              scrollController,
+      body: Container(
+        decoration: backgroundImage == null
+            ? null
+            : BoxDecoration(
+                image: DecorationImage(
+                  image: backgroundImage,
+                  fit: BoxFit.cover,
+                ),
+              ),
+        child: Column(
+          children: [
+            Expanded(
+              child: _buildBody(
+                context,
+                channelId,
+                chatState,
+                chatNotifier,
+                scrollController,
+              ),
             ),
-          ),
-          _buildInputBar(context, textController, chatState.sending, (text) {
-            chatNotifier.sendMessage(channelId.value, text);
-          }),
-        ],
+            _buildInputBar(context, textController, chatState.sending, (text) {
+              chatNotifier.sendMessage(channelId.value, text);
+            }),
+          ],
+        ),
       ),
     );
   }
@@ -146,17 +161,28 @@ class ClawChatPage extends HookConsumerWidget {
                 constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width * 0.75,
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onLongPress: () => _showMessageActions(context, msg),
+                    child: Ink(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isUser
+                            ? Theme.of(context).colorScheme.primaryContainer
+                            : Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(msg.content),
+                    ),
+                  ),
                 ),
-                decoration: BoxDecoration(
-                  color: isUser
-                      ? Theme.of(context).colorScheme.primaryContainer
-                      : Theme.of(context).colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(msg.content),
               ),
             ],
           ),
@@ -199,17 +225,39 @@ class ClawChatPage extends HookConsumerWidget {
             ),
           ),
           const SizedBox(width: 8),
-          PlatformIconButton(
-            icon: Icon(
-              PlatformX.isMaterial(context)
-                  ? Icons.send
-                  : CupertinoIcons.paperplane_fill,
+          Material(
+            type: MaterialType.transparency,
+            shape: CircleBorder(),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: sending ? null : () => onSendWrapper(controller.text),
+              child: Ink(
+                decoration: BoxDecoration(
+                  color: sending
+                      ? Theme.of(
+                          context,
+                        ).colorScheme.primaryContainer.withValues(alpha: 0.5)
+                      : Theme.of(context).colorScheme.primaryContainer,
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(8),
+                child: Icon(
+                  PlatformX.isMaterial(context)
+                      ? Icons.send
+                      : CupertinoIcons.paperplane_fill,
+                  color: sending ? Colors.white38 : Colors.white,
+                  size: 24,
+                ),
+              ),
             ),
-            onPressed: sending ? null : () => onSendWrapper(controller.text),
           ),
         ],
       ),
     );
+  }
+
+  void _showMessageActions(BuildContext context, ClawMessage msg) {
+
   }
 
   Future<void> _switchChannel(
