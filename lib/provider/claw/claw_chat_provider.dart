@@ -116,6 +116,7 @@ class ClawChatState {
 
 class ClawChatNotifier extends Notifier<ClawChatState> {
   int _msgCounter = 0;
+  ClawMessage? _pendingMsg;
 
   BidiList<ClawMessage> get mergedMessages =>
       BidiList(state.httpMessages, state.wsMessages);
@@ -150,7 +151,11 @@ class ClawChatNotifier extends Notifier<ClawChatState> {
     }
   }
 
-  void sendMessage(ChannelId channelId, String text) {
+  void sendMessage(
+    ChannelId channelId,
+    String text, {
+    bool shouldPreserve = false,
+  }) {
     state = state.copyWith(sending: true);
 
     final messageId =
@@ -172,10 +177,21 @@ class ClawChatNotifier extends Notifier<ClawChatState> {
       timestamp: DateTime.now().millisecondsSinceEpoch,
       media: {},
     );
+    if (shouldPreserve) {
+      _pendingMsg = userMsg;
+    }
+    debugPrint("#### sendMessage ${jsonEncode(userMsg)}");
     state = state.copyWith(wsMessages: [...state.wsMessages, userMsg]);
   }
 
+  Future<ClawMessage?> cancelSending(ChannelId channelId) async {
+    if (!state.sending) return null;
+    await loadMessages(channelId);
+    return _pendingMsg;
+  }
+
   void onWsMessage(ClawMessage msg) {
+    _pendingMsg = null;
     state = state.copyWith(
       wsMessages: [...state.wsMessages, msg],
       sending: false,

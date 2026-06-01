@@ -117,9 +117,24 @@ class ClawChatPage extends HookConsumerWidget {
                 selectedMsgId,
               ),
             ),
-            _buildInputBar(context, textController, chatState.sending, (text) {
-              chatNotifier.sendMessage(channelId.value, text);
-            }),
+            _buildInputBar(
+              context,
+              textController,
+              chatState.sending,
+              onSend: (text) => chatNotifier.sendMessage(
+                channelId.value,
+                text,
+                shouldPreserve: true,
+              ),
+              onStop: () async {
+                final pendingMsg = await chatNotifier.cancelSending(
+                  channelId.value,
+                );
+                if (pendingMsg != null) {
+                  textController.text = pendingMsg.content;
+                }
+              },
+            ),
           ],
         ),
       ),
@@ -214,6 +229,7 @@ class ClawChatPage extends HookConsumerWidget {
                         : () => notifier.sendMessage(
                             channelId.value,
                             '*Pokes DantaClaw*',
+                            shouldPreserve: false,
                           ),
                     child: Ink(
                       padding: const EdgeInsets.symmetric(
@@ -299,9 +315,10 @@ class ClawChatPage extends HookConsumerWidget {
   Widget _buildInputBar(
     BuildContext context,
     TextEditingController controller,
-    bool sending,
-    void Function(String) onSend,
-  ) {
+    bool sending, {
+    required void Function(String) onSend,
+    void Function()? onStop,
+  }) {
     final onSendWrapper = (String text) {
       text = text.trim();
       if (text.isNotEmpty) {
@@ -335,22 +352,22 @@ class ClawChatPage extends HookConsumerWidget {
             shape: CircleBorder(),
             child: InkWell(
               customBorder: const CircleBorder(),
-              onTap: sending ? null : () => onSendWrapper(controller.text),
+              onTap: sending ? onStop : () => onSendWrapper(controller.text),
               child: Ink(
                 decoration: BoxDecoration(
-                  color: sending
-                      ? Theme.of(
-                          context,
-                        ).colorScheme.primaryContainer.withValues(alpha: 0.5)
-                      : Theme.of(context).colorScheme.primaryContainer,
+                  color: Theme.of(context).colorScheme.primaryContainer,
                   shape: BoxShape.circle,
                 ),
                 padding: const EdgeInsets.all(8),
                 child: Icon(
-                  PlatformX.isMaterial(context)
+                  sending
+                      ? PlatformX.isMaterial(context)
+                            ? Icons.stop
+                            : CupertinoIcons.stop
+                      : PlatformX.isMaterial(context)
                       ? Icons.send
                       : CupertinoIcons.paperplane_fill,
-                  color: sending ? Colors.white38 : Colors.white,
+                  color: Colors.white,
                   size: 24,
                 ),
               ),
