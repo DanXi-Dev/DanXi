@@ -17,7 +17,6 @@
 
 import 'dart:async';
 
-import 'package:dan_xi/model/claw/claw_message.dart';
 import 'package:dan_xi/provider/claw/claw_chat_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/claw/ws_service.dart';
@@ -46,6 +45,7 @@ class ClawChatPage extends HookConsumerWidget {
 
     final chatState = ref.watch(clawChatProvider);
     final chatNotifier = ref.read(clawChatProvider.notifier);
+    final selectedMsgId = useState<String?>(null);
 
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -91,12 +91,17 @@ class ClawChatPage extends HookConsumerWidget {
         child: Column(
           children: [
             Expanded(
-              child: _buildBody(
-                context,
-                channelId,
-                chatState,
-                chatNotifier,
-                scrollController,
+              child: GestureDetector(
+                onTap: () => selectedMsgId.value = null,
+                onSecondaryTap: () => selectedMsgId.value = null,
+                child: _buildBody(
+                  context,
+                  channelId,
+                  chatState,
+                  chatNotifier,
+                  scrollController,
+                  selectedMsgId,
+                ),
               ),
             ),
             _buildInputBar(context, textController, chatState.sending, (text) {
@@ -114,6 +119,7 @@ class ClawChatPage extends HookConsumerWidget {
     ClawChatState state,
     ClawChatNotifier notifier,
     ScrollController scrollController,
+    ValueNotifier<String?> selectedMsgId,
   ) {
     if (state.loading) {
       return const Center(child: PlatformCircularProgressIndicator());
@@ -140,6 +146,7 @@ class ClawChatPage extends HookConsumerWidget {
       itemBuilder: (context, index) {
         final msg = state.messages[index];
         final isUser = msg.isUser;
+        final isSelected = msg.messageId == selectedMsgId.value;
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Column(
@@ -165,7 +172,18 @@ class ClawChatPage extends HookConsumerWidget {
                   type: MaterialType.transparency,
                   child: InkWell(
                     borderRadius: BorderRadius.circular(16),
-                    onLongPress: () => _showMessageActions(context, msg),
+                    onTap: () {
+                      selectedMsgId.value = isSelected ? null : msg.messageId;
+                    },
+                    onSecondaryTap: () {
+                      selectedMsgId.value = isSelected ? null : msg.messageId;
+                    },
+                    onDoubleTap: isUser
+                        ? null
+                        : () => notifier.sendMessage(
+                            channelId.value,
+                            '*Pokes DantaClaw*',
+                          ),
                     child: Ink(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -183,6 +201,62 @@ class ClawChatPage extends HookConsumerWidget {
                     ),
                   ),
                 ),
+              ),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 256),
+                curve: Curves.easeInOut,
+                child: isSelected
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              DateFormat.yMMMd().add_Hms().format(
+                                DateTime.fromMillisecondsSinceEpoch(
+                                  msg.timestamp,
+                                ),
+                              ),
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
+                            ),
+                            const SizedBox(width: 4),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () {
+                                Clipboard.setData(
+                                  ClipboardData(text: msg.content),
+                                );
+                                selectedMsgId.value = null;
+                                ScaffoldMessenger.of(context)
+                                  ..hideCurrentSnackBar()
+                                  ..showSnackBar(
+                                    const SnackBar(
+                                      // TODO: Use i18n.
+                                      content: Text('Copied'),
+                                      duration: Duration(seconds: 1),
+                                    ),
+                                  );
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.copy,
+                                  size: 16,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : const SizedBox.shrink(),
               ),
             ],
           ),
@@ -254,10 +328,6 @@ class ClawChatPage extends HookConsumerWidget {
         ],
       ),
     );
-  }
-
-  void _showMessageActions(BuildContext context, ClawMessage msg) {
-
   }
 
   Future<void> _switchChannel(
