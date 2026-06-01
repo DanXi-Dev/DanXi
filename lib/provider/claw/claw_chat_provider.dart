@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:dan_xi/model/claw/claw_message.dart';
@@ -42,6 +43,28 @@ class SomeChannelId extends ChannelId {
   int get asInt => id;
 }
 
+class BidiList<T> extends ListBase<T> {
+  final List<T> backward; // Newest first.
+  final List<T> forward; // Oldest first.
+
+  BidiList(this.backward, this.forward);
+
+  @override
+  int get length => forward.length + backward.length;
+
+  @override
+  set length(int value) => throw UnsupportedError('Read-only view');
+
+  @override
+  T operator [](int index) => index < forward.length
+      ? forward[forward.length - index - 1]
+      : backward[index - forward.length];
+
+  @override
+  void operator []=(int index, T value) =>
+      throw UnsupportedError('Read-only view');
+}
+
 sealed class ChatError {
   const ChatError._();
 }
@@ -57,26 +80,33 @@ class SomeError extends ChatError {
 }
 
 class ClawChatState {
-  final List<ClawMessage> messages;
+  final List<ClawMessage> httpMessages; // Extended towards the past.
+  final List<ClawMessage> wsMessages; // Extended towards the future.
   final bool loading;
   final ChatError error;
   final bool sending;
 
   const ClawChatState({
-    this.messages = const [],
+    this.httpMessages = const [],
+    this.wsMessages = const [],
     this.loading = false,
     this.error = const NoError(),
     this.sending = false,
   });
 
+  BidiList<ClawMessage> get mergedMessages =>
+      BidiList(httpMessages, wsMessages);
+
   ClawChatState copyWith({
-    List<ClawMessage>? messages,
+    List<ClawMessage>? httpMessages,
+    List<ClawMessage>? wsMessages,
     bool? loading,
     ChatError? error,
     bool? sending,
   }) {
     return ClawChatState(
-      messages: messages ?? this.messages,
+      httpMessages: httpMessages ?? this.httpMessages,
+      wsMessages: wsMessages ?? this.wsMessages,
       loading: loading ?? this.loading,
       error: error ?? this.error,
       sending: sending ?? this.sending,
@@ -87,6 +117,9 @@ class ClawChatState {
 class ClawChatNotifier extends Notifier<ClawChatState> {
   int _msgCounter = 0;
 
+  BidiList<ClawMessage> get mergedMessages =>
+      BidiList(state.httpMessages, state.wsMessages);
+
   @override
   ClawChatState build() => const ClawChatState();
 
@@ -94,22 +127,22 @@ class ClawChatNotifier extends Notifier<ClawChatState> {
     state = state.copyWith(loading: true, error: const NoError());
     try {
       // TODO: Load from end and expand in need.
-      final msgs = <ClawMessage>[];
+      final loadedMsgs = <ClawMessage>[];
       if (channelId case SomeChannelId(id: final channelId)) {
         while (true) {
           final msgsSlice = await ClawRepository.getInstance().getMessages(
             channelId: channelId,
             sort: 'asc',
-            offset: msgs.length,
+            offset: loadedMsgs.length,
           );
           if (msgsSlice.isEmpty) {
             break;
           }
-          msgs.addAll(msgsSlice);
+          loadedMsgs.addAll(msgsSlice);
         }
       }
       state = ClawChatState(
-        messages: msgs.reversed.toList(growable: false),
+        httpMessages: loadedMsgs.reversed.toList(growable: false),
         loading: false,
       );
     } catch (e) {
@@ -139,11 +172,14 @@ class ClawChatNotifier extends Notifier<ClawChatState> {
       timestamp: DateTime.now().millisecondsSinceEpoch,
       media: {},
     );
-    state = state.copyWith(messages: [userMsg, ...state.messages]);
+    state = state.copyWith(wsMessages: [...state.wsMessages, userMsg]);
   }
 
   void onWsMessage(ClawMessage msg) {
-    state = state.copyWith(messages: [msg, ...state.messages], sending: false);
+    state = state.copyWith(
+      wsMessages: [...state.wsMessages, msg],
+      sending: false,
+    );
   }
 }
 

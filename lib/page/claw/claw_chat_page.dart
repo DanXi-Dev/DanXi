@@ -134,7 +134,17 @@ class ClawChatPage extends HookConsumerWidget {
     ScrollController scrollController,
     ValueNotifier<String?> selectedMsgId,
   ) {
-    if (channelId.value is NewChannelId) {
+    if (state.loading) {
+      return const Center(child: PlatformCircularProgressIndicator());
+    }
+    if (state.error case SomeError(:final error)) {
+      return ErrorPageWidget.buildWidget(
+        context,
+        error,
+        onTap: () => notifier.loadMessages(channelId.value),
+      );
+    }
+    if (state.httpMessages.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -160,30 +170,14 @@ class ClawChatPage extends HookConsumerWidget {
         ),
       );
     }
-    if (state.loading) {
-      return const Center(child: PlatformCircularProgressIndicator());
-    }
-    if (state.error case SomeError(:final error)) {
-      return ErrorPageWidget.buildWidget(
-        context,
-        error,
-        onTap: () => notifier.loadMessages(channelId.value),
-      );
-    }
-    if (state.messages.isEmpty) {
-      return Center(
-        child: Text(
-          'No messages in channel ${channelId.value}. This might be an internal error.',
-        ),
-      );
-    }
+    final mergedMsgs = state.mergedMessages;
     return ListView.builder(
       controller: scrollController,
       reverse: true,
       padding: const EdgeInsets.all(16),
-      itemCount: state.messages.length,
+      itemCount: mergedMsgs.length,
       itemBuilder: (context, index) {
-        final msg = state.messages[index];
+        final msg = mergedMsgs[index];
         final isUser = msg.isUser;
         final isSelected = msg.messageId == selectedMsgId.value;
         final msgOnTap = () =>
