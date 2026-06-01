@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dan_xi/model/claw/claw_message.dart';
+import 'package:dan_xi/model/claw/claw_ws_frame.dart';
 import 'package:dan_xi/repository/claw/claw_repository.dart';
 
 class ClawWebSocketService {
@@ -33,21 +34,23 @@ class ClawWebSocketService {
     ws.listen(
       (data) {
         try {
-          final json = jsonDecode(data as String) as Map<String, dynamic>;
-          final type = json['type'] as String?;
-
-          switch (type) {
-            case 'auth_success':
+          final frame = ClawWsInFrame.fromJson(
+            jsonDecode(data as String) as Map<String, dynamic>,
+          );
+          switch (frame) {
+            case WsAuthSuccess():
               _connected = true;
-            case 'message':
-              _messageController.add(ClawMessage.fromJson(json));
-            case 'ping':
-              _send({
-                'type': 'pong',
-                'timestamp': DateTime.now().millisecondsSinceEpoch,
-                'version': '1.0',
-              });
-            case 'error':
+            case WsMessageReceived(:final message):
+              _messageController.add(message);
+            case WsPing(:final version):
+              send(
+                WsPong(
+                  timestamp: DateTime.now().millisecondsSinceEpoch,
+                  version: version ?? ClawWsOutFrame.kVersion,
+                ),
+              );
+            case WsError():
+            case WsUnknown():
               // Ignore errors for now.
               break;
           }
@@ -64,12 +67,9 @@ class ClawWebSocketService {
     );
 
     final token = ClawRepository.getInstance().token;
-    _send({
-      'type': 'auth',
-      'token': token,
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-      'version': '1.0',
-    });
+    send(
+      WsAuth(token: token, timestamp: DateTime.now().millisecondsSinceEpoch),
+    );
   }
 
   void sendMessage({
@@ -77,20 +77,18 @@ class ClawWebSocketService {
     required String content,
     required String messageId,
   }) {
-    _send({
-      'type': 'message',
-      'from': 'user',
-      'content': content,
-      'message_id': messageId,
-      'channel_id': channelId,
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-      'media': {},
-      'version': '1.0',
-    });
+    send(
+      WsSendMessage(
+        channelId: channelId,
+        content: content,
+        messageId: messageId,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      ),
+    );
   }
 
-  void _send(Map<String, dynamic> message) {
-    _ws?.add(jsonEncode(message));
+  void send(ClawWsOutFrame frame) {
+    _ws?.add(jsonEncode(frame.toJson()));
   }
 
   void disconnect() {
