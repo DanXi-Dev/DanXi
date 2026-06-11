@@ -161,10 +161,19 @@ class PagedListViewState<T> extends State<PagedListView<T>>
           !_isEnded &&
           !_hasError &&
           _shouldLoad) {
-        pageIndex++;
         _isRefreshing = true;
-        setState(() {
-          _futureData = LazyFuture.pack(widget.dataReceiver!(pageIndex));
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) {
+            return;
+          }
+          if (_isEnded || _hasError || !_shouldLoad) {
+            _isRefreshing = false;
+            return;
+          }
+          ++pageIndex;
+          setState(() {
+            _futureData = LazyFuture.pack(widget.dataReceiver!(pageIndex));
+          });
         });
       }
       return false;
