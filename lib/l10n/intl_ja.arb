@@ -137,6 +137,7 @@
   "failed_exam_no_grade": "追試験の成績はアカデミックサービスでご確認ください",
   "fatal_error": "エラー",
   "favorites": "お気に入り",
+  "filter": "フィルター",
   "forum_clean_mode": "クリーンモード",
   "forum_clean_mode_description": "フォーラムで非友好的な絵文字をフィルタリング",
   "forum_clean_mode_detail": "クリーンモードをオンにすると、フォーラムで広く「不親切」とされる絵文字表現がフィルタリングされるようになります。",

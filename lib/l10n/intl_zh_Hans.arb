@@ -137,6 +137,7 @@
   "failed_exam_no_grade": "补缓考成绩请以教务服务为准",
   "fatal_error": "错误",
   "favorites": "收藏",
+  "filter": "筛选",
   "forum_clean_mode": "清净模式",
   "forum_clean_mode_description": "过滤茶楼中不友善的 Emoji",
   "forum_clean_mode_detail": "开启清净模式后，茶楼中部分被广泛认为「不友善」的 Emoji 表情将会被过滤。",

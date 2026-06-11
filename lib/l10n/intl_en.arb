@@ -139,6 +139,7 @@
   "failed_exam_no_grade": "Please check JWFW for make-up exam grades.",
   "fatal_error": "Error",
   "favorites": "Favorites",
+  "filter": "Filter",
   "forum_clean_mode": "Clean Mode",
   "forum_clean_mode_description": "Hide unfriendly emojis in Forum",
   "forum_clean_mode_detail": "When Clean Mode is enabled, emojis that are widely considered \"unfriendly\" will be hidden.",

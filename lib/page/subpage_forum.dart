@@ -138,8 +138,8 @@ class OTTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Note: these strings can be (and should be) localized. 
-    // But since other division names are not localized (yet), we leave them hardcoded for now. 
+    // Note: these strings can be (and should be) localized.
+    // But since other division names are not localized (yet), we leave them hardcoded for now.
     OTDivision homepageDivision = OTDivision(null, "全站", "展示所有板块", null);
 
     List<OTDivision> divisions =
@@ -295,6 +295,16 @@ class ForumSubpage extends PlatformSubpage<ForumSubpage> {
             }
           }),
           AppBarButtonItem(
+            S.of(cxt).filter,
+            Icon(
+              ForumSubpageState._postFilterIcon(
+                cxt,
+                forumPageKey.currentState?._showPostFilter ?? false,
+              ),
+            ),
+            forumPageKey.currentState?._togglePostFilter,
+          ),
+          AppBarButtonItem(
               S.of(cxt).new_post, Icon(PlatformIcons(cxt).addCircled), () {
             if (cxt.read<ForumProvider>().isUserInitialized) {
               CreateNewPostEvent().fire();
@@ -377,6 +387,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
   String? _tagFilter;
   PostsType _postsType = PostsType.NORMAL_POSTS;
+  bool _showPostFilter = false;
+  String _postFilterPattern = "";
 
   ListDelegate? _delegate;
 
@@ -667,10 +679,11 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
               PostsType.SUBSCRIBED_DISCUSSION => S.of(context).subscriptions,
               _ => throw Exception("Unreachable"),
             }),
+            trailingActions: [_buildPostFilterButton(context)],
           ),
           body: Builder(
             // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-            builder: (context) => _buildPageBody(context, false),
+            builder: (context) => _buildFilteredPageBody(context, false),
           ),
         );
       case PostsType.FILTER_BY_ME:
@@ -681,6 +694,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           appBar: PlatformAppBarX(
             title: Text(S.of(context).list_my_posts),
             trailingActions: [
+              _buildPostFilterButton(context),
               PlatformIconButton(
                 padding: EdgeInsets.zero,
                 icon: Icon(Icons.restore_page),
@@ -698,7 +712,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           ),
           body: Builder(
             // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-            builder: (context) => _buildPageBody(context, false),
+            builder: (context) => _buildFilteredPageBody(context, false),
           ),
         );
       case PostsType.FILTER_BY_TAG:
@@ -708,13 +722,15 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: PlatformAppBarX(
             title: Text(S.of(context).filtering_by_tag(_tagFilter ?? "?")),
+            trailingActions: [_buildPostFilterButton(context)],
           ),
           body: Builder(
             // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-            builder: (context) => _buildPageBody(context, false),
+            builder: (context) => _buildFilteredPageBody(context, false),
           ),
         );
       case PostsType.NORMAL_POSTS:
+        return _buildFilteredPageBody(context, PlatformX.isMaterial(context));
       case PostsType.EXTERNAL_VIEW:
         return _buildPageBody(context, PlatformX.isMaterial(context));
     }
@@ -759,6 +775,96 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
                 padding: buildTabBar ? EdgeInsets.zero : null);
           }
         }),
+      ),
+    );
+  }
+
+  bool _matchesCurrentPostFilter(OTHole hole) {
+    final pattern = _postFilterPattern.trim();
+    if (pattern.isEmpty) {
+      return true;
+    }
+    final RegExp filterRegExp;
+    try {
+      filterRegExp = RegExp(pattern, caseSensitive: false);
+    } on FormatException {
+      return false;
+    }
+    final fields = [
+      hole.hole_id?.toString(),
+      hole.floors?.first_floor?.filteredContent,
+      hole.floors?.last_floor?.filteredContent,
+      ...?hole.tags?.map((tag) => tag.name),
+    ];
+    return fields.whereType<String>().any(filterRegExp.hasMatch);
+  }
+
+  void _togglePostFilter() {
+    setState(() {
+      _showPostFilter = !_showPostFilter;
+      if (!_showPostFilter) {
+        _postFilterPattern = "";
+      }
+    });
+  }
+
+  static IconData _postFilterIcon(BuildContext context, bool showPostFilter) =>
+      PlatformX.isMaterial(context)
+      ? (showPostFilter ? Icons.filter_alt_off : Icons.filter_alt)
+      : (showPostFilter
+            ? CupertinoIcons.line_horizontal_3
+            : CupertinoIcons.slider_horizontal_3);
+
+  Widget _buildPostFilterButton(BuildContext context) {
+    return PlatformIconButton(
+      padding: EdgeInsets.zero,
+      icon: Icon(_postFilterIcon(context, _showPostFilter)),
+      onPressed: _togglePostFilter,
+    );
+  }
+
+  Widget _buildFilteredPageBody(BuildContext context, bool buildTabBar) {
+    return Column(
+      children: [
+        if (_showPostFilter) _buildPostFilterBar(context),
+        Expanded(child: _buildPageBody(context, buildTabBar)),
+      ],
+    );
+  }
+
+  Widget _buildPostFilterBar(BuildContext context) {
+    return Material(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      elevation: PlatformX.isMaterial(context) ? 2 : 0,
+      child: SafeArea(
+        top: false,
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+          child: Row(
+            children: [
+              Icon(
+                PlatformX.isMaterial(context)
+                    ? Icons.filter_alt
+                    : CupertinoIcons.slider_horizontal_3,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: PlatformTextField(
+                  autofocus: true,
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.search,
+                  hintText: S.of(context).search,
+                  onChanged: (value) {
+                    setState(() {
+                      _postFilterPattern = value;
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -887,7 +993,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     // Avoid excluding pinned posts from favorite and subscription list
     bool isSpecialView = _postsType == PostsType.FAVORED_DISCUSSION ||
         _postsType == PostsType.SUBSCRIBED_DISCUSSION;
-    if (postElement.floors?.first_floor == null ||
+    if (!_matchesCurrentPostFilter(postElement) ||
+        postElement.floors?.first_floor == null ||
         postElement.floors?.last_floor == null ||
         (foldBehavior == FoldBehavior.HIDE && postElement.is_folded) ||
         (!isPinned &&
@@ -976,7 +1083,7 @@ Widget buildForumTopBar() => Selector<ForumProvider, bool>(
                     : EdgeInsets.zero,
                 child: PlatformIconButton(
                   icon: Icon(PlatformIcons(context).search),
-                  onPressed: () { 
+                  onPressed: () {
                     HapticFeedbackUtil.light();
                     smartNavigatorPush(context, '/bbs/search',
                       forcePushOnMainNavigator: true);
