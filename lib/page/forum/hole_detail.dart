@@ -42,6 +42,7 @@ import 'package:dan_xi/util/watermark.dart';
 import 'package:dan_xi/widget/forum/ai_summary_sheet.dart';
 import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:dan_xi/widget/forum/ottag_selector.dart';
+import 'package:dan_xi/widget/forum/post_filter_widgets.dart';
 import 'package:dan_xi/widget/forum/post_render.dart';
 import 'package:dan_xi/widget/forum/render/base_render.dart';
 import 'package:dan_xi/widget/forum/render/render_impl.dart';
@@ -126,6 +127,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   int? _highlightFloorId;
   Timer? _highlightTimer;
   Future<List<OTFloor>>? _loadAllContentFuture;
+  final PostFilterState _postFilter = PostFilterState();
 
   final PagedListViewController<OTFloor> _listViewController =
       PagedListViewController<OTFloor>();
@@ -400,6 +402,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   @override
   void dispose() {
     _highlightTimer?.cancel();
+    _postFilter.dispose();
     StateProvider.needScreenshotWarning = false;
     super.dispose();
   }
@@ -508,6 +511,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           },
         ),
         trailingActions: [
+          PlatformIconButton(
+            padding: EdgeInsets.zero,
+            icon: Icon(getPostFilterIcon(context, _postFilter.shown)),
+            onPressed: () => setState(() {
+              _postFilter.toggle();
+            }),
+          ),
           if (_renderModel
               case Normal(
                 hole: var hole,
@@ -687,12 +697,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             },
           );
 
+          final filteredContent = _buildFilteredPageBody(context, content);
           if (!_shouldShowAiSummaryEntry || PlatformX.isMaterial(context)) {
-            return content;
+            return filteredContent;
           }
           return Stack(
             children: [
-              Positioned.fill(child: content),
+              Positioned.fill(child: filteredContent),
               Positioned(
                 right: 16,
                 bottom: 16 + MediaQuery.of(context).padding.bottom,
@@ -703,6 +714,66 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         },
       ),
     ).withWatermarkRegion();
+  }
+
+  bool _floorMatchesAppliedPostFilter(OTFloor floor) {
+    final pattern = _postFilter.appliedPattern.trim();
+    if (pattern.isEmpty) {
+      return true;
+    }
+    if (_postFilter.appliedMode == PostFilterMode.js) {
+      return _floorMatchesJsPostFilter(floor, pattern);
+    }
+    final RegExp filterRegExp;
+    try {
+      filterRegExp = RegExp(pattern, caseSensitive: false);
+    } on FormatException {
+      return false;
+    }
+    final fields = [
+      floor.floor_id?.toString(),
+      floor.hole_id?.toString(),
+      floor.filteredContent,
+      floor.anonyname,
+      floor.special_tag,
+    ];
+    return fields.whereType<String>().any(filterRegExp.hasMatch);
+  }
+
+  bool _floorMatchesJsPostFilter(OTFloor floor, String expression) {
+    var result = false;
+    try {
+      result = _postFilter.jsRuntime.evaluateFloor(
+        expression,
+        floor,
+        hole: switch (_renderModel) {
+          Normal(hole: var hole) => hole,
+          _ => null,
+        },
+      );
+    } catch (e) {
+      debugPrint("PostFilterJsRuntime.evaluateFloor: $e");
+    }
+    return result;
+  }
+
+  Widget _buildFilteredPageBody(BuildContext context, Widget content) {
+    return Column(
+      children: [
+        if (_postFilter.shown)
+          PostFilterBar(
+            mode: _postFilter.mode,
+            controller: _postFilter.controller,
+            onModeChanged: (mode) => setState(() {
+              _postFilter.mode = mode;
+            }),
+            onApply: () => setState(() {
+              _postFilter.apply();
+            }),
+          ),
+        Expanded(child: content),
+      ],
+    );
   }
 
   bool get _shouldShowAiSummaryEntry {
@@ -1487,6 +1558,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       if (selectedPerson != null && floor.anonyname != selectedPerson) {
         return nil;
       }
+    }
+    if (!_floorMatchesAppliedPostFilter(floor)) {
+      return const SizedBox.shrink();
     }
 
     Future<List<ImageUrlInfo>?> loadPageImage(
