@@ -717,11 +717,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   bool _floorMatchesAppliedPostFilter(OTFloor floor) {
-    final pattern = _postFilter.appliedPattern.trim();
+    final pattern = _postFilter.pattern;
     if (pattern.isEmpty) {
       return true;
     }
-    if (_postFilter.appliedMode == PostFilterMode.js) {
+    if (_postFilter.mode == PostFilterMode.js) {
       return _floorMatchesJsPostFilter(floor, pattern);
     }
     final RegExp filterRegExp;

@@ -8,20 +8,29 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 enum PostFilterMode { regex, js }
 
 class PostFilterState {
-  bool shown = false;
+  bool _shown = false;
   final TextEditingController controller = TextEditingController();
-  PostFilterMode mode = PostFilterMode.regex;
-  String appliedPattern = '';
-  PostFilterMode appliedMode = PostFilterMode.regex;
+  PostFilterMode _mode = PostFilterMode.regex;
+  final Map<PostFilterMode, String> _patterns = {};
   final PostFilterJsRuntime jsRuntime = PostFilterJsRuntime();
 
+  bool get shown => _shown;
+
+  PostFilterMode get mode => _mode;
+
+  set mode(PostFilterMode newMode) {
+    _mode = newMode;
+    controller.text = _patterns[newMode] ?? '';
+  }
+
+  String get pattern => _patterns[_mode] ?? '';
+
   void toggle() {
-    shown = !shown;
+    _shown = !_shown;
   }
 
   void apply() {
-    appliedPattern = controller.text;
-    appliedMode = mode;
+    _patterns[_mode] = controller.text.trim();
   }
 
   void dispose() {
@@ -71,7 +80,8 @@ class PostFilterBar extends StatelessWidget {
                   mode == PostFilterMode.regex,
                   mode == PostFilterMode.js,
                 ],
-                onPressed: (index) => onModeChanged(PostFilterMode.values[index]),
+                onPressed: (index) =>
+                    onModeChanged(PostFilterMode.values[index]),
                 children: const [Text('.*'), Text('JS')],
               ),
               const SizedBox(width: 8),

@@ -781,11 +781,11 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   }
 
   bool _holeMatchesAppliedPostFilter(OTHole hole) {
-    final pattern = _postFilter.appliedPattern.trim();
+    final pattern = _postFilter.pattern;
     if (pattern.isEmpty) {
       return true;
     }
-    if (_postFilter.appliedMode == PostFilterMode.js) {
+    if (_postFilter.mode == PostFilterMode.js) {
       return _holeMatchesJsPostFilter(hole, pattern);
     }
     final RegExp filterRegExp;
