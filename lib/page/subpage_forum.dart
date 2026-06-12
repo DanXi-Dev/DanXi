@@ -21,6 +21,7 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/forum/division.dart';
+import 'package:dan_xi/model/forum/floor.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/model/forum/tag.dart';
 import 'package:dan_xi/page/forum/hole_editor.dart';
@@ -35,6 +36,7 @@ import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/forum/post_filter_js_runtime.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
 import 'package:dan_xi/util/haptic_feedback_util.dart';
@@ -360,6 +362,8 @@ enum PostsType {
   EXTERNAL_VIEW
 }
 
+enum PostFilterMode { regex, js }
+
 /// A list page showing bbs posts.
 ///
 /// Arguments:
@@ -388,7 +392,11 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   String? _tagFilter;
   PostsType _postsType = PostsType.NORMAL_POSTS;
   bool _showPostFilter = false;
-  String _postFilterPattern = "";
+  final TextEditingController _postFilterController = TextEditingController();
+  PostFilterMode _postFilterMode = PostFilterMode.regex;
+  String _appliedPostFilterPattern = "";
+  PostFilterMode _appliedPostFilterMode = PostFilterMode.regex;
+  final PostFilterJsRuntime _postFilterJsRuntime = PostFilterJsRuntime();
 
   ListDelegate? _delegate;
 
@@ -662,6 +670,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     _postSubscription.cancel();
     _refreshSubscription.cancel();
     _divisionChangedSubscription.cancel();
+    _postFilterController.dispose();
+    _postFilterJsRuntime.dispose();
   }
 
   @override
@@ -779,10 +789,13 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     );
   }
 
-  bool _matchesCurrentPostFilter(OTHole hole) {
-    final pattern = _postFilterPattern.trim();
+  bool _matchesAppliedPostFilter(OTHole hole) {
+    final pattern = _appliedPostFilterPattern.trim();
     if (pattern.isEmpty) {
       return true;
+    }
+    if (_appliedPostFilterMode == PostFilterMode.js) {
+      return _matchesJsPostFilter(hole, pattern);
     }
     final RegExp filterRegExp;
     try {
@@ -799,14 +812,91 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     return fields.whereType<String>().any(filterRegExp.hasMatch);
   }
 
+  bool _matchesJsPostFilter(OTHole hole, String expression) {
+    var result = false;
+    try {
+      result = _postFilterJsRuntime.evaluate(
+        expression,
+        _postFilterPostMap(hole),
+      );
+    } catch (e) {
+      debugPrint("_matchesJsPostFilter error: $e");
+    }
+    return result;
+  }
+
+  Map<String, dynamic> _postFilterPostMap(OTHole hole) {
+    final first = hole.floors?.first_floor;
+    final firstContent = first?.filteredContent ?? '';
+    final last = hole.floors?.last_floor;
+    final lastContent = last?.filteredContent ?? '';
+    return {
+      'id': hole.hole_id,
+      'holeId': hole.hole_id,
+      'divisionId': hole.division_id,
+      'tags':
+          hole.tags
+              ?.map((tag) => tag.name)
+              .whereType<String>()
+              .toList(growable: false) ??
+          const [],
+      'view': hole.view ?? 0,
+      'reply': hole.reply ?? 0,
+      'favoriteCount': hole.favorite_count ?? 0,
+      'subscriptionCount': hole.subscription_count ?? 0,
+      'timeCreated': hole.time_created,
+      'created': hole.time_created,
+      'timeUpdated': hole.time_updated,
+      'updated': hole.time_updated,
+      'first': _postFilterFloorMap(first),
+      'content': firstContent,
+      'firstContent': firstContent,
+      'last': _postFilterFloorMap(last),
+      'lastContent': lastContent,
+    };
+  }
+
+  Map<String, dynamic>? _postFilterFloorMap(OTFloor? floor) {
+    if (floor == null) return null;
+    return {
+      'id': floor.floor_id,
+      'floorId': floor.floor_id,
+      'holeId': floor.hole_id,
+      'content': floor.filteredContent ?? '',
+      'anonyname': floor.anonyname,
+      'name': floor.anonyname,
+      'specialTag': floor.special_tag,
+      'timeCreated': floor.time_created,
+      'created': floor.time_created,
+      'timeUpdated': floor.time_updated,
+      'updated': floor.time_updated,
+      'deleted': floor.deleted ?? false,
+      'modified': floor.modified ?? false,
+      'isMe': floor.is_me ?? false,
+      'liked': floor.liked ?? false,
+      'disliked': floor.disliked ?? false,
+      'like': floor.like ?? 0,
+      'dislike': floor.dislike ?? 0,
+      'mention':
+          floor.mention
+              ?.map((m) => _postFilterFloorMap(m))
+              .toList(growable: false) ??
+          const [],
+    };
+  }
+
   void _togglePostFilter() {
     setState(() {
       _showPostFilter = !_showPostFilter;
-      if (!_showPostFilter) {
-        _postFilterPattern = "";
-      }
     });
   }
+  void _applyPostFilter() {
+    setState(() {
+      _appliedPostFilterPattern = _postFilterController.text;
+      _appliedPostFilterMode = _postFilterMode;
+    });
+  }
+
 
   static IconData _postFilterIcon(BuildContext context, bool showPostFilter) =>
       PlatformX.isMaterial(context)
@@ -833,6 +923,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   }
 
   Widget _buildPostFilterBar(BuildContext context) {
+    final patternEnabled =
+        _postFilterMode != PostFilterMode.js || PostFilterJsRuntime.isSupported;
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
       elevation: PlatformX.isMaterial(context) ? 2 : 0,
@@ -843,25 +935,44 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
           child: Row(
             children: [
-              Icon(
-                PlatformX.isMaterial(context)
-                    ? Icons.filter_alt
-                    : CupertinoIcons.slider_horizontal_3,
+              ToggleButtons(
+                constraints: const BoxConstraints(minHeight: 32, minWidth: 40),
+                isSelected: [
+                  _postFilterMode == PostFilterMode.regex,
+                  _postFilterMode == PostFilterMode.js,
+                ],
+                onPressed: (index) => setState(() {
+                  _postFilterMode = PostFilterMode.values[index];
+                }),
+                children: const [Text('.*'), Text('JS')],
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: PlatformTextField(
-                  autofocus: true,
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.search,
-                  hintText: S.of(context).search,
-                  onChanged: (value) {
-                    setState(() {
-                      _postFilterPattern = value;
-                    });
-                  },
+                  autofocus: true,
+                  controller: _postFilterController,
+                  onSubmitted: (_) => _applyPostFilter(),
+                  enabled: patternEnabled,
+                  hintText: _postFilterMode == PostFilterMode.regex
+                      ? S.of(context).filter
+                      : PostFilterJsRuntime.isSupported
+                      ? 'content.match(/regex/i)'
+                      // TODO: Use i18n text.
+                      : 'PostFilterJsRuntime.isSupported: false',
                 ),
               ),
+              if (patternEnabled)
+                PlatformIconButton(
+                  padding: EdgeInsets.zero,
+                  icon: Icon(
+                    PlatformX.isMaterial(context)
+                        ? Icons.check
+                        : CupertinoIcons.check_mark,
+                  ),
+                  onPressed: _applyPostFilter,
+                ),
             ],
           ),
         ),
@@ -993,7 +1104,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     // Avoid excluding pinned posts from favorite and subscription list
     bool isSpecialView = _postsType == PostsType.FAVORED_DISCUSSION ||
         _postsType == PostsType.SUBSCRIBED_DISCUSSION;
-    if (!_matchesCurrentPostFilter(postElement) ||
+    if (!_matchesAppliedPostFilter(postElement) ||
         postElement.floors?.first_floor == null ||
         postElement.floors?.last_floor == null ||
         (foldBehavior == FoldBehavior.HIDE && postElement.is_folded) ||
