@@ -47,7 +47,7 @@ class PostFilterState {
   }
 
   bool _matches(Iterable<String?> regexFields, bool Function() evaluateJs) {
-    if (pattern.isEmpty) {
+    if (!shown || pattern.isEmpty) {
       return true;
     }
     if (mode == PostFilterMode.js) {
