@@ -240,6 +240,18 @@ class ForumSubpage extends PlatformSubpage<ForumSubpage> {
             currentSortOrder == SortOrder.LAST_CREATED
                 ? lastCreatedOption
                 : lastRepliedOption;
+        final bool postFilterShown =
+            forumPageKey.currentState?._postFilter.shown ?? false;
+        final PopupMenuOption filterOption = PopupMenuOption(
+          label: S.of(cxt).filter,
+          cupertino: (context, platform) =>
+              CupertinoPopupMenuOptionData(isDefaultAction: postFilterShown),
+          onTap: (_) => forumPageKey.currentState?._togglePostFilter(),
+        );
+        final List<PopupMenuOption> overflowOptions = [
+          ...sortOptions,
+          filterOption,
+        ];
 
         return [
           if (cxt.select<ForumProvider, bool>(
@@ -253,23 +265,28 @@ class ForumSubpage extends PlatformSubpage<ForumSubpage> {
             })
           ],
           AppBarButtonItem(
-              S.of(cxt).sort_order,
+              S.of(cxt).and_more,
               PlatformPopupMenuX(
-                options: sortOptions,
+                options: overflowOptions,
                 cupertino: (context, platform) => CupertinoPopupMenuData(
                     cancelButtonData: CupertinoPopupMenuCancelButtonData(
                         child: Text(S.of(context).cancel))),
                 material: (context, platform) => MaterialPopupMenuData(
                     initialValue: currentSortOption,
-                    itemBuilder: (context) => sortOptions
-                        .map((option) => CheckedPopupMenuItem<PopupMenuOption>(
+                    itemBuilder: (context) => overflowOptions
+                        .map(
+                          (option) => CheckedPopupMenuItem<PopupMenuOption>(
                             value: option,
-                            checked: option == currentSortOption,
-                            child: Text(option.label ?? '')))
-                        .toList()),
+                            checked:
+                                option == currentSortOption ||
+                                (option == filterOption && postFilterShown),
+                            child: Text(option.label ?? ''),
+                          ),
+                        )
+                        .toList(growable: false)),
                 icon: Icon(PlatformX.isMaterial(cxt)
-                    ? Icons.filter_list
-                    : CupertinoIcons.sort_down_circle),
+                    ? Icons.more_vert
+                    : CupertinoIcons.ellipsis),
               ),
               null,
               useCustomWidget: true),
@@ -295,16 +312,6 @@ class ForumSubpage extends PlatformSubpage<ForumSubpage> {
                   forcePushOnMainNavigator: true);
             }
           }),
-          AppBarButtonItem(
-            S.of(cxt).filter,
-            Icon(
-              getPostFilterIcon(
-                cxt,
-                forumPageKey.currentState?._postFilter.shown ?? false,
-              ),
-            ),
-            forumPageKey.currentState?._togglePostFilter,
-          ),
           AppBarButtonItem(
               S.of(cxt).new_post, Icon(PlatformIcons(cxt).addCircled), () {
             if (cxt.read<ForumProvider>().isUserInitialized) {
