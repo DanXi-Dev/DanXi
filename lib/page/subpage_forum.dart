@@ -788,36 +788,12 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   }
 
   bool _holeMatchesAppliedPostFilter(OTHole hole) {
-    final pattern = _postFilter.pattern;
-    if (pattern.isEmpty) {
-      return true;
-    }
-    if (_postFilter.mode == PostFilterMode.js) {
-      return _holeMatchesJsPostFilter(hole, pattern);
-    }
-    final RegExp filterRegExp;
     try {
-      filterRegExp = RegExp(pattern, caseSensitive: false);
-    } on FormatException {
-      return false;
-    }
-    final fields = [
-      hole.hole_id?.toString(),
-      hole.floors?.first_floor?.filteredContent,
-      hole.floors?.last_floor?.filteredContent,
-      ...?hole.tags?.map((tag) => tag.name),
-    ];
-    return fields.whereType<String>().any(filterRegExp.hasMatch);
-  }
-
-  bool _holeMatchesJsPostFilter(OTHole hole, String expression) {
-    var result = false;
-    try {
-      result = _postFilter.jsRuntime.evaluateHole(expression, hole);
+      return _postFilter.holeMatches(hole);
     } catch (e) {
-      debugPrint("PostFilterJsRuntime.evaluateHole: $e");
+      debugPrint("PostFilterState.holeMatches: $e");
     }
-    return result;
+    return false;
   }
 
   void _togglePostFilter() {

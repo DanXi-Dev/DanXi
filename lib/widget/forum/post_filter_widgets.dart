@@ -1,4 +1,6 @@
 import 'package:dan_xi/generated/l10n.dart';
+import 'package:dan_xi/model/forum/floor.dart';
+import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/util/forum/post_filter_js_runtime.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,6 +26,41 @@ class PostFilterState {
   }
 
   String get pattern => _patterns[_mode] ?? '';
+
+  bool holeMatches(OTHole hole) {
+    return _matches([
+      hole.hole_id?.toString(),
+      hole.floors?.first_floor?.filteredContent,
+      hole.floors?.last_floor?.filteredContent,
+      ...?hole.tags?.map((tag) => tag.name),
+    ], () => jsRuntime.evaluateHole(pattern, hole));
+  }
+
+  bool floorMatches(OTFloor floor, {OTHole? hole}) {
+    return _matches([
+      floor.floor_id?.toString(),
+      floor.hole_id?.toString(),
+      floor.filteredContent,
+      floor.anonyname,
+      floor.special_tag,
+    ], () => jsRuntime.evaluateFloor(pattern, floor, hole: hole));
+  }
+
+  bool _matches(Iterable<String?> regexFields, bool Function() evaluateJs) {
+    if (pattern.isEmpty) {
+      return true;
+    }
+    if (mode == PostFilterMode.js) {
+      return evaluateJs();
+    }
+    final RegExp filterRegExp;
+    try {
+      filterRegExp = RegExp(pattern, caseSensitive: false);
+    } on FormatException {
+      return false;
+    }
+    return regexFields.whereType<String>().any(filterRegExp.hasMatch);
+  }
 
   void toggle() {
     _shown = !_shown;

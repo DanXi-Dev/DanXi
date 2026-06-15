@@ -717,34 +717,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   bool _floorMatchesAppliedPostFilter(OTFloor floor) {
-    final pattern = _postFilter.pattern;
-    if (pattern.isEmpty) {
-      return true;
-    }
-    if (_postFilter.mode == PostFilterMode.js) {
-      return _floorMatchesJsPostFilter(floor, pattern);
-    }
-    final RegExp filterRegExp;
     try {
-      filterRegExp = RegExp(pattern, caseSensitive: false);
-    } on FormatException {
-      return false;
-    }
-    final fields = [
-      floor.floor_id?.toString(),
-      floor.hole_id?.toString(),
-      floor.filteredContent,
-      floor.anonyname,
-      floor.special_tag,
-    ];
-    return fields.whereType<String>().any(filterRegExp.hasMatch);
-  }
-
-  bool _floorMatchesJsPostFilter(OTFloor floor, String expression) {
-    var result = false;
-    try {
-      result = _postFilter.jsRuntime.evaluateFloor(
-        expression,
+      return _postFilter.floorMatches(
         floor,
         hole: switch (_renderModel) {
           Normal(hole: var hole) => hole,
@@ -752,9 +726,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         },
       );
     } catch (e) {
-      debugPrint("PostFilterJsRuntime.evaluateFloor: $e");
+      debugPrint("PostFilterState.floorMatches: $e");
     }
-    return result;
+    return false;
   }
 
   Widget _buildFilteredPageBody(BuildContext context, Widget content) {
