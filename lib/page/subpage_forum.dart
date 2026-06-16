@@ -691,7 +691,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           ),
           body: Builder(
             // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-            builder: (context) => _buildFilteredPageBody(context, false),
+            builder: (context) => _buildPageBody(context, false),
           ),
         );
       case PostsType.FILTER_BY_ME:
@@ -720,7 +720,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           ),
           body: Builder(
             // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-            builder: (context) => _buildFilteredPageBody(context, false),
+            builder: (context) => _buildPageBody(context, false),
           ),
         );
       case PostsType.FILTER_BY_TAG:
@@ -734,11 +734,11 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           ),
           body: Builder(
             // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
-            builder: (context) => _buildFilteredPageBody(context, false),
+            builder: (context) => _buildPageBody(context, false),
           ),
         );
       case PostsType.NORMAL_POSTS:
-        return _buildFilteredPageBody(context, PlatformX.isMaterial(context));
+        return _buildPageBody(context, PlatformX.isMaterial(context));
       case PostsType.EXTERNAL_VIEW:
         return _buildPageBody(context, PlatformX.isMaterial(context));
     }
@@ -779,8 +779,20 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           if (_postsType == PostsType.EXTERNAL_VIEW) {
             return _delegate!.build(context);
           } else {
-            return _buildOTListView(context,
-                padding: buildTabBar ? EdgeInsets.zero : null);
+            return WithPostFilterBar(
+              filter: _postFilter,
+              onModeChanged: (mode) => setState(() {
+                _postFilter.mode = mode;
+              }),
+              onApply: _applyPostFilter,
+              topSafeArea:
+              PlatformX.isCupertino(context) &&
+                  _postsType != PostsType.NORMAL_POSTS,
+              child: _buildOTListView(
+                context,
+                padding: buildTabBar ? EdgeInsets.zero : null,
+              ),
+            );
           }
         }),
       ),
@@ -812,23 +824,6 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
       padding: EdgeInsets.zero,
       icon: Icon(getPostFilterIcon(context, _postFilter.shown)),
       onPressed: _togglePostFilter,
-    );
-  }
-
-  Widget _buildFilteredPageBody(BuildContext context, bool buildTabBar) {
-    return Column(
-      children: [
-        if (_postFilter.shown)
-          PostFilterBar(
-            mode: _postFilter.mode,
-            controller: _postFilter.controller,
-            onModeChanged: (mode) => setState(() {
-              _postFilter.mode = mode;
-            }),
-            onApply: _applyPostFilter,
-          ),
-        Expanded(child: _buildPageBody(context, buildTabBar)),
-      ],
     );
   }
 

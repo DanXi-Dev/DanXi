@@ -88,6 +88,7 @@ class PostFilterBar extends StatelessWidget {
   final TextEditingController controller;
   final ValueChanged<PostFilterMode> onModeChanged;
   final VoidCallback onApply;
+  final bool topSafeArea;
 
   const PostFilterBar({
     super.key,
@@ -95,6 +96,7 @@ class PostFilterBar extends StatelessWidget {
     required this.controller,
     required this.onModeChanged,
     required this.onApply,
+    this.topSafeArea = false,
   });
 
   @override
@@ -105,7 +107,7 @@ class PostFilterBar extends StatelessWidget {
       color: Theme.of(context).scaffoldBackgroundColor,
       elevation: PlatformX.isMaterial(context) ? 2 : 0,
       child: SafeArea(
-        top: false,
+        top: topSafeArea,
         bottom: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -152,6 +154,48 @@ class PostFilterBar extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class WithPostFilterBar extends StatelessWidget {
+  final PostFilterState filter;
+  final Widget child;
+  final ValueChanged<PostFilterMode> onModeChanged;
+  final VoidCallback onApply;
+  final bool topSafeArea;
+
+  const WithPostFilterBar({
+    super.key,
+    required this.filter,
+    required this.child,
+    required this.onModeChanged,
+    required this.onApply,
+    required this.topSafeArea,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        if (filter.shown)
+          PostFilterBar(
+            mode: filter.mode,
+            controller: filter.controller,
+            onModeChanged: onModeChanged,
+            onApply: onApply,
+            topSafeArea: topSafeArea,
+          ),
+        Expanded(
+          child: filter.shown && topSafeArea
+              ? MediaQuery.removePadding(
+                  context: context,
+                  removeTop: true,
+                  child: child,
+                )
+              : child,
+        ),
+      ],
     );
   }
 }

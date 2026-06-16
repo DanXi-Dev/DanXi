@@ -671,39 +671,48 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 : BoxDecoration(
                     image: DecorationImage(
                         image: _backgroundImage!, fit: BoxFit.cover)),
-            child: switch (_renderModel) {
-              Normal() => RefreshIndicator(
-                  edgeOffset: MediaQuery.of(context).padding.top,
-                  color: Theme.of(context).colorScheme.secondary,
-                  backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
-                  onRefresh: () async {
-                    HapticFeedback.mediumImpact();
+            child: WithPostFilterBar(
+              filter: _postFilter,
+              onModeChanged: (mode) => setState(() {
+                _postFilter.mode = mode;
+              }),
+              onApply: () => setState(() {
+                _postFilter.apply();
+              }),
+              topSafeArea: PlatformX.isCupertino(context),
+              child: switch (_renderModel) {
+                Normal() => RefreshIndicator(
+                    edgeOffset: MediaQuery.of(context).padding.top,
+                    color: Theme.of(context).colorScheme.secondary,
+                    backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
+                    onRefresh: () async {
+                      HapticFeedback.mediumImpact();
 
-                    // when users pull to refresh under "only this person" mode,
-                    // the mode should be quited since if the floor is deep
-                    // the initial request won't fetch them, and the page will be blank.
-                    if ((_renderModel as Normal).selectedPerson !=
-                        (_renderModel as Normal)
-                            .hole
-                            .floors
-                            ?.first_floor
-                            ?.anonyname) {
-                      (_renderModel as Normal).selectedPerson = null;
-                    }
-                    await refreshListView();
-                  },
-                  child: pagedListView),
-              _ => pagedListView,
-            },
+                      // when users pull to refresh under "only this person" mode,
+                      // the mode should be quited since if the floor is deep
+                      // the initial request won't fetch them, and the page will be blank.
+                      if ((_renderModel as Normal).selectedPerson !=
+                          (_renderModel as Normal)
+                              .hole
+                              .floors
+                              ?.first_floor
+                              ?.anonyname) {
+                        (_renderModel as Normal).selectedPerson = null;
+                      }
+                      await refreshListView();
+                    },
+                    child: pagedListView),
+                _ => pagedListView,
+              },
+            ),
           );
 
-          final filteredContent = _buildFilteredPageBody(context, content);
           if (!_shouldShowAiSummaryEntry || PlatformX.isMaterial(context)) {
-            return filteredContent;
+            return content;
           }
           return Stack(
             children: [
-              Positioned.fill(child: filteredContent),
+              Positioned.fill(child: content),
               Positioned(
                 right: 16,
                 bottom: 16 + MediaQuery.of(context).padding.bottom,
@@ -729,25 +738,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       debugPrint("PostFilterState.floorMatches: $e");
     }
     return false;
-  }
-
-  Widget _buildFilteredPageBody(BuildContext context, Widget content) {
-    return Column(
-      children: [
-        if (_postFilter.shown)
-          PostFilterBar(
-            mode: _postFilter.mode,
-            controller: _postFilter.controller,
-            onModeChanged: (mode) => setState(() {
-              _postFilter.mode = mode;
-            }),
-            onApply: () => setState(() {
-              _postFilter.apply();
-            }),
-          ),
-        Expanded(child: content),
-      ],
-    );
   }
 
   bool get _shouldShowAiSummaryEntry {
