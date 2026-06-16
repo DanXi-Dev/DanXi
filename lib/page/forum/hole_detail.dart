@@ -511,13 +511,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           },
         ),
         trailingActions: [
-          PlatformIconButton(
-            padding: EdgeInsets.zero,
-            icon: Icon(getPostFilterIcon(context, _postFilter.shown)),
-            onPressed: () => setState(() {
-              _postFilter.toggle();
-            }),
-          ),
           if (_renderModel
               case Normal(
                 hole: var hole,
@@ -554,6 +547,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                         shouldScrollToEnd = true;
                       });
                     }),
+                PopupMenuOption(
+                  label: S.of(context).filter,
+                  onTap: (_) => setState(() {
+                    _postFilter.toggle();
+                  }),
+                ),
+                // TODO: It is possible to use the post filter to show DZ only.
                 PopupMenuOption(
                     label: selectedPerson == hole.floors?.first_floor?.anonyname
                         ? S.of(context).show_all_replies
