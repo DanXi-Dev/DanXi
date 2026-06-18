@@ -298,15 +298,22 @@ class PostFilterBar extends StatelessWidget {
         top: topSafeArea,
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+          padding: const EdgeInsets.all(8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _buildAppliedRow(context),
-              AnimatedBuilder(
-                animation: controller,
-                builder: (context, _) =>
-                    _buildExprGroup(context, controller.root),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.5,
+                ),
+                child: SingleChildScrollView(
+                  child: AnimatedBuilder(
+                    animation: controller,
+                    builder: (context, _) =>
+                        _buildExprGroup(context, controller.root),
+                  ),
+                ),
               ),
             ],
           ),
