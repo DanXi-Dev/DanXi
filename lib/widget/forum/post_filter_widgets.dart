@@ -548,6 +548,50 @@ class PostFilterBar extends StatelessWidget {
     );
   }
 
+  Widget _buildGroupRelationSelector(
+    BuildContext context,
+    PostFilterExprGroup group,
+  ) {
+    return _buildPopupChipButton<PostFilterExprRelation>(
+      context,
+      label: _relationLabel(group.relation),
+      initialValue: group.relation,
+      items: PostFilterExprRelation.values
+          .map(
+            (relation) => PopupMenuItem(
+              value: relation,
+              child: _buildPopupAvatarItem(
+                context,
+                _relationAvatar(context, relation),
+                _relationLabel(relation),
+              ),
+            ),
+          )
+          .toList(growable: false),
+      onSelected: (value) => controller.setRelation(group, value),
+    );
+  }
+
+  String _relationLabel(PostFilterExprRelation relation) {
+    return '[${relation.name.toUpperCase()}]';
+  }
+
+  IconData _relationAvatar(
+    BuildContext context,
+    PostFilterExprRelation relation,
+  ) {
+    return switch (relation) {
+      PostFilterExprRelation.and =>
+        PlatformX.isMaterial(context)
+            ? Icons.call_merge
+            : CupertinoIcons.arrow_merge,
+      PostFilterExprRelation.or =>
+        PlatformX.isMaterial(context)
+            ? Icons.call_split
+            : CupertinoIcons.arrow_branch,
+    };
+  }
+
   Widget _buildFieldSelector(
     BuildContext context,
     PostFilterFieldExpr expr,
@@ -561,12 +605,10 @@ class PostFilterBar extends StatelessWidget {
           .map(
             (field) => PopupMenuItem(
               value: field,
-              child: Row(
-                children: [
-                  _buildFieldTypeAvatar(context, field.type),
-                  const SizedBox(width: 4),
-                  Text(field.name),
-                ],
+              child: _buildPopupAvatarItem(
+                context,
+                _fieldAvatar(context, field),
+                _fieldLabel(field),
               ),
             ),
           )
@@ -582,25 +624,8 @@ class PostFilterBar extends StatelessWidget {
     return field.name.isEmpty ? 'Field' : field.name;
   }
 
-  Widget _buildFieldTypeAvatar(BuildContext context, PostFilterFieldType type) {
-    return Container(
-      width: 24,
-      height: 24,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer,
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        _fieldTypeIcon(context, type),
-        size: 14,
-        color: Theme.of(context).colorScheme.onPrimaryContainer,
-      ),
-    );
-  }
-
-  IconData _fieldTypeIcon(BuildContext context, PostFilterFieldType type) {
-    return switch (type) {
+  IconData _fieldAvatar(BuildContext context, PostFilterField field) {
+    return switch (field.type) {
       PostFilterFieldType.boolean =>
         PlatformX.isMaterial(context)
             ? Icons.toggle_on
@@ -666,23 +691,6 @@ class PostFilterBar extends StatelessWidget {
     );
   }
 
-  Widget _buildGroupRelationSelector(
-    BuildContext context,
-    PostFilterExprGroup group,
-  ) {
-    final relation = group.relation;
-    return _buildPopupChipButton<PostFilterExprRelation>(
-      context,
-      label: relation == PostFilterExprRelation.and ? '[AND]' : '[OR]',
-      initialValue: relation,
-      items: const [
-        PopupMenuItem(value: PostFilterExprRelation.and, child: Text('[AND]')),
-        PopupMenuItem(value: PostFilterExprRelation.or, child: Text('[OR]')),
-      ],
-      onSelected: (value) => controller.setRelation(group, value),
-    );
-  }
-
   Widget _buildPopupChipButton<T>(
     BuildContext context, {
     required String label,
@@ -712,6 +720,33 @@ class PostFilterBar extends StatelessWidget {
     );
   }
 
+  Widget _buildPopupAvatarItem(
+    BuildContext context,
+    IconData avatar,
+    String name,
+  ) {
+    return Row(
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: _chipContainerColor(context),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            avatar,
+            size: 16,
+            color: _chipContentColor(context),
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(name),
+      ],
+    );
+  }
+
   Widget _buildChipLabel(BuildContext context, String label) {
     return Container(
       alignment: Alignment.center,
@@ -731,9 +766,13 @@ class PostFilterBar extends StatelessWidget {
 
   BoxDecoration _chipDecoration(BuildContext context) {
     return BoxDecoration(
-      color: Theme.of(context).colorScheme.secondaryContainer,
+      color: _chipContainerColor(context),
       borderRadius: BorderRadius.circular(2),
     );
+  }
+
+  Color _chipContainerColor(BuildContext context) {
+    return Theme.of(context).colorScheme.secondaryContainer;
   }
 
   Color _chipContentColor(BuildContext context) {
