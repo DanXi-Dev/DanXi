@@ -673,9 +673,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                         image: _backgroundImage!, fit: BoxFit.cover)),
             child: WithPostFilterBar(
               filter: _postFilter,
-              onModeChanged: (mode) => setState(() {
-                _postFilter.mode = mode;
-              }),
               onApply: () => setState(() {
                 _postFilter.apply();
               }),

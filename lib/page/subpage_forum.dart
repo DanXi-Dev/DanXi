@@ -781,9 +781,6 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           } else {
             return WithPostFilterBar(
               filter: _postFilter,
-              onModeChanged: (mode) => setState(() {
-                _postFilter.mode = mode;
-              }),
               onApply: _applyPostFilter,
               topSafeArea:
               PlatformX.isCupertino(context) &&
