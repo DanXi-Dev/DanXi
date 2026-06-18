@@ -371,6 +371,7 @@ class PostFilterBar extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: 4,
         children: [
           _buildExprGroupHeader(context, group, slot: slot),
           ...group.slots.map(
@@ -388,10 +389,7 @@ class PostFilterBar extends StatelessWidget {
               ),
             },
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            child: _buildGroupAddButton(context, group),
-          ),
+          _buildGroupAddButton(context, group),
         ],
       ),
     );
@@ -404,16 +402,11 @@ class PostFilterBar extends StatelessWidget {
   }) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Row(
         children: [
           const Spacer(),
-          Text(
-            'Group',
-            style: Theme.of(
-              context,
-            ).textTheme.labelSmall,
-          ),
+          Text('Group', style: Theme.of(context).textTheme.labelSmall),
           const SizedBox(width: 4),
           _buildGroupRelationSelector(context, group),
           const Spacer(),
@@ -433,7 +426,7 @@ class PostFilterBar extends StatelessWidget {
     return Container(
       width: double.infinity,
       constraints: const BoxConstraints(minHeight: 16),
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Row(
         children: [
           Expanded(child: _buildFieldSelector(context, expr, slot)),
@@ -743,11 +736,7 @@ class PostFilterBar extends StatelessWidget {
             color: _chipContainerColor(context),
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            avatar,
-            size: 16,
-            color: _chipContentColor(context),
-          ),
+          child: Icon(avatar, size: 16, color: _chipContentColor(context)),
         ),
         const SizedBox(width: 4),
         Text(name),
