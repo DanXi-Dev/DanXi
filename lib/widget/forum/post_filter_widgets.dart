@@ -2,6 +2,7 @@ import 'package:dan_xi/model/forum/floor.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/util/forum/post_filter_js_runtime.dart';
 import 'package:dan_xi/util/platform_universal.dart';
+import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -404,7 +405,7 @@ class PostFilterBar extends StatelessWidget {
             'Group',
             style: Theme.of(
               context,
-            ).textTheme.labelSmall?.copyWith(color: _chipContentColor(context)),
+            ).textTheme.labelSmall,
           ),
           const SizedBox(width: 4),
           _buildGroupRelationSelector(context, group),
@@ -772,11 +773,17 @@ class PostFilterBar extends StatelessWidget {
   }
 
   Color _chipContainerColor(BuildContext context) {
-    return Theme.of(context).colorScheme.secondaryContainer;
+    return Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3);
   }
 
+  // Following chip_widgets.dart:97-101 (433f4a3), but with secondary color.
+  // TODO: Can we reuse it from other places?
   Color _chipContentColor(BuildContext context) {
-    return Theme.of(context).colorScheme.onSecondaryContainer;
+    final effectiveColor = Theme.of(context).colorScheme.secondary;
+    final lightness = HSLColor.fromColor(effectiveColor).lightness;
+    return PlatformX.isDarkMode
+        ? effectiveColor.withLightness((lightness + 0.2).clamp(0, 1))
+        : effectiveColor.withLightness((lightness - 0.2).clamp(0, 1));
   }
 
   PostFilterExpr _createExpr(_ExprKind kind, PostFilterField field) {
