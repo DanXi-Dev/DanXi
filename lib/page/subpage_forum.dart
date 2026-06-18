@@ -785,6 +785,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
               topSafeArea:
               PlatformX.isCupertino(context) &&
                   _postsType != PostsType.NORMAL_POSTS,
+              fields: postFilterHoleFieldNames,
               child: _buildOTListView(
                 context,
                 padding: buildTabBar ? EdgeInsets.zero : null,

@@ -677,6 +677,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 _postFilter.apply();
               }),
               topSafeArea: PlatformX.isCupertino(context),
+              fields: postFilterFloorFieldNames,
               child: switch (_renderModel) {
                 Normal() => RefreshIndicator(
                     edgeOffset: MediaQuery.of(context).padding.top,
