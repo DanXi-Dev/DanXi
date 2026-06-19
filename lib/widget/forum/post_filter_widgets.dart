@@ -618,6 +618,7 @@ class PostFilterBar extends StatelessWidget {
         slot,
         _createExpr(_defaultKindForField(field), field),
       ),
+      autoOpen: expr.field.name.isEmpty,
     );
   }
 
@@ -698,27 +699,35 @@ class PostFilterBar extends StatelessWidget {
     required T initialValue,
     required List<PopupMenuEntry<T>> items,
     required ValueChanged<T> onSelected,
+    bool autoOpen = false,
   }) {
-    return PopupMenuButton<T>(
-      padding: EdgeInsets.zero,
-      initialValue: initialValue,
-      onSelected: onSelected,
-      itemBuilder: (context) => items,
-      child: Container(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-        decoration: _chipDecoration(context),
-        child: Text(
-          label,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-          textAlign: TextAlign.center,
-          style: Theme.of(
-            context,
-          ).textTheme.labelSmall?.copyWith(color: _chipContentColor(context)),
-        ),
+    final child = Container(
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+      decoration: _chipDecoration(context),
+      child: Text(
+        label,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+        textAlign: TextAlign.center,
+        style: Theme.of(
+          context,
+        ).textTheme.labelSmall?.copyWith(color: _chipContentColor(context)),
       ),
     );
+    return autoOpen
+        ? _AutoOpenPopupMenuButton<T>(
+            initialValue: initialValue,
+            items: items,
+            onSelected: onSelected,
+            child: child,
+          )
+        : _buildPopupMenuButton<T>(
+            initialValue: initialValue,
+            items: items,
+            onSelected: onSelected,
+            child: child,
+          );
   }
 
   Widget _buildPopupAvatarItem(
@@ -884,6 +893,69 @@ class PostFilterBar extends StatelessWidget {
       PostFilterFieldType.array => const ['"keyword"', '0'],
       PostFilterFieldType.map => const ['"keyword"', 'null'],
     };
+  }
+}
+
+PopupMenuButton<T> _buildPopupMenuButton<T>({
+  Key? key,
+  required T initialValue,
+  required List<PopupMenuEntry<T>> items,
+  required ValueChanged<T> onSelected,
+  required Widget child,
+}) {
+  return PopupMenuButton<T>(
+    key: key,
+    padding: EdgeInsets.zero,
+    initialValue: initialValue,
+    onSelected: onSelected,
+    itemBuilder: (context) => items,
+    child: child,
+  );
+}
+
+class _AutoOpenPopupMenuButton<T> extends StatefulWidget {
+  final Widget child;
+  final T initialValue;
+  final List<PopupMenuEntry<T>> items;
+  final ValueChanged<T> onSelected;
+
+  const _AutoOpenPopupMenuButton({
+    required this.child,
+    required this.initialValue,
+    required this.items,
+    required this.onSelected,
+  });
+
+  @override
+  State<_AutoOpenPopupMenuButton<T>> createState() =>
+      _AutoOpenPopupMenuButtonState<T>();
+}
+
+class _AutoOpenPopupMenuButtonState<T>
+    extends State<_AutoOpenPopupMenuButton<T>> {
+  final GlobalKey<PopupMenuButtonState<T>> _key = GlobalKey();
+  bool _opened = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_opened && mounted) {
+        _opened = true;
+        _key.currentState?.showButtonMenu();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildPopupMenuButton<T>(
+      key: _key,
+      initialValue: widget.initialValue,
+      items: widget.items,
+      onSelected: widget.onSelected,
+      child: widget.child,
+    );
   }
 }
 
