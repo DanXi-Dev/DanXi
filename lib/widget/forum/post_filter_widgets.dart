@@ -87,6 +87,10 @@ class PostFilterExprGroup extends PostFilterExpr {
   PostFilterExprGroup({this.relation = PostFilterExprRelation.and})
     : slots = [];
 
+  PostFilterExprGroup.and() : this(relation: PostFilterExprRelation.and);
+
+  PostFilterExprGroup.or() : this(relation: PostFilterExprRelation.or);
+
   bool get isEmpty => slots.isEmpty;
 
   @override
@@ -200,8 +204,6 @@ class MatchExpr extends PostFilterFieldExpr {
 }
 
 enum _ExprKind { lt, gt, le, ge, equal, include, match }
-
-enum _AddExprKind { andGroup, orGroup, fieldExpr }
 
 class PostFilterExprController extends ChangeNotifier {
   final PostFilterExprGroup root = PostFilterExprGroup();
@@ -494,66 +496,51 @@ class PostFilterBar extends StatelessWidget {
       builder: (context) => SafeArea(
         child: Material(
           color: Theme.of(context).scaffoldBackgroundColor,
-          child: _buildPopupBody(
-            context,
-            children: [
-              _buildAddExprButton(
-                context,
-                group,
-                'AND group',
-                _AddExprKind.andGroup,
-              ),
-              _buildAddExprButton(
-                context,
-                group,
-                'OR group',
-                _AddExprKind.orGroup,
-              ),
-              _buildAddExprButton(
-                context,
-                group,
-                'Field expression',
-                _AddExprKind.fieldExpr,
-              ),
-            ],
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.5,
+            ),
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                _buildAddExprListTile(
+                  context,
+                  group,
+                  'Field expression',
+                  _createEmptyFieldExpr,
+                ),
+                _buildAddExprListTile(
+                  context,
+                  group,
+                  'AND group',
+                  PostFilterExprGroup.and,
+                ),
+                _buildAddExprListTile(
+                  context,
+                  group,
+                  'OR group',
+                  PostFilterExprGroup.or,
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildPopupBody(
-    BuildContext context, {
-    required List<Widget> children,
-  }) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.5,
-      ),
-      child: ListView(shrinkWrap: true, children: children),
-    );
-  }
-
-  Widget _buildAddExprButton(
+  Widget _buildAddExprListTile(
     BuildContext context,
     PostFilterExprGroup group,
     String label,
-    _AddExprKind kind,
+    PostFilterExpr Function() createExpr,
   ) {
     return ListTile(
       title: Text(label),
       dense: true,
       onTap: () {
         Navigator.of(context).pop();
-        controller.addExpr(group, switch (kind) {
-          _AddExprKind.andGroup => PostFilterExprGroup(
-            relation: PostFilterExprRelation.and,
-          ),
-          _AddExprKind.orGroup => PostFilterExprGroup(
-            relation: PostFilterExprRelation.or,
-          ),
-          _AddExprKind.fieldExpr => _createEmptyFieldExpr(),
-        });
+        controller.addExpr(group, createExpr());
       },
     );
   }
