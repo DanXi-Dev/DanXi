@@ -76,8 +76,9 @@ sealed class PostFilterExpr {
 
 class PostFilterExprSlot {
   PostFilterExpr expr;
+  PostFilterExprGroup group;
 
-  PostFilterExprSlot({required this.expr});
+  PostFilterExprSlot({required this.expr, required this.group});
 }
 
 class PostFilterExprGroup extends PostFilterExpr {
@@ -211,12 +212,12 @@ class PostFilterExprController extends ChangeNotifier {
   String toJs() => root.toJs();
 
   void addExpr(PostFilterExprGroup group, PostFilterExpr expr) {
-    group.slots.add(PostFilterExprSlot(expr: expr));
+    group.slots.add(PostFilterExprSlot(expr: expr, group: group));
     notifyListeners();
   }
 
-  void removeSlot(PostFilterExprGroup group, PostFilterExprSlot slot) {
-    group.slots.remove(slot);
+  void removeSlot(PostFilterExprSlot slot) {
+    slot.group.slots.remove(slot);
     notifyListeners();
   }
 
@@ -377,17 +378,16 @@ class PostFilterBar extends StatelessWidget {
         children: [
           _buildExprGroupHeader(context, group, slot: slot),
           ...group.slots.map(
-            (slot) => switch (slot.expr) {
+            (childSlot) => switch (childSlot.expr) {
               PostFilterExprGroup groupExpr => _buildExprGroup(
                 context,
                 groupExpr,
-                slot: slot,
+                slot: childSlot,
               ),
               PostFilterFieldExpr fieldExpr => _buildFieldExprRow(
                 context,
-                group,
                 fieldExpr,
-                slot,
+                childSlot,
               ),
             },
           ),
@@ -419,7 +419,7 @@ class PostFilterBar extends StatelessWidget {
           _buildGroupRelationSelector(context, group),
           const Spacer(),
           const SizedBox(width: 4),
-          if (slot != null) _buildCloseButton(context, group, slot),
+          if (slot != null) _buildCloseButton(context, slot),
         ],
       ),
     );
@@ -427,7 +427,6 @@ class PostFilterBar extends StatelessWidget {
 
   Widget _buildFieldExprRow(
     BuildContext context,
-    PostFilterExprGroup group,
     PostFilterFieldExpr expr,
     PostFilterExprSlot slot,
   ) {
@@ -446,19 +445,15 @@ class PostFilterBar extends StatelessWidget {
           const SizedBox(width: 4),
           Expanded(child: _buildValueSelector(context, expr, slot)),
           const SizedBox(width: 4),
-          _buildCloseButton(context, group, slot),
+          _buildCloseButton(context, slot),
         ],
       ),
     );
   }
 
-  Widget _buildCloseButton(
-    BuildContext context,
-    PostFilterExprGroup group,
-    PostFilterExprSlot slot,
-  ) {
+  Widget _buildCloseButton(BuildContext context, PostFilterExprSlot slot) {
     return InkWell(
-      onTap: () => controller.removeSlot(group, slot),
+      onTap: () => controller.removeSlot(slot),
       child: SizedBox(
         width: 16,
         height: 16,
