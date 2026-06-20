@@ -85,7 +85,7 @@ class PostFilterGroup extends PostFilterExpr {
   PostFilterExprRelation relation;
   final List<PostFilterSlot> slots;
 
-  PostFilterGroup({this.relation = PostFilterExprRelation.and}) : slots = [];
+  PostFilterGroup({required this.relation}) : slots = [];
 
   PostFilterGroup.and() : this(relation: PostFilterExprRelation.and);
 
@@ -206,7 +206,7 @@ class MatchExpr extends PostFilterCondition {
 enum _ExprKind { lt, gt, le, ge, equal, include, match }
 
 class PostFilterController extends ChangeNotifier {
-  final PostFilterGroup root = PostFilterGroup();
+  final PostFilterGroup root = PostFilterGroup.and();
 
   String toJs() => root.toJs();
 
