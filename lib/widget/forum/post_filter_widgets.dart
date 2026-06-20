@@ -74,23 +74,22 @@ sealed class PostFilterExpr {
   String toJs();
 }
 
-class PostFilterExprSlot {
+class PostFilterSlot {
   PostFilterExpr expr;
-  PostFilterGroupExpr group;
+  PostFilterGroup group;
 
-  PostFilterExprSlot({required this.expr, required this.group});
+  PostFilterSlot({required this.expr, required this.group});
 }
 
-class PostFilterGroupExpr extends PostFilterExpr {
+class PostFilterGroup extends PostFilterExpr {
   PostFilterExprRelation relation;
-  final List<PostFilterExprSlot> slots;
+  final List<PostFilterSlot> slots;
 
-  PostFilterGroupExpr({this.relation = PostFilterExprRelation.and})
-    : slots = [];
+  PostFilterGroup({this.relation = PostFilterExprRelation.and}) : slots = [];
 
-  PostFilterExprGroup.and() : this(relation: PostFilterExprRelation.and);
+  PostFilterGroup.and() : this(relation: PostFilterExprRelation.and);
 
-  PostFilterGroupExpr.or() : this(relation: PostFilterExprRelation.or);
+  PostFilterGroup.or() : this(relation: PostFilterExprRelation.or);
 
   bool get isEmpty => slots.isEmpty;
 
@@ -103,17 +102,17 @@ class PostFilterGroupExpr extends PostFilterExpr {
         buffer.write(relation == PostFilterExprRelation.or ? ' || ' : ' && ');
       }
       final js = slot.expr.toJs();
-      buffer.write(slot.expr is PostFilterGroupExpr ? '($js)' : js);
+      buffer.write(slot.expr is PostFilterGroup ? '($js)' : js);
     }
     return buffer.toString();
   }
 }
 
-sealed class PostFilterFieldExpr extends PostFilterExpr {
+sealed class PostFilterCondition extends PostFilterExpr {
   final PostFilterField field;
   final String value;
 
-  const PostFilterFieldExpr(this.field, this.value);
+  const PostFilterCondition(this.field, this.value);
 
   String get operatorLabel;
 
@@ -127,7 +126,7 @@ sealed class PostFilterFieldExpr extends PostFilterExpr {
       field.name.isEmpty ? 'false' : '${field.name} $jsOperator $value';
 }
 
-class LtExpr extends PostFilterFieldExpr {
+class LtExpr extends PostFilterCondition {
   const LtExpr(super.field, super.value);
 
   @override
@@ -137,7 +136,7 @@ class LtExpr extends PostFilterFieldExpr {
   String get jsOperator => '<';
 }
 
-class GtExpr extends PostFilterFieldExpr {
+class GtExpr extends PostFilterCondition {
   const GtExpr(super.field, super.value);
 
   @override
@@ -147,7 +146,7 @@ class GtExpr extends PostFilterFieldExpr {
   String get jsOperator => '>';
 }
 
-class LeExpr extends PostFilterFieldExpr {
+class LeExpr extends PostFilterCondition {
   const LeExpr(super.field, super.value);
 
   @override
@@ -157,7 +156,7 @@ class LeExpr extends PostFilterFieldExpr {
   String get jsOperator => '<=';
 }
 
-class GeExpr extends PostFilterFieldExpr {
+class GeExpr extends PostFilterCondition {
   const GeExpr(super.field, super.value);
 
   @override
@@ -167,7 +166,7 @@ class GeExpr extends PostFilterFieldExpr {
   String get jsOperator => '>=';
 }
 
-class EqualExpr extends PostFilterFieldExpr {
+class EqualExpr extends PostFilterCondition {
   const EqualExpr(super.field, super.value);
 
   @override
@@ -177,7 +176,7 @@ class EqualExpr extends PostFilterFieldExpr {
   String get jsOperator => '===';
 }
 
-class IncludeExpr extends PostFilterFieldExpr {
+class IncludeExpr extends PostFilterCondition {
   const IncludeExpr(super.field, super.value);
 
   @override
@@ -191,7 +190,7 @@ class IncludeExpr extends PostFilterFieldExpr {
       field.name.isEmpty ? 'false' : '${field.name}.includes($value)';
 }
 
-class MatchExpr extends PostFilterFieldExpr {
+class MatchExpr extends PostFilterCondition {
   const MatchExpr(super.field, super.value);
 
   @override
@@ -206,27 +205,27 @@ class MatchExpr extends PostFilterFieldExpr {
 
 enum _ExprKind { lt, gt, le, ge, equal, include, match }
 
-class PostFilterExprController extends ChangeNotifier {
-  final PostFilterGroupExpr root = PostFilterGroupExpr();
+class PostFilterController extends ChangeNotifier {
+  final PostFilterGroup root = PostFilterGroup();
 
   String toJs() => root.toJs();
 
-  void addExpr(PostFilterGroupExpr group, PostFilterExpr expr) {
-    group.slots.add(PostFilterExprSlot(expr: expr, group: group));
+  void addExpr(PostFilterGroup group, PostFilterExpr expr) {
+    group.slots.add(PostFilterSlot(expr: expr, group: group));
     notifyListeners();
   }
 
-  void removeSlot(PostFilterExprSlot slot) {
+  void removeSlot(PostFilterSlot slot) {
     slot.group.slots.remove(slot);
     notifyListeners();
   }
 
-  void replaceSlot(PostFilterExprSlot slot, PostFilterExpr expr) {
+  void replaceSlot(PostFilterSlot slot, PostFilterExpr expr) {
     slot.expr = expr;
     notifyListeners();
   }
 
-  void setRelation(PostFilterGroupExpr group, PostFilterExprRelation relation) {
+  void setRelation(PostFilterGroup group, PostFilterExprRelation relation) {
     group.relation = relation;
     notifyListeners();
   }
@@ -234,7 +233,7 @@ class PostFilterExprController extends ChangeNotifier {
 
 class PostFilterState {
   bool _shown = false;
-  final PostFilterExprController controller = PostFilterExprController();
+  final PostFilterController controller = PostFilterController();
   String pattern = '';
   final PostFilterJsRuntime jsRuntime = PostFilterJsRuntime();
 
@@ -277,7 +276,7 @@ IconData getPostFilterIcon(BuildContext context, bool showPostFilter) =>
           : CupertinoIcons.slider_horizontal_3);
 
 class PostFilterBar extends StatelessWidget {
-  final PostFilterExprController controller;
+  final PostFilterController controller;
   final String appliedJsExpr;
   final VoidCallback onApply;
   final bool topSafeArea;
@@ -364,8 +363,8 @@ class PostFilterBar extends StatelessWidget {
 
   Widget _buildGroupExpr(
     BuildContext context,
-    PostFilterGroupExpr group, {
-    PostFilterExprSlot? slot,
+    PostFilterGroup group, {
+    PostFilterSlot? slot,
   }) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 4),
@@ -381,12 +380,12 @@ class PostFilterBar extends StatelessWidget {
           _buildGroupExprHeader(context, group, slot: slot),
           ...group.slots.map(
             (childSlot) => switch (childSlot.expr) {
-              PostFilterGroupExpr groupExpr => _buildGroupExpr(
+              PostFilterGroup groupExpr => _buildGroupExpr(
                 context,
                 groupExpr,
                 slot: childSlot,
               ),
-              PostFilterFieldExpr fieldExpr => _buildFieldExprRow(
+              PostFilterCondition fieldExpr => _buildFieldExprRow(
                 context,
                 fieldExpr,
                 childSlot,
@@ -408,8 +407,8 @@ class PostFilterBar extends StatelessWidget {
   /// The root group has no [slot] and therefore no close button.
   Widget _buildGroupExprHeader(
     BuildContext context,
-    PostFilterGroupExpr group, {
-    PostFilterExprSlot? slot,
+    PostFilterGroup group, {
+    PostFilterSlot? slot,
   }) {
     return Container(
       width: double.infinity,
@@ -431,8 +430,8 @@ class PostFilterBar extends StatelessWidget {
 
   Widget _buildFieldExprRow(
     BuildContext context,
-    PostFilterFieldExpr expr,
-    PostFilterExprSlot slot,
+    PostFilterCondition expr,
+    PostFilterSlot slot,
   ) {
     return Container(
       width: double.infinity,
@@ -455,7 +454,7 @@ class PostFilterBar extends StatelessWidget {
     );
   }
 
-  Widget _buildCloseButton(BuildContext context, PostFilterExprSlot slot) {
+  Widget _buildCloseButton(BuildContext context, PostFilterSlot slot) {
     return InkWell(
       onTap: () => controller.removeSlot(slot),
       child: SizedBox(
@@ -470,7 +469,7 @@ class PostFilterBar extends StatelessWidget {
     );
   }
 
-  Widget _buildGroupAddButton(BuildContext context, PostFilterGroupExpr group) {
+  Widget _buildGroupAddButton(BuildContext context, PostFilterGroup group) {
     return InkWell(
       onTap: () => _showAddExprPopup(context, group),
       child: Container(
@@ -488,7 +487,7 @@ class PostFilterBar extends StatelessWidget {
 
   Future<void> _showAddExprPopup(
     BuildContext context,
-    PostFilterGroupExpr group,
+    PostFilterGroup group,
   ) async {
     await showPlatformModalSheet(
       context: context,
@@ -512,13 +511,13 @@ class PostFilterBar extends StatelessWidget {
                   context,
                   group,
                   'AND group',
-                  PostFilterGroupExpr.and,
+                  PostFilterGroup.and,
                 ),
                 _buildAddExprListTile(
                   context,
                   group,
                   'OR group',
-                  PostFilterGroupExpr.or,
+                  PostFilterGroup.or,
                 ),
               ],
             ),
@@ -530,7 +529,7 @@ class PostFilterBar extends StatelessWidget {
 
   Widget _buildAddExprListTile(
     BuildContext context,
-    PostFilterGroupExpr group,
+    PostFilterGroup group,
     String label,
     PostFilterExpr Function() createExpr,
   ) {
@@ -548,7 +547,7 @@ class PostFilterBar extends StatelessWidget {
 
   Widget _buildGroupRelationSelector(
     BuildContext context,
-    PostFilterGroupExpr group,
+    PostFilterGroup group,
   ) {
     final nextRelation = group.relation == PostFilterExprRelation.and
         ? PostFilterExprRelation.or
@@ -587,8 +586,8 @@ class PostFilterBar extends StatelessWidget {
 
   Widget _buildExprSubjectSelector(
     BuildContext context,
-    PostFilterFieldExpr expr,
-    PostFilterExprSlot slot,
+    PostFilterCondition expr,
+    PostFilterSlot slot,
   ) {
     return _buildPopupChipButton<PostFilterField>(
       context,
@@ -646,8 +645,8 @@ class PostFilterBar extends StatelessWidget {
 
   Widget _buildExprVerbSelector(
     BuildContext context,
-    PostFilterFieldExpr expr,
-    PostFilterExprSlot slot,
+    PostFilterCondition expr,
+    PostFilterSlot slot,
   ) {
     if (expr.field.name.isEmpty) {
       return _buildChipLabel(context, 'Method');
@@ -673,8 +672,8 @@ class PostFilterBar extends StatelessWidget {
 
   Widget _buildExprObjectSelector(
     BuildContext context,
-    PostFilterFieldExpr expr,
-    PostFilterExprSlot slot,
+    PostFilterCondition expr,
+    PostFilterSlot slot,
   ) {
     return switch (expr.field.type) {
       PostFilterFieldType.boolean => _buildTapChipButton(
@@ -767,9 +766,9 @@ class PostFilterBar extends StatelessWidget {
 
   Future<void> _showStringValueInputDialog(
     BuildContext context,
-    PostFilterFieldExpr expr,
+    PostFilterCondition expr,
     _ExprKind kind,
-    PostFilterExprSlot slot,
+    PostFilterSlot slot,
   ) async {
     final prompt = switch (kind) {
       _ExprKind.equal => 'Exact value',
@@ -911,7 +910,7 @@ class PostFilterBar extends StatelessWidget {
     };
   }
 
-  _ExprKind _kindFromExpr(PostFilterFieldExpr expr) {
+  _ExprKind _kindFromExpr(PostFilterCondition expr) {
     return switch (expr) {
       LtExpr _ => _ExprKind.lt,
       GtExpr _ => _ExprKind.gt,
