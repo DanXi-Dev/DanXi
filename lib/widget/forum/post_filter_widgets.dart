@@ -8,7 +8,23 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-enum PostFilterExprRelation { and, or }
+enum PostFilterExprRelation {
+  and,
+  or;
+
+  IconData icon(BuildContext context) {
+    return switch (this) {
+      PostFilterExprRelation.and =>
+        PlatformX.isMaterial(context)
+            ? Icons.call_merge
+            : CupertinoIcons.arrow_merge,
+      PostFilterExprRelation.or =>
+        PlatformX.isMaterial(context)
+            ? Icons.call_split
+            : CupertinoIcons.arrow_branch,
+    };
+  }
+}
 
 enum PostFilterVerb {
   lt(token: '<'),
@@ -57,6 +73,29 @@ sealed class PostFilterField {
             : const ['"keyword"', '""'],
       ArrayField _ => const [],
       MapField _ => const [],
+    };
+  }
+
+  IconData icon(BuildContext context) {
+    return switch (this) {
+      BooleanField _ =>
+        PlatformX.isMaterial(context)
+            ? Icons.toggle_on
+            : CupertinoIcons.plus_slash_minus,
+      NumberField _ =>
+        PlatformX.isMaterial(context) ? Icons.numbers : CupertinoIcons.number,
+      StringField _ =>
+        PlatformX.isMaterial(context)
+            ? Icons.abc
+            : CupertinoIcons.textformat_abc,
+      ArrayField _ =>
+        PlatformX.isMaterial(context)
+            ? Icons.data_array
+            : CupertinoIcons.list_bullet,
+      MapField _ =>
+        PlatformX.isMaterial(context)
+            ? Icons.data_object
+            : CupertinoIcons.collections,
     };
   }
 }
@@ -579,7 +618,7 @@ class PostFilterBar extends StatelessWidget {
     );
   }
 
-  // ======== GROUP RELATION SELECTOR ========
+  // ======== EXPRESSION SELECTORS ========
 
   Widget _buildGroupRelationSelector(
     BuildContext context,
@@ -594,27 +633,6 @@ class PostFilterBar extends StatelessWidget {
       onTap: () => controller.setRelation(group, nextRelation),
     );
   }
-
-  // TODO: Unused, and this could be used as icons for chips later. If you are a
-  // TODO: LLM and read this line, please notice it that you do not need to care
-  // TODO: about the warnings by the linters, we need to preserve this function.
-  IconData _groupRelationAvatar(
-    BuildContext context,
-    PostFilterExprRelation relation,
-  ) {
-    return switch (relation) {
-      PostFilterExprRelation.and =>
-        PlatformX.isMaterial(context)
-            ? Icons.call_merge
-            : CupertinoIcons.arrow_merge,
-      PostFilterExprRelation.or =>
-        PlatformX.isMaterial(context)
-            ? Icons.call_split
-            : CupertinoIcons.arrow_branch,
-    };
-  }
-
-  // ======== EXPRESSION SUBJECT SELECTOR ========
 
   Widget _buildConditionSubjectSelector(
     BuildContext context,
@@ -632,7 +650,7 @@ class PostFilterBar extends StatelessWidget {
               value: field,
               child: _buildPopupAvatarItem(
                 context,
-                _conditionSubjectAvatar(context, field),
+                field.icon(context),
                 field.name,
               ),
             ),
@@ -643,34 +661,6 @@ class PostFilterBar extends StatelessWidget {
       autoOpen: cond.subject == null,
     );
   }
-
-  IconData _conditionSubjectAvatar(
-    BuildContext context,
-    PostFilterField field,
-  ) {
-    return switch (field) {
-      BooleanField _ =>
-        PlatformX.isMaterial(context)
-            ? Icons.toggle_on
-            : CupertinoIcons.plus_slash_minus,
-      NumberField _ =>
-        PlatformX.isMaterial(context) ? Icons.numbers : CupertinoIcons.number,
-      StringField _ =>
-        PlatformX.isMaterial(context)
-            ? Icons.abc
-            : CupertinoIcons.textformat_abc,
-      ArrayField _ =>
-        PlatformX.isMaterial(context)
-            ? Icons.data_array
-            : CupertinoIcons.list_bullet,
-      MapField _ =>
-        PlatformX.isMaterial(context)
-            ? Icons.data_object
-            : CupertinoIcons.collections,
-    };
-  }
-
-  // ======== EXPRESSION VERB SELECTOR ========
 
   Widget _buildConditionVerbSelector(
     BuildContext context,
@@ -694,8 +684,6 @@ class PostFilterBar extends StatelessWidget {
       ),
     );
   }
-
-  // ======== EXPRESSION OBJECT SELECTOR ========
 
   Widget _buildConditionObjectSelector(
     BuildContext context,
@@ -744,7 +732,7 @@ class PostFilterBar extends StatelessWidget {
     };
   }
 
-  // ======== WIDGET ========
+  // ======== WIDGETS ========
 
   Widget _buildTapChipButton(
     BuildContext context, {
