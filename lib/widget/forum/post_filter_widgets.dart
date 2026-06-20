@@ -629,8 +629,9 @@ class PostFilterBar extends StatelessWidget {
         : PostFilterExprRelation.and;
     return _buildTapChipButton(
       context,
-      label: '[${group.relation.name.toUpperCase()}]',
       onTap: () => controller.setRelation(group, nextRelation),
+      label: '[${group.relation.name.toUpperCase()}]',
+      icon: group.relation.icon(context),
     );
   }
 
@@ -641,8 +642,6 @@ class PostFilterBar extends StatelessWidget {
   ) {
     return _buildPopupChipButton<PostFilterField>(
       context,
-      label: cond.subject?.name ?? '',
-      initialValue: cond.subject,
       items: fields
           .whereNot((f) => f.shouldSkip)
           .map(
@@ -656,8 +655,11 @@ class PostFilterBar extends StatelessWidget {
             ),
           )
           .toList(growable: false),
+      initialValue: cond.subject,
       onSelected: (field) =>
           controller.replaceSlot(slot, PostFilterCondition.fromField(field)),
+      label: cond.subject?.name ?? '',
+      icon: cond.subject?.icon(context),
       autoOpen: cond.subject == null,
     );
   }
@@ -669,11 +671,10 @@ class PostFilterBar extends StatelessWidget {
   ) {
     return _buildPopupChipButton<PostFilterVerb>(
       context,
-      label: cond.verb.token,
-      initialValue: cond.verb,
       items: (cond.subject?.verbs ?? const [])
           .map((kind) => PopupMenuItem(value: kind, child: Text(kind.token)))
           .toList(growable: false),
+      initialValue: cond.verb,
       onSelected: (kind) => controller.replaceSlot(
         slot,
         PostFilterCondition(
@@ -682,6 +683,7 @@ class PostFilterBar extends StatelessWidget {
           object: cond.subject?.defaultObject(kind),
         ),
       ),
+      label: cond.verb.token,
     );
   }
 
@@ -697,7 +699,6 @@ class PostFilterBar extends StatelessWidget {
             false;
         return _buildTapChipButton(
           context,
-          label: currBool.toString(),
           onTap: () => controller.replaceSlot(
             slot,
             PostFilterCondition(
@@ -705,21 +706,21 @@ class PostFilterBar extends StatelessWidget {
               object: (!currBool).toString(),
             ),
           ),
+          label: currBool.toString(),
         );
       })(),
       StringField _ => _buildTapChipButton(
         context,
-        label: cond.object ?? '',
         onTap: () =>
             _showStringValueInputDialog(context, cond, cond.verb, slot),
+        label: cond.object ?? '',
       ),
       _ => _buildPopupChipButton<String>(
         context,
-        label: cond.object ?? '',
-        initialValue: cond.object,
         items: (cond.subject?.exampleObjects(cond.verb) ?? const [])
             .map((value) => PopupMenuItem(value: value, child: Text(value)))
             .toList(growable: false),
+        initialValue: cond.object,
         onSelected: (value) => controller.replaceSlot(
           slot,
           PostFilterCondition(
@@ -728,6 +729,7 @@ class PostFilterBar extends StatelessWidget {
             object: value,
           ),
         ),
+        label: cond.object ?? '',
       ),
     };
   }
@@ -736,10 +738,14 @@ class PostFilterBar extends StatelessWidget {
 
   Widget _buildTapChipButton(
     BuildContext context, {
-    required String label,
     required VoidCallback onTap,
+    required String label,
+    IconData? icon,
   }) {
-    return InkWell(onTap: onTap, child: _buildChipButton(context, label));
+    return InkWell(
+      onTap: onTap,
+      child: _buildChipButton(context, label, icon: icon),
+    );
   }
 
   Widget _buildPopupChipButton<T>(
@@ -749,9 +755,10 @@ class PostFilterBar extends StatelessWidget {
     required ValueChanged<T> onSelected,
     EdgeInsets padding = EdgeInsets.zero,
     required String label,
+    IconData? icon,
     bool autoOpen = false,
   }) {
-    final child = _buildChipButton(context, label);
+    final child = _buildChipButton(context, label, icon: icon);
     return autoOpen
         ? _AutoOpenPopupMenuButton<T>(
             items: items,
@@ -769,19 +776,35 @@ class PostFilterBar extends StatelessWidget {
           );
   }
 
-  Widget _buildChipButton(BuildContext context, String label) {
+  Widget _buildChipButton(
+    BuildContext context,
+    String label, {
+    IconData? icon,
+  }) {
     return Container(
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
       decoration: _chipDecoration(context),
-      child: Text(
-        label,
-        overflow: TextOverflow.ellipsis,
-        maxLines: 1,
-        textAlign: TextAlign.center,
-        style: Theme.of(
-          context,
-        ).textTheme.labelSmall?.copyWith(color: _chipContentColor(context)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 2),
+              child: Icon(icon, size: 12, color: _chipContentColor(context)),
+            ),
+          Flexible(
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: _chipContentColor(context),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
