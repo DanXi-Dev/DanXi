@@ -8,6 +8,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
+enum PostFilterExprRelation { and, or }
+
 enum PostFilterFieldType { boolean, number, string, array, map }
 
 class PostFilterField {
@@ -15,12 +17,57 @@ class PostFilterField {
   final PostFilterFieldType type;
 
   const PostFilterField(this.name, this.type);
-}
 
-const PostFilterField _emptyPostFilterField = PostFilterField(
-  '',
-  PostFilterFieldType.string,
-);
+  bool get shouldSkip => switch (type) {
+    PostFilterFieldType.array => true,
+    PostFilterFieldType.map => true,
+    _ => false,
+  };
+
+  List<PostFilterVerb> get verbs => switch (type) {
+    PostFilterFieldType.boolean => const [PostFilterVerb.eq],
+    PostFilterFieldType.number => const [
+      PostFilterVerb.lt,
+      PostFilterVerb.gt,
+      PostFilterVerb.le,
+      PostFilterVerb.ge,
+      PostFilterVerb.eq,
+      PostFilterVerb.ne,
+    ],
+    PostFilterFieldType.string => const [
+      PostFilterVerb.eq,
+      PostFilterVerb.ne,
+      PostFilterVerb.include,
+      PostFilterVerb.match,
+    ],
+    PostFilterFieldType.array => const [PostFilterVerb.include],
+    PostFilterFieldType.map => const [PostFilterVerb.eq, PostFilterVerb.ne],
+  };
+
+  String defaultObject(PostFilterVerb verb) {
+    if (verb == PostFilterVerb.match) return '/^/i';
+    return switch (type) {
+      PostFilterFieldType.boolean => 'true',
+      PostFilterFieldType.number => '0',
+      PostFilterFieldType.string ||
+      PostFilterFieldType.array ||
+      PostFilterFieldType.map => '""',
+    };
+  }
+
+  List<String> exampleObjects(PostFilterVerb verb) {
+    if (verb == PostFilterVerb.match) {
+      return const [r'/keyword/i', r'/^keyword/i', r'/keyword$/i'];
+    }
+    return switch (type) {
+      PostFilterFieldType.boolean => const ['true', 'false'],
+      PostFilterFieldType.number => const ['0', '1', '-1', '10'],
+      PostFilterFieldType.string => const ['"keyword"', '""'],
+      PostFilterFieldType.array => const [],
+      PostFilterFieldType.map => const [],
+    };
+  }
+}
 
 const List<PostFilterField> postFilterHoleFieldNames = [
   PostFilterField('hole', PostFilterFieldType.map),
@@ -67,7 +114,21 @@ const List<PostFilterField> postFilterFloorFieldNames = [
   PostFilterField('mention', PostFilterFieldType.array),
 ];
 
-enum PostFilterExprRelation { and, or }
+enum PostFilterVerb {
+  lt(token: '<'),
+  gt(token: '>'),
+  le(token: '<='),
+  ge(token: '>='),
+  eq(token: '==='),
+  ne(token: '!=='),
+  include(token: 'includes', isOperator: false),
+  match(token: 'match', isOperator: false);
+
+  const PostFilterVerb({required this.token, this.isOperator = true});
+
+  final String token;
+  final bool isOperator;
+}
 
 sealed class PostFilterExpr {
   const PostFilterExpr();
@@ -109,93 +170,39 @@ class PostFilterGroup extends PostFilterExpr {
   }
 }
 
-sealed class PostFilterCondition extends PostFilterExpr {
-  final PostFilterField? subjectField;
-  final String? objectString;
+class PostFilterCondition extends PostFilterExpr {
+  final PostFilterField? subject;
+  final PostFilterVerb verb;
+  final String? object;
 
-  const PostFilterCondition(this.subjectField, this.objectString);
+  const PostFilterCondition({
+    this.subject,
+    this.verb = PostFilterVerb.eq,
+    this.object,
+  });
 
-  String get verb;
+  const PostFilterCondition.empty() : this();
+
+  factory PostFilterCondition.fromField(
+    PostFilterField field, [
+    PostFilterVerb verb = PostFilterVerb.eq,
+  ]) {
+    return PostFilterCondition(
+      subject: field,
+      verb: verb,
+      object: field.defaultObject(verb),
+    );
+  }
 
   @override
-  String toJs() => toInfixJs();
-
-  @protected
-  String toInfixJs() => switch ((subjectField, objectString)) {
-    (final s?, final o?) => '${s.name} $verb $o',
-    _ => 'false',
-  };
-
-  @protected
-  String toMethodJs() => switch ((subjectField, objectString)) {
-    (final s?, final o?) => '${s.name}.$verb($o)',
-    _ => 'false',
-  };
+  String toJs() {
+    return switch ((subject, verb.isOperator, object)) {
+      (final s?, false, final o?) => '${s.name}.${verb.token}($o)',
+      (final s?, true, final o?) => '${s.name} ${verb.token} ($o)',
+      (null, _, _) || (_, _, null) => 'false',
+    };
+  }
 }
-
-class LtExpr extends PostFilterCondition {
-  const LtExpr(super.field, super.value);
-
-  @override
-  String get verb => '<';
-}
-
-class GtExpr extends PostFilterCondition {
-  const GtExpr(super.field, super.value);
-
-  @override
-  String get verb => '>';
-}
-
-class LeExpr extends PostFilterCondition {
-  const LeExpr(super.field, super.value);
-
-  @override
-  String get verb => '<=';
-}
-
-class GeExpr extends PostFilterCondition {
-  const GeExpr(super.field, super.value);
-
-  @override
-  String get verb => '>=';
-}
-
-class EqExpr extends PostFilterCondition {
-  const EqExpr(super.field, super.value);
-
-  @override
-  String get verb => '===';
-}
-
-class NeExpr extends PostFilterCondition {
-  const NeExpr(super.field, super.value);
-
-  @override
-  String get verb => '!==';
-}
-
-class IncludeExpr extends PostFilterCondition {
-  const IncludeExpr(super.field, super.value);
-
-  @override
-  String get verb => 'includes';
-
-  @override
-  String toJs() => toMethodJs();
-}
-
-class MatchExpr extends PostFilterCondition {
-  const MatchExpr(super.field, super.value);
-
-  @override
-  String get verb => 'match';
-
-  @override
-  String toJs() => toMethodJs();
-}
-
-enum _ExprKind { lt, gt, le, ge, eq, ne, include, match }
 
 class PostFilterRawCondition extends PostFilterExpr {
   final String raw;
@@ -444,7 +451,7 @@ class PostFilterBar extends StatelessWidget {
         children: [
           Expanded(child: _buildExprSubjectSelector(context, cond, slot)),
           const SizedBox(width: 4),
-          if (cond.subjectField?.type == PostFilterFieldType.boolean)
+          if (cond.subject?.type == PostFilterFieldType.boolean)
             Text('is', style: _labelSmallStyle(context))
           else
             _buildExprVerbSelector(context, cond, slot),
@@ -508,7 +515,7 @@ class PostFilterBar extends StatelessWidget {
                   context,
                   group,
                   'Field expression',
-                  _createEmptyFieldExpr,
+                  PostFilterCondition.empty,
                 ),
                 _buildAddExprListTile(
                   context,
@@ -595,9 +602,9 @@ class PostFilterBar extends StatelessWidget {
     return _buildPopupChipButton<PostFilterField>(
       context,
       label: _conditionSubjectLabel(cond),
-      initialValue: cond.subjectField,
+      initialValue: cond.subject,
       items: fields
-          .whereNot(_shouldSkipField)
+          .whereNot((f) => f.shouldSkip)
           .map(
             (field) => PopupMenuItem(
               value: field,
@@ -610,20 +617,20 @@ class PostFilterBar extends StatelessWidget {
           )
           .toList(growable: false),
       onSelected: (field) =>
-          controller.replaceSlot(slot, _createExpr(_ExprKind.eq, field)),
-      autoOpen: cond.subjectField == null,
+          controller.replaceSlot(slot, PostFilterCondition.fromField(field)),
+      autoOpen: cond.subject == null,
     );
   }
 
   String _conditionSubjectLabel(PostFilterCondition cond) {
-    return cond.subjectField?.name ?? '';
+    return cond.subject?.name ?? '';
   }
 
   IconData _conditionSubjectAvatar(
     BuildContext context,
     PostFilterCondition cond,
   ) {
-    return switch (cond.subjectField?.type) {
+    return switch (cond.subject?.type) {
       PostFilterFieldType.boolean =>
         PlatformX.isMaterial(context)
             ? Icons.toggle_on
@@ -656,22 +663,19 @@ class PostFilterBar extends StatelessWidget {
     PostFilterCondition cond,
     PostFilterSlot slot,
   ) {
-    return _buildPopupChipButton<_ExprKind>(
+    return _buildPopupChipButton<PostFilterVerb>(
       context,
-      label: cond.verb,
-      initialValue: _kindFromExpr(cond),
-      items: _conditionVerbOptions(cond)
-          .map(
-            (kind) =>
-                PopupMenuItem(value: kind, child: Text(_operatorLabel(kind))),
-          )
+      label: cond.verb.token,
+      initialValue: cond.verb,
+      items: (cond.subject?.verbs ?? const [])
+          .map((kind) => PopupMenuItem(value: kind, child: Text(kind.token)))
           .toList(growable: false),
       onSelected: (kind) => controller.replaceSlot(
         slot,
-        _createExprWithValue(
-          kind,
-          cond.subjectField,
-          cond.subjectField?.apply((s) => _defaultValue(s, kind)),
+        PostFilterCondition(
+          subject: cond.subject,
+          verb: kind,
+          object: cond.subject?.defaultObject(kind),
         ),
       ),
     );
@@ -684,40 +688,43 @@ class PostFilterBar extends StatelessWidget {
     PostFilterCondition cond,
     PostFilterSlot slot,
   ) {
-    return switch (cond.subjectField?.type) {
-      PostFilterFieldType.boolean => _buildTapChipButton(
-        context,
-        label: cond.objectString ?? '',
-        onTap: () {
-          final currBool =
-              bool.tryParse(cond.objectString ?? '', caseSensitive: false) ??
-              false;
-          controller.replaceSlot(
+    return switch (cond.subject?.type) {
+      PostFilterFieldType.boolean => (() {
+        final currBool =
+            cond.object?.apply((o) => bool.tryParse(o, caseSensitive: false)) ??
+            false;
+        return _buildTapChipButton(
+          context,
+          label: currBool.toString(),
+          onTap: () => controller.replaceSlot(
             slot,
-            EqExpr(cond.subjectField, (!currBool).toString()),
-          );
-        },
-      ),
+            PostFilterCondition(
+              subject: cond.subject,
+              object: (!currBool).toString(),
+            ),
+          ),
+        );
+      })(),
       PostFilterFieldType.string => _buildTapChipButton(
         context,
-        label: cond.objectString ?? '',
-        onTap: () => _showStringValueInputDialog(
-          context,
-          cond,
-          _kindFromExpr(cond),
-          slot,
-        ),
+        label: cond.object ?? '',
+        onTap: () =>
+            _showStringValueInputDialog(context, cond, cond.verb, slot),
       ),
       _ => _buildPopupChipButton<String>(
         context,
-        label: cond.objectString ?? '',
-        initialValue: cond.objectString,
-        items: _valueOptions(cond.subjectField, _kindFromExpr(cond))
+        label: cond.object ?? '',
+        initialValue: cond.object,
+        items: (cond.subject?.exampleObjects(cond.verb) ?? const [])
             .map((value) => PopupMenuItem(value: value, child: Text(value)))
             .toList(growable: false),
         onSelected: (value) => controller.replaceSlot(
           slot,
-          _createExprWithValue(_kindFromExpr(cond), cond.subjectField, value),
+          PostFilterCondition(
+            subject: cond.subject,
+            verb: cond.verb,
+            object: value,
+          ),
         ),
       ),
     };
@@ -780,23 +787,23 @@ class PostFilterBar extends StatelessWidget {
   Future<void> _showStringValueInputDialog(
     BuildContext context,
     PostFilterCondition cond,
-    _ExprKind kind,
+    PostFilterVerb kind,
     PostFilterSlot slot,
   ) async {
     final prompt = switch (kind) {
-      _ExprKind.eq => 'Exact value',
-      _ExprKind.ne => 'Exclude value',
-      _ExprKind.include => 'Substring',
-      _ExprKind.match => 'Regex pattern',
+      PostFilterVerb.eq => 'Exact value',
+      PostFilterVerb.ne => 'Exclude value',
+      PostFilterVerb.include => 'Substring',
+      PostFilterVerb.match => 'Regex pattern',
       _ => 'Unknown verb',
     };
     final example = switch (kind) {
-      _ExprKind.eq || _ExprKind.ne => '"content"',
-      _ExprKind.include => '"keyword"',
-      _ExprKind.match => '/regex/i',
+      PostFilterVerb.eq || PostFilterVerb.ne => '"content"',
+      PostFilterVerb.include => '"keyword"',
+      PostFilterVerb.match => '/regex/i',
       _ => '',
     };
-    final textController = TextEditingController(text: cond.objectString);
+    final textController = TextEditingController(text: cond.object);
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
@@ -828,7 +835,7 @@ class PostFilterBar extends StatelessWidget {
     if (result != null) {
       controller.replaceSlot(
         slot,
-        _createExprWithValue(kind, cond.subjectField, result),
+        PostFilterCondition(subject: cond.subject, verb: kind, object: result),
       );
     }
   }
@@ -879,117 +886,6 @@ class PostFilterBar extends StatelessWidget {
 
   TextStyle? _labelSmallStyle(BuildContext context) {
     return Theme.of(context).textTheme.labelSmall;
-  }
-
-  // ======== DATA ========
-
-  PostFilterExpr _createExpr(_ExprKind kind, PostFilterField field) {
-    return _createExprWithValue(kind, field, _defaultValue(field, kind));
-  }
-
-  PostFilterExpr _createEmptyFieldExpr() {
-    return _createExpr(_ExprKind.eq, _emptyPostFilterField);
-  }
-
-  PostFilterExpr _createExprWithValue(
-    _ExprKind kind,
-    PostFilterField? field,
-    String? value,
-  ) {
-    return switch (kind) {
-      _ExprKind.lt => LtExpr(field, value),
-      _ExprKind.gt => GtExpr(field, value),
-      _ExprKind.le => LeExpr(field, value),
-      _ExprKind.ge => GeExpr(field, value),
-      _ExprKind.eq => EqExpr(field, value),
-      _ExprKind.ne => NeExpr(field, value),
-      _ExprKind.include => IncludeExpr(field, value),
-      _ExprKind.match => MatchExpr(field, value),
-    };
-  }
-
-  _ExprKind _kindFromExpr(PostFilterCondition expr) {
-    return switch (expr) {
-      LtExpr _ => _ExprKind.lt,
-      GtExpr _ => _ExprKind.gt,
-      LeExpr _ => _ExprKind.le,
-      GeExpr _ => _ExprKind.ge,
-      EqExpr _ => _ExprKind.eq,
-      NeExpr _ => _ExprKind.ne,
-      IncludeExpr _ => _ExprKind.include,
-      MatchExpr _ => _ExprKind.match,
-    };
-  }
-
-  bool _shouldSkipField(PostFilterField field) {
-    return switch (field.type) {
-      PostFilterFieldType.array => true,
-      PostFilterFieldType.map => true,
-      _ => false,
-    };
-  }
-
-  List<_ExprKind> _conditionVerbOptions(PostFilterCondition cond) {
-    return switch (cond.subjectField?.type) {
-      PostFilterFieldType.boolean => const [_ExprKind.eq],
-      PostFilterFieldType.number => const [
-        _ExprKind.lt,
-        _ExprKind.gt,
-        _ExprKind.le,
-        _ExprKind.ge,
-        _ExprKind.eq,
-        _ExprKind.ne,
-      ],
-      PostFilterFieldType.string => const [
-        _ExprKind.eq,
-        _ExprKind.ne,
-        _ExprKind.include,
-        _ExprKind.match,
-      ],
-      PostFilterFieldType.array => const [_ExprKind.include],
-      PostFilterFieldType.map => const [_ExprKind.eq, _ExprKind.ne],
-      null => const [],
-    };
-  }
-
-  String _operatorLabel(_ExprKind kind) {
-    return switch (kind) {
-      _ExprKind.lt => '<',
-      _ExprKind.gt => '>',
-      _ExprKind.le => '<=',
-      _ExprKind.ge => '>=',
-      _ExprKind.eq => '===',
-      _ExprKind.ne => '!==',
-      _ExprKind.include => 'includes',
-      _ExprKind.match => 'match',
-    };
-  }
-
-  String _defaultValue(PostFilterField field, _ExprKind kind) {
-    if (kind == _ExprKind.match) {
-      return '//i';
-    }
-    return switch (field.type) {
-      PostFilterFieldType.boolean => 'true',
-      PostFilterFieldType.number => '0',
-      PostFilterFieldType.string => '""',
-      PostFilterFieldType.array => '""',
-      PostFilterFieldType.map => '""',
-    };
-  }
-
-  List<String> _valueOptions(PostFilterField? field, _ExprKind kind) {
-    if (kind == _ExprKind.match) {
-      return const [r'/keyword/i', r'/^keyword/i', r'/keyword$/i'];
-    }
-    return switch (field?.type) {
-      PostFilterFieldType.boolean => const ['true', 'false'],
-      PostFilterFieldType.number => const ['0', '1', '-1', '10'],
-      PostFilterFieldType.string => const ['"keyword"', '""'],
-      PostFilterFieldType.array => const ['"keyword"', '0'],
-      PostFilterFieldType.map => const ['"keyword"', 'null'],
-      null => const [],
-    };
   }
 }
 
