@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:dan_xi/model/forum/floor.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/util/forum/post_filter_js_runtime.dart';
@@ -109,108 +110,89 @@ class PostFilterGroup extends PostFilterExpr {
 }
 
 sealed class PostFilterCondition extends PostFilterExpr {
-  final PostFilterField field;
-  final String value;
+  final PostFilterField? subjectField;
+  final String? objectString;
 
-  const PostFilterCondition(this.field, this.value);
+  const PostFilterCondition(this.subjectField, this.objectString);
 
-  String get operatorLabel;
-
-  String get jsOperator;
+  String get verb;
 
   @override
-  String get label => '${field.name} $operatorLabel $value';
+  String toJs() => toInfixJs();
 
-  @override
-  String toJs() =>
-      field.name.isEmpty ? 'false' : '${field.name} $jsOperator $value';
+  @protected
+  String toInfixJs() => switch ((subjectField, objectString)) {
+    (final s?, final o?) => '${s.name} $verb $o',
+    _ => 'false',
+  };
+
+  @protected
+  String toMethodJs() => switch ((subjectField, objectString)) {
+    (final s?, final o?) => '${s.name}.$verb($o)',
+    _ => 'false',
+  };
 }
 
 class LtExpr extends PostFilterCondition {
   const LtExpr(super.field, super.value);
 
   @override
-  String get operatorLabel => '<';
-
-  @override
-  String get jsOperator => '<';
+  String get verb => '<';
 }
 
 class GtExpr extends PostFilterCondition {
   const GtExpr(super.field, super.value);
 
   @override
-  String get operatorLabel => '>';
-
-  @override
-  String get jsOperator => '>';
+  String get verb => '>';
 }
 
 class LeExpr extends PostFilterCondition {
   const LeExpr(super.field, super.value);
 
   @override
-  String get operatorLabel => '<=';
-
-  @override
-  String get jsOperator => '<=';
+  String get verb => '<=';
 }
 
 class GeExpr extends PostFilterCondition {
   const GeExpr(super.field, super.value);
 
   @override
-  String get operatorLabel => '>=';
-
-  @override
-  String get jsOperator => '>=';
+  String get verb => '>=';
 }
 
 class EqExpr extends PostFilterCondition {
   const EqExpr(super.field, super.value);
 
   @override
-  String get operatorLabel => '===';
-
-  @override
-  String get jsOperator => '===';
+  String get verb => '===';
 }
 
 class NeExpr extends PostFilterCondition {
   const NeExpr(super.field, super.value);
 
   @override
-  String get operatorLabel => '!==';
-
-  @override
-  String get jsOperator => '!==';
+  String get verb => '!==';
 }
 
 class IncludeExpr extends PostFilterCondition {
   const IncludeExpr(super.field, super.value);
 
   @override
-  String get operatorLabel => 'includes';
+  String get verb => 'includes';
 
   @override
-  String get jsOperator => '';
-
-  @override
-  String toJs() =>
-      field.name.isEmpty ? 'false' : '${field.name}.includes($value)';
+  String toJs() => toMethodJs();
 }
 
 class MatchExpr extends PostFilterCondition {
   const MatchExpr(super.field, super.value);
 
   @override
-  String get operatorLabel => 'match';
+  String get verb => 'match';
 
   @override
-  String get jsOperator => '';
-
-  @override
-  String toJs() => field.name.isEmpty ? 'false' : '${field.name}.match($value)';
+  String toJs() => toMethodJs();
 }
 
 enum _ExprKind { lt, gt, le, ge, eq, ne, include, match }
@@ -390,14 +372,14 @@ class PostFilterBar extends StatelessWidget {
           _buildGroupExprHeader(context, group, slot: slot),
           ...group.slots.map(
             (childSlot) => switch (childSlot.expr) {
-              PostFilterGroup groupExpr => _buildGroupExpr(
+              PostFilterGroup childGroup => _buildGroupExpr(
                 context,
-                groupExpr,
+                childGroup,
                 slot: childSlot,
               ),
-              PostFilterCondition fieldExpr => _buildFieldExprRow(
+              PostFilterCondition cond => _buildConditionExprRow(
                 context,
-                fieldExpr,
+                cond,
                 childSlot,
               ),
             },
@@ -438,9 +420,9 @@ class PostFilterBar extends StatelessWidget {
     );
   }
 
-  Widget _buildFieldExprRow(
+  Widget _buildConditionExprRow(
     BuildContext context,
-    PostFilterCondition expr,
+    PostFilterCondition cond,
     PostFilterSlot slot,
   ) {
     return Container(
@@ -449,14 +431,14 @@ class PostFilterBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Row(
         children: [
-          Expanded(child: _buildExprSubjectSelector(context, expr, slot)),
+          Expanded(child: _buildExprSubjectSelector(context, cond, slot)),
           const SizedBox(width: 4),
-          if (expr.field.type == PostFilterFieldType.boolean)
+          if (cond.subjectField?.type == PostFilterFieldType.boolean)
             Text('is', style: _labelSmallStyle(context))
           else
-            _buildExprVerbSelector(context, expr, slot),
+            _buildExprVerbSelector(context, cond, slot),
           const SizedBox(width: 4),
-          Expanded(child: _buildExprObjectSelector(context, expr, slot)),
+          Expanded(child: _buildExprObjectSelector(context, cond, slot)),
           const SizedBox(width: 4),
           _buildCloseButton(context, slot),
         ],
@@ -596,40 +578,41 @@ class PostFilterBar extends StatelessWidget {
 
   Widget _buildExprSubjectSelector(
     BuildContext context,
-    PostFilterCondition expr,
+    PostFilterCondition cond,
     PostFilterSlot slot,
   ) {
     return _buildPopupChipButton<PostFilterField>(
       context,
-      label: _exprSubjectLabel(expr.field),
-      initialValue: expr.field,
+      label: _conditionSubjectLabel(cond),
+      initialValue: cond.subjectField,
       items: fields
-          .where((f) => !_shouldSkipField(f))
+          .whereNot(_shouldSkipField)
           .map(
             (field) => PopupMenuItem(
               value: field,
               child: _buildPopupAvatarItem(
                 context,
-                _exprSubjectAvatar(context, field),
-                _exprSubjectLabel(field),
+                _conditionSubjectAvatar(context, cond),
+                _conditionSubjectLabel(cond),
               ),
             ),
           )
           .toList(growable: false),
-      onSelected: (field) => controller.replaceSlot(
-        slot,
-        _createExpr(_defaultKindForField(field), field),
-      ),
-      autoOpen: expr.field.name.isEmpty,
+      onSelected: (field) =>
+          controller.replaceSlot(slot, _createExpr(_ExprKind.eq, field)),
+      autoOpen: cond.subjectField == null,
     );
   }
 
-  String _exprSubjectLabel(PostFilterField field) {
-    return field.name.isEmpty ? 'Field' : field.name;
+  String _conditionSubjectLabel(PostFilterCondition cond) {
+    return cond.subjectField?.name ?? '';
   }
 
-  IconData _exprSubjectAvatar(BuildContext context, PostFilterField field) {
-    return switch (field.type) {
+  IconData _conditionSubjectAvatar(
+    BuildContext context,
+    PostFilterCondition cond,
+  ) {
+    return switch (cond.subjectField?.type) {
       PostFilterFieldType.boolean =>
         PlatformX.isMaterial(context)
             ? Icons.toggle_on
@@ -648,6 +631,10 @@ class PostFilterBar extends StatelessWidget {
         PlatformX.isMaterial(context)
             ? Icons.data_object
             : CupertinoIcons.collections,
+      null =>
+        PlatformX.isMaterial(context)
+            ? Icons.question_mark
+            : CupertinoIcons.question,
     };
   }
 
@@ -655,17 +642,14 @@ class PostFilterBar extends StatelessWidget {
 
   Widget _buildExprVerbSelector(
     BuildContext context,
-    PostFilterCondition expr,
+    PostFilterCondition cond,
     PostFilterSlot slot,
   ) {
-    if (expr.field.name.isEmpty) {
-      return _buildChipLabel(context, 'Method');
-    }
     return _buildPopupChipButton<_ExprKind>(
       context,
-      label: expr.operatorLabel,
-      initialValue: _kindFromExpr(expr),
-      items: _methodOptions(expr.field)
+      label: cond.verb,
+      initialValue: _kindFromExpr(cond),
+      items: _conditionVerbOptions(cond)
           .map(
             (kind) =>
                 PopupMenuItem(value: kind, child: Text(_operatorLabel(kind))),
@@ -673,7 +657,11 @@ class PostFilterBar extends StatelessWidget {
           .toList(growable: false),
       onSelected: (kind) => controller.replaceSlot(
         slot,
-        _createExprWithValue(kind, expr.field, _defaultValue(expr.field, kind)),
+        _createExprWithValue(
+          kind,
+          cond.subjectField,
+          cond.subjectField?.apply((s) => _defaultValue(s, kind)),
+        ),
       ),
     );
   }
@@ -682,42 +670,43 @@ class PostFilterBar extends StatelessWidget {
 
   Widget _buildExprObjectSelector(
     BuildContext context,
-    PostFilterCondition expr,
+    PostFilterCondition cond,
     PostFilterSlot slot,
   ) {
-    return switch (expr.field.type) {
+    return switch (cond.subjectField?.type) {
       PostFilterFieldType.boolean => _buildTapChipButton(
         context,
-        label: expr.value,
+        label: cond.objectString ?? '',
         onTap: () {
           final currBool =
-              bool.tryParse(expr.value, caseSensitive: false) ?? false;
+              bool.tryParse(cond.objectString ?? '', caseSensitive: false) ??
+              false;
           controller.replaceSlot(
             slot,
-            EqExpr(expr.field, (!currBool).toString()),
+            EqExpr(cond.subjectField, (!currBool).toString()),
           );
         },
       ),
       PostFilterFieldType.string => _buildTapChipButton(
         context,
-        label: expr.value,
+        label: cond.objectString ?? '',
         onTap: () => _showStringValueInputDialog(
           context,
-          expr,
-          _kindFromExpr(expr),
+          cond,
+          _kindFromExpr(cond),
           slot,
         ),
       ),
       _ => _buildPopupChipButton<String>(
         context,
-        label: expr.value,
-        initialValue: expr.value,
-        items: _valueOptions(expr.field, _kindFromExpr(expr))
+        label: cond.objectString ?? '',
+        initialValue: cond.objectString,
+        items: _valueOptions(cond.subjectField, _kindFromExpr(cond))
             .map((value) => PopupMenuItem(value: value, child: Text(value)))
             .toList(growable: false),
         onSelected: (value) => controller.replaceSlot(
           slot,
-          _createExprWithValue(_kindFromExpr(expr), expr.field, value),
+          _createExprWithValue(_kindFromExpr(cond), cond.subjectField, value),
         ),
       ),
     };
@@ -730,34 +719,37 @@ class PostFilterBar extends StatelessWidget {
     required String label,
     required VoidCallback onTap,
   }) {
-    return InkWell(onTap: onTap, child: _buildChipChild(context, label));
+    return InkWell(onTap: onTap, child: _buildChipButton(context, label));
   }
 
   Widget _buildPopupChipButton<T>(
     BuildContext context, {
-    required String label,
-    required T initialValue,
     required List<PopupMenuEntry<T>> items,
+    required T? initialValue,
     required ValueChanged<T> onSelected,
+    EdgeInsets padding = EdgeInsets.zero,
+    required String label,
     bool autoOpen = false,
   }) {
-    final child = _buildChipChild(context, label);
+    final child = _buildChipButton(context, label);
     return autoOpen
         ? _AutoOpenPopupMenuButton<T>(
-            initialValue: initialValue,
             items: items,
+            initialValue: initialValue,
             onSelected: onSelected,
+            padding: padding,
             child: child,
           )
-        : _buildPopupMenuButton<T>(
+        : PopupMenuButton<T>(
+            itemBuilder: (_) => items,
             initialValue: initialValue,
-            items: items,
             onSelected: onSelected,
+            padding: padding,
             child: child,
           );
   }
 
-  Widget _buildChipChild(BuildContext context, String label) {
+  Widget _buildChipButton(BuildContext context, String label) {
     return Container(
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
@@ -776,7 +768,7 @@ class PostFilterBar extends StatelessWidget {
 
   Future<void> _showStringValueInputDialog(
     BuildContext context,
-    PostFilterCondition expr,
+    PostFilterCondition cond,
     _ExprKind kind,
     PostFilterSlot slot,
   ) async {
@@ -793,7 +785,7 @@ class PostFilterBar extends StatelessWidget {
       _ExprKind.match => '/regex/i',
       _ => '',
     };
-    final textController = TextEditingController(text: expr.value);
+    final textController = TextEditingController(text: cond.objectString);
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
@@ -825,7 +817,7 @@ class PostFilterBar extends StatelessWidget {
     if (result != null) {
       controller.replaceSlot(
         slot,
-        _createExprWithValue(kind, expr.field, result),
+        _createExprWithValue(kind, cond.subjectField, result),
       );
     }
   }
@@ -850,23 +842,6 @@ class PostFilterBar extends StatelessWidget {
         const SizedBox(width: 4),
         Text(name),
       ],
-    );
-  }
-
-  Widget _buildChipLabel(BuildContext context, String label) {
-    return Container(
-      alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-      decoration: _chipDecoration(context),
-      child: Text(
-        label,
-        overflow: TextOverflow.ellipsis,
-        maxLines: 1,
-        textAlign: TextAlign.center,
-        style: Theme.of(
-          context,
-        ).textTheme.labelSmall?.copyWith(color: _chipContentColor(context)),
-      ),
     );
   }
 
@@ -907,8 +882,8 @@ class PostFilterBar extends StatelessWidget {
 
   PostFilterExpr _createExprWithValue(
     _ExprKind kind,
-    PostFilterField field,
-    String value,
+    PostFilterField? field,
+    String? value,
   ) {
     return switch (kind) {
       _ExprKind.lt => LtExpr(field, value),
@@ -935,16 +910,6 @@ class PostFilterBar extends StatelessWidget {
     };
   }
 
-  _ExprKind _defaultKindForField(PostFilterField field) {
-    return switch (field.type) {
-      PostFilterFieldType.boolean => _ExprKind.eq,
-      PostFilterFieldType.number => _ExprKind.eq,
-      PostFilterFieldType.string => _ExprKind.eq,
-      PostFilterFieldType.array => _ExprKind.eq,
-      PostFilterFieldType.map => _ExprKind.eq,
-    };
-  }
-
   bool _shouldSkipField(PostFilterField field) {
     return switch (field.type) {
       PostFilterFieldType.array => true,
@@ -953,8 +918,8 @@ class PostFilterBar extends StatelessWidget {
     };
   }
 
-  List<_ExprKind> _methodOptions(PostFilterField field) {
-    return switch (field.type) {
+  List<_ExprKind> _conditionVerbOptions(PostFilterCondition cond) {
+    return switch (cond.subjectField?.type) {
       PostFilterFieldType.boolean => const [_ExprKind.eq],
       PostFilterFieldType.number => const [
         _ExprKind.lt,
@@ -972,6 +937,7 @@ class PostFilterBar extends StatelessWidget {
       ],
       PostFilterFieldType.array => const [_ExprKind.include],
       PostFilterFieldType.map => const [_ExprKind.eq, _ExprKind.ne],
+      null => const [],
     };
   }
 
@@ -990,59 +956,45 @@ class PostFilterBar extends StatelessWidget {
 
   String _defaultValue(PostFilterField field, _ExprKind kind) {
     if (kind == _ExprKind.match) {
-      return '/keyword/i';
+      return '//i';
     }
     return switch (field.type) {
       PostFilterFieldType.boolean => 'true',
       PostFilterFieldType.number => '0',
-      PostFilterFieldType.string => '"keyword"',
-      PostFilterFieldType.array => '"keyword"',
-      PostFilterFieldType.map => '"keyword"',
+      PostFilterFieldType.string => '""',
+      PostFilterFieldType.array => '""',
+      PostFilterFieldType.map => '""',
     };
   }
 
-  List<String> _valueOptions(PostFilterField field, _ExprKind kind) {
+  List<String> _valueOptions(PostFilterField? field, _ExprKind kind) {
     if (kind == _ExprKind.match) {
       return const [r'/keyword/i', r'/^keyword/i', r'/keyword$/i'];
     }
-    return switch (field.type) {
+    return switch (field?.type) {
       PostFilterFieldType.boolean => const ['true', 'false'],
       PostFilterFieldType.number => const ['0', '1', '-1', '10'],
       PostFilterFieldType.string => const ['"keyword"', '""'],
       PostFilterFieldType.array => const ['"keyword"', '0'],
       PostFilterFieldType.map => const ['"keyword"', 'null'],
+      null => const [],
     };
   }
 }
 
-PopupMenuButton<T> _buildPopupMenuButton<T>({
-  Key? key,
-  required T initialValue,
-  required List<PopupMenuEntry<T>> items,
-  required ValueChanged<T> onSelected,
-  required Widget child,
-}) {
-  return PopupMenuButton<T>(
-    key: key,
-    padding: EdgeInsets.zero,
-    initialValue: initialValue,
-    onSelected: onSelected,
-    itemBuilder: (context) => items,
-    child: child,
-  );
-}
-
 class _AutoOpenPopupMenuButton<T> extends StatefulWidget {
-  final Widget child;
-  final T initialValue;
   final List<PopupMenuEntry<T>> items;
+  final T? initialValue;
   final ValueChanged<T> onSelected;
+  final EdgeInsets padding;
+  final Widget child;
 
   const _AutoOpenPopupMenuButton({
-    required this.child,
-    required this.initialValue,
     required this.items,
+    required this.initialValue,
     required this.onSelected,
+    required this.padding,
+    required this.child,
   });
 
   @override
@@ -1068,11 +1020,12 @@ class _AutoOpenPopupMenuButtonState<T>
 
   @override
   Widget build(BuildContext context) {
-    return _buildPopupMenuButton<T>(
+    return PopupMenuButton<T>(
       key: _key,
+      itemBuilder: (_) => widget.items,
       initialValue: widget.initialValue,
-      items: widget.items,
       onSelected: widget.onSelected,
+      padding: widget.padding,
       child: widget.child,
     );
   }
