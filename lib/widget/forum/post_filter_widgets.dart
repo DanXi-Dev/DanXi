@@ -197,6 +197,15 @@ class MatchExpr extends PostFilterCondition {
 
 enum _ExprKind { lt, gt, le, ge, eq, ne, include, match }
 
+class PostFilterRawCondition extends PostFilterExpr {
+  final String raw;
+
+  const PostFilterRawCondition(this.raw);
+
+  @override
+  String toJs() => raw;
+}
+
 class PostFilterController extends ChangeNotifier {
   final PostFilterGroup root = PostFilterGroup.and();
 
@@ -382,6 +391,8 @@ class PostFilterBar extends StatelessWidget {
                 cond,
                 childSlot,
               ),
+              // TODO: Implement it.
+              PostFilterRawCondition rawCond => Text(rawCond.raw),
             },
           ),
           _buildGroupAddButton(context, group),
