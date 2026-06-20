@@ -475,14 +475,14 @@ class PostFilterBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Row(
         children: [
-          Expanded(child: _buildExprSubjectSelector(context, cond, slot)),
+          Expanded(child: _buildConditionSubjectSelector(context, cond, slot)),
           const SizedBox(width: 4),
           if (cond.subject is BooleanField)
             Text('is', style: _labelSmallStyle(context))
           else
-            _buildExprVerbSelector(context, cond, slot),
+            _buildConditionVerbSelector(context, cond, slot),
           const SizedBox(width: 4),
-          Expanded(child: _buildExprObjectSelector(context, cond, slot)),
+          Expanded(child: _buildConditionObjectSelector(context, cond, slot)),
           const SizedBox(width: 4),
           _buildCloseButton(context, slot),
         ],
@@ -590,13 +590,9 @@ class PostFilterBar extends StatelessWidget {
         : PostFilterExprRelation.and;
     return _buildTapChipButton(
       context,
-      label: _groupRelationLabel(group.relation),
+      label: '[${group.relation.name.toUpperCase()}]',
       onTap: () => controller.setRelation(group, nextRelation),
     );
-  }
-
-  String _groupRelationLabel(PostFilterExprRelation relation) {
-    return '[${relation.name.toUpperCase()}]';
   }
 
   // TODO: Unused, and this could be used as icons for chips later. If you are a
@@ -620,14 +616,14 @@ class PostFilterBar extends StatelessWidget {
 
   // ======== EXPRESSION SUBJECT SELECTOR ========
 
-  Widget _buildExprSubjectSelector(
+  Widget _buildConditionSubjectSelector(
     BuildContext context,
     PostFilterCondition cond,
     PostFilterSlot slot,
   ) {
     return _buildPopupChipButton<PostFilterField>(
       context,
-      label: _conditionSubjectLabel(cond),
+      label: cond.subject?.name ?? '',
       initialValue: cond.subject,
       items: fields
           .whereNot((f) => f.shouldSkip)
@@ -636,8 +632,8 @@ class PostFilterBar extends StatelessWidget {
               value: field,
               child: _buildPopupAvatarItem(
                 context,
-                _conditionSubjectAvatar(context, cond),
-                _conditionSubjectLabel(cond),
+                _conditionSubjectAvatar(context, field),
+                field.name,
               ),
             ),
           )
@@ -648,15 +644,11 @@ class PostFilterBar extends StatelessWidget {
     );
   }
 
-  String _conditionSubjectLabel(PostFilterCondition cond) {
-    return cond.subject?.name ?? '';
-  }
-
   IconData _conditionSubjectAvatar(
     BuildContext context,
-    PostFilterCondition cond,
+    PostFilterField field,
   ) {
-    return switch (cond.subject) {
+    return switch (field) {
       BooleanField _ =>
         PlatformX.isMaterial(context)
             ? Icons.toggle_on
@@ -675,16 +667,12 @@ class PostFilterBar extends StatelessWidget {
         PlatformX.isMaterial(context)
             ? Icons.data_object
             : CupertinoIcons.collections,
-      null =>
-        PlatformX.isMaterial(context)
-            ? Icons.question_mark
-            : CupertinoIcons.question,
     };
   }
 
   // ======== EXPRESSION VERB SELECTOR ========
 
-  Widget _buildExprVerbSelector(
+  Widget _buildConditionVerbSelector(
     BuildContext context,
     PostFilterCondition cond,
     PostFilterSlot slot,
@@ -709,7 +697,7 @@ class PostFilterBar extends StatelessWidget {
 
   // ======== EXPRESSION OBJECT SELECTOR ========
 
-  Widget _buildExprObjectSelector(
+  Widget _buildConditionObjectSelector(
     BuildContext context,
     PostFilterCondition cond,
     PostFilterSlot slot,
