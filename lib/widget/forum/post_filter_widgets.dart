@@ -406,7 +406,7 @@ class PostFilterBar extends StatelessWidget {
       child: Row(
         children: [
           const Spacer(),
-          Text('Group', style: Theme.of(context).textTheme.labelSmall),
+          Text('Group', style: _labelSmallStyle(context)),
           const SizedBox(width: 4),
           _buildGroupRelationSelector(context, group),
           const Spacer(),
@@ -431,7 +431,10 @@ class PostFilterBar extends StatelessWidget {
         children: [
           Expanded(child: _buildFieldSelector(context, expr, slot)),
           const SizedBox(width: 4),
-          _buildMethodSelector(context, expr, slot),
+          if (expr.field.type == PostFilterFieldType.boolean)
+            Text('is', style: _labelSmallStyle(context))
+          else
+            _buildMethodSelector(context, expr, slot),
           const SizedBox(width: 4),
           Expanded(child: _buildValueSelector(context, expr, slot)),
           const SizedBox(width: 4),
@@ -790,6 +793,10 @@ class PostFilterBar extends StatelessWidget {
     return PlatformX.isDarkMode
         ? effectiveColor.withLightness((lightness + 0.2).clamp(0, 1))
         : effectiveColor.withLightness((lightness - 0.2).clamp(0, 1));
+  }
+
+  TextStyle? _labelSmallStyle(BuildContext context) {
+    return Theme.of(context).textTheme.labelSmall;
   }
 
   PostFilterExpr _createExpr(_ExprKind kind, PostFilterField field) {
