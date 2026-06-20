@@ -166,14 +166,24 @@ class GeExpr extends PostFilterCondition {
   String get jsOperator => '>=';
 }
 
-class EqualExpr extends PostFilterCondition {
-  const EqualExpr(super.field, super.value);
+class EqExpr extends PostFilterCondition {
+  const EqExpr(super.field, super.value);
 
   @override
   String get operatorLabel => '===';
 
   @override
   String get jsOperator => '===';
+}
+
+class NeExpr extends PostFilterCondition {
+  const NeExpr(super.field, super.value);
+
+  @override
+  String get operatorLabel => '!==';
+
+  @override
+  String get jsOperator => '!==';
 }
 
 class IncludeExpr extends PostFilterCondition {
@@ -203,7 +213,7 @@ class MatchExpr extends PostFilterCondition {
   String toJs() => field.name.isEmpty ? 'false' : '${field.name}.match($value)';
 }
 
-enum _ExprKind { lt, gt, le, ge, equal, include, match }
+enum _ExprKind { lt, gt, le, ge, eq, ne, include, match }
 
 class PostFilterController extends ChangeNotifier {
   final PostFilterGroup root = PostFilterGroup.and();
@@ -684,7 +694,7 @@ class PostFilterBar extends StatelessWidget {
               bool.tryParse(expr.value, caseSensitive: false) ?? false;
           controller.replaceSlot(
             slot,
-            EqualExpr(expr.field, (!currBool).toString()),
+            EqExpr(expr.field, (!currBool).toString()),
           );
         },
       ),
@@ -771,13 +781,14 @@ class PostFilterBar extends StatelessWidget {
     PostFilterSlot slot,
   ) async {
     final prompt = switch (kind) {
-      _ExprKind.equal => 'Exact value',
+      _ExprKind.eq => 'Exact value',
+      _ExprKind.ne => 'Exclude value',
       _ExprKind.include => 'Substring',
       _ExprKind.match => 'Regex pattern',
       _ => 'Unknown verb',
     };
     final example = switch (kind) {
-      _ExprKind.equal => '"content"',
+      _ExprKind.eq || _ExprKind.ne => '"content"',
       _ExprKind.include => '"keyword"',
       _ExprKind.match => '/regex/i',
       _ => '',
@@ -891,7 +902,7 @@ class PostFilterBar extends StatelessWidget {
   }
 
   PostFilterExpr _createEmptyFieldExpr() {
-    return _createExpr(_ExprKind.equal, _emptyPostFilterField);
+    return _createExpr(_ExprKind.eq, _emptyPostFilterField);
   }
 
   PostFilterExpr _createExprWithValue(
@@ -904,7 +915,8 @@ class PostFilterBar extends StatelessWidget {
       _ExprKind.gt => GtExpr(field, value),
       _ExprKind.le => LeExpr(field, value),
       _ExprKind.ge => GeExpr(field, value),
-      _ExprKind.equal => EqualExpr(field, value),
+      _ExprKind.eq => EqExpr(field, value),
+      _ExprKind.ne => NeExpr(field, value),
       _ExprKind.include => IncludeExpr(field, value),
       _ExprKind.match => MatchExpr(field, value),
     };
@@ -916,7 +928,8 @@ class PostFilterBar extends StatelessWidget {
       GtExpr _ => _ExprKind.gt,
       LeExpr _ => _ExprKind.le,
       GeExpr _ => _ExprKind.ge,
-      EqualExpr _ => _ExprKind.equal,
+      EqExpr _ => _ExprKind.eq,
+      NeExpr _ => _ExprKind.ne,
       IncludeExpr _ => _ExprKind.include,
       MatchExpr _ => _ExprKind.match,
     };
@@ -924,11 +937,11 @@ class PostFilterBar extends StatelessWidget {
 
   _ExprKind _defaultKindForField(PostFilterField field) {
     return switch (field.type) {
-      PostFilterFieldType.boolean => _ExprKind.equal,
-      PostFilterFieldType.number => _ExprKind.equal,
-      PostFilterFieldType.string => _ExprKind.include,
-      PostFilterFieldType.array => _ExprKind.include,
-      PostFilterFieldType.map => _ExprKind.equal,
+      PostFilterFieldType.boolean => _ExprKind.eq,
+      PostFilterFieldType.number => _ExprKind.eq,
+      PostFilterFieldType.string => _ExprKind.eq,
+      PostFilterFieldType.array => _ExprKind.eq,
+      PostFilterFieldType.map => _ExprKind.eq,
     };
   }
 
@@ -942,21 +955,23 @@ class PostFilterBar extends StatelessWidget {
 
   List<_ExprKind> _methodOptions(PostFilterField field) {
     return switch (field.type) {
-      PostFilterFieldType.boolean => const [_ExprKind.equal],
+      PostFilterFieldType.boolean => const [_ExprKind.eq],
       PostFilterFieldType.number => const [
         _ExprKind.lt,
         _ExprKind.gt,
         _ExprKind.le,
         _ExprKind.ge,
-        _ExprKind.equal,
+        _ExprKind.eq,
+        _ExprKind.ne,
       ],
       PostFilterFieldType.string => const [
-        _ExprKind.equal,
+        _ExprKind.eq,
+        _ExprKind.ne,
         _ExprKind.include,
         _ExprKind.match,
       ],
       PostFilterFieldType.array => const [_ExprKind.include],
-      PostFilterFieldType.map => const [_ExprKind.equal],
+      PostFilterFieldType.map => const [_ExprKind.eq, _ExprKind.ne],
     };
   }
 
@@ -966,7 +981,8 @@ class PostFilterBar extends StatelessWidget {
       _ExprKind.gt => '>',
       _ExprKind.le => '<=',
       _ExprKind.ge => '>=',
-      _ExprKind.equal => '===',
+      _ExprKind.eq => '===',
+      _ExprKind.ne => '!==',
       _ExprKind.include => 'includes',
       _ExprKind.match => 'match',
     };
