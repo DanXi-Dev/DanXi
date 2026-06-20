@@ -669,8 +669,8 @@ class PostFilterBar extends StatelessWidget {
     PostFilterFieldExpr expr,
     PostFilterExprSlot slot,
   ) {
-    if (expr.field.type == PostFilterFieldType.boolean) {
-      return _buildTapChipButton(
+    return switch (expr.field.type) {
+      PostFilterFieldType.boolean => _buildTapChipButton(
         context,
         label: expr.value,
         onTap: () {
@@ -681,20 +681,30 @@ class PostFilterBar extends StatelessWidget {
             EqualExpr(expr.field, (!currBool).toString()),
           );
         },
-      );
-    }
-    return _buildPopupChipButton<String>(
-      context,
-      label: expr.value,
-      initialValue: expr.value,
-      items: _valueOptions(expr.field, _kindFromExpr(expr))
-          .map((value) => PopupMenuItem(value: value, child: Text(value)))
-          .toList(growable: false),
-      onSelected: (value) => controller.replaceSlot(
-        slot,
-        _createExprWithValue(_kindFromExpr(expr), expr.field, value),
       ),
-    );
+      PostFilterFieldType.string => _buildTapChipButton(
+        context,
+        label: expr.value,
+        onTap: () => _showStringValueInputDialog(
+          context,
+          expr,
+          _kindFromExpr(expr),
+          slot,
+        ),
+      ),
+      _ => _buildPopupChipButton<String>(
+        context,
+        label: expr.value,
+        initialValue: expr.value,
+        items: _valueOptions(expr.field, _kindFromExpr(expr))
+            .map((value) => PopupMenuItem(value: value, child: Text(value)))
+            .toList(growable: false),
+        onSelected: (value) => controller.replaceSlot(
+          slot,
+          _createExprWithValue(_kindFromExpr(expr), expr.field, value),
+        ),
+      ),
+    };
   }
 
   Widget _buildTapChipButton(
@@ -744,6 +754,61 @@ class PostFilterBar extends StatelessWidget {
         ).textTheme.labelSmall?.copyWith(color: _chipContentColor(context)),
       ),
     );
+  }
+
+  Future<void> _showStringValueInputDialog(
+    BuildContext context,
+    PostFilterFieldExpr expr,
+    _ExprKind kind,
+    PostFilterExprSlot slot,
+  ) async {
+    final prompt = switch (kind) {
+      _ExprKind.equal => 'Exact value',
+      _ExprKind.include => 'Substring',
+      _ExprKind.match => 'Regex pattern',
+      _ => 'Unknown verb',
+    };
+    final example = switch (kind) {
+      _ExprKind.equal => '"content"',
+      _ExprKind.include => '"keyword"',
+      _ExprKind.match => '/regex/i',
+      _ => '',
+    };
+    final textController = TextEditingController(text: expr.value);
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(prompt, style: _labelSmallStyle(context)),
+            const SizedBox(height: 8),
+            TextField(
+              controller: textController,
+              autofocus: true,
+              decoration: InputDecoration(hintText: example),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, textController.text),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+    if (result != null) {
+      controller.replaceSlot(
+        slot,
+        _createExprWithValue(kind, expr.field, result),
+      );
+    }
   }
 
   Widget _buildPopupAvatarItem(
