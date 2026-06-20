@@ -26,108 +26,134 @@ enum PostFilterVerb {
   final bool isOperator;
 }
 
-enum PostFilterFieldType { boolean, number, string, array, map }
-
-class PostFilterField {
+sealed class PostFilterField {
   final String name;
-  final PostFilterFieldType type;
 
-  const PostFilterField(this.name, this.type);
+  const PostFilterField(this.name);
 
-  bool get shouldSkip => switch (type) {
-    PostFilterFieldType.array => true,
-    PostFilterFieldType.map => true,
+  bool get shouldSkip => switch (this) {
+    ArrayField _ || MapField _ => true,
     _ => false,
   };
 
-  List<PostFilterVerb> get verbs => switch (type) {
-    PostFilterFieldType.boolean => const [PostFilterVerb.eq],
-    PostFilterFieldType.number => const [
-      PostFilterVerb.lt,
-      PostFilterVerb.gt,
-      PostFilterVerb.le,
-      PostFilterVerb.ge,
-      PostFilterVerb.eq,
-      PostFilterVerb.ne,
-    ],
-    PostFilterFieldType.string => const [
-      PostFilterVerb.eq,
-      PostFilterVerb.ne,
-      PostFilterVerb.include,
-      PostFilterVerb.match,
-    ],
-    PostFilterFieldType.array => const [PostFilterVerb.include],
-    PostFilterFieldType.map => const [PostFilterVerb.eq, PostFilterVerb.ne],
-  };
+  List<PostFilterVerb> get verbs;
 
   String defaultObject(PostFilterVerb verb) {
-    if (verb == PostFilterVerb.match) return '/^/i';
-    return switch (type) {
-      PostFilterFieldType.boolean => 'true',
-      PostFilterFieldType.number => '0',
-      PostFilterFieldType.string ||
-      PostFilterFieldType.array ||
-      PostFilterFieldType.map => '""',
+    return switch (this) {
+      BooleanField _ => 'true',
+      NumberField _ => '0',
+      StringField _ => verb == PostFilterVerb.match ? '/^/i' : '""',
+      ArrayField _ || MapField _ => '""',
     };
   }
 
   List<String> exampleObjects(PostFilterVerb verb) {
-    if (verb == PostFilterVerb.match) {
-      return const [r'/keyword/i', r'/^keyword/i', r'/keyword$/i'];
-    }
-    return switch (type) {
-      PostFilterFieldType.boolean => const ['true', 'false'],
-      PostFilterFieldType.number => const ['0', '1', '-1', '10'],
-      PostFilterFieldType.string => const ['"keyword"', '""'],
-      PostFilterFieldType.array => const [],
-      PostFilterFieldType.map => const [],
+    return switch (this) {
+      BooleanField _ => const ['true', 'false'],
+      NumberField _ => const ['0', '1', '-1', '10'],
+      StringField _ =>
+        verb == PostFilterVerb.match
+            ? const [r'/keyword/i', r'/^keyword/i', r'/keyword$/i']
+            : const ['"keyword"', '""'],
+      ArrayField _ => const [],
+      MapField _ => const [],
     };
   }
 }
 
+class BooleanField extends PostFilterField {
+  const BooleanField(super.name);
+
+  @override
+  List<PostFilterVerb> get verbs => const [PostFilterVerb.eq];
+}
+
+class NumberField extends PostFilterField {
+  const NumberField(super.name);
+
+  @override
+  List<PostFilterVerb> get verbs => const [
+    PostFilterVerb.lt,
+    PostFilterVerb.gt,
+    PostFilterVerb.le,
+    PostFilterVerb.ge,
+    PostFilterVerb.eq,
+    PostFilterVerb.ne,
+  ];
+}
+
+class StringField extends PostFilterField {
+  const StringField(super.name);
+
+  @override
+  List<PostFilterVerb> get verbs => const [
+    PostFilterVerb.eq,
+    PostFilterVerb.ne,
+    PostFilterVerb.include,
+    PostFilterVerb.match,
+  ];
+}
+
+class ArrayField extends PostFilterField {
+  const ArrayField(super.name);
+
+  @override
+  List<PostFilterVerb> get verbs => const [PostFilterVerb.include];
+}
+
+class MapField extends PostFilterField {
+  const MapField(super.name);
+
+  @override
+  List<PostFilterVerb> get verbs => const [
+    PostFilterVerb.eq,
+    PostFilterVerb.ne,
+  ];
+}
+
 const List<PostFilterField> postFilterHoleFieldNames = [
-  PostFilterField('hole', PostFilterFieldType.map),
-  PostFilterField('id', PostFilterFieldType.number),
-  PostFilterField('holeId', PostFilterFieldType.number),
-  PostFilterField('divisionId', PostFilterFieldType.number),
-  PostFilterField('tags', PostFilterFieldType.array),
-  PostFilterField('view', PostFilterFieldType.number),
-  PostFilterField('reply', PostFilterFieldType.number),
-  PostFilterField('favoriteCount', PostFilterFieldType.number),
-  PostFilterField('subscriptionCount', PostFilterFieldType.number),
-  PostFilterField('timeCreated', PostFilterFieldType.string),
-  PostFilterField('created', PostFilterFieldType.string),
-  PostFilterField('timeUpdated', PostFilterFieldType.string),
-  PostFilterField('updated', PostFilterFieldType.string),
-  PostFilterField('first', PostFilterFieldType.map),
-  PostFilterField('content', PostFilterFieldType.string),
-  PostFilterField('firstContent', PostFilterFieldType.string),
-  PostFilterField('last', PostFilterFieldType.map),
-  PostFilterField('lastContent', PostFilterFieldType.string),
+  MapField('hole'),
+  NumberField('id'),
+  NumberField('holeId'),
+  NumberField('divisionId'),
+  ArrayField('tags'),
+  NumberField('view'),
+  NumberField('reply'),
+  NumberField('favoriteCount'),
+  NumberField('subscriptionCount'),
+  StringField('timeCreated'),
+  StringField('created'),
+  StringField('timeUpdated'),
+  StringField('updated'),
+  MapField('first'),
+  StringField('content'),
+  StringField('firstContent'),
+  MapField('last'),
+  StringField('lastContent'),
 ];
 
 const List<PostFilterField> postFilterFloorFieldNames = [
-  PostFilterField('floor', PostFilterFieldType.map),
-  PostFilterField('hole', PostFilterFieldType.map),
-  PostFilterField('id', PostFilterFieldType.number),
-  PostFilterField('floorId', PostFilterFieldType.number),
-  PostFilterField('holeId', PostFilterFieldType.number),
-  PostFilterField('content', PostFilterFieldType.string),
-  PostFilterField('anonyname', PostFilterFieldType.string),
-  PostFilterField('name', PostFilterFieldType.string),
-  PostFilterField('specialTag', PostFilterFieldType.string),
-  PostFilterField('timeCreated', PostFilterFieldType.string),
-  PostFilterField('created', PostFilterFieldType.string),
-  PostFilterField('timeUpdated', PostFilterFieldType.string),
-  PostFilterField('updated', PostFilterFieldType.string),
-  PostFilterField('deleted', PostFilterFieldType.boolean),
-  PostFilterField('modified', PostFilterFieldType.boolean),
-  PostFilterField('isMe', PostFilterFieldType.boolean),
-  PostFilterField('liked', PostFilterFieldType.boolean),
-  PostFilterField('disliked', PostFilterFieldType.boolean),
-  PostFilterField('like', PostFilterFieldType.number),
-  PostFilterField('dislike', PostFilterFieldType.number),
-  PostFilterField('mention', PostFilterFieldType.array),
+  MapField('floor'),
+  MapField('hole'),
+  NumberField('id'),
+  NumberField('floorId'),
+  NumberField('holeId'),
+  StringField('content'),
+  StringField('anonyname'),
+  StringField('name'),
+  StringField('specialTag'),
+  StringField('timeCreated'),
+  StringField('created'),
+  StringField('timeUpdated'),
+  StringField('updated'),
+  BooleanField('deleted'),
+  BooleanField('modified'),
+  BooleanField('isMe'),
+  BooleanField('liked'),
+  BooleanField('disliked'),
+  NumberField('like'),
+  NumberField('dislike'),
+  ArrayField('mention'),
 ];
 
 sealed class PostFilterExpr {
@@ -451,7 +477,7 @@ class PostFilterBar extends StatelessWidget {
         children: [
           Expanded(child: _buildExprSubjectSelector(context, cond, slot)),
           const SizedBox(width: 4),
-          if (cond.subject?.type == PostFilterFieldType.boolean)
+          if (cond.subject is BooleanField)
             Text('is', style: _labelSmallStyle(context))
           else
             _buildExprVerbSelector(context, cond, slot),
@@ -630,22 +656,22 @@ class PostFilterBar extends StatelessWidget {
     BuildContext context,
     PostFilterCondition cond,
   ) {
-    return switch (cond.subject?.type) {
-      PostFilterFieldType.boolean =>
+    return switch (cond.subject) {
+      BooleanField _ =>
         PlatformX.isMaterial(context)
             ? Icons.toggle_on
             : CupertinoIcons.plus_slash_minus,
-      PostFilterFieldType.number =>
+      NumberField _ =>
         PlatformX.isMaterial(context) ? Icons.numbers : CupertinoIcons.number,
-      PostFilterFieldType.string =>
+      StringField _ =>
         PlatformX.isMaterial(context)
             ? Icons.abc
             : CupertinoIcons.textformat_abc,
-      PostFilterFieldType.array =>
+      ArrayField _ =>
         PlatformX.isMaterial(context)
             ? Icons.data_array
             : CupertinoIcons.list_bullet,
-      PostFilterFieldType.map =>
+      MapField _ =>
         PlatformX.isMaterial(context)
             ? Icons.data_object
             : CupertinoIcons.collections,
@@ -688,8 +714,8 @@ class PostFilterBar extends StatelessWidget {
     PostFilterCondition cond,
     PostFilterSlot slot,
   ) {
-    return switch (cond.subject?.type) {
-      PostFilterFieldType.boolean => (() {
+    return switch (cond.subject) {
+      BooleanField _ => (() {
         final currBool =
             cond.object?.apply((o) => bool.tryParse(o, caseSensitive: false)) ??
             false;
@@ -705,7 +731,7 @@ class PostFilterBar extends StatelessWidget {
           ),
         );
       })(),
-      PostFilterFieldType.string => _buildTapChipButton(
+      StringField _ => _buildTapChipButton(
         context,
         label: cond.object ?? '',
         onTap: () =>
