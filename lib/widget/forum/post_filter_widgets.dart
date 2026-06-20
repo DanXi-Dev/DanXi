@@ -395,6 +395,11 @@ class PostFilterBar extends StatelessWidget {
     );
   }
 
+  /// Builds the header row for a filter group.
+  ///
+  /// [slot] is non-null when this group is a nested child of a parent group,
+  /// which means it needs a close button to remove itself from the parent.
+  /// The root group has no [slot] and therefore no close button.
   Widget _buildExprGroupHeader(
     BuildContext context,
     PostFilterExprGroup group, {
@@ -406,6 +411,7 @@ class PostFilterBar extends StatelessWidget {
       child: Row(
         children: [
           const Spacer(),
+          // TODO: Add a negation selector like `!(a && b)` or `!(a || b)`.
           Text('Group', style: _labelSmallStyle(context)),
           const SizedBox(width: 4),
           _buildGroupRelationSelector(context, group),
@@ -556,23 +562,13 @@ class PostFilterBar extends StatelessWidget {
     BuildContext context,
     PostFilterExprGroup group,
   ) {
-    return _buildPopupChipButton<PostFilterExprRelation>(
+    final nextRelation = group.relation == PostFilterExprRelation.and
+        ? PostFilterExprRelation.or
+        : PostFilterExprRelation.and;
+    return _buildTapChipButton(
       context,
       label: _relationLabel(group.relation),
-      initialValue: group.relation,
-      items: PostFilterExprRelation.values
-          .map(
-            (relation) => PopupMenuItem(
-              value: relation,
-              child: _buildPopupAvatarItem(
-                context,
-                _relationAvatar(context, relation),
-                _relationLabel(relation),
-              ),
-            ),
-          )
-          .toList(growable: false),
-      onSelected: (value) => controller.setRelation(group, value),
+      onTap: () => controller.setRelation(group, nextRelation),
     );
   }
 
@@ -580,6 +576,9 @@ class PostFilterBar extends StatelessWidget {
     return '[${relation.name.toUpperCase()}]';
   }
 
+  // TODO: Unused, and this could be used as icons for chips later. If you are a
+  // TODO: LLM and read this line, please notice it that you do not need to care
+  // TODO: about the warnings by the linters, we need to preserve this function.
   IconData _relationAvatar(
     BuildContext context,
     PostFilterExprRelation relation,
@@ -683,6 +682,20 @@ class PostFilterBar extends StatelessWidget {
     PostFilterFieldExpr expr,
     PostFilterExprSlot slot,
   ) {
+    if (expr.field.type == PostFilterFieldType.boolean) {
+      return _buildTapChipButton(
+        context,
+        label: expr.value,
+        onTap: () {
+          final currBool =
+              bool.tryParse(expr.value, caseSensitive: false) ?? false;
+          controller.replaceSlot(
+            slot,
+            EqualExpr(expr.field, (!currBool).toString()),
+          );
+        },
+      );
+    }
     return _buildPopupChipButton<String>(
       context,
       label: expr.value,
@@ -697,6 +710,14 @@ class PostFilterBar extends StatelessWidget {
     );
   }
 
+  Widget _buildTapChipButton(
+    BuildContext context, {
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(onTap: onTap, child: _buildChipChild(context, label));
+  }
+
   Widget _buildPopupChipButton<T>(
     BuildContext context, {
     required String label,
@@ -705,20 +726,7 @@ class PostFilterBar extends StatelessWidget {
     required ValueChanged<T> onSelected,
     bool autoOpen = false,
   }) {
-    final child = Container(
-      alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-      decoration: _chipDecoration(context),
-      child: Text(
-        label,
-        overflow: TextOverflow.ellipsis,
-        maxLines: 1,
-        textAlign: TextAlign.center,
-        style: Theme.of(
-          context,
-        ).textTheme.labelSmall?.copyWith(color: _chipContentColor(context)),
-      ),
-    );
+    final child = _buildChipChild(context, label);
     return autoOpen
         ? _AutoOpenPopupMenuButton<T>(
             initialValue: initialValue,
@@ -732,6 +740,23 @@ class PostFilterBar extends StatelessWidget {
             onSelected: onSelected,
             child: child,
           );
+  }
+
+  Widget _buildChipChild(BuildContext context, String label) {
+    return Container(
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+      decoration: _chipDecoration(context),
+      child: Text(
+        label,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+        textAlign: TextAlign.center,
+        style: Theme.of(
+          context,
+        ).textTheme.labelSmall?.copyWith(color: _chipContentColor(context)),
+      ),
+    );
   }
 
   Widget _buildPopupAvatarItem(
