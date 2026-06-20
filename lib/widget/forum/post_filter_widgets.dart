@@ -10,6 +10,22 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 enum PostFilterExprRelation { and, or }
 
+enum PostFilterVerb {
+  lt(token: '<'),
+  gt(token: '>'),
+  le(token: '<='),
+  ge(token: '>='),
+  eq(token: '==='),
+  ne(token: '!=='),
+  include(token: 'includes', isOperator: false),
+  match(token: 'match', isOperator: false);
+
+  const PostFilterVerb({required this.token, this.isOperator = true});
+
+  final String token;
+  final bool isOperator;
+}
+
 enum PostFilterFieldType { boolean, number, string, array, map }
 
 class PostFilterField {
@@ -114,33 +130,10 @@ const List<PostFilterField> postFilterFloorFieldNames = [
   PostFilterField('mention', PostFilterFieldType.array),
 ];
 
-enum PostFilterVerb {
-  lt(token: '<'),
-  gt(token: '>'),
-  le(token: '<='),
-  ge(token: '>='),
-  eq(token: '==='),
-  ne(token: '!=='),
-  include(token: 'includes', isOperator: false),
-  match(token: 'match', isOperator: false);
-
-  const PostFilterVerb({required this.token, this.isOperator = true});
-
-  final String token;
-  final bool isOperator;
-}
-
 sealed class PostFilterExpr {
   const PostFilterExpr();
 
   String toJs();
-}
-
-class PostFilterSlot {
-  PostFilterExpr expr;
-  PostFilterGroup group;
-
-  PostFilterSlot({required this.expr, required this.group});
 }
 
 class PostFilterGroup extends PostFilterExpr {
@@ -211,6 +204,13 @@ class PostFilterRawCondition extends PostFilterExpr {
 
   @override
   String toJs() => raw;
+}
+
+class PostFilterSlot {
+  PostFilterExpr expr;
+  PostFilterGroup group;
+
+  PostFilterSlot({required this.expr, required this.group});
 }
 
 class PostFilterController extends ChangeNotifier {
