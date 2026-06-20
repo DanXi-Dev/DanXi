@@ -603,6 +603,7 @@ class PostFilterBar extends StatelessWidget {
       label: _fieldLabel(expr.field),
       initialValue: expr.field,
       items: fields
+          .where((f) => !_shouldSkipField(f))
           .map(
             (field) => PopupMenuItem(
               value: field,
@@ -834,6 +835,14 @@ class PostFilterBar extends StatelessWidget {
       PostFilterFieldType.string => _ExprKind.include,
       PostFilterFieldType.array => _ExprKind.include,
       PostFilterFieldType.map => _ExprKind.equal,
+    };
+  }
+
+  bool _shouldSkipField(PostFilterField field) {
+    return switch (field.type) {
+      PostFilterFieldType.array => true,
+      PostFilterFieldType.map => true,
+      _ => false,
     };
   }
 
