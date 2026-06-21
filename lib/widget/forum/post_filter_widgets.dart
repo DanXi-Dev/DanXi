@@ -42,6 +42,51 @@ enum PostFilterVerb {
   final bool isOperator;
 }
 
+sealed class PostFilterValue {
+  const PostFilterValue();
+
+  String get token;
+}
+
+class PostFilterRawValue extends PostFilterValue {
+  const PostFilterRawValue();
+
+  @override
+  String get token => throw UnsupportedError('Unreachable');
+}
+
+class PostFilterLiteralValue extends PostFilterValue {
+  final String literal;
+
+  const PostFilterLiteralValue(this.literal);
+
+  @override
+  String get token => literal;
+
+  @override
+  bool operator ==(Object other) =>
+      other is PostFilterLiteralValue && other.literal == literal;
+
+  @override
+  int get hashCode => literal.hashCode;
+}
+
+class PostFilterFieldValue extends PostFilterValue {
+  final PostFilterField field;
+
+  const PostFilterFieldValue(this.field);
+
+  @override
+  String get token => field.name;
+
+  @override
+  bool operator ==(Object other) =>
+      other is PostFilterFieldValue && other.field.name == field.name;
+
+  @override
+  int get hashCode => field.name.hashCode;
+}
+
 sealed class PostFilterField {
   final String name;
 
@@ -54,14 +99,15 @@ sealed class PostFilterField {
 
   List<PostFilterVerb> get verbs;
 
-  String defaultObject(PostFilterVerb verb) {
-    return switch (this) {
+  PostFilterLiteralValue defaultObject(PostFilterVerb verb) {
+    final literal = switch (this) {
       BooleanField _ => 'true',
       NumberField _ => '0',
       StringField _ => verb == PostFilterVerb.match ? '/^/i' : '""',
       ArrayField _ => '[]',
       MapField _ => '{}',
     };
+    return PostFilterLiteralValue(literal);
   }
 
   IconData icon(BuildContext context) {
@@ -219,7 +265,7 @@ class PostFilterGroup extends PostFilterExpr {
 class PostFilterCondition extends PostFilterExpr {
   final PostFilterField? subject;
   final PostFilterVerb verb;
-  final String? object;
+  final PostFilterValue? object;
 
   const PostFilterCondition({
     this.subject,
@@ -230,21 +276,21 @@ class PostFilterCondition extends PostFilterExpr {
   const PostFilterCondition.empty() : this();
 
   factory PostFilterCondition.fromField(
-    PostFilterField field, [
+    PostFilterField? field, [
     PostFilterVerb verb = PostFilterVerb.eq,
   ]) {
     return PostFilterCondition(
       subject: field,
       verb: verb,
-      object: field.defaultObject(verb),
+      object: field?.defaultObject(verb),
     );
   }
 
   @override
   String toJs() {
     return switch ((subject, verb.isOperator, object)) {
-      (final s?, false, final o?) => '${s.name}.${verb.token}($o)',
-      (final s?, true, final o?) => '${s.name} ${verb.token} ($o)',
+      (final s?, false, final o?) => '${s.name}.${verb.token}(${o.token})',
+      (final s?, true, final o?) => '${s.name} ${verb.token} (${o.token})',
       (null, _, _) || (_, _, null) => 'false',
     };
   }
@@ -660,22 +706,16 @@ class PostFilterBar extends StatelessWidget {
     return _buildPopupChipButton<PostFilterVerb>(
       context,
       items: (cond.subject?.verbs ?? const [])
-          .map((kind) => PopupMenuItem(value: kind, child: Text(kind.token)))
+          .map((verb) => PopupMenuItem(value: verb, child: Text(verb.token)))
           .toList(growable: false),
       initialValue: cond.verb,
-      onSelected: (kind) => controller.replaceSlot(
+      onSelected: (verb) => controller.replaceSlot(
         slot,
-        PostFilterCondition(
-          subject: cond.subject,
-          verb: kind,
-          object: cond.subject?.defaultObject(kind),
-        ),
+        PostFilterCondition.fromField(cond.subject, verb),
       ),
       label: cond.verb.token,
     );
   }
-
-  static const String _customInputKey = '__CUSTOM_INPUT__';
 
   Widget _buildConditionObjectSelector(
     BuildContext context,
@@ -683,32 +723,38 @@ class PostFilterBar extends StatelessWidget {
     PostFilterSlot slot,
   ) {
     if (cond.subject is BooleanField) {
-      final currBool =
-          cond.object?.apply((o) => bool.tryParse(o, caseSensitive: false)) ??
-          false;
+      final currBool = switch (cond.object) {
+        PostFilterLiteralValue(:final literal) =>
+          bool.tryParse(literal, caseSensitive: false) ?? false,
+        _ => false,
+      };
       return _buildTapChipButton(
         context,
         onTap: () => controller.replaceSlot(
           slot,
           PostFilterCondition(
             subject: cond.subject,
-            object: (!currBool).toString(),
+            verb: PostFilterVerb.eq,
+            object: PostFilterLiteralValue((!currBool).toString()),
           ),
         ),
         label: currBool.toString(),
       );
     }
-    return _buildPopupChipButton<String>(
+    return _buildPopupChipButton<PostFilterValue>(
       context,
       items: [
-        if (cond.subject?.defaultObject(cond.verb) case final o?)
-          PopupMenuItem(value: o, child: Text(o)),
-        PopupMenuItem(value: _customInputKey, child: Text('Custom input...')),
+        if (cond.subject?.defaultObject(cond.verb).token case final o?)
+          PopupMenuItem(value: PostFilterLiteralValue(o), child: Text(o)),
+        const PopupMenuItem(
+          value: PostFilterRawValue(),
+          child: Text('Custom input...'),
+        ),
         const PopupMenuDivider(),
         for (final field in fields)
           if (field.runtimeType == cond.subject?.runtimeType)
             PopupMenuItem(
-              value: field.name,
+              value: PostFilterFieldValue(field),
               child: _buildPopupAvatarItem(
                 context,
                 field.icon(context),
@@ -718,7 +764,7 @@ class PostFilterBar extends StatelessWidget {
       ],
       initialValue: cond.object,
       onSelected: (value) {
-        if (value == _customInputKey) {
+        if (value is PostFilterRawValue) {
           _showStringValueInputDialog(context, cond, cond.verb, slot);
         } else {
           controller.replaceSlot(
@@ -731,7 +777,7 @@ class PostFilterBar extends StatelessWidget {
           );
         }
       },
-      label: cond.object ?? '',
+      label: cond.object?.token ?? '',
     );
   }
 
@@ -813,23 +859,28 @@ class PostFilterBar extends StatelessWidget {
   Future<void> _showStringValueInputDialog(
     BuildContext context,
     PostFilterCondition cond,
-    PostFilterVerb kind,
+    PostFilterVerb verb,
     PostFilterSlot slot,
   ) async {
-    final prompt = switch (kind) {
+    final prompt = switch (verb) {
       PostFilterVerb.eq => 'Exact value',
       PostFilterVerb.ne => 'Exclude value',
       PostFilterVerb.include => 'Substring',
       PostFilterVerb.match => 'Regex pattern',
       _ => 'Unknown verb',
     };
-    final example = switch (kind) {
+    final example = switch (verb) {
       PostFilterVerb.eq || PostFilterVerb.ne => '"content"',
       PostFilterVerb.include => '"keyword"',
       PostFilterVerb.match => '/regex/i',
       _ => '',
     };
-    final textController = TextEditingController(text: cond.object);
+    final textController = TextEditingController(
+      text: switch (cond.object) {
+        PostFilterLiteralValue(:final literal) => literal,
+        _ => null,
+      },
+    );
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
@@ -861,7 +912,11 @@ class PostFilterBar extends StatelessWidget {
     if (result != null) {
       controller.replaceSlot(
         slot,
-        PostFilterCondition(subject: cond.subject, verb: kind, object: result),
+        PostFilterCondition(
+          subject: cond.subject,
+          verb: verb,
+          object: PostFilterLiteralValue(result),
+        ),
       );
     }
   }
