@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:dan_xi/model/forum/floor.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/util/forum/post_filter_js_runtime.dart';
@@ -505,8 +504,8 @@ class PostFilterBar extends StatelessWidget {
         spacing: 4,
         children: [
           _buildGroupExprHeader(context, group, slot: slot),
-          ...group.slots.map(
-            (childSlot) => switch (childSlot.expr) {
+          for (final childSlot in group.slots)
+            switch (childSlot.expr) {
               PostFilterGroup childGroup => _buildGroupExpr(
                 context,
                 childGroup,
@@ -520,7 +519,6 @@ class PostFilterBar extends StatelessWidget {
               // TODO: Implement it.
               PostFilterRawCondition rawCond => Text(rawCond.raw),
             },
-          ),
           _buildGroupAddButton(context, group),
         ],
       ),
@@ -720,10 +718,10 @@ class PostFilterBar extends StatelessWidget {
   ) {
     return _buildPopupChipButton<PostFilterField>(
       context,
-      items: fields
-          .whereNot((f) => f.shouldSkip)
-          .map(
-            (field) => PopupMenuItem(
+      items: [
+        for (final field in fields)
+          if (!field.shouldSkip)
+            PopupMenuItem(
               value: field,
               child: _buildPopupAvatarItem(
                 context,
@@ -731,8 +729,7 @@ class PostFilterBar extends StatelessWidget {
                 field.name,
               ),
             ),
-          )
-          .toList(growable: false),
+      ],
       initialValue: cond.subject,
       onSelected: (field) =>
           controller.replaceSlot(slot, PostFilterCondition.fromField(field)),
@@ -749,9 +746,10 @@ class PostFilterBar extends StatelessWidget {
   ) {
     return _buildPopupChipButton<PostFilterVerb>(
       context,
-      items: (cond.subject?.verbs ?? const [])
-          .map((verb) => PopupMenuItem(value: verb, child: Text(verb.token)))
-          .toList(growable: false),
+      items: [
+        for (final verb in cond.subject?.verbs ?? const [])
+          PopupMenuItem(value: verb, child: Text(verb.token)),
+      ],
       initialValue: cond.verb,
       onSelected: (verb) => controller.replaceSlot(
         slot,
