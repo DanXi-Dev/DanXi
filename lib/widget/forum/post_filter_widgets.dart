@@ -764,6 +764,10 @@ class PostFilterBar extends StatelessWidget {
         }
       },
       label: cond.object?.token ?? '',
+      icon: switch (cond.object) {
+        PostFilterFieldValue(:final field) => field.icon(context),
+        _ => null,
+      },
     );
   }
 
