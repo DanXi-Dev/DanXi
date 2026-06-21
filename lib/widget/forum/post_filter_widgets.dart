@@ -308,12 +308,12 @@ class PostFilterCondition extends PostFilterExpr {
 }
 
 class PostFilterRawCondition extends PostFilterExpr {
-  final String raw;
+  final String? raw;
 
-  const PostFilterRawCondition(this.raw);
+  const PostFilterRawCondition({this.raw});
 
   @override
-  String toJs() => raw;
+  String toJs() => raw ?? 'false';
 }
 
 class PostFilterSlot {
@@ -516,8 +516,11 @@ class PostFilterBar extends StatelessWidget {
                 cond,
                 childSlot,
               ),
-              // TODO: Implement it.
-              PostFilterRawCondition rawCond => Text(rawCond.raw),
+              PostFilterRawCondition rawCond => _buildRawConditionRow(
+                context,
+                rawCond,
+                childSlot,
+              ),
             },
           _buildGroupAddButton(context, group),
         ],
@@ -580,6 +583,47 @@ class PostFilterBar extends StatelessWidget {
     );
   }
 
+  Widget _buildRawConditionRow(
+    BuildContext context,
+    PostFilterRawCondition rawCond,
+    PostFilterSlot slot,
+  ) {
+    final onAutoOpen = () async {
+      if (await _showRawConditionInputDialog(context, rawCond) case final o
+          when o.raw != null) {
+        controller.replaceSlot(slot, o);
+      }
+    };
+    final child = Row(
+      children: [
+        Expanded(
+          child: InkWell(
+            onTap: onAutoOpen,
+            child: Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+              decoration: _chipDecoration(context),
+              child: Text(
+                rawCond.raw ?? '',
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: _chipContentColor(context),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 4),
+        _buildCloseButton(context, slot),
+      ],
+    );
+    return rawCond.raw == null
+        ? _AutoOpenWrapper(onAutoOpen: onAutoOpen, child: child)
+        : child;
+  }
+
   Widget _buildCloseButton(BuildContext context, PostFilterSlot slot) {
     return InkWell(
       onTap: () => controller.removeSlot(slot),
@@ -632,6 +676,12 @@ class PostFilterBar extends StatelessWidget {
                   group,
                   'Field expression',
                   PostFilterCondition.new,
+                ),
+                _buildAddExprListTile(
+                  context,
+                  group,
+                  'Raw expression',
+                  PostFilterRawCondition.new,
                 ),
                 _buildAddExprListTile(
                   context,
@@ -911,12 +961,12 @@ class PostFilterBar extends StatelessWidget {
     );
     final result = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(prompt, style: _labelSmallStyle(context)),
+            Text(prompt, style: _labelSmallStyle(dialogContext)),
             const SizedBox(height: 8),
             TextField(
               controller: textController,
@@ -927,11 +977,11 @@ class PostFilterBar extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, textController.text),
+            onPressed: () => Navigator.pop(dialogContext, textController.text),
             child: const Text('OK'),
           ),
         ],
@@ -941,6 +991,43 @@ class PostFilterBar extends StatelessWidget {
       final r? when r.isNotEmpty => PostFilterLiteralValue(r),
       _ => null,
     };
+  }
+
+  Future<PostFilterRawCondition> _showRawConditionInputDialog(
+    BuildContext context,
+    PostFilterRawCondition rawCond,
+  ) async {
+    final textController = TextEditingController(text: rawCond.raw);
+    final result = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Enter a raw JS expression'),
+            const SizedBox(height: 8),
+            TextField(controller: textController, autofocus: true),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, textController.text),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+    return PostFilterRawCondition(
+      raw: switch (result) {
+        final r? when r.isNotEmpty => r,
+        _ => null,
+      },
+    );
   }
 
   Widget _buildPopupAvatarItem(
@@ -1015,30 +1102,46 @@ class _AutoOpenPopupMenuButton<T> extends StatefulWidget {
 class _AutoOpenPopupMenuButtonState<T>
     extends State<_AutoOpenPopupMenuButton<T>> {
   final GlobalKey<PopupMenuButtonState<T>> _key = GlobalKey();
-  bool _opened = false;
 
+  @override
+  Widget build(BuildContext context) {
+    return _AutoOpenWrapper(
+      onAutoOpen: () => _key.currentState?.showButtonMenu(),
+      child: PopupMenuButton<T>(
+        key: _key,
+        itemBuilder: (_) => widget.items,
+        initialValue: widget.initialValue,
+        onSelected: widget.onSelected,
+        padding: widget.padding,
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+class _AutoOpenWrapper extends StatefulWidget {
+  final Function() onAutoOpen;
+  final Widget child;
+
+  const _AutoOpenWrapper({required this.onAutoOpen, required this.child});
+
+  @override
+  State<_AutoOpenWrapper> createState() => _AutoOpenWrapperState();
+}
+
+class _AutoOpenWrapperState extends State<_AutoOpenWrapper> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_opened && mounted) {
-        _opened = true;
-        _key.currentState?.showButtonMenu();
+      if (mounted) {
+        widget.onAutoOpen();
       }
     });
   }
 
   @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton<T>(
-      key: _key,
-      itemBuilder: (_) => widget.items,
-      initialValue: widget.initialValue,
-      onSelected: widget.onSelected,
-      padding: widget.padding,
-      child: widget.child,
-    );
-  }
+  Widget build(BuildContext context) => widget.child;
 }
 
 class WithPostFilterBar extends StatelessWidget {
