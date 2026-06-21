@@ -242,23 +242,25 @@ enum PostFilterRelation {
 class PostFilterGroup extends PostFilterExpr {
   final List<PostFilterSlot> slots = [];
   PostFilterRelation relation;
-  bool not;
+  bool negated;
 
-  PostFilterGroup({required this.relation, this.not = false});
+  PostFilterGroup({required this.relation, this.negated = false});
 
   PostFilterGroup.and() : this(relation: PostFilterRelation.and);
 
   PostFilterGroup.or() : this(relation: PostFilterRelation.or);
 
-  PostFilterGroup.nand() : this(relation: PostFilterRelation.and, not: true);
+  PostFilterGroup.nand()
+    : this(relation: PostFilterRelation.and, negated: true);
 
-  PostFilterGroup.nor() : this(relation: PostFilterRelation.or, not: true);
+  PostFilterGroup.nor() : this(relation: PostFilterRelation.or, negated: true);
 
   @override
   String toJs() {
-    return slots
+    final joined = slots
         .map((slot) => '(${slot.expr.toJs()})')
         .join(' ${relation.token} ');
+    return negated ? '!($joined)' : joined;
   }
 }
 
@@ -350,8 +352,8 @@ class PostFilterController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleGroupNot(PostFilterGroup group) {
-    group.not = !group.not;
+  void toggleGroupNegated(PostFilterGroup group) {
+    group.negated = !group.negated;
     notifyListeners();
   }
 }
@@ -543,8 +545,7 @@ class PostFilterBar extends StatelessWidget {
       child: Row(
         children: [
           const Spacer(),
-          // TODO: Add a negation selector like `!(a && b)` or `!(a || b)`.
-          Text('Group', style: _labelSmallStyle(context)),
+          _buildGroupNegationSelector(context, group),
           const SizedBox(width: 4),
           _buildGroupRelationSelector(context, group),
           const Spacer(),
@@ -683,6 +684,22 @@ class PostFilterBar extends StatelessWidget {
   }
 
   // ======== EXPRESSION SELECTORS ========
+
+  Widget _buildGroupNegationSelector(
+    BuildContext context,
+    PostFilterGroup group,
+  ) {
+    return _buildTapChipButton(
+      context,
+      onTap: () => controller.toggleGroupNegated(group),
+      label: group.negated ? 'Negated Group' : 'Group',
+      icon: group.negated
+          ? PlatformX.isMaterial(context)
+                ? Icons.not_interested
+                : CupertinoIcons.clear_circled
+          : null,
+    );
+  }
 
   Widget _buildGroupRelationSelector(
     BuildContext context,
