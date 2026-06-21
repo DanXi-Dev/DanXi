@@ -8,24 +8,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-enum PostFilterExprRelation {
-  and,
-  or;
-
-  IconData icon(BuildContext context) {
-    return switch (this) {
-      PostFilterExprRelation.and =>
-        PlatformX.isMaterial(context)
-            ? Icons.call_merge
-            : CupertinoIcons.arrow_merge,
-      PostFilterExprRelation.or =>
-        PlatformX.isMaterial(context)
-            ? Icons.call_split
-            : CupertinoIcons.arrow_branch,
-    };
-  }
-}
-
 enum PostFilterVerb {
   lt(token: '<'),
   gt(token: '>'),
@@ -235,30 +217,64 @@ sealed class PostFilterExpr {
   String toJs();
 }
 
-class PostFilterGroup extends PostFilterExpr {
-  PostFilterExprRelation relation;
-  final List<PostFilterSlot> slots;
-
-  PostFilterGroup({required this.relation}) : slots = [];
-
-  PostFilterGroup.and() : this(relation: PostFilterExprRelation.and);
-
-  PostFilterGroup.or() : this(relation: PostFilterExprRelation.or);
-
-  bool get isEmpty => slots.isEmpty;
+sealed class PostFilterGroup extends PostFilterExpr {
+  List<PostFilterSlot> get slots;
 
   @override
   String toJs() {
-    final buffer = StringBuffer();
-    for (var i = 0; i < slots.length; i++) {
-      final slot = slots[i];
-      if (i > 0) {
-        buffer.write(relation == PostFilterExprRelation.or ? ' || ' : ' && ');
-      }
-      final js = slot.expr.toJs();
-      buffer.write(slot.expr is PostFilterGroup ? '($js)' : js);
+    return slots
+        .map((slot) {
+          final js = slot.expr.toJs();
+          return slot.expr is PostFilterGroup ? '($js)' : js;
+        })
+        .join(switch (this) {
+          AndGroup _ => ' && ',
+          OrGroup _ => ' || ',
+        });
+  }
+
+  List<PostFilterSlot> moveSlotsTo(PostFilterGroup target) {
+    for (final slot in slots) {
+      slot.group = target;
     }
-    return buffer.toString();
+    final moved = List.of(slots);
+    slots.clear();
+    return moved;
+  }
+
+  IconData icon(BuildContext context) {
+    return switch (this) {
+      AndGroup _ =>
+        PlatformX.isMaterial(context)
+            ? Icons.call_merge
+            : CupertinoIcons.arrow_merge,
+      OrGroup _ =>
+        PlatformX.isMaterial(context)
+            ? Icons.call_split
+            : CupertinoIcons.arrow_branch,
+    };
+  }
+}
+
+class AndGroup extends PostFilterGroup {
+  @override
+  final List<PostFilterSlot> slots = [];
+
+  AndGroup();
+
+  AndGroup.fromGroup(PostFilterGroup group) {
+    slots.addAll(group.moveSlotsTo(this));
+  }
+}
+
+class OrGroup extends PostFilterGroup {
+  @override
+  final List<PostFilterSlot> slots = [];
+
+  OrGroup();
+
+  OrGroup.fromGroup(PostFilterGroup group) {
+    slots.addAll(group.moveSlotsTo(this));
   }
 }
 
@@ -272,8 +288,6 @@ class PostFilterCondition extends PostFilterExpr {
     this.verb = PostFilterVerb.eq,
     this.object,
   });
-
-  const PostFilterCondition.empty() : this();
 
   factory PostFilterCondition.fromField(
     PostFilterField field, [
@@ -325,7 +339,7 @@ class PostFilterSlot {
 }
 
 class PostFilterController extends ChangeNotifier {
-  final PostFilterGroup root = PostFilterGroup.and();
+  PostFilterGroup root = AndGroup();
 
   String toJs() => root.toJs();
 
@@ -344,8 +358,8 @@ class PostFilterController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setRelation(PostFilterGroup group, PostFilterExprRelation relation) {
-    group.relation = relation;
+  void replaceRoot(PostFilterGroup group) {
+    root = group;
     notifyListeners();
   }
 }
@@ -540,7 +554,7 @@ class PostFilterBar extends StatelessWidget {
           // TODO: Add a negation selector like `!(a && b)` or `!(a || b)`.
           Text('Group', style: _labelSmallStyle(context)),
           const SizedBox(width: 4),
-          _buildGroupRelationSelector(context, group),
+          _buildGroupRelationSelector(context, group, slot: slot),
           const Spacer(),
           const SizedBox(width: 4),
           if (slot != null) _buildCloseButton(context, slot),
@@ -626,20 +640,15 @@ class PostFilterBar extends StatelessWidget {
                   context,
                   group,
                   'Field expression',
-                  PostFilterCondition.empty,
+                  PostFilterCondition.new,
                 ),
                 _buildAddExprListTile(
                   context,
                   group,
                   'AND group',
-                  PostFilterGroup.and,
+                  AndGroup.new,
                 ),
-                _buildAddExprListTile(
-                  context,
-                  group,
-                  'OR group',
-                  PostFilterGroup.or,
-                ),
+                _buildAddExprListTile(context, group, 'OR group', OrGroup.new),
               ],
             ),
           ),
@@ -668,16 +677,27 @@ class PostFilterBar extends StatelessWidget {
 
   Widget _buildGroupRelationSelector(
     BuildContext context,
-    PostFilterGroup group,
-  ) {
-    final nextRelation = group.relation == PostFilterExprRelation.and
-        ? PostFilterExprRelation.or
-        : PostFilterExprRelation.and;
+    PostFilterGroup group, {
+    PostFilterSlot? slot,
+  }) {
     return _buildTapChipButton(
       context,
-      onTap: () => controller.setRelation(group, nextRelation),
-      label: '[${group.relation.name.toUpperCase()}]',
-      icon: group.relation.icon(context),
+      onTap: () {
+        final toggled = switch (group) {
+          AndGroup _ => OrGroup.fromGroup(group),
+          OrGroup _ => AndGroup.fromGroup(group),
+        };
+        if (slot == null) {
+          controller.replaceRoot(toggled);
+        } else {
+          controller.replaceSlot(slot, toggled);
+        }
+      },
+      label: switch (group) {
+        AndGroup _ => '[AND]',
+        OrGroup _ => '[OR]',
+      },
+      icon: group.icon(context),
     );
   }
 
