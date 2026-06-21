@@ -59,20 +59,8 @@ sealed class PostFilterField {
       BooleanField _ => 'true',
       NumberField _ => '0',
       StringField _ => verb == PostFilterVerb.match ? '/^/i' : '""',
-      ArrayField _ || MapField _ => '""',
-    };
-  }
-
-  List<String> exampleObjects(PostFilterVerb verb) {
-    return switch (this) {
-      BooleanField _ => const ['true', 'false'],
-      NumberField _ => const ['0', '1', '-1', '10'],
-      StringField _ =>
-        verb == PostFilterVerb.match
-            ? const [r'/keyword/i', r'/^keyword/i', r'/keyword$/i']
-            : const ['"keyword"', '""'],
-      ArrayField _ => const [],
-      MapField _ => const [],
+      ArrayField _ => '[]',
+      MapField _ => '{}',
     };
   }
 
@@ -687,51 +675,64 @@ class PostFilterBar extends StatelessWidget {
     );
   }
 
+  static const String _customInputKey = '__CUSTOM_INPUT__';
+
   Widget _buildConditionObjectSelector(
     BuildContext context,
     PostFilterCondition cond,
     PostFilterSlot slot,
   ) {
-    return switch (cond.subject) {
-      BooleanField _ => (() {
-        final currBool =
-            cond.object?.apply((o) => bool.tryParse(o, caseSensitive: false)) ??
-            false;
-        return _buildTapChipButton(
-          context,
-          onTap: () => controller.replaceSlot(
-            slot,
-            PostFilterCondition(
-              subject: cond.subject,
-              object: (!currBool).toString(),
-            ),
-          ),
-          label: currBool.toString(),
-        );
-      })(),
-      StringField _ => _buildTapChipButton(
+    if (cond.subject is BooleanField) {
+      final currBool =
+          cond.object?.apply((o) => bool.tryParse(o, caseSensitive: false)) ??
+          false;
+      return _buildTapChipButton(
         context,
-        onTap: () =>
-            _showStringValueInputDialog(context, cond, cond.verb, slot),
-        label: cond.object ?? '',
-      ),
-      _ => _buildPopupChipButton<String>(
-        context,
-        items: (cond.subject?.exampleObjects(cond.verb) ?? const [])
-            .map((value) => PopupMenuItem(value: value, child: Text(value)))
-            .toList(growable: false),
-        initialValue: cond.object,
-        onSelected: (value) => controller.replaceSlot(
+        onTap: () => controller.replaceSlot(
           slot,
           PostFilterCondition(
             subject: cond.subject,
-            verb: cond.verb,
-            object: value,
+            object: (!currBool).toString(),
           ),
         ),
-        label: cond.object ?? '',
-      ),
-    };
+        label: currBool.toString(),
+      );
+    }
+    return _buildPopupChipButton<String>(
+      context,
+      items: [
+        if (cond.subject?.defaultObject(cond.verb) case final o?)
+          PopupMenuItem(value: o, child: Text(o)),
+        PopupMenuItem(value: _customInputKey, child: Text('Custom input...')),
+        const PopupMenuDivider(),
+        for (final field in fields)
+          if (field.runtimeType == cond.subject?.runtimeType)
+            PopupMenuItem(
+              value: field.name,
+              child: _buildPopupAvatarItem(
+                context,
+                field.icon(context),
+                field.name,
+              ),
+            ),
+      ],
+      initialValue: cond.object,
+      onSelected: (value) {
+        if (value == _customInputKey) {
+          _showStringValueInputDialog(context, cond, cond.verb, slot);
+        } else {
+          controller.replaceSlot(
+            slot,
+            PostFilterCondition(
+              subject: cond.subject,
+              verb: cond.verb,
+              object: value,
+            ),
+          );
+        }
+      },
+      label: cond.object ?? '',
+    );
   }
 
   // ======== WIDGETS ========
