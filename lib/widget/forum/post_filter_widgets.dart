@@ -276,13 +276,25 @@ class PostFilterCondition extends PostFilterExpr {
   const PostFilterCondition.empty() : this();
 
   factory PostFilterCondition.fromField(
-    PostFilterField? field, [
+    PostFilterField field, [
     PostFilterVerb verb = PostFilterVerb.eq,
   ]) {
     return PostFilterCondition(
       subject: field,
       verb: verb,
-      object: field?.defaultObject(verb),
+      object: field.defaultObject(verb),
+    );
+  }
+
+  PostFilterCondition copyWith({
+    PostFilterField? subject,
+    PostFilterVerb? verb,
+    PostFilterValue? object,
+  }) {
+    return PostFilterCondition(
+      subject: subject ?? this.subject,
+      verb: verb ?? this.verb,
+      object: object ?? this.object,
     );
   }
 
@@ -711,7 +723,10 @@ class PostFilterBar extends StatelessWidget {
       initialValue: cond.verb,
       onSelected: (verb) => controller.replaceSlot(
         slot,
-        PostFilterCondition.fromField(cond.subject, verb),
+        cond.copyWith(
+          verb: verb,
+          object: cond.object ?? cond.subject?.defaultObject(verb),
+        ),
       ),
       label: cond.verb.token,
     );
@@ -751,16 +766,9 @@ class PostFilterBar extends StatelessWidget {
       initialValue: cond.object,
       onSelected: (value) {
         if (value is PostFilterRawValue) {
-          _showStringValueInputDialog(context, cond, cond.verb, slot);
+          _showStringValueInputDialog(context, cond, slot);
         } else {
-          controller.replaceSlot(
-            slot,
-            PostFilterCondition(
-              subject: cond.subject,
-              verb: cond.verb,
-              object: value,
-            ),
-          );
+          controller.replaceSlot(slot, cond.copyWith(object: value));
         }
       },
       label: cond.object?.token ?? '',
@@ -849,17 +857,16 @@ class PostFilterBar extends StatelessWidget {
   Future<void> _showStringValueInputDialog(
     BuildContext context,
     PostFilterCondition cond,
-    PostFilterVerb verb,
     PostFilterSlot slot,
   ) async {
-    final prompt = switch (verb) {
+    final prompt = switch (cond.verb) {
       PostFilterVerb.eq => 'Exact value',
       PostFilterVerb.ne => 'Exclude value',
       PostFilterVerb.include => 'Substring',
       PostFilterVerb.match => 'Regex pattern',
       _ => 'Unknown verb',
     };
-    final example = switch (verb) {
+    final example = switch (cond.verb) {
       PostFilterVerb.eq || PostFilterVerb.ne => '"content"',
       PostFilterVerb.include => '"keyword"',
       PostFilterVerb.match => '/regex/i',
@@ -902,11 +909,7 @@ class PostFilterBar extends StatelessWidget {
     if (result != null) {
       controller.replaceSlot(
         slot,
-        PostFilterCondition(
-          subject: cond.subject,
-          verb: verb,
-          object: PostFilterLiteralValue(result),
-        ),
+        cond.copyWith(object: PostFilterLiteralValue(result)),
       );
     }
   }
