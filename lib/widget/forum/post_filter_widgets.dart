@@ -794,11 +794,12 @@ class PostFilterBar extends StatelessWidget {
             ),
       ],
       initialValue: cond.object,
-      onSelected: (value) {
-        if (value is PostFilterRawValue) {
-          _showStringValueInputDialog(context, cond, slot);
-        } else {
-          controller.replaceSlot(slot, cond.copyWith(object: value));
+      onSelected: (value) async {
+        if (value is PostFilterRawValue
+                ? await _showStringValueInputDialog(context, cond, slot)
+                : value
+            case final o?) {
+          controller.replaceSlot(slot, cond.copyWith(object: o));
         }
       },
       label: cond.object?.token ?? '',
@@ -884,7 +885,7 @@ class PostFilterBar extends StatelessWidget {
     );
   }
 
-  Future<void> _showStringValueInputDialog(
+  Future<PostFilterLiteralValue?> _showStringValueInputDialog(
     BuildContext context,
     PostFilterCondition cond,
     PostFilterSlot slot,
@@ -936,12 +937,10 @@ class PostFilterBar extends StatelessWidget {
         ],
       ),
     );
-    if (result != null) {
-      controller.replaceSlot(
-        slot,
-        cond.copyWith(object: PostFilterLiteralValue(result)),
-      );
-    }
+    return switch (result) {
+      final r? when r.isNotEmpty => PostFilterLiteralValue(r),
+      _ => null,
+    };
   }
 
   Widget _buildPopupAvatarItem(
