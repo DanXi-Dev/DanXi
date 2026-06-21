@@ -722,34 +722,20 @@ class PostFilterBar extends StatelessWidget {
     PostFilterCondition cond,
     PostFilterSlot slot,
   ) {
-    if (cond.subject is BooleanField) {
-      final currBool = switch (cond.object) {
-        PostFilterLiteralValue(:final literal) =>
-          bool.tryParse(literal, caseSensitive: false) ?? false,
-        _ => false,
-      };
-      return _buildTapChipButton(
-        context,
-        onTap: () => controller.replaceSlot(
-          slot,
-          PostFilterCondition(
-            subject: cond.subject,
-            verb: PostFilterVerb.eq,
-            object: PostFilterLiteralValue((!currBool).toString()),
-          ),
-        ),
-        label: currBool.toString(),
-      );
-    }
     return _buildPopupChipButton<PostFilterValue>(
       context,
       items: [
-        if (cond.subject?.defaultObject(cond.verb).token case final o?)
-          PopupMenuItem(value: PostFilterLiteralValue(o), child: Text(o)),
-        const PopupMenuItem(
-          value: PostFilterRawValue(),
-          child: Text('Custom input...'),
-        ),
+        if (cond.subject is BooleanField)
+          for (final b in const ['false', 'true'])
+            PopupMenuItem(value: PostFilterLiteralValue(b), child: Text(b))
+        else ...[
+          if (cond.subject?.defaultObject(cond.verb).token case final o?)
+            PopupMenuItem(value: PostFilterLiteralValue(o), child: Text(o)),
+          const PopupMenuItem(
+            value: PostFilterRawValue(),
+            child: Text('Custom input...'),
+          ),
+        ],
         const PopupMenuDivider(),
         for (final field in fields)
           if (field.runtimeType == cond.subject?.runtimeType)
