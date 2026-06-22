@@ -413,14 +413,15 @@ class PostFilterState {
     controller.dispose();
     jsRuntime.dispose();
   }
-}
 
-IconData getPostFilterIcon(BuildContext context, bool showPostFilter) =>
-    PlatformX.isMaterial(context)
-    ? (showPostFilter ? Icons.filter_alt_off : Icons.filter_alt)
-    : (showPostFilter
-          ? CupertinoIcons.line_horizontal_3
-          : CupertinoIcons.slider_horizontal_3);
+  IconData getIcon(BuildContext context) => _shown
+      ? PlatformX.isMaterial(context)
+            ? Icons.filter_alt_off
+            : CupertinoIcons.line_horizontal_3
+      : PlatformX.isMaterial(context)
+      ? Icons.filter_alt
+      : CupertinoIcons.slider_horizontal_3;
+}
 
 class PostFilterBar extends StatelessWidget {
   final PostFilterController controller;

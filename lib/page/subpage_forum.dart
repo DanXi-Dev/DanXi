@@ -820,7 +820,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   Widget _buildPostFilterButton(BuildContext context) {
     return PlatformIconButton(
       padding: EdgeInsets.zero,
-      icon: Icon(getPostFilterIcon(context, _postFilter.shown)),
+      icon: Icon(_postFilter.getIcon(context)),
       onPressed: _togglePostFilter,
     );
   }
