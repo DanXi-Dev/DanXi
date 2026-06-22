@@ -983,7 +983,6 @@ class PostFilterBar extends StatelessWidget {
     BuildContext context,
     PostFilterCondition cond,
   ) async {
-    // TODO: Add increment and decrement buttons.
     final result = await _showTextInputDialog(
       context,
       prompt: switch (cond.verb) {
@@ -1001,6 +1000,27 @@ class PostFilterBar extends StatelessWidget {
       },
       hintText: 'e.g. 42',
       keyboardType: TextInputType.number,
+      contentBuilder: (textController, textField) => Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.remove),
+            onPressed: () {
+              if (num.tryParse(textController.text) case final current?) {
+                textController.text = (current - 1).toString();
+              }
+            },
+          ),
+          Expanded(child: textField),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              if (num.tryParse(textController.text) case final current?) {
+                textController.text = (current + 1).toString();
+              }
+            },
+          ),
+        ],
+      ),
     );
     return switch (result) {
       final r? when r.isNotEmpty && r.isNumber() => PostFilterLiteralValue(r),
@@ -1101,8 +1121,15 @@ class PostFilterBar extends StatelessWidget {
     String? initialValue,
     String? hintText,
     TextInputType? keyboardType,
+    Widget Function(TextEditingController, Widget)? contentBuilder,
   }) async {
     final textController = TextEditingController(text: initialValue);
+    final defaultTextField = TextField(
+      controller: textController,
+      decoration: InputDecoration(hintText: hintText),
+      keyboardType: keyboardType,
+      autofocus: true,
+    );
     final result = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -1114,12 +1141,8 @@ class PostFilterBar extends StatelessWidget {
               Text(prompt, style: _labelSmallStyle(context)),
               const SizedBox(height: 8),
             ],
-            TextField(
-              controller: textController,
-              decoration: InputDecoration(hintText: hintText),
-              keyboardType: keyboardType,
-              autofocus: true,
-            ),
+            contentBuilder?.call(textController, defaultTextField) ??
+                defaultTextField,
           ],
         ),
         actions: [
