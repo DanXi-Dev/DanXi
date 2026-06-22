@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:dan_xi/model/forum/floor.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/util/forum/post_filter_js_runtime.dart';
@@ -1070,17 +1071,102 @@ class PostFilterBar extends StatelessWidget {
     BuildContext context,
     PostFilterCondition cond,
   ) async {
+    final regexLiteral = switch (cond.object) {
+      PostFilterLiteralValue(:final literal) => literal,
+      _ => null,
+    };
+
+    final String regexPattern;
+    final flags = <String>{};
+    if (RegExp(
+          r'^/(?<pattern>(?:\\.|[^/])*)/(?<flags>\w*)$',
+        ).firstMatch(regexLiteral ?? '')
+        case final match?) {
+      regexPattern = match.namedGroup('pattern') ?? '';
+      final flagsStr = match.namedGroup('flags') ?? '';
+      flags.addAll(flagsStr.split(''));
+    } else if (regexLiteral != null && regexLiteral.startsWith('/')) {
+      regexPattern = regexLiteral.substring(1);
+    } else {
+      regexPattern = '';
+    }
+
+    // From `https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions`.
+    final allFlags = [
+      ('d', 'Generate indices for substring matches.', 'hasIndices'),
+      ('g', 'Global search.', 'global'),
+      ('i', 'Case-insensitive search.', 'ignoreCase'),
+      (
+        'm',
+        r'Makes `^` and `$` match the start and end of each line instead of those of the entire string.',
+        'multiline',
+      ),
+      ('s', 'Allows `.` matches newline characters', 'dotAll'),
+      (
+        'u',
+        '"Unicode"; tread a pattern as a sequence of Unicode code points.',
+        'unicode',
+      ),
+      (
+        'v',
+        'An upgrade to the `u` mode with more Unicode features.',
+        'unicodeSets',
+      ),
+      (
+        'y',
+        'Perform a "sticky" search that matches starting at the current position in the target string.',
+        'sticky',
+      ),
+    ];
+
     final result = await _showTextInputDialog(
       context,
       prompt: 'Regex pattern',
-      initialValue: switch (cond.object) {
-        PostFilterLiteralValue(:final literal) => literal,
-        _ => null,
-      },
-      hintText: '/pattern/i',
+      initialValue: regexPattern,
+      contentBuilder: (textController, textField) => [
+        textField,
+        const SizedBox(height: 12),
+        Text('Flags', style: _labelSmallStyle(context)),
+        const SizedBox(height: 4),
+        StatefulBuilder(
+          builder: (innerContext, setInnerState) => Column(
+            children: [
+              for (final (flag, desc, prop) in allFlags)
+                CheckboxListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  visualDensity: VisualDensity.compact,
+                  title: Text(
+                    '$flag: $prop',
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  subtitle: Text(
+                    desc,
+                    style: const TextStyle(fontFamily: 'monospace'),
+                  ),
+                  value: flags.contains(flag),
+                  onChanged: (selected) {
+                    setInnerState(() {
+                      if (selected == true) {
+                        flags.add(flag);
+                      } else {
+                        flags.remove(flag);
+                      }
+                    });
+                  },
+                ),
+            ],
+          ),
+        ),
+      ],
     );
     return switch (result) {
-      final r? when r.isNotEmpty => PostFilterLiteralValue(r),
+      final r? when r.isNotEmpty => PostFilterLiteralValue(
+        '/$r/${flags.sorted().join()}',
+      ),
       _ => null,
     };
   }
