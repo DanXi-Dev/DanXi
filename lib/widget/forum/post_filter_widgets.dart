@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
+import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/forum/floor.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/util/forum/post_filter_js_runtime.dart';
@@ -482,9 +483,10 @@ class PostFilterBar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: Text(
               PostFilterJsRuntime.isSupported
-                  // TODO: Use i18n.
-                  ? (appliedJsExpr.isEmpty ? 'JS expression' : appliedJsExpr)
-                  : 'PostFilterJsRuntime.isSupported: false',
+                  ? (appliedJsExpr.isEmpty
+                        ? S.of(context).js_expression
+                        : appliedJsExpr)
+                  : S.of(context).js_runtime_unsupported,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: appliedJsExpr.isEmpty
                     ? Theme.of(context).hintColor
@@ -602,7 +604,7 @@ class PostFilterBar extends StatelessWidget {
           Expanded(child: _buildConditionSubjectSelector(context, cond, slot)),
           const SizedBox(width: 4),
           if (cond.subject?.type == PostFilterValueType.boolean)
-            Text('is', style: _labelSmallStyle(context))
+            Text(S.of(context).boolean_is, style: _labelSmallStyle(context))
           else
             _buildConditionVerbSelector(context, cond, slot),
           const SizedBox(width: 4),
@@ -729,37 +731,37 @@ class PostFilterBar extends StatelessWidget {
                 _buildAddExprListTile(
                   context,
                   group,
-                  'Field expression',
+                  S.of(context).field_expression,
                   PostFilterCondition.new,
                 ),
                 _buildAddExprListTile(
                   context,
                   group,
-                  'Raw expression',
+                  S.of(context).raw_expression,
                   PostFilterRawCondition.new,
                 ),
                 _buildAddExprListTile(
                   context,
                   group,
-                  'AND group',
+                  S.of(context).and_group,
                   PostFilterGroup.and,
                 ),
                 _buildAddExprListTile(
                   context,
                   group,
-                  'OR group',
+                  S.of(context).or_group,
                   PostFilterGroup.or,
                 ),
                 _buildAddExprListTile(
                   context,
                   group,
-                  'NOT AND group',
+                  S.of(context).not_and_group,
                   PostFilterGroup.nand,
                 ),
                 _buildAddExprListTile(
                   context,
                   group,
-                  'NOT OR group',
+                  S.of(context).not_or_group,
                   PostFilterGroup.nor,
                 ),
               ],
@@ -795,7 +797,9 @@ class PostFilterBar extends StatelessWidget {
     return _buildTapChipButton(
       context,
       onTap: () => controller.toggleGroupNegated(group),
-      label: group.negated ? 'Negated Group' : 'Group',
+      label: group.negated
+          ? S.of(context).negated_group
+          : S.of(context).group_label,
       icon: group.negated
           ? PlatformX.isMaterial(context)
                 ? Icons.not_interested
@@ -811,7 +815,10 @@ class PostFilterBar extends StatelessWidget {
     return _buildTapChipButton(
       context,
       onTap: () => controller.toggleGroupRelation(group),
-      label: group.relation.name.toUpperCase(),
+      label: switch (group.relation) {
+        PostFilterRelation.and => S.of(context).and_operator,
+        PostFilterRelation.or => S.of(context).or_operator,
+      },
       icon: group.relation.icon(context),
     );
   }
@@ -890,7 +897,7 @@ class PostFilterBar extends StatelessWidget {
           PostFilterValueType.regExp => [
             PopupMenuItem(
               value: PostFilterInputValue(type: objectType),
-              child: const Text('Input content'),
+              child: Text(S.of(context).input_content),
             ),
           ],
           _ => const [],
@@ -908,7 +915,7 @@ class PostFilterBar extends StatelessWidget {
         const PopupMenuDivider(),
         PopupMenuItem(
           value: PostFilterInputValue(),
-          child: const Text('Custom expression'),
+          child: Text(S.of(context).custom_expression),
         ),
       ],
       initialValue: cond.object,
@@ -1026,19 +1033,19 @@ class PostFilterBar extends StatelessWidget {
     final result = await _showTextInputDialog(
       context,
       prompt: switch (cond.verb) {
-        PostFilterVerb.lt => 'Less than',
-        PostFilterVerb.gt => 'Greater than',
-        PostFilterVerb.le => 'At most',
-        PostFilterVerb.ge => 'At least',
-        PostFilterVerb.eq => 'Exact value',
-        PostFilterVerb.ne => 'Exclude value',
+        PostFilterVerb.lt => S.of(context).less_than,
+        PostFilterVerb.gt => S.of(context).greater_than,
+        PostFilterVerb.le => S.of(context).at_most,
+        PostFilterVerb.ge => S.of(context).at_least,
+        PostFilterVerb.eq => S.of(context).exact_value,
+        PostFilterVerb.ne => S.of(context).exclude_value,
         _ => null,
       },
       initialValue: switch (cond.object) {
         PostFilterLiteralValue(:final literal) => literal,
         _ => null,
       },
-      hintText: 'e.g. 42',
+      hintText: S.of(context).eg_42,
       keyboardType: TextInputType.number,
       contentBuilder: (textController, textField) => [
         Row(
@@ -1077,8 +1084,8 @@ class PostFilterBar extends StatelessWidget {
     final result = await _showTextInputDialog(
       context,
       prompt: switch (cond.verb) {
-        PostFilterVerb.eq || PostFilterVerb.ne => 'Exact value',
-        PostFilterVerb.include => 'Substring',
+        PostFilterVerb.eq || PostFilterVerb.ne => S.of(context).exact_value,
+        PostFilterVerb.include => S.of(context).substring,
         _ => null,
       },
       initialValue: switch (cond.object) {
@@ -1095,8 +1102,8 @@ class PostFilterBar extends StatelessWidget {
         _ => null,
       },
       hintText: switch (cond.verb) {
-        PostFilterVerb.eq || PostFilterVerb.ne => 'content',
-        PostFilterVerb.include => 'keyword',
+        PostFilterVerb.eq || PostFilterVerb.ne => S.of(context).content_hint,
+        PostFilterVerb.include => S.of(context).keyword_hint,
         _ => null,
       },
     );
@@ -1131,41 +1138,26 @@ class PostFilterBar extends StatelessWidget {
     }
 
     // From `https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions`.
+    final s = S.of(context);
     final allFlags = [
-      ('d', 'Generate indices for substring matches.', 'hasIndices'),
-      ('g', 'Global search.', 'global'),
-      ('i', 'Case-insensitive search.', 'ignoreCase'),
-      (
-        'm',
-        r'Makes `^` and `$` match the start and end of each line instead of those of the entire string.',
-        'multiline',
-      ),
-      ('s', 'Allows `.` matches newline characters', 'dotAll'),
-      (
-        'u',
-        '"Unicode"; tread a pattern as a sequence of Unicode code points.',
-        'unicode',
-      ),
-      (
-        'v',
-        'An upgrade to the `u` mode with more Unicode features.',
-        'unicodeSets',
-      ),
-      (
-        'y',
-        'Perform a "sticky" search that matches starting at the current position in the target string.',
-        'sticky',
-      ),
+      ('d', s.regex_flag_d_description, 'hasIndices'),
+      ('g', s.regex_flag_g_description, 'global'),
+      ('i', s.regex_flag_i_description, 'ignoreCase'),
+      ('m', s.regex_flag_m_description, 'multiline'),
+      ('s', s.regex_flag_s_description, 'dotAll'),
+      ('u', s.regex_flag_u_description, 'unicode'),
+      ('v', s.regex_flag_v_description, 'unicodeSets'),
+      ('y', s.regex_flag_y_description, 'sticky'),
     ];
 
     final result = await _showTextInputDialog(
       context,
-      prompt: 'Regex pattern',
+      prompt: s.regex_pattern,
       initialValue: regexPattern,
       contentBuilder: (textController, textField) => [
         textField,
         const SizedBox(height: 12),
-        Text('Flags', style: _labelSmallStyle(context)),
+        Text(s.regex_flags, style: _labelSmallStyle(context)),
         const SizedBox(height: 4),
         StatefulBuilder(
           builder: (innerContext, setInnerState) => Column(
@@ -1216,7 +1208,7 @@ class PostFilterBar extends StatelessWidget {
   ) async {
     final result = await _showTextInputDialog(
       context,
-      prompt: 'Raw JS value',
+      prompt: S.of(context).raw_js_value,
       initialValue: cond.object?.token,
     );
     return switch (result) {
@@ -1231,7 +1223,7 @@ class PostFilterBar extends StatelessWidget {
   ) async {
     final result = await _showTextInputDialog(
       context,
-      prompt: 'Raw JS condition',
+      prompt: S.of(context).raw_js_condition,
       initialValue: rawCond.raw,
     );
     return PostFilterRawCondition(
@@ -1277,11 +1269,11 @@ class PostFilterBar extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text(S.of(context).cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, textController.text),
-            child: const Text('OK'),
+            child: Text(S.of(context).ok),
           ),
         ],
       ),
