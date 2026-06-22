@@ -69,11 +69,25 @@ class PostFilterFieldValue extends PostFilterValue {
 }
 
 enum PostFilterValueType {
-  boolean, // The JS Boolean.
+  boolean, // The JS Boolean, not the Dart bool.
   number,
   string,
   array,
-  object, // The JS Object.
+  regExp, // The JS RegExp.
+  object // The JS Object. Conceptually Array and RegExp are Object too.
+  ;
+
+  PostFilterLiteralValue get defaultValue {
+    final literal = switch (this) {
+      PostFilterValueType.boolean => 'true',
+      PostFilterValueType.number => '0',
+      PostFilterValueType.string => '""',
+      PostFilterValueType.array => '[]',
+      PostFilterValueType.regExp => '/^/',
+      PostFilterValueType.object => '{}',
+    };
+    return PostFilterLiteralValue(literal);
+  }
 }
 
 class PostFilterField {
@@ -117,42 +131,47 @@ class PostFilterField {
       PostFilterVerb.eq,
       PostFilterVerb.include,
     ],
+    PostFilterValueType.regExp => const [
+      PostFilterVerb.eq,
+      PostFilterVerb.match,
+    ],
     PostFilterValueType.object => const [PostFilterVerb.eq],
   };
 
-  PostFilterLiteralValue defaultObject(PostFilterVerb verb) {
-    final literal = switch (type) {
-      PostFilterValueType.boolean => 'true',
-      PostFilterValueType.number => '0',
-      PostFilterValueType.string => verb == PostFilterVerb.match ? '/^/i' : '""',
-      PostFilterValueType.array => '[]',
-      PostFilterValueType.object => '{}',
-    };
-    return PostFilterLiteralValue(literal);
-  }
+  PostFilterValueType objectType(PostFilterVerb verb) => switch (type) {
+    PostFilterValueType.boolean => PostFilterValueType.boolean,
+    PostFilterValueType.number => PostFilterValueType.number,
+    PostFilterValueType.string => switch (verb) {
+      PostFilterVerb.match => PostFilterValueType.regExp,
+      _ => PostFilterValueType.string,
+    },
+    PostFilterValueType.regExp => PostFilterValueType.string,
+    PostFilterValueType.array => PostFilterValueType.array,
+    PostFilterValueType.object => PostFilterValueType.object,
+  };
 
-  IconData icon(BuildContext context) {
-    return switch (type) {
-      PostFilterValueType.boolean =>
-        PlatformX.isMaterial(context)
-            ? Icons.toggle_on
-            : CupertinoIcons.plus_slash_minus,
-      PostFilterValueType.number =>
-        PlatformX.isMaterial(context) ? Icons.numbers : CupertinoIcons.number,
-      PostFilterValueType.string =>
-        PlatformX.isMaterial(context)
-            ? Icons.abc
-            : CupertinoIcons.textformat_abc,
-      PostFilterValueType.array =>
-        PlatformX.isMaterial(context)
-            ? Icons.data_array
-            : CupertinoIcons.list_bullet,
-      PostFilterValueType.object =>
-        PlatformX.isMaterial(context)
-            ? Icons.data_object
-            : CupertinoIcons.collections,
-    };
-  }
+  IconData icon(BuildContext context) => switch (type) {
+    PostFilterValueType.boolean =>
+      PlatformX.isMaterial(context)
+          ? Icons.toggle_on
+          : CupertinoIcons.plus_slash_minus,
+    PostFilterValueType.number =>
+      PlatformX.isMaterial(context) ? Icons.numbers : CupertinoIcons.number,
+    PostFilterValueType.string =>
+      PlatformX.isMaterial(context) ? Icons.abc : CupertinoIcons.textformat_abc,
+    PostFilterValueType.array =>
+      PlatformX.isMaterial(context)
+          ? Icons.data_array
+          : CupertinoIcons.list_bullet,
+    PostFilterValueType.regExp =>
+      PlatformX.isMaterial(context)
+          ? Icons.manage_search
+          : CupertinoIcons.slash_circle,
+    PostFilterValueType.object =>
+      PlatformX.isMaterial(context)
+          ? Icons.data_object
+          : CupertinoIcons.collections,
+  };
 }
 
 const List<PostFilterField> postFilterHoleFieldNames = [
@@ -271,7 +290,7 @@ class PostFilterCondition extends PostFilterExpr {
     return PostFilterCondition(
       subject: field,
       verb: verb,
-      object: field.defaultObject(verb),
+      object: field.objectType(verb).defaultValue,
     );
   }
 
@@ -795,7 +814,7 @@ class PostFilterBar extends StatelessWidget {
         slot,
         cond.copyWith(
           verb: verb,
-          object: cond.object ?? cond.subject?.defaultObject(verb),
+          object: cond.object ?? cond.subject?.objectType(verb).defaultValue,
         ),
       ),
       label: cond.verb.token,
@@ -807,31 +826,35 @@ class PostFilterBar extends StatelessWidget {
     PostFilterCondition cond,
     PostFilterSlot slot,
   ) {
+    final objectType = cond.subject?.objectType(cond.verb);
+    final objectFields = [
+      for (final field in fields)
+        if (field.type == objectType) field,
+    ];
     return _buildPopupChipButton<PostFilterValue>(
       context,
       items: [
-        if (cond.subject?.type == PostFilterValueType.boolean)
+        if (objectType == PostFilterValueType.boolean)
           for (final b in const ['false', 'true'])
             PopupMenuItem(value: PostFilterLiteralValue(b), child: Text(b))
         else ...[
-          if (cond.subject?.defaultObject(cond.verb).token case final o?)
+          if (objectType?.defaultValue.token case final o?)
             PopupMenuItem(value: PostFilterLiteralValue(o), child: Text(o)),
           const PopupMenuItem(
             value: PostFilterRawValue(),
             child: Text('Custom input...'),
           ),
         ],
-        const PopupMenuDivider(),
-        for (final field in fields)
-          if (field.runtimeType == cond.subject?.runtimeType)
-            PopupMenuItem(
-              value: PostFilterFieldValue(field),
-              child: _buildPopupAvatarItem(
-                context,
-                field.icon(context),
-                field.name,
-              ),
+        if (objectFields.isNotEmpty) const PopupMenuDivider(),
+        for (final field in objectFields)
+          PopupMenuItem(
+            value: PostFilterFieldValue(field),
+            child: _buildPopupAvatarItem(
+              context,
+              field.icon(context),
+              field.name,
             ),
+          ),
       ],
       initialValue: cond.object,
       onSelected: (value) async {
