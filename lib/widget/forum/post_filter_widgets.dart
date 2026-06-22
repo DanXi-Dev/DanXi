@@ -1000,27 +1000,29 @@ class PostFilterBar extends StatelessWidget {
       },
       hintText: 'e.g. 42',
       keyboardType: TextInputType.number,
-      contentBuilder: (textController, textField) => Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.remove),
-            onPressed: () {
-              if (num.tryParse(textController.text) case final current?) {
-                textController.text = (current - 1).toString();
-              }
-            },
-          ),
-          Expanded(child: textField),
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              if (num.tryParse(textController.text) case final current?) {
-                textController.text = (current + 1).toString();
-              }
-            },
-          ),
-        ],
-      ),
+      contentBuilder: (textController, textField) => [
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.remove),
+              onPressed: () {
+                if (num.tryParse(textController.text) case final current?) {
+                  textController.text = (current - 1).toString();
+                }
+              },
+            ),
+            Expanded(child: textField),
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                if (num.tryParse(textController.text) case final current?) {
+                  textController.text = (current + 1).toString();
+                }
+              },
+            ),
+          ],
+        ),
+      ],
     );
     return switch (result) {
       final r? when r.isNotEmpty && r.isNumber() => PostFilterLiteralValue(r),
@@ -1121,7 +1123,7 @@ class PostFilterBar extends StatelessWidget {
     String? initialValue,
     String? hintText,
     TextInputType? keyboardType,
-    Widget Function(TextEditingController, Widget)? contentBuilder,
+    List<Widget> Function(TextEditingController, Widget)? contentBuilder,
   }) async {
     final textController = TextEditingController(text: initialValue);
     final defaultTextField = TextField(
@@ -1133,17 +1135,19 @@ class PostFilterBar extends StatelessWidget {
     final result = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (prompt != null) ...[
-              Text(prompt, style: _labelSmallStyle(context)),
-              const SizedBox(height: 8),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (prompt != null) ...[
+                Text(prompt, style: _labelSmallStyle(dialogContext)),
+                const SizedBox(height: 8),
+              ],
+              ...(contentBuilder?.call(textController, defaultTextField) ??
+                  [defaultTextField]),
             ],
-            contentBuilder?.call(textController, defaultTextField) ??
-                defaultTextField,
-          ],
+          ),
         ),
         actions: [
           TextButton(
