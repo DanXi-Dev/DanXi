@@ -839,8 +839,6 @@ class PostFilterBar extends StatelessWidget {
     return _buildPopupChipButton<PostFilterValue>(
       context,
       items: [
-        if (objectType?.defaultValue.token case final o?)
-          PopupMenuItem(value: PostFilterLiteralValue(o), child: Text(o)),
         ...switch (objectType) {
           PostFilterValueType.boolean => [
             for (final b in const ['false', 'true'])
