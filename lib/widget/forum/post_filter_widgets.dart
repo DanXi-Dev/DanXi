@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dan_xi/model/forum/floor.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/util/forum/post_filter_js_runtime.dart';
@@ -29,8 +31,10 @@ sealed class PostFilterValue {
   String get token;
 }
 
-class PostFilterRawValue extends PostFilterValue {
-  const PostFilterRawValue();
+class PostFilterInputValue extends PostFilterValue {
+  final PostFilterValueType? type;
+
+  const PostFilterInputValue({this.type});
 
   @override
   String get token => throw UnsupportedError('Unreachable');
@@ -834,17 +838,23 @@ class PostFilterBar extends StatelessWidget {
     return _buildPopupChipButton<PostFilterValue>(
       context,
       items: [
-        if (objectType == PostFilterValueType.boolean)
-          for (final b in const ['false', 'true'])
-            PopupMenuItem(value: PostFilterLiteralValue(b), child: Text(b))
-        else ...[
-          if (objectType?.defaultValue.token case final o?)
-            PopupMenuItem(value: PostFilterLiteralValue(o), child: Text(o)),
-          const PopupMenuItem(
-            value: PostFilterRawValue(),
-            child: Text('Custom input...'),
-          ),
-        ],
+        if (objectType?.defaultValue.token case final o?)
+          PopupMenuItem(value: PostFilterLiteralValue(o), child: Text(o)),
+        ...switch (objectType) {
+          PostFilterValueType.boolean => [
+            for (final b in const ['false', 'true'])
+              PopupMenuItem(value: PostFilterLiteralValue(b), child: Text(b)),
+          ],
+          PostFilterValueType.number ||
+          PostFilterValueType.string ||
+          PostFilterValueType.regExp => [
+            PopupMenuItem(
+              value: PostFilterInputValue(type: objectType),
+              child: const Text('Input content'),
+            ),
+          ],
+          _ => const [],
+        },
         if (objectFields.isNotEmpty) const PopupMenuDivider(),
         for (final field in objectFields)
           PopupMenuItem(
@@ -855,12 +865,33 @@ class PostFilterBar extends StatelessWidget {
               field.name,
             ),
           ),
+        const PopupMenuDivider(),
+        PopupMenuItem(
+          value: PostFilterInputValue(),
+          child: const Text('Custom expression'),
+        ),
       ],
       initialValue: cond.object,
       onSelected: (value) async {
-        if (value is PostFilterRawValue
-                ? await _showStringValueInputDialog(context, cond, slot)
-                : value
+        if (switch (value) {
+              PostFilterInputValue(type: final inputType) =>
+                await switch (inputType) {
+                  PostFilterValueType.number => _showNumberInputDialog(
+                    context,
+                    cond,
+                  ),
+                  PostFilterValueType.string => _showStringInputDialog(
+                    context,
+                    cond,
+                  ),
+                  PostFilterValueType.regExp => _showRegExpInputDialog(
+                    context,
+                    cond,
+                  ),
+                  _ => _showRawValueInputDialog(context, cond),
+                },
+              _ => value,
+            }
             case final o?) {
           controller.replaceSlot(slot, cond.copyWith(object: o));
         }
@@ -948,30 +979,130 @@ class PostFilterBar extends StatelessWidget {
     );
   }
 
-  Future<PostFilterLiteralValue?> _showStringValueInputDialog(
+  Future<PostFilterLiteralValue?> _showNumberInputDialog(
     BuildContext context,
     PostFilterCondition cond,
-    PostFilterSlot slot,
   ) async {
-    final prompt = switch (cond.verb) {
-      PostFilterVerb.eq => 'Exact value',
-      PostFilterVerb.ne => 'Exclude value',
-      PostFilterVerb.include => 'Substring',
-      PostFilterVerb.match => 'Regex pattern',
-      _ => 'Unknown verb',
-    };
-    final example = switch (cond.verb) {
-      PostFilterVerb.eq || PostFilterVerb.ne => '"content"',
-      PostFilterVerb.include => '"keyword"',
-      PostFilterVerb.match => '/regex/i',
-      _ => '',
-    };
-    final textController = TextEditingController(
-      text: switch (cond.object) {
+    // TODO: Add increment and decrement buttons.
+    final result = await _showTextInputDialog(
+      context,
+      prompt: switch (cond.verb) {
+        PostFilterVerb.lt => 'Less than',
+        PostFilterVerb.gt => 'Greater than',
+        PostFilterVerb.le => 'At most',
+        PostFilterVerb.ge => 'At least',
+        PostFilterVerb.eq => 'Exact value',
+        PostFilterVerb.ne => 'Exclude value',
+        _ => null,
+      },
+      initialValue: switch (cond.object) {
         PostFilterLiteralValue(:final literal) => literal,
         _ => null,
       },
+      hintText: 'e.g. 42',
+      keyboardType: TextInputType.number,
     );
+    return switch (result) {
+      final r? when r.isNotEmpty && r.isNumber() => PostFilterLiteralValue(r),
+      _ => null,
+    };
+  }
+
+  Future<PostFilterLiteralValue?> _showStringInputDialog(
+    BuildContext context,
+    PostFilterCondition cond,
+  ) async {
+    final result = await _showTextInputDialog(
+      context,
+      prompt: switch (cond.verb) {
+        PostFilterVerb.eq || PostFilterVerb.ne => 'Exact value',
+        PostFilterVerb.include => 'Substring',
+        _ => null,
+      },
+      initialValue: switch (cond.object) {
+        PostFilterLiteralValue(:final literal) => switch ((() {
+          try {
+            return jsonDecode(literal);
+          } catch (_) {
+            return null;
+          }
+        })()) {
+          final String content? => content,
+          _ => null,
+        },
+        _ => null,
+      },
+      hintText: switch (cond.verb) {
+        PostFilterVerb.eq || PostFilterVerb.ne => 'content',
+        PostFilterVerb.include => 'keyword',
+        _ => null,
+      },
+    );
+    return switch (result) {
+      final r? => PostFilterLiteralValue(jsonEncode(r)),
+      _ => null,
+    };
+  }
+
+  Future<PostFilterLiteralValue?> _showRegExpInputDialog(
+    BuildContext context,
+    PostFilterCondition cond,
+  ) async {
+    final result = await _showTextInputDialog(
+      context,
+      prompt: 'Regex pattern',
+      initialValue: switch (cond.object) {
+        PostFilterLiteralValue(:final literal) => literal,
+        _ => null,
+      },
+      hintText: '/pattern/i',
+    );
+    return switch (result) {
+      final r? when r.isNotEmpty => PostFilterLiteralValue(r),
+      _ => null,
+    };
+  }
+
+  Future<PostFilterLiteralValue?> _showRawValueInputDialog(
+    BuildContext context,
+    PostFilterCondition cond,
+  ) async {
+    final result = await _showTextInputDialog(
+      context,
+      prompt: 'Raw JS value',
+      initialValue: cond.object?.token,
+    );
+    return switch (result) {
+      final r? when r.isNotEmpty => PostFilterLiteralValue(r),
+      _ => null,
+    };
+  }
+
+  Future<PostFilterRawCondition> _showRawConditionInputDialog(
+    BuildContext context,
+    PostFilterRawCondition rawCond,
+  ) async {
+    final result = await _showTextInputDialog(
+      context,
+      prompt: 'Raw JS condition',
+      initialValue: rawCond.raw,
+    );
+    return PostFilterRawCondition(
+      raw: switch (result) {
+        final r? when r.isNotEmpty => r,
+        _ => null,
+      },
+    );
+  }
+
+  Future<String?> _showTextInputDialog(
+    BuildContext context, {
+    String? prompt,
+    String? initialValue,
+    String? hintText,
+    TextInputType? keyboardType,
+  }) async {
+    final textController = TextEditingController(text: initialValue);
     final result = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -979,12 +1110,15 @@ class PostFilterBar extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(prompt, style: _labelSmallStyle(dialogContext)),
-            const SizedBox(height: 8),
+            if (prompt != null) ...[
+              Text(prompt, style: _labelSmallStyle(context)),
+              const SizedBox(height: 8),
+            ],
             TextField(
               controller: textController,
+              decoration: InputDecoration(hintText: hintText),
+              keyboardType: keyboardType,
               autofocus: true,
-              decoration: InputDecoration(hintText: example),
             ),
           ],
         ),
@@ -1000,47 +1134,7 @@ class PostFilterBar extends StatelessWidget {
         ],
       ),
     );
-    return switch (result) {
-      final r? when r.isNotEmpty => PostFilterLiteralValue(r),
-      _ => null,
-    };
-  }
-
-  Future<PostFilterRawCondition> _showRawConditionInputDialog(
-    BuildContext context,
-    PostFilterRawCondition rawCond,
-  ) async {
-    final textController = TextEditingController(text: rawCond.raw);
-    final result = await showDialog<String>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text('Enter a raw JS expression'),
-            const SizedBox(height: 8),
-            TextField(controller: textController, autofocus: true),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, textController.text),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-    return PostFilterRawCondition(
-      raw: switch (result) {
-        final r? when r.isNotEmpty => r,
-        _ => null,
-      },
-    );
+    return result;
   }
 
   Widget _buildPopupAvatarItem(
