@@ -256,6 +256,7 @@ class PostFilterGroup extends PostFilterExpr {
   final List<PostFilterSlot> slots = [];
   PostFilterRelation relation;
   bool negated;
+  bool isExpanded = true;
 
   PostFilterGroup({required this.relation, this.negated = false});
 
@@ -367,6 +368,11 @@ class PostFilterController extends ChangeNotifier {
 
   void toggleGroupNegated(PostFilterGroup group) {
     group.negated = !group.negated;
+    notifyListeners();
+  }
+
+  void toggleGroupExpanded(PostFilterGroup group) {
+    group.isExpanded = !group.isExpanded;
     notifyListeners();
   }
 }
@@ -518,25 +524,35 @@ class PostFilterBar extends StatelessWidget {
         spacing: 4,
         children: [
           _buildGroupExprHeader(context, group, slot: slot),
-          for (final childSlot in group.slots)
-            switch (childSlot.expr) {
-              PostFilterGroup childGroup => _buildGroupExpr(
-                context,
-                childGroup,
-                slot: childSlot,
-              ),
-              PostFilterCondition cond => _buildConditionExprRow(
-                context,
-                cond,
-                childSlot,
-              ),
-              PostFilterRawCondition rawCond => _buildRawConditionRow(
-                context,
-                rawCond,
-                childSlot,
-              ),
-            },
-          _buildGroupAddButton(context, group),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 256),
+            curve: Curves.easeInOut,
+            alignment: Alignment.topCenter,
+            child: group.isExpanded
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    spacing: 4,
+                    children: [
+                      for (final childSlot in group.slots)
+                        switch (childSlot.expr) {
+                          PostFilterGroup childGroup => _buildGroupExpr(
+                            context,
+                            childGroup,
+                            slot: childSlot,
+                          ),
+                          PostFilterCondition cond => _buildConditionExprRow(
+                            context,
+                            cond,
+                            childSlot,
+                          ),
+                          PostFilterRawCondition rawCond =>
+                            _buildRawConditionRow(context, rawCond, childSlot),
+                        },
+                      _buildGroupAddButton(context, group),
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );
@@ -559,6 +575,7 @@ class PostFilterBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Row(
         children: [
+          _buildGroupFoldExpandButton(context, group),
           const Spacer(),
           _buildGroupNegationSelector(context, group),
           const SizedBox(width: 4),
@@ -636,6 +653,30 @@ class PostFilterBar extends StatelessWidget {
     return rawCond.raw == null
         ? _AutoOpenWrapper(onAutoOpen: onAutoOpen, child: child)
         : child;
+  }
+
+  Widget _buildGroupFoldExpandButton(
+    BuildContext context,
+    PostFilterGroup group,
+  ) {
+    return InkWell(
+      onTap: () => controller.toggleGroupExpanded(group),
+      child: SizedBox(
+        width: 16,
+        height: 16,
+        child: Icon(
+          group.isExpanded
+              ? (PlatformX.isMaterial(context)
+                    ? Icons.expand_more
+                    : CupertinoIcons.chevron_down)
+              : (PlatformX.isMaterial(context)
+                    ? Icons.chevron_right
+                    : CupertinoIcons.chevron_right),
+          size: 16,
+          color: _chipContentColor(context),
+        ),
+      ),
+    );
   }
 
   Widget _buildCloseButton(BuildContext context, PostFilterSlot slot) {
