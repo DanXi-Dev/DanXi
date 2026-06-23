@@ -1,3 +1,20 @@
+/*
+ *     Copyright (C) 2026  DanXi-Dev
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
@@ -13,6 +30,61 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
+// DanXi Post Filter - Architecture Overview
+// ================================================================
+// This file implements a configurable post/filter expression editor for the
+// forum. Users build structured conditions (subject + verb + object) via
+// chip-style selectors, or drop into a raw JS expression. The built expression
+// is passed to a JavaScript runtime (PostFilterJsRuntime) for evaluation.
+//
+// DATA MODEL LAYER
+// - PostFilterExpr (sealed): root of the expression tree.
+//   - PostFilterCondition: a single predicate (field operand field/value).
+//   - PostFilterGroup: a relation (AND/OR) of child expressions, with negation.
+//   - PostFilterRawCondition: an unparsed JS expression string.
+// - PostFilterValue (sealed): the RHS of a condition.
+//   - PostFilterLiteralValue: a verbatim string.
+//   - PostFilterFieldValue: a reference to a field by name + type.
+//   - PostFilterInputValue: transient placeholder used in the UI.
+// - PostFilterField: a named, typed data source (hole.id, floor.content, etc.)
+//   with derived verbs, expected object types, and icons.
+// - PostFilterController (ChangeNotifier): owns the root PostFilterGroup and
+//   mutates it via methods (addExpr, removeSlot, replaceSlot, loadFromGroup…).
+// - PostFilterHistory: a snapshot of the filter state (root + timestamp).
+// - PostFilterState: per-page state (shown, controller, applied JS string).
+//
+// SERIALIZATION
+// - toJson() on sealed classes uses a single switch(this) with a "kind"/"type"
+//   discriminator. Subclasses never override.
+// - fromJson() factories dispatch on the same discriminator.
+// - PostFilterHistory stores the full tree + ISO-8601 timestamp.
+//
+// HISTORY SYSTEM (provided by callers)
+// - PostFilterBar receives three callbacks from the consumer:
+//   - onSaveHistory(PostFilterHistory) - persist one snapshot entry.
+//   - getHistory() -> List<PostFilterHistory> - load saved entries.
+//   - onClearHistory() - clear persisted entries.
+// - Callers (subpage_forum.dart, hole_detail.dart) store JSON-encoded
+//   PostFilterHistory strings in SharedPreferences under separate keys
+//   (KEY_POST_FILTER_HISTORY_HOLES / KEY_POST_FILTER_HISTORY_FLOORS).
+// - The history dialog (showFilterHistoryDialog) lists entries by JS preview
+//   + relative time; tapping loads into the controller, long-press copies.
+//
+// WIDGET LAYER
+// - PostFilterBar (StatelessWidget): the main editor bar, receives external
+//   data through callbacks (onApply, onSaveHistory, getHistory, onClearHistory)
+//   and never reads SettingsProvider directly.
+// - WithPostFilterBar: a convenience wrapper that shows/hides PostFilterBar
+//   based on PostFilterState.shown.
+//
+// EXPRESSION COMPILATION
+// - Condition.toJs() -> "fieldName op value" or "fieldName.method(value)".
+// - Group.toJs() -> "(EXPR) && (EXPR)" / "(EXPR) || (EXPR)", with optional
+//   "!(EXPR)".
+// - RawCondition.toJs() -> the raw string or "false".
+// - The final string is passed to onApply(String) and evaluated by the JS
+//   runtime against hole/floor objects.
 
 enum PostFilterVerb {
   lt(token: '<'),
