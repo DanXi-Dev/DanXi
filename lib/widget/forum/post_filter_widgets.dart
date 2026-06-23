@@ -32,6 +32,23 @@ sealed class PostFilterValue {
   const PostFilterValue();
 
   String get token;
+
+  Map<String, dynamic> toJson() => switch (this) {
+    PostFilterInputValue() => throw UnsupportedError('Unreachable'),
+    final PostFilterLiteralValue v => {'kind': 'literal', 'value': v.literal},
+    final PostFilterFieldValue v => {'kind': 'field', 'value': v.field.name},
+  };
+
+  factory PostFilterValue.fromJson(
+    Map<String, dynamic> json,
+    List<PostFilterField> fields,
+  ) => switch (json['kind']) {
+    'literal' => PostFilterLiteralValue(json['value'] as String),
+    'field' => PostFilterFieldValue(
+      fields.firstWhere((f) => f.name == json['value']),
+    ),
+    final kind => throw ArgumentError('Unknown value kind: $kind'),
+  };
 }
 
 class PostFilterInputValue extends PostFilterValue {
@@ -230,6 +247,20 @@ sealed class PostFilterExpr {
   const PostFilterExpr();
 
   String toJs();
+
+  Map<String, dynamic> toJson();
+
+  factory PostFilterExpr.fromJson(
+    Map<String, dynamic> json,
+    List<PostFilterField> fields,
+  ) {
+    return switch (json['kind']) {
+      'group' => PostFilterGroup.fromJson(json, fields),
+      'condition' => PostFilterCondition.fromJson(json, fields),
+      'raw-condition' => PostFilterRawCondition.fromJson(json),
+      final type => throw ArgumentError('Unknown expr type: $type'),
+    };
+  }
 }
 
 enum PostFilterRelation {
@@ -278,6 +309,33 @@ class PostFilterGroup extends PostFilterExpr {
         .join(' ${relation.token} ');
     return negated ? '!($joined)' : joined;
   }
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'kind': 'group',
+    'relation': relation.name,
+    'negated': negated,
+    'slots': [for (final slot in slots) slot.expr.toJson()],
+  };
+
+  factory PostFilterGroup.fromJson(
+    Map<String, dynamic> json,
+    List<PostFilterField> fields,
+  ) {
+    final group = PostFilterGroup(
+      relation: PostFilterRelation.values.byName(json['relation'] as String),
+      negated: json['negated'] as bool? ?? false,
+    );
+    for (final s in json['slots'] as List<dynamic>) {
+      group.slots.add(
+        PostFilterSlot(
+          expr: PostFilterExpr.fromJson(s as Map<String, dynamic>, fields),
+          group: group,
+        ),
+      );
+    }
+    return group;
+  }
 }
 
 class PostFilterCondition extends PostFilterExpr {
@@ -322,6 +380,31 @@ class PostFilterCondition extends PostFilterExpr {
       (null, _, _) || (_, _, null) => 'false',
     };
   }
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'kind': 'condition',
+    'subject': subject?.name,
+    'verb': verb.name,
+    'object': ?object?.toJson(),
+  };
+
+  factory PostFilterCondition.fromJson(
+    Map<String, dynamic> json,
+    List<PostFilterField> fields,
+  ) {
+    return PostFilterCondition(
+      subject: switch (json['subject']) {
+        final s? => fields.firstWhere((f) => f.name == s),
+        _ => null,
+      },
+      verb: PostFilterVerb.values.byName(json['verb'] as String),
+      object: switch (json['object']) {
+        final Map<String, dynamic> o => PostFilterValue.fromJson(o, fields),
+        _ => null,
+      },
+    );
+  }
 }
 
 class PostFilterRawCondition extends PostFilterExpr {
@@ -331,6 +414,12 @@ class PostFilterRawCondition extends PostFilterExpr {
 
   @override
   String toJs() => raw ?? 'false';
+
+  @override
+  Map<String, dynamic> toJson() => {'kind': 'raw-condition', 'raw': ?raw};
+
+  factory PostFilterRawCondition.fromJson(Map<String, dynamic> json) =>
+      PostFilterRawCondition(raw: json['raw'] as String?);
 }
 
 class PostFilterSlot {
@@ -341,9 +430,22 @@ class PostFilterSlot {
 }
 
 class PostFilterController extends ChangeNotifier {
-  final PostFilterGroup root = PostFilterGroup.and();
+  final PostFilterGroup root;
+
+  PostFilterController({PostFilterGroup? root})
+    : root = root ?? PostFilterGroup.and();
 
   String toJs() => root.toJs();
+
+  Map<String, dynamic> toJson() => root.toJson();
+
+  factory PostFilterController.fromJson(
+    Map<String, dynamic> json,
+    List<PostFilterField> fields,
+  ) {
+    final root = PostFilterGroup.fromJson(json, fields);
+    return PostFilterController(root: root);
+  }
 
   void replaceRoot(Iterable<PostFilterExpr> children) {
     root.slots.replaceRange(0, root.slots.length, [
