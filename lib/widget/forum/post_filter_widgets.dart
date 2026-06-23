@@ -5,6 +5,7 @@ import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/forum/floor.dart';
 import 'package:dan_xi/model/forum/hole.dart';
 import 'package:dan_xi/util/forum/post_filter_js_runtime.dart';
+import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:flutter/cupertino.dart';
@@ -344,6 +345,13 @@ class PostFilterController extends ChangeNotifier {
 
   String toJs() => root.toJs();
 
+  void replaceRoot(Iterable<PostFilterExpr> children) {
+    root.slots.replaceRange(0, root.slots.length, [
+      for (final child in children) PostFilterSlot(expr: child, group: root),
+    ]);
+    notifyListeners();
+  }
+
   void addExpr(PostFilterGroup group, PostFilterExpr expr) {
     group.slots.add(PostFilterSlot(expr: expr, group: group));
     notifyListeners();
@@ -427,6 +435,11 @@ class PostFilterBar extends StatelessWidget {
   final PostFilterController controller;
   final String appliedJsExpr;
   final VoidCallback onApply;
+
+  // TODO: Use it to select history sources for different pages, e.g. the forum
+  // TODO: subpage, the hole details, or the search results.
+  final List<String> Function() filterHistoryGetter;
+
   final bool topSafeArea;
   final List<PostFilterField> fields;
 
@@ -435,6 +448,7 @@ class PostFilterBar extends StatelessWidget {
     required this.controller,
     required this.appliedJsExpr,
     required this.onApply,
+    required this.filterHistoryGetter,
     this.topSafeArea = false,
     required this.fields,
   });
@@ -477,11 +491,20 @@ class PostFilterBar extends StatelessWidget {
   Widget _buildAppliedRow(BuildContext context) {
     return Row(
       children: [
+        PlatformIconButton(
+          icon: Icon(
+            PlatformX.isMaterial(context)
+                ? Icons.history
+                : CupertinoIcons.clock,
+          ),
+          padding: EdgeInsets.zero,
+          onPressed: () => _showFilterHistoryDialog(context),
+        ),
         Expanded(
           child: Container(
-            constraints: const BoxConstraints(minHeight: 32),
-            alignment: Alignment.centerLeft,
+            alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            constraints: const BoxConstraints(minHeight: 32),
             child: Text(
               PostFilterJsRuntime.isSupported
                   ? (appliedJsExpr.isEmpty
@@ -498,15 +521,63 @@ class PostFilterBar extends StatelessWidget {
         ),
         if (PostFilterJsRuntime.isSupported)
           PlatformIconButton(
-            padding: EdgeInsets.zero,
             icon: Icon(
               PlatformX.isMaterial(context)
                   ? Icons.check
                   : CupertinoIcons.check_mark,
             ),
+            padding: EdgeInsets.zero,
             onPressed: onApply,
           ),
       ],
+    );
+  }
+
+  void _showFilterHistoryDialog(BuildContext context) {
+    final history = filterHistoryGetter();
+    if (history.isEmpty) {
+      Noticing.showMaterialNotice(
+        context,
+        S.of(context).post_filter_history_empty,
+      );
+      return;
+    }
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context).post_filter_history),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: history.length,
+            itemBuilder: (_, i) {
+              final expr = history[history.length - i - 1];
+              return ListTile(
+                title: Text(
+                  expr,
+                  style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                ),
+                dense: true,
+                // TODO: Overwrite the applied JS expression only, with another
+                // TODO: separate button to rebuild the condition selectors.
+                onTap: () {
+                  Navigator.pop(dialogContext);
+                  controller.replaceRoot([PostFilterRawCondition(raw: expr)]);
+                  onApply();
+                },
+              );
+            },
+          ),
+        ),
+        // TODO: A clear history button.
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context).cancel),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1400,6 +1471,7 @@ class WithPostFilterBar extends StatelessWidget {
   final PostFilterState filter;
   final Widget child;
   final VoidCallback onApply;
+  final List<String> Function() filterHistoryGetter;
   final bool topSafeArea;
   final List<PostFilterField> fields;
 
@@ -1408,6 +1480,7 @@ class WithPostFilterBar extends StatelessWidget {
     required this.filter,
     required this.child,
     required this.onApply,
+    required this.filterHistoryGetter,
     required this.topSafeArea,
     required this.fields,
   });
@@ -1423,6 +1496,7 @@ class WithPostFilterBar extends StatelessWidget {
             onApply: onApply,
             topSafeArea: topSafeArea,
             fields: fields,
+            filterHistoryGetter: filterHistoryGetter,
           ),
         Expanded(
           child: filter.shown && topSafeArea

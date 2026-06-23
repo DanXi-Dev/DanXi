@@ -605,5 +605,7 @@
   "keyword_hint": "keyword",
   "raw_js_value": "Raw JS value",
   "raw_js_condition": "Raw JS condition",
-  "js_runtime_unsupported": "PostFilterJsRuntime.isSupported: false"
+  "js_runtime_unsupported": "PostFilterJsRuntime.isSupported: false",
+  "post_filter_history": "Filter History",
+  "post_filter_history_empty": "No saved filter expressions"
 }

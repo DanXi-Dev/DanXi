@@ -682,6 +682,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   ];
                 }
               },
+              filterHistoryGetter: () =>
+                  SettingsProvider.getInstance().postFilterHistory,
               topSafeArea: PlatformX.isCupertino(context),
               fields: postFilterFloorFieldNames,
               child: switch (_renderModel) {

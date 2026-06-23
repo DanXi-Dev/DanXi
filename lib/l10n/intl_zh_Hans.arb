@@ -599,5 +599,7 @@
   "keyword_hint": "关键词",
   "raw_js_value": "原生 JS 值",
   "raw_js_condition": "原生 JS 条件",
-  "js_runtime_unsupported": "贴子筛选器 JS 运行时未受支持（PostFilterJsRuntime.isSupported: false）"
+  "js_runtime_unsupported": "贴子筛选器 JS 运行时未受支持（PostFilterJsRuntime.isSupported: false）",
+  "post_filter_history": "筛选历史",
+  "post_filter_history_empty": "没有已保存的筛选表达式"
 }

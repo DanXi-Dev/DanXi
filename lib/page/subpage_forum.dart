@@ -792,6 +792,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
                   ];
                 }
               },
+              filterHistoryGetter: () =>
+                  SettingsProvider.getInstance().postFilterHistory,
               topSafeArea:
                   PlatformX.isCupertino(context) &&
                   _postsType != PostsType.NORMAL_POSTS,
