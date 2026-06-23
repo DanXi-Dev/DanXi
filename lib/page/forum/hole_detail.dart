@@ -549,9 +549,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                     }),
                 PopupMenuOption(
                   label: S.of(context).filter,
-                  onTap: (_) => setState(() {
-                    _postFilter.toggle();
-                  }),
+                  onTap: (_) => setState(() => _postFilter.toggle()),
                 ),
                 // TODO: It is possible to use the post filter to show DZ only.
                 PopupMenuOption(
@@ -674,9 +672,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             child: WithPostFilterBar(
               filter: _postFilter,
               onApply: () {
-                setState(() {
-                  _postFilter.apply();
-                });
+                setState(() => _postFilter.apply());
                 final expr = _postFilter.pattern;
                 if (expr.isNotEmpty) {
                   final settings = SettingsProvider.getInstance();

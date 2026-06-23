@@ -781,9 +781,19 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           } else {
             return WithPostFilterBar(
               filter: _postFilter,
-              onApply: _applyPostFilter,
+              onApply: () {
+                setState(() => _postFilter.apply());
+                final expr = _postFilter.pattern;
+                if (expr.isNotEmpty) {
+                  final settings = SettingsProvider.getInstance();
+                  settings.postFilterHistory = [
+                    ...settings.postFilterHistory,
+                    expr,
+                  ];
+                }
+              },
               topSafeArea:
-              PlatformX.isCupertino(context) &&
+                  PlatformX.isCupertino(context) &&
                   _postsType != PostsType.NORMAL_POSTS,
               fields: postFilterHoleFieldNames,
               child: _buildOTListView(
@@ -807,29 +817,14 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   }
 
   void _togglePostFilter() {
-    setState(() {
-      _postFilter.toggle();
-    });
-  }
-  void _applyPostFilter() {
-    setState(() {
-      _postFilter.apply();
-    });
-    final expr = _postFilter.pattern;
-    if (expr.isNotEmpty) {
-      final settings = SettingsProvider.getInstance();
-      settings.postFilterHistory = [
-        ...settings.postFilterHistory,
-        expr,
-      ];
-    }
+    setState(() => _postFilter.toggle());
   }
 
   Widget _buildPostFilterButton(BuildContext context) {
     return PlatformIconButton(
       padding: EdgeInsets.zero,
       icon: Icon(_postFilter.getIcon(context)),
-      onPressed: _togglePostFilter,
+      onPressed: () => setState(() => _postFilter.toggle()),
     );
   }
 
