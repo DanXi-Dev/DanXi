@@ -424,34 +424,21 @@ class PostFilterCondition extends PostFilterExpr {
   final PostFilterVerb verb;
   final PostFilterValue? object;
 
-  const PostFilterCondition({
+  PostFilterCondition({
     this.subject,
     this.verb = PostFilterVerb.eq,
-    this.object,
-  });
-
-  factory PostFilterCondition.fromField(
-    PostFilterField field, [
-    PostFilterVerb verb = PostFilterVerb.eq,
-  ]) {
-    return PostFilterCondition(
-      subject: field,
-      verb: verb,
-      object: field.objectType(verb).defaultValue,
-    );
-  }
+    PostFilterValue? object,
+  }) : object = object ?? subject?.objectType(verb).defaultValue;
 
   PostFilterCondition copyWith({
     PostFilterField? subject,
     PostFilterVerb? verb,
     PostFilterValue? object,
-  }) {
-    return PostFilterCondition(
-      subject: subject ?? this.subject,
-      verb: verb ?? this.verb,
-      object: object ?? this.object,
-    );
-  }
+  }) => PostFilterCondition(
+    subject: subject ?? this.subject,
+    verb: verb ?? this.verb,
+    object: object ?? this.object,
+  );
 
   @override
   String toJs() {
@@ -1174,7 +1161,7 @@ class PostFilterBar extends StatelessWidget {
       ],
       initialValue: cond.subject,
       onSelected: (field) =>
-          controller.replaceSlot(slot, PostFilterCondition.fromField(field)),
+          controller.replaceSlot(slot, cond.copyWith(subject: field)),
       label: cond.subject?.name ?? '',
       icon: cond.subject?.icon(context),
       autoOpen: cond.subject == null,
@@ -1193,13 +1180,8 @@ class PostFilterBar extends StatelessWidget {
           PopupMenuItem(value: verb, child: Text(verb.token)),
       ],
       initialValue: cond.verb,
-      onSelected: (verb) => controller.replaceSlot(
-        slot,
-        cond.copyWith(
-          verb: verb,
-          object: cond.object ?? cond.subject?.objectType(verb).defaultValue,
-        ),
-      ),
+      onSelected: (verb) =>
+          controller.replaceSlot(slot, cond.copyWith(verb: verb)),
       label: cond.verb.token,
     );
   }
