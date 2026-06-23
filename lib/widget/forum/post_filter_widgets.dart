@@ -434,11 +434,12 @@ class PostFilterState {
 class PostFilterBar extends StatelessWidget {
   final PostFilterController controller;
   final String appliedJsExpr;
-  final VoidCallback onApply;
+  final void Function() onApply;
 
   // TODO: Use it to select history sources for different pages, e.g. the forum
   // TODO: subpage, the hole details, or the search results.
-  final List<String> Function() filterHistoryGetter;
+  final void Function()? onClearHistory;
+  final List<String> Function()? getHistory;
 
   final bool topSafeArea;
   final List<PostFilterField> fields;
@@ -448,7 +449,8 @@ class PostFilterBar extends StatelessWidget {
     required this.controller,
     required this.appliedJsExpr,
     required this.onApply,
-    required this.filterHistoryGetter,
+    this.onClearHistory,
+    this.getHistory,
     this.topSafeArea = false,
     required this.fields,
   });
@@ -534,7 +536,7 @@ class PostFilterBar extends StatelessWidget {
   }
 
   void _showFilterHistoryDialog(BuildContext context) {
-    final history = filterHistoryGetter();
+    final history = getHistory?.call() ?? const [];
     if (history.isEmpty) {
       Noticing.showMaterialNotice(
         context,
@@ -570,13 +572,24 @@ class PostFilterBar extends StatelessWidget {
             },
           ),
         ),
-        // TODO: A clear history button.
         actions: [
+          if (onClearHistory case final onClear?)
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(dialogContext).colorScheme.error,
+              ),
+              onPressed: () {
+                onClear();
+                Navigator.pop(dialogContext);
+              },
+              child: Text(S.of(context).clear),
+            ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(S.of(context).cancel),
           ),
         ],
+        actionsAlignment: MainAxisAlignment.spaceBetween,
       ),
     );
   }
@@ -1470,8 +1483,9 @@ class _AutoOpenWrapperState extends State<_AutoOpenWrapper> {
 class WithPostFilterBar extends StatelessWidget {
   final PostFilterState filter;
   final Widget child;
-  final VoidCallback onApply;
-  final List<String> Function() filterHistoryGetter;
+  final void Function() onApply;
+  final void Function()? onClearHistory;
+  final List<String> Function()? getHistory;
   final bool topSafeArea;
   final List<PostFilterField> fields;
 
@@ -1480,7 +1494,8 @@ class WithPostFilterBar extends StatelessWidget {
     required this.filter,
     required this.child,
     required this.onApply,
-    required this.filterHistoryGetter,
+    this.onClearHistory,
+    this.getHistory,
     required this.topSafeArea,
     required this.fields,
   });
@@ -1494,9 +1509,10 @@ class WithPostFilterBar extends StatelessWidget {
             controller: filter.controller,
             appliedJsExpr: filter.pattern,
             onApply: onApply,
+            onClearHistory: onClearHistory,
+            getHistory: getHistory,
             topSafeArea: topSafeArea,
             fields: fields,
-            filterHistoryGetter: filterHistoryGetter,
           ),
         Expanded(
           child: filter.shown && topSafeArea
