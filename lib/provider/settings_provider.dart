@@ -98,7 +98,10 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_IS_LOGGED_IN = "is_logged_in";
   static const String KEY_HIDDEN_MY_POSTS = "hidden_my_posts";
   static const String KEY_HIDDEN_MY_REPLIES = "hidden_my_replies";
-  static const String KEY_POST_FILTER_HISTORY = "post_filter_history";
+  static const String KEY_POST_FILTER_HISTORY_HOLES =
+      "post_filter_history_holes";
+  static const String KEY_POST_FILTER_HISTORY_FLOORS =
+      "post_filter_history_floors";
 
   static const int MAX_VIEW_HISTORY = 250;
 
@@ -899,14 +902,28 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  List<String> get postFilterHistory =>
-      preferences!.getStringList(KEY_POST_FILTER_HISTORY) ?? List.empty();
+  List<String> get postFilterHistoryHoles =>
+      preferences!.getStringList(KEY_POST_FILTER_HISTORY_HOLES) ??
+      List.empty();
 
-  set postFilterHistory(List<String>? value) {
+  set postFilterHistoryHoles(List<String>? value) {
     if (value != null) {
-      preferences!.setStringList(KEY_POST_FILTER_HISTORY, value);
+      preferences!.setStringList(KEY_POST_FILTER_HISTORY_HOLES, value);
     } else {
-      preferences!.remove(KEY_POST_FILTER_HISTORY);
+      preferences!.remove(KEY_POST_FILTER_HISTORY_HOLES);
+    }
+    notifyListeners();
+  }
+
+  List<String> get postFilterHistoryFloors =>
+      preferences!.getStringList(KEY_POST_FILTER_HISTORY_FLOORS) ??
+      List.empty();
+
+  set postFilterHistoryFloors(List<String>? value) {
+    if (value != null) {
+      preferences!.setStringList(KEY_POST_FILTER_HISTORY_FLOORS, value);
+    } else {
+      preferences!.remove(KEY_POST_FILTER_HISTORY_FLOORS);
     }
     notifyListeners();
   }

@@ -554,13 +554,9 @@ class PostFilterBar extends StatelessWidget {
   final PostFilterController controller;
   final String appliedJsExpr;
   final void Function(String expr) onApply;
-
-  // TODO: Use it to select history sources for different pages, e.g. the forum
-  // TODO: subpage, the hole details, or the search results.
   final void Function(PostFilterHistory history)? onSaveHistory;
   final void Function()? onClearHistory;
   final List<PostFilterHistory> Function()? getHistory;
-
   final bool topSafeArea;
   final List<PostFilterField> fields;
 

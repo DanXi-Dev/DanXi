@@ -674,16 +674,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               onApply: (expr) => setState(() => _postFilter.apply(expr)),
               onSaveHistory: (history) {
                 final settings = SettingsProvider.getInstance();
-                settings.postFilterHistory = [
-                  ...settings.postFilterHistory,
+                settings.postFilterHistoryFloors = [
+                  ...settings.postFilterHistoryFloors,
                   jsonEncode(history.toJson()),
                 ];
               },
               onClearHistory: () =>
-                  SettingsProvider.getInstance().postFilterHistory = null,
+                  SettingsProvider.getInstance().postFilterHistoryFloors = null,
               getHistory: () => [
                 for (final e
-                    in SettingsProvider.getInstance().postFilterHistory)
+                    in SettingsProvider.getInstance().postFilterHistoryFloors)
                   if (jsonDecode(e) case final Map<String, dynamic> map)
                     PostFilterHistory.fromJson(map),
               ],
