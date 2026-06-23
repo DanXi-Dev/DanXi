@@ -694,9 +694,25 @@ class PostFilterBar extends StatelessWidget {
             itemBuilder: (_, i) {
               final entry = history[history.length - i - 1];
               return ListTile(
-                title: Text(
-                  entry.root.toJs(),
-                  style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                title: Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 4,
+                    horizontal: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      dialogContext,
+                    ).colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    entry.root.toJs(),
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                    ),
+                    softWrap: true,
+                  ),
                 ),
                 subtitle: Text(entry.relativeTime(context)),
                 trailing: IconButton(
@@ -717,6 +733,13 @@ class PostFilterBar extends StatelessWidget {
                   Navigator.pop(dialogContext);
                   // Apply a filter history.
                   onApply(entry.root.toJs());
+                },
+                onLongPress: () {
+                  Clipboard.setData(ClipboardData(text: entry.root.toJs()));
+                  Noticing.showMaterialNotice(
+                    context,
+                    S.of(context).copy_success,
+                  );
                 },
               );
             },
