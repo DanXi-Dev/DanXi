@@ -784,11 +784,12 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
               filter: _postFilter,
               onApply: (expr) => setState(() => _postFilter.apply(expr)),
               onSaveHistory: (history) {
+                final stringified = jsonEncode(history.toJson());
+                if (stringified.isEmpty) return;
                 final settings = SettingsProvider.getInstance();
-                settings.postFilterHistoryHoles = [
-                  ...settings.postFilterHistoryHoles,
-                  jsonEncode(history.toJson()),
-                ];
+                final entries = settings.postFilterHistoryHoles;
+                if (stringified == entries.lastOrNull) return;
+                settings.postFilterHistoryHoles = [...entries, stringified];
               },
               onClearHistory: () =>
                   SettingsProvider.getInstance().postFilterHistoryHoles = null,
