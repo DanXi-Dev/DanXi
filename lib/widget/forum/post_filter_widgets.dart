@@ -176,6 +176,15 @@ enum PostFilterValueType {
   object // The JS Object. Conceptually Array and RegExp are Object too.
   ;
 
+  PostFilterVerb get defaultVerb => switch (this) {
+    PostFilterValueType.boolean ||
+    PostFilterValueType.number ||
+    PostFilterValueType.object => PostFilterVerb.eq,
+    PostFilterValueType.string ||
+    PostFilterValueType.regExp => PostFilterVerb.match,
+    PostFilterValueType.array => PostFilterVerb.include,
+  };
+
   PostFilterLiteralValue get defaultValue {
     final literal = switch (this) {
       PostFilterValueType.boolean => 'true',
@@ -424,11 +433,21 @@ class PostFilterCondition extends PostFilterExpr {
   final PostFilterVerb verb;
   final PostFilterValue? object;
 
-  PostFilterCondition({
+  const PostFilterCondition._([
     this.subject,
     this.verb = PostFilterVerb.eq,
+    this.object,
+  ]);
+
+  factory PostFilterCondition({
+    PostFilterField? subject,
+    PostFilterVerb? verb,
     PostFilterValue? object,
-  }) : object = object ?? subject?.objectType(verb).defaultValue;
+  }) {
+    verb ??= subject?.type.defaultVerb ?? PostFilterVerb.eq;
+    object ??= subject?.objectType(verb).defaultValue;
+    return PostFilterCondition._(subject, verb, object);
+  }
 
   PostFilterCondition copyWith({
     PostFilterField? subject,
