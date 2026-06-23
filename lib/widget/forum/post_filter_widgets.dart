@@ -389,21 +389,23 @@ class PostFilterController extends ChangeNotifier {
 class PostFilterState {
   bool _shown = false;
   final PostFilterController controller = PostFilterController();
-  String pattern = '';
+  String appliedJsExpr = '';
   final PostFilterJsRuntime jsRuntime = PostFilterJsRuntime();
 
   bool get shown => _shown;
 
   bool holeMatches(OTHole hole) {
-    return _matches(() => jsRuntime.evaluateHole(pattern, hole));
+    return _matches(() => jsRuntime.evaluateHole(appliedJsExpr, hole));
   }
 
   bool floorMatches(OTFloor floor, {OTHole? hole}) {
-    return _matches(() => jsRuntime.evaluateFloor(pattern, floor, hole: hole));
+    return _matches(
+      () => jsRuntime.evaluateFloor(appliedJsExpr, floor, hole: hole),
+    );
   }
 
   bool _matches(bool Function() evaluateJs) {
-    if (!shown || pattern.isEmpty) {
+    if (!shown || appliedJsExpr.isEmpty) {
       return true;
     }
     return evaluateJs();
@@ -413,8 +415,8 @@ class PostFilterState {
     _shown = !_shown;
   }
 
-  void apply() {
-    pattern = controller.toJs().trim();
+  void apply(String expr) {
+    appliedJsExpr = expr;
   }
 
   void dispose() {
@@ -434,10 +436,11 @@ class PostFilterState {
 class PostFilterBar extends StatelessWidget {
   final PostFilterController controller;
   final String appliedJsExpr;
-  final void Function() onApply;
+  final void Function(String expr) onApply;
 
   // TODO: Use it to select history sources for different pages, e.g. the forum
   // TODO: subpage, the hole details, or the search results.
+  final void Function(String expr)? onSaveHistory;
   final void Function()? onClearHistory;
   final List<String> Function()? getHistory;
 
@@ -449,6 +452,7 @@ class PostFilterBar extends StatelessWidget {
     required this.controller,
     required this.appliedJsExpr,
     required this.onApply,
+    this.onSaveHistory,
     this.onClearHistory,
     this.getHistory,
     this.topSafeArea = false,
@@ -529,7 +533,11 @@ class PostFilterBar extends StatelessWidget {
                   : CupertinoIcons.check_mark,
             ),
             padding: EdgeInsets.zero,
-            onPressed: onApply,
+            onPressed: () {
+              final expr = controller.toJs();
+              onApply(expr);
+              onSaveHistory?.call(expr);
+            },
           ),
       ],
     );
@@ -561,12 +569,9 @@ class PostFilterBar extends StatelessWidget {
                   style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
                 ),
                 dense: true,
-                // TODO: Overwrite the applied JS expression only, with another
-                // TODO: separate button to rebuild the condition selectors.
                 onTap: () {
                   Navigator.pop(dialogContext);
-                  controller.replaceRoot([PostFilterRawCondition(raw: expr)]);
-                  onApply();
+                  onApply(expr);
                 },
               );
             },
@@ -1483,7 +1488,8 @@ class _AutoOpenWrapperState extends State<_AutoOpenWrapper> {
 class WithPostFilterBar extends StatelessWidget {
   final PostFilterState filter;
   final Widget child;
-  final void Function() onApply;
+  final void Function(String expr) onApply;
+  final void Function(String expr)? onSaveHistory;
   final void Function()? onClearHistory;
   final List<String> Function()? getHistory;
   final bool topSafeArea;
@@ -1494,6 +1500,7 @@ class WithPostFilterBar extends StatelessWidget {
     required this.filter,
     required this.child,
     required this.onApply,
+    this.onSaveHistory,
     this.onClearHistory,
     this.getHistory,
     required this.topSafeArea,
@@ -1507,8 +1514,9 @@ class WithPostFilterBar extends StatelessWidget {
         if (filter.shown)
           PostFilterBar(
             controller: filter.controller,
-            appliedJsExpr: filter.pattern,
+            appliedJsExpr: filter.appliedJsExpr,
             onApply: onApply,
+            onSaveHistory: onSaveHistory,
             onClearHistory: onClearHistory,
             getHistory: getHistory,
             topSafeArea: topSafeArea,

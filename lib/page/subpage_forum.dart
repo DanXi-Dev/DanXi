@@ -781,9 +781,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           } else {
             return WithPostFilterBar(
               filter: _postFilter,
-              onApply: () {
-                setState(() => _postFilter.apply());
-                final expr = _postFilter.pattern;
+              onApply: (expr) => setState(() => _postFilter.apply(expr)),
+              onSaveHistory: (expr) {
                 if (expr.isNotEmpty) {
                   final settings = SettingsProvider.getInstance();
                   settings.postFilterHistory = [
@@ -792,10 +791,10 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
                   ];
                 }
               },
-              getHistory: () =>
-                  SettingsProvider.getInstance().postFilterHistory,
               onClearHistory: () =>
                   SettingsProvider.getInstance().postFilterHistory = null,
+              getHistory: () =>
+                  SettingsProvider.getInstance().postFilterHistory,
               topSafeArea:
                   PlatformX.isCupertino(context) &&
                   _postsType != PostsType.NORMAL_POSTS,
