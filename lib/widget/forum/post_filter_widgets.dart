@@ -250,7 +250,7 @@ class PostFilterField {
     PostFilterValueType.object => const [PostFilterVerb.eq],
   };
 
-  PostFilterValueType objectType(PostFilterVerb verb) => switch (type) {
+  PostFilterValueType objectType(PostFilterVerb? verb) => switch (type) {
     PostFilterValueType.boolean => PostFilterValueType.boolean,
     PostFilterValueType.number => PostFilterValueType.number,
     PostFilterValueType.string => switch (verb) {
@@ -430,21 +430,17 @@ class PostFilterGroup extends PostFilterExpr {
 
 class PostFilterCondition extends PostFilterExpr {
   final PostFilterField? subject;
-  final PostFilterVerb verb;
+  final PostFilterVerb? verb;
   final PostFilterValue? object;
 
-  const PostFilterCondition._([
-    this.subject,
-    this.verb = PostFilterVerb.eq,
-    this.object,
-  ]);
+  const PostFilterCondition._([this.subject, this.verb, this.object]);
 
   factory PostFilterCondition({
     PostFilterField? subject,
     PostFilterVerb? verb,
     PostFilterValue? object,
   }) {
-    verb ??= subject?.type.defaultVerb ?? PostFilterVerb.eq;
+    verb ??= subject?.type.defaultVerb;
     object ??= subject?.objectType(verb).defaultValue;
     return PostFilterCondition._(subject, verb, object);
   }
@@ -460,19 +456,19 @@ class PostFilterCondition extends PostFilterExpr {
   );
 
   @override
-  String toJs() {
-    return switch ((subject, verb.isOperator, object)) {
-      (final s?, false, final o?) => '${s.name}.${verb.token}(${o.token})',
-      (final s?, true, final o?) => '${s.name} ${verb.token} (${o.token})',
-      (null, _, _) || (_, _, null) => 'false',
-    };
-  }
+  String toJs() => switch ((subject, verb, object)) {
+    (final s?, final v?, final o?) =>
+      v.isOperator
+          ? '${s.name} ${verb?.token} (${o.token})'
+          : '${s.name}.${verb?.token}(${o.token})',
+    (null, _, _) || (_, null, _) || (_, _, null) => 'false',
+  };
 
   @override
   Map<String, dynamic> toJson() => {
     'kind': 'condition',
-    'subject': subject?.toJson(),
-    'verb': verb.name,
+    'subject': ?subject?.toJson(),
+    'verb': ?verb?.name,
     'object': ?object?.toJson(),
   };
 
@@ -482,7 +478,10 @@ class PostFilterCondition extends PostFilterExpr {
         final Map<String, dynamic> s => PostFilterField.fromJson(s),
         _ => null,
       },
-      verb: PostFilterVerb.values.byName(json['verb'] as String),
+      verb: switch (json['verb']) {
+        final String v => PostFilterVerb.values.byName(v),
+        _ => null,
+      },
       object: switch (json['object']) {
         final Map<String, dynamic> o => PostFilterValue.fromJson(o),
         _ => null,
@@ -1201,7 +1200,7 @@ class PostFilterBar extends StatelessWidget {
       initialValue: cond.verb,
       onSelected: (verb) =>
           controller.replaceSlot(slot, cond.copyWith(verb: verb)),
-      label: cond.verb.token,
+      label: cond.verb?.token ?? '',
     );
   }
 
