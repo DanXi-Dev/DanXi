@@ -11,6 +11,7 @@ import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 enum PostFilterVerb {
@@ -623,20 +624,33 @@ class PostFilterBar extends StatelessWidget {
           onPressed: () => _showFilterHistoryDialog(context),
         ),
         Expanded(
-          child: Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            constraints: const BoxConstraints(minHeight: 32),
-            child: Text(
-              PostFilterJsRuntime.isSupported
-                  ? (appliedJsExpr.isEmpty
-                        ? S.of(context).js_expression
-                        : appliedJsExpr)
-                  : S.of(context).js_runtime_unsupported,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: appliedJsExpr.isEmpty
-                    ? Theme.of(context).hintColor
-                    : null,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onLongPress: () {
+              if (appliedJsExpr.isNotEmpty) {
+                Clipboard.setData(ClipboardData(text: appliedJsExpr));
+                Noticing.showMaterialNotice(
+                  context,
+                  S.of(context).copy_success,
+                );
+              }
+            },
+            child: Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              constraints: const BoxConstraints(minHeight: 32),
+              child: SelectableText(
+                PostFilterJsRuntime.isSupported
+                    ? (appliedJsExpr.isEmpty
+                          ? S.of(context).js_expression
+                          : appliedJsExpr)
+                    : S.of(context).js_runtime_unsupported,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: appliedJsExpr.isEmpty
+                      ? Theme.of(context).hintColor
+                      : null,
+                ),
+                textAlign: TextAlign.center,
               ),
             ),
           ),
