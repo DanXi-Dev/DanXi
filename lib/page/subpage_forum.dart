@@ -796,7 +796,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
                 for (final e
                     in SettingsProvider.getInstance().postFilterHistory)
                   if (jsonDecode(e) case final Map<String, dynamic> map)
-                    PostFilterHistory.fromJson(map, postFilterHoleFieldNames),
+                    PostFilterHistory.fromJson(map),
               ],
               topSafeArea:
                   PlatformX.isCupertino(context) &&

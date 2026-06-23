@@ -685,7 +685,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 for (final e
                     in SettingsProvider.getInstance().postFilterHistory)
                   if (jsonDecode(e) case final Map<String, dynamic> map)
-                    PostFilterHistory.fromJson(map, postFilterFloorFieldNames),
+                    PostFilterHistory.fromJson(map),
               ],
               topSafeArea: PlatformX.isCupertino(context),
               fields: postFilterFloorFieldNames,

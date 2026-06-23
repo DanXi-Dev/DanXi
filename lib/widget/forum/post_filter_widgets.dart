@@ -37,19 +37,20 @@ sealed class PostFilterValue {
   Map<String, dynamic> toJson() => switch (this) {
     PostFilterInputValue() => throw UnsupportedError('Unreachable'),
     final PostFilterLiteralValue v => {'kind': 'literal', 'value': v.literal},
-    final PostFilterFieldValue v => {'kind': 'field', 'value': v.field.name},
+    final PostFilterFieldValue v => {
+      'kind': 'field',
+      'value': v.field.toJson(),
+    },
   };
 
-  factory PostFilterValue.fromJson(
-    Map<String, dynamic> json,
-    List<PostFilterField> fields,
-  ) => switch (json['kind']) {
-    'literal' => PostFilterLiteralValue(json['value'] as String),
-    'field' => PostFilterFieldValue(
-      fields.firstWhere((f) => f.name == json['value']),
-    ),
-    final kind => throw ArgumentError('Unknown value kind: $kind'),
-  };
+  factory PostFilterValue.fromJson(Map<String, dynamic> json) =>
+      switch (json['kind']) {
+        'literal' => PostFilterLiteralValue(json['value'] as String),
+        'field' => PostFilterFieldValue(
+          PostFilterField.fromJson(json['value'] as Map<String, dynamic>),
+        ),
+        final kind => throw ArgumentError('Unknown value kind: $kind'),
+      };
 }
 
 class PostFilterInputValue extends PostFilterValue {
@@ -197,6 +198,14 @@ class PostFilterField {
           ? Icons.data_object
           : CupertinoIcons.collections,
   };
+
+  Map<String, dynamic> toJson() => {'type': type.name, 'name': name};
+
+  factory PostFilterField.fromJson(Map<String, dynamic> json) =>
+      PostFilterField(
+        PostFilterValueType.values.byName(json['type'] as String),
+        json['name'] as String,
+      );
 }
 
 const List<PostFilterField> postFilterHoleFieldNames = [
@@ -251,13 +260,10 @@ sealed class PostFilterExpr {
 
   Map<String, dynamic> toJson();
 
-  factory PostFilterExpr.fromJson(
-    Map<String, dynamic> json,
-    List<PostFilterField> fields,
-  ) {
+  factory PostFilterExpr.fromJson(Map<String, dynamic> json) {
     return switch (json['kind']) {
-      'group' => PostFilterGroup.fromJson(json, fields),
-      'condition' => PostFilterCondition.fromJson(json, fields),
+      'group' => PostFilterGroup.fromJson(json),
+      'condition' => PostFilterCondition.fromJson(json),
       'raw-condition' => PostFilterRawCondition.fromJson(json),
       final type => throw ArgumentError('Unknown expr type: $type'),
     };
@@ -319,10 +325,7 @@ class PostFilterGroup extends PostFilterExpr {
     'slots': [for (final slot in slots) slot.expr.toJson()],
   };
 
-  factory PostFilterGroup.fromJson(
-    Map<String, dynamic> json,
-    List<PostFilterField> fields,
-  ) {
+  factory PostFilterGroup.fromJson(Map<String, dynamic> json) {
     final group = PostFilterGroup(
       relation: PostFilterRelation.values.byName(json['relation'] as String),
       negated: json['negated'] as bool? ?? false,
@@ -330,7 +333,7 @@ class PostFilterGroup extends PostFilterExpr {
     for (final s in json['slots'] as List<dynamic>) {
       group.slots.add(
         PostFilterSlot(
-          expr: PostFilterExpr.fromJson(s as Map<String, dynamic>, fields),
+          expr: PostFilterExpr.fromJson(s as Map<String, dynamic>),
           group: group,
         ),
       );
@@ -385,23 +388,20 @@ class PostFilterCondition extends PostFilterExpr {
   @override
   Map<String, dynamic> toJson() => {
     'kind': 'condition',
-    'subject': subject?.name,
+    'subject': subject?.toJson(),
     'verb': verb.name,
     'object': ?object?.toJson(),
   };
 
-  factory PostFilterCondition.fromJson(
-    Map<String, dynamic> json,
-    List<PostFilterField> fields,
-  ) {
+  factory PostFilterCondition.fromJson(Map<String, dynamic> json) {
     return PostFilterCondition(
       subject: switch (json['subject']) {
-        final s? => fields.firstWhere((f) => f.name == s),
+        final Map<String, dynamic> s => PostFilterField.fromJson(s),
         _ => null,
       },
       verb: PostFilterVerb.values.byName(json['verb'] as String),
       object: switch (json['object']) {
-        final Map<String, dynamic> o => PostFilterValue.fromJson(o, fields),
+        final Map<String, dynamic> o => PostFilterValue.fromJson(o),
         _ => null,
       },
     );
@@ -492,16 +492,11 @@ class PostFilterHistory {
     'time': time.toIso8601String(),
   };
 
-  factory PostFilterHistory.fromJson(
-    Map<String, dynamic> json,
-    List<PostFilterField> fields,
-  ) => PostFilterHistory(
-    root: PostFilterGroup.fromJson(
-      json['root'] as Map<String, dynamic>,
-      fields,
-    ),
-    time: DateTime.parse(json['time'] as String),
-  );
+  factory PostFilterHistory.fromJson(Map<String, dynamic> json) =>
+      PostFilterHistory(
+        root: PostFilterGroup.fromJson(json['root'] as Map<String, dynamic>),
+        time: DateTime.parse(json['time'] as String),
+      );
 
   String relativeTime(BuildContext context) =>
       HumanDuration.tryFormat(context, time);
