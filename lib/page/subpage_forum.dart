@@ -815,6 +815,14 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     setState(() {
       _postFilter.apply();
     });
+    final expr = _postFilter.pattern;
+    if (expr.isNotEmpty) {
+      final settings = SettingsProvider.getInstance();
+      settings.postFilterHistory = [
+        ...settings.postFilterHistory,
+        expr,
+      ];
+    }
   }
 
   Widget _buildPostFilterButton(BuildContext context) {

@@ -673,9 +673,19 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                         image: _backgroundImage!, fit: BoxFit.cover)),
             child: WithPostFilterBar(
               filter: _postFilter,
-              onApply: () => setState(() {
-                _postFilter.apply();
-              }),
+              onApply: () {
+                setState(() {
+                  _postFilter.apply();
+                });
+                final expr = _postFilter.pattern;
+                if (expr.isNotEmpty) {
+                  final settings = SettingsProvider.getInstance();
+                  settings.postFilterHistory = [
+                    ...settings.postFilterHistory,
+                    expr,
+                  ];
+                }
+              },
               topSafeArea: PlatformX.isCupertino(context),
               fields: postFilterFloorFieldNames,
               child: switch (_renderModel) {

@@ -98,6 +98,7 @@ class SettingsProvider with ChangeNotifier {
   static const String KEY_IS_LOGGED_IN = "is_logged_in";
   static const String KEY_HIDDEN_MY_POSTS = "hidden_my_posts";
   static const String KEY_HIDDEN_MY_REPLIES = "hidden_my_replies";
+  static const String KEY_POST_FILTER_HISTORY = "post_filter_history";
 
   static const int MAX_VIEW_HISTORY = 250;
 
@@ -895,6 +896,18 @@ class SettingsProvider with ChangeNotifier {
 
   set hiddenMyReplies(List<int> value) {
     preferences!.setIntList(KEY_HIDDEN_MY_REPLIES, value);
+    notifyListeners();
+  }
+
+  List<String> get postFilterHistory =>
+      preferences!.getStringList(KEY_POST_FILTER_HISTORY) ?? List.empty();
+
+  set postFilterHistory(List<String>? value) {
+    if (value != null) {
+      preferences!.setStringList(KEY_POST_FILTER_HISTORY, value);
+    } else {
+      preferences!.remove(KEY_POST_FILTER_HISTORY);
+    }
     notifyListeners();
   }
 }
