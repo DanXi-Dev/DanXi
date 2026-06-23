@@ -221,6 +221,10 @@ class PostFilterField {
       PostFilterVerb.ne,
     ],
     PostFilterValueType.string => const [
+      PostFilterVerb.lt,
+      PostFilterVerb.gt,
+      PostFilterVerb.le,
+      PostFilterVerb.ge,
       PostFilterVerb.eq,
       PostFilterVerb.ne,
       PostFilterVerb.include,
@@ -1410,7 +1414,12 @@ class PostFilterBar extends StatelessWidget {
     final result = await _showTextInputDialog(
       context,
       prompt: switch (cond.verb) {
-        PostFilterVerb.eq || PostFilterVerb.ne => S.of(context).exact_value,
+        PostFilterVerb.lt => S.of(context).less_than_str,
+        PostFilterVerb.gt => S.of(context).greater_than_str,
+        PostFilterVerb.le => S.of(context).at_most_str,
+        PostFilterVerb.ge => S.of(context).at_least_str,
+        PostFilterVerb.eq => S.of(context).exact_value,
+        PostFilterVerb.ne => S.of(context).exclude_value,
         PostFilterVerb.include => S.of(context).substring,
         _ => null,
       },
@@ -1428,7 +1437,12 @@ class PostFilterBar extends StatelessWidget {
         _ => null,
       },
       hintText: switch (cond.verb) {
-        PostFilterVerb.eq || PostFilterVerb.ne => S.of(context).content_hint,
+        PostFilterVerb.lt ||
+        PostFilterVerb.gt ||
+        PostFilterVerb.le ||
+        PostFilterVerb.ge ||
+        PostFilterVerb.eq ||
+        PostFilterVerb.ne => S.of(context).content_hint,
         PostFilterVerb.include => S.of(context).keyword_hint,
         _ => null,
       },
