@@ -16,6 +16,7 @@
  */
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
@@ -782,19 +783,21 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
             return WithPostFilterBar(
               filter: _postFilter,
               onApply: (expr) => setState(() => _postFilter.apply(expr)),
-              onSaveHistory: (expr) {
-                if (expr.isNotEmpty) {
-                  final settings = SettingsProvider.getInstance();
-                  settings.postFilterHistory = [
-                    ...settings.postFilterHistory,
-                    expr,
-                  ];
-                }
+              onSaveHistory: (history) {
+                final settings = SettingsProvider.getInstance();
+                settings.postFilterHistory = [
+                  ...settings.postFilterHistory,
+                  jsonEncode(history.toJson()),
+                ];
               },
               onClearHistory: () =>
                   SettingsProvider.getInstance().postFilterHistory = null,
-              getHistory: () =>
-                  SettingsProvider.getInstance().postFilterHistory,
+              getHistory: () => [
+                for (final e
+                    in SettingsProvider.getInstance().postFilterHistory)
+                  if (jsonDecode(e) case final Map<String, dynamic> map)
+                    PostFilterHistory.fromJson(map, postFilterHoleFieldNames),
+              ],
               topSafeArea:
                   PlatformX.isCupertino(context) &&
                   _postsType != PostsType.NORMAL_POSTS,

@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:dan_xi/generated/l10n.dart';
 import 'package:dan_xi/model/forum/floor.dart';
 import 'package:dan_xi/model/forum/hole.dart';
+import 'package:dan_xi/util/forum/human_duration.dart';
 import 'package:dan_xi/util/forum/post_filter_js_runtime.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -435,22 +436,13 @@ class PostFilterController extends ChangeNotifier {
   PostFilterController({PostFilterGroup? root})
     : root = root ?? PostFilterGroup.and();
 
-  String toJs() => root.toJs();
-
-  Map<String, dynamic> toJson() => root.toJson();
-
-  factory PostFilterController.fromJson(
-    Map<String, dynamic> json,
-    List<PostFilterField> fields,
-  ) {
-    final root = PostFilterGroup.fromJson(json, fields);
-    return PostFilterController(root: root);
-  }
-
-  void replaceRoot(Iterable<PostFilterExpr> children) {
+  void loadFromGroup(PostFilterGroup group) {
     root.slots.replaceRange(0, root.slots.length, [
-      for (final child in children) PostFilterSlot(expr: child, group: root),
+      for (final slot in group.slots)
+        PostFilterSlot(expr: slot.expr, group: root),
     ]);
+    root.relation = group.relation;
+    root.negated = group.negated;
     notifyListeners();
   }
 
@@ -486,6 +478,33 @@ class PostFilterController extends ChangeNotifier {
     group.isExpanded = !group.isExpanded;
     notifyListeners();
   }
+}
+
+class PostFilterHistory {
+  final PostFilterGroup root;
+  final DateTime time;
+
+  PostFilterHistory({required this.root, DateTime? time})
+    : time = time ?? DateTime.now();
+
+  Map<String, dynamic> toJson() => {
+    'root': root.toJson(),
+    'time': time.toIso8601String(),
+  };
+
+  factory PostFilterHistory.fromJson(
+    Map<String, dynamic> json,
+    List<PostFilterField> fields,
+  ) => PostFilterHistory(
+    root: PostFilterGroup.fromJson(
+      json['root'] as Map<String, dynamic>,
+      fields,
+    ),
+    time: DateTime.parse(json['time'] as String),
+  );
+
+  String relativeTime(BuildContext context) =>
+      HumanDuration.tryFormat(context, time);
 }
 
 class PostFilterState {
@@ -542,9 +561,9 @@ class PostFilterBar extends StatelessWidget {
 
   // TODO: Use it to select history sources for different pages, e.g. the forum
   // TODO: subpage, the hole details, or the search results.
-  final void Function(String expr)? onSaveHistory;
+  final void Function(PostFilterHistory history)? onSaveHistory;
   final void Function()? onClearHistory;
-  final List<String> Function()? getHistory;
+  final List<PostFilterHistory> Function()? getHistory;
 
   final bool topSafeArea;
   final List<PostFilterField> fields;
@@ -636,9 +655,9 @@ class PostFilterBar extends StatelessWidget {
             ),
             padding: EdgeInsets.zero,
             onPressed: () {
-              final expr = controller.toJs();
+              final expr = controller.root.toJs();
               onApply(expr);
-              onSaveHistory?.call(expr);
+              onSaveHistory?.call(PostFilterHistory(root: controller.root));
             },
           ),
       ],
@@ -664,16 +683,31 @@ class PostFilterBar extends StatelessWidget {
             shrinkWrap: true,
             itemCount: history.length,
             itemBuilder: (_, i) {
-              final expr = history[history.length - i - 1];
+              final entry = history[history.length - i - 1];
               return ListTile(
                 title: Text(
-                  expr,
+                  entry.root.toJs(),
                   style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                ),
+                subtitle: Text(entry.relativeTime(context)),
+                trailing: IconButton(
+                  icon: Icon(
+                    PlatformX.isMaterial(context)
+                        ? Icons.integration_instructions_outlined
+                        : CupertinoIcons.chevron_left_slash_chevron_right,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                    // Load a filter history into the controller and apply it.
+                    controller.loadFromGroup(entry.root);
+                    onApply(controller.root.toJs());
+                  },
                 ),
                 dense: true,
                 onTap: () {
                   Navigator.pop(dialogContext);
-                  onApply(expr);
+                  // Apply a filter history.
+                  onApply(entry.root.toJs());
                 },
               );
             },
@@ -1589,24 +1623,24 @@ class _AutoOpenWrapperState extends State<_AutoOpenWrapper> {
 
 class WithPostFilterBar extends StatelessWidget {
   final PostFilterState filter;
-  final Widget child;
   final void Function(String expr) onApply;
-  final void Function(String expr)? onSaveHistory;
+  final void Function(PostFilterHistory history)? onSaveHistory;
   final void Function()? onClearHistory;
-  final List<String> Function()? getHistory;
+  final List<PostFilterHistory> Function()? getHistory;
   final bool topSafeArea;
   final List<PostFilterField> fields;
+  final Widget child;
 
   const WithPostFilterBar({
     super.key,
     required this.filter,
-    required this.child,
     required this.onApply,
     this.onSaveHistory,
     this.onClearHistory,
     this.getHistory,
     required this.topSafeArea,
     required this.fields,
+    required this.child,
   });
 
   @override
