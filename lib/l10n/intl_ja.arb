@@ -594,5 +594,7 @@
   "raw_js_condition": "Raw JS条件",
   "js_runtime_unsupported": "現在の環境は JS ランタイムをサポートしていません（PostFilterJsRuntime.isSupported: false）",
   "post_filter_history": "フィルター履歴",
-  "post_filter_history_empty": "保存されたフィルター式はありません"
+  "post_filter_history_empty": "保存されたフィルター式はありません",
+  "post_filter_placeholder_holes": "{time}以降の{count}件の投稿をフィルターしました",
+  "post_filter_placeholder_floors": "{time}以降の{count}件のレスをフィルターしました"
 }

@@ -605,5 +605,7 @@
   "raw_js_condition": "原生 JS 條件",
   "js_runtime_unsupported": "貼子篩選器 JS 運行時未受支持（PostFilterJsRuntime.isSupported: false）",
   "post_filter_history": "篩選記錄",
-  "post_filter_history_empty": "已儲存之篩選運算式爲空"
+  "post_filter_history_empty": "已儲存之篩選運算式爲空",
+  "post_filter_placeholder_holes": "自{time}起篩除{count}個帖子",
+  "post_filter_placeholder_floors": "自{time}起篩除{count}條回覆"
 }

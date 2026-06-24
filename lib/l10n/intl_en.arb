@@ -611,5 +611,7 @@
   "raw_js_condition": "Raw JS condition",
   "js_runtime_unsupported": "PostFilterJsRuntime.isSupported: false",
   "post_filter_history": "Filter History",
-  "post_filter_history_empty": "No saved filter expressions"
+  "post_filter_history_empty": "No saved filter expressions",
+  "post_filter_placeholder_holes": "Filtered {count} posts since {time}",
+  "post_filter_placeholder_floors": "Filtered {count} floors since {time}"
 }

@@ -658,7 +658,7 @@ class PostFilterState {
     return _matches(() => jsRuntime.evaluateHole(appliedJsExpr, hole));
   }
 
-  bool floorMatches(OTFloor floor, {OTHole? hole}) {
+  bool floorMatches(OTFloor floor, [OTHole? hole]) {
     return _matches(
       () => jsRuntime.evaluateFloor(appliedJsExpr, floor, hole: hole),
     );
@@ -698,6 +698,12 @@ class PostFilterState {
       : PlatformX.isMaterial(context)
       ? Icons.filter_alt
       : CupertinoIcons.slider_horizontal_3;
+}
+
+class PostFilterPlaceholderHint {
+  final int filteredCount;
+
+  const PostFilterPlaceholderHint(this.filteredCount);
 }
 
 class PostFilterBar extends StatelessWidget {

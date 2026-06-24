@@ -41,6 +41,8 @@ class OTFloor {
   List<OTFloor>? mention;
   int? dislike;
   bool? disliked;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  Object? meta;
 
   factory OTFloor.fromJson(Map<String, dynamic> json) =>
       _$OTFloorFromJson(json);
@@ -67,21 +69,23 @@ class OTFloor {
       (other is OTFloor) && floor_id == other.floor_id;
 
   OTFloor(
-      this.floor_id,
-      this.hole_id,
-      this.content,
-      this.anonyname,
-      this.time_created,
-      this.time_updated,
-      this.deleted,
-      this.fold,
-      this.modified,
-      this.like,
-      this.is_me,
-      this.liked,
-      this.mention,
-      this.dislike,
-      this.disliked);
+    this.floor_id,
+    this.hole_id,
+    this.content,
+    this.anonyname,
+    this.time_created,
+    this.time_updated,
+    this.deleted,
+    this.fold,
+    this.modified,
+    this.like,
+    this.is_me,
+    this.liked,
+    this.mention,
+    this.dislike,
+    this.disliked, {
+    this.meta
+  });
 
   OTFloor copyWith({
     int? floor_id,
@@ -99,6 +103,7 @@ class OTFloor {
     List<OTFloor>? mention,
     int? dislike,
     bool? disliked,
+    Object? meta,
   }) {
     return OTFloor(
       floor_id ?? this.floor_id,
@@ -116,6 +121,7 @@ class OTFloor {
       mention ?? this.mention,
       dislike ?? this.dislike,
       disliked ?? this.disliked,
+      meta: meta ?? this.meta,
     );
   }
 

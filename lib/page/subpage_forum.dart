@@ -33,6 +33,7 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
+import 'package:dan_xi/util/forum/human_duration.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -440,13 +441,13 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
         // Favored discussion has only one page.
         if (page > 1) return [];
         final loadedPost = await ForumRepository.getInstance().getFavoriteHoles();
-        loadedPost?.retainWhere((hole) => _postFilter.holeMatches(hole));
-        return loadedPost;
+        final filtered = _applyPostFilter(loadedPost ?? const []);
+        return filtered ?? const [];
       case PostsType.SUBSCRIBED_DISCUSSION:
         if (page > 1) return [];
         final loadedPost = await ForumRepository.getInstance().getSubscribedHoles();
-        loadedPost?.retainWhere((hole) => _postFilter.holeMatches(hole));
-        return loadedPost;
+        final filtered = _applyPostFilter(loadedPost ?? const []);
+        return filtered ?? const [];
       case PostsType.FILTER_BY_ME:
         List<OTHole>? loadedPost = await adaptLayer
             .generateReceiver(listViewController, (lastElement) {
@@ -471,12 +472,9 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
                 .hiddenMyPosts
                 .contains(element.hole_id));
 
-        loadedPost?.retainWhere((hole) => _postFilter.holeMatches(hole));
-
         // About this line, see [PagedListView].
-        return loadedPost == null || loadedPost.isEmpty
-            ? [OTHole.DUMMY_POST]
-            : loadedPost;
+        final filtered = _applyPostFilter(loadedPost ?? const []);
+        return filtered ?? [OTHole.dummyPost];
       case PostsType.FILTER_BY_TAG:
       case PostsType.NORMAL_POSTS:
         List<OTHole>? loadedPost = await adaptLayer
@@ -523,16 +521,24 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
         loadedPost?.removeWhere((element) =>
             hiddenPosts.any((blockPost) => element.hole_id == blockPost));
 
-        loadedPost?.retainWhere((hole) => _postFilter.holeMatches(hole));
-
         // About this line, see [PagedListView].
-        return loadedPost == null || loadedPost.isEmpty
-            ? [OTHole.DUMMY_POST]
-            : loadedPost;
+        final filtered = _applyPostFilter(loadedPost ?? const []);
+        return filtered ?? [OTHole.dummyPost];
       case PostsType.EXTERNAL_VIEW:
         // If we are showing a widget predefined
         return [];
     }
+  }
+
+  List<OTHole>? _applyPostFilter(List<OTHole> posts) {
+    if (posts.isEmpty) return null;
+    final filtered = [
+      for (final post in posts)
+        if (_postFilter.holeMatches(post)) post,
+    ];
+    return filtered.isEmpty
+        ? [posts.last.copyWith(meta: PostFilterPlaceholderHint(posts.length))]
+        : filtered;
   }
 
   /// Refresh the whole list.
@@ -838,7 +844,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
   Widget _buildOTListView(BuildContext context, {EdgeInsets? padding}) =>
       PagedListView<OTHole>(
-        noneItem: OTHole.DUMMY_POST,
+        noneItem: OTHole.dummyPost,
         pagedController: listViewController,
         withScrollbar: true,
         scrollController: PrimaryScrollController.of(context),
@@ -957,6 +963,25 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   Widget _buildListItem(BuildContext context, ListProvider<OTHole>? _, int? __,
       OTHole postElement,
       {bool isPinned = false}) {
+    if (postElement.meta case PostFilterPlaceholderHint(:final filteredCount)) {
+      final sortOrder =
+          context.read<SettingsProvider>().forumSortOrder ??
+          SortOrder.LAST_REPLIED;
+      final timeField = switch (sortOrder) {
+        SortOrder.LAST_CREATED => postElement.time_created,
+        SortOrder.LAST_REPLIED => postElement.time_updated,
+      };
+      final time = HumanDuration.tryFormat(
+        context,
+        DateTime.tryParse(timeField ?? ''),
+      );
+      return Center(
+        child: Text(
+          S.of(context).post_filter_placeholder_holes(filteredCount, time),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
     // Avoid excluding pinned posts from favorite and subscription list
     bool isSpecialView = _postsType == PostsType.FAVORED_DISCUSSION ||
         _postsType == PostsType.SUBSCRIBED_DISCUSSION;

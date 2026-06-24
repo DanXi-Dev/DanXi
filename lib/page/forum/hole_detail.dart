@@ -33,6 +33,7 @@ import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
+import 'package:dan_xi/util/forum/human_duration.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -170,11 +171,25 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       PunishmentHistory() => await loadPunishmentHistory(page),
     };
 
-    if (results == null) return null;
-    if (results.isEmpty) return const [];
+    final filtered = _applyPostFilter(
+      results ?? const [],
+      switch (_renderModel) {
+        Normal(:final hole) => hole,
+        _ => null,
+      },
+    );
+    return filtered ?? const [];
+  }
 
-    results.retainWhere((floor) => _postFilter.floorMatches(floor));
-    return results.isEmpty ? [OTFloor.dummyPost] : results;
+  List<OTFloor>? _applyPostFilter(List<OTFloor> posts, [OTHole? hole]) {
+    if (posts.isEmpty) return null;
+    final filtered = [
+      for (final post in posts)
+        if (_postFilter.floorMatches(post, hole)) post,
+    ];
+    return filtered.isEmpty
+        ? [posts.first.copyWith(meta: PostFilterPlaceholderHint(posts.length))]
+        : filtered;
   }
 
   /// Build the text form of a floor for sharing.
@@ -1519,6 +1534,18 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   Widget _getListItems(BuildContext context, ListProvider<OTFloor> dataProvider,
       int index, OTFloor floor,
       {bool isNested = false}) {
+    if (floor.meta case PostFilterPlaceholderHint(:final filteredCount)) {
+      final time = HumanDuration.tryFormat(
+        context,
+        DateTime.tryParse(floor.time_created ?? ''),
+      );
+      return Center(
+        child: Text(
+          S.of(context).post_filter_placeholder_floors(filteredCount, time),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
     if (_renderModel case Normal(selectedPerson: var selectedPerson, hole: _)) {
       if (selectedPerson != null && floor.anonyname != selectedPerson) {
         return nil;
