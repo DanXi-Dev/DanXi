@@ -33,7 +33,6 @@ import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
-import 'package:dan_xi/util/forum/human_duration.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -1535,15 +1534,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       int index, OTFloor floor,
       {bool isNested = false}) {
     if (floor.meta case PostFilterPlaceholderHint(:final filteredCount)) {
-      final time = HumanDuration.tryFormat(
-        context,
-        DateTime.tryParse(floor.time_created ?? ''),
-      );
-      return Center(
-        child: Text(
-          S.of(context).post_filter_placeholder_floors(filteredCount, time),
-          textAlign: TextAlign.center,
-        ),
+      return PostFilterPlaceholderWidget(
+        filteredCount: filteredCount,
+        time: DateTime.tryParse(floor.time_created ?? '') ?? DateTime.now(),
+        labelBuilder: (context, count, time) =>
+            S.of(context).post_filter_placeholder_floors(count, time),
       );
     }
     if (_renderModel case Normal(selectedPerson: var selectedPerson, hole: _)) {

@@ -31,6 +31,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:intl/intl.dart';
 
 // DanXi Post Filter - Architecture Overview
 // ================================================================
@@ -704,6 +705,49 @@ class PostFilterPlaceholderHint {
   final int filteredCount;
 
   const PostFilterPlaceholderHint(this.filteredCount);
+}
+
+class PostFilterPlaceholderWidget extends StatefulWidget {
+  final int filteredCount;
+  final DateTime time;
+  final String Function(BuildContext context, int count, String time)
+  labelBuilder;
+
+  const PostFilterPlaceholderWidget({
+    super.key,
+    required this.filteredCount,
+    required this.time,
+    required this.labelBuilder,
+  });
+
+  @override
+  State<PostFilterPlaceholderWidget> createState() =>
+      _PostFilterPlaceholderWidgetState();
+}
+
+class _PostFilterPlaceholderWidgetState
+    extends State<PostFilterPlaceholderWidget> {
+  bool _showAbsolute = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final timeStr = _showAbsolute
+        ? DateFormat.yMMMd().add_Hms().format(widget.time.toLocal())
+        : HumanDuration.tryFormat(context, widget.time);
+    return InkWell(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        width: double.infinity,
+        child: Center(
+          child: Text(
+            widget.labelBuilder(context, widget.filteredCount, timeStr),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+      onLongPress: () => setState(() => _showAbsolute = !_showAbsolute),
+    );
+  }
 }
 
 class PostFilterBar extends StatelessWidget {

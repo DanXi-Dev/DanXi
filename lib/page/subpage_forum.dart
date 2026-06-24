@@ -33,7 +33,6 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
-import 'package:dan_xi/util/forum/human_duration.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -971,15 +970,11 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
         SortOrder.LAST_CREATED => postElement.time_created,
         SortOrder.LAST_REPLIED => postElement.time_updated,
       };
-      final time = HumanDuration.tryFormat(
-        context,
-        DateTime.tryParse(timeField ?? ''),
-      );
-      return Center(
-        child: Text(
-          S.of(context).post_filter_placeholder_holes(filteredCount, time),
-          textAlign: TextAlign.center,
-        ),
+      return PostFilterPlaceholderWidget(
+        filteredCount: filteredCount,
+        time: DateTime.tryParse(timeField ?? '') ?? DateTime.now(),
+        labelBuilder: (context, count, time) =>
+            S.of(context).post_filter_placeholder_holes(count, time),
       );
     }
     // Avoid excluding pinned posts from favorite and subscription list
