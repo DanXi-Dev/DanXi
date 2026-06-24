@@ -570,7 +570,7 @@
   "regex_flag_i_description": "不區分大小寫搜索。",
   "regex_flag_m_description": "多行搜索。",
   "regex_flag_s_description": "允許 `.` 匹配換行符。",
-  "regex_flag_u_description": "使用 unicode 碼的模式進行匹配。",
+  "regex_flag_u_description": "使用 Unicode 碼的模式進行匹配。",
   "regex_flag_v_description": "對 `u` 模式的升級，支援更多 Unicode 功能。",
   "regex_flag_y_description": "執行「粘性 (`sticky`)」搜索，匹配從目標字符串的當前位置開始。",
   "js_expression": "JS 運算式",
