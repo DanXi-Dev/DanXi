@@ -27,6 +27,7 @@ import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -634,10 +635,9 @@ class PostFilterHistory {
         return PostFilterHistory.fromJson(map);
       }
     } catch (e, stackTrace) {
-      assert(() {
+      if (kDebugMode) {
         debugPrint('Failed to parse PostFilterHistory: $e\n$stackTrace');
-        return true;
-      }());
+      }
     }
     return null;
   }
@@ -668,7 +668,14 @@ class PostFilterState {
     if (!shown || appliedJsExpr.isEmpty) {
       return true;
     }
-    return evaluateJs();
+    try {
+      return evaluateJs();
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint("PostFilterState JS error: $e");
+      }
+      return false;
+    }
   }
 
   void toggle() {

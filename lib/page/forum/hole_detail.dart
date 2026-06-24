@@ -170,7 +170,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       PunishmentHistory() => await loadPunishmentHistory(page),
     };
 
-    return results;
+    if (results == null) return null;
+    if (results.isEmpty) return const [];
+
+    results.retainWhere((floor) => _postFilter.floorMatches(floor));
+    return results.isEmpty ? [OTFloor.dummyPost] : results;
   }
 
   /// Build the text form of a floor for sharing.
@@ -437,7 +441,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     final pagedListView = PagedListView<OTFloor>(
       pagedController: _listViewController,
-      noneItem: OTFloor.dummy(),
+      noneItem: OTFloor.dummyPost,
       withScrollbar: true,
       scrollController: PrimaryScrollController.of(context),
       dataReceiver: _loadContent,
@@ -735,21 +739,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         },
       ),
     ).withWatermarkRegion();
-  }
-
-  bool _floorMatchesAppliedPostFilter(OTFloor floor) {
-    try {
-      return _postFilter.floorMatches(
-        floor,
-        hole: switch (_renderModel) {
-          Normal(hole: var hole) => hole,
-          _ => null,
-        },
-      );
-    } catch (e) {
-      debugPrint("PostFilterState.floorMatches: $e");
-    }
-    return false;
   }
 
   bool get _shouldShowAiSummaryEntry {
@@ -1534,9 +1523,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       if (selectedPerson != null && floor.anonyname != selectedPerson) {
         return nil;
       }
-    }
-    if (!_floorMatchesAppliedPostFilter(floor)) {
-      return const SizedBox.shrink();
     }
 
     Future<List<ImageUrlInfo>?> loadPageImage(

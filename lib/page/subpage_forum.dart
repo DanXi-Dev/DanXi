@@ -439,10 +439,14 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
       case PostsType.FAVORED_DISCUSSION:
         // Favored discussion has only one page.
         if (page > 1) return [];
-        return await ForumRepository.getInstance().getFavoriteHoles();
+        final loadedPost = await ForumRepository.getInstance().getFavoriteHoles();
+        loadedPost?.retainWhere((hole) => _postFilter.holeMatches(hole));
+        return loadedPost;
       case PostsType.SUBSCRIBED_DISCUSSION:
         if (page > 1) return [];
-        return await ForumRepository.getInstance().getSubscribedHoles();
+        final loadedPost = await ForumRepository.getInstance().getSubscribedHoles();
+        loadedPost?.retainWhere((hole) => _postFilter.holeMatches(hole));
+        return loadedPost;
       case PostsType.FILTER_BY_ME:
         List<OTHole>? loadedPost = await adaptLayer
             .generateReceiver(listViewController, (lastElement) {
@@ -466,6 +470,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
             !SettingsProvider.getInstance()
                 .hiddenMyPosts
                 .contains(element.hole_id));
+
+        loadedPost?.retainWhere((hole) => _postFilter.holeMatches(hole));
 
         // About this line, see [PagedListView].
         return loadedPost == null || loadedPost.isEmpty
@@ -516,6 +522,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
         List<int> hiddenPosts = SettingsProvider.getInstance().hiddenHoles;
         loadedPost?.removeWhere((element) =>
             hiddenPosts.any((blockPost) => element.hole_id == blockPost));
+
+        loadedPost?.retainWhere((hole) => _postFilter.holeMatches(hole));
 
         // About this line, see [PagedListView].
         return loadedPost == null || loadedPost.isEmpty
@@ -816,15 +824,6 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     );
   }
 
-  bool _holeMatchesAppliedPostFilter(OTHole hole) {
-    try {
-      return _postFilter.holeMatches(hole);
-    } catch (e) {
-      debugPrint("PostFilterState.holeMatches: $e");
-    }
-    return false;
-  }
-
   void _togglePostFilter() {
     setState(() => _postFilter.toggle());
   }
@@ -961,8 +960,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     // Avoid excluding pinned posts from favorite and subscription list
     bool isSpecialView = _postsType == PostsType.FAVORED_DISCUSSION ||
         _postsType == PostsType.SUBSCRIBED_DISCUSSION;
-    if (!_holeMatchesAppliedPostFilter(postElement) ||
-        postElement.floors?.first_floor == null ||
+    if (postElement.floors?.first_floor == null ||
         postElement.floors?.last_floor == null ||
         (foldBehavior == FoldBehavior.HIDE && postElement.is_folded) ||
         (!isPinned &&
