@@ -161,7 +161,7 @@ class PostFilterFieldValue extends PostFilterValue {
 
   @override
   bool operator ==(Object other) =>
-      other is PostFilterFieldValue && other.field.name == field.name;
+      other is PostFilterFieldValue && other.field == field;
 
   @override
   int get hashCode => field.name.hashCode;
@@ -286,6 +286,13 @@ class PostFilterField {
   };
 
   Map<String, dynamic> toJson() => {'type': type.name, 'name': name};
+
+  @override
+  bool operator ==(Object other) =>
+      other is PostFilterField && other.type == type && other.name == name;
+
+  @override
+  int get hashCode => Object.hash(type, name);
 
   factory PostFilterField.fromJson(Map<String, dynamic> json) =>
       PostFilterField(
@@ -426,6 +433,16 @@ class PostFilterGroup extends PostFilterExpr {
     }
     return group;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      other is PostFilterGroup &&
+      other.relation == relation &&
+      other.negated == negated &&
+      const ListEquality().equals(other.slots, slots);
+
+  @override
+  int get hashCode => Object.hash(relation, negated, Object.hashAll(slots));
 }
 
 class PostFilterCondition extends PostFilterExpr {
@@ -472,6 +489,16 @@ class PostFilterCondition extends PostFilterExpr {
     'object': ?object?.toJson(),
   };
 
+  @override
+  bool operator ==(Object other) =>
+      other is PostFilterCondition &&
+      other.subject?.name == subject?.name &&
+      other.verb == verb &&
+      other.object == object;
+
+  @override
+  int get hashCode => Object.hash(subject?.name, verb, object);
+
   factory PostFilterCondition.fromJson(Map<String, dynamic> json) {
     return PostFilterCondition(
       subject: switch (json['subject']) {
@@ -503,6 +530,13 @@ class PostFilterRawCondition extends PostFilterExpr {
 
   factory PostFilterRawCondition.fromJson(Map<String, dynamic> json) =>
       PostFilterRawCondition(raw: json['raw'] as String?);
+
+  @override
+  bool operator ==(Object other) =>
+      other is PostFilterRawCondition && other.raw == raw;
+
+  @override
+  int get hashCode => raw.hashCode;
 }
 
 class PostFilterSlot {
@@ -510,6 +544,13 @@ class PostFilterSlot {
   PostFilterGroup group;
 
   PostFilterSlot({required this.expr, required this.group});
+
+  @override
+  bool operator ==(Object other) =>
+      other is PostFilterSlot && other.expr == expr;
+
+  @override
+  int get hashCode => expr.hashCode;
 }
 
 class PostFilterController extends ChangeNotifier {
@@ -579,6 +620,26 @@ class PostFilterHistory {
         root: PostFilterGroup.fromJson(json['root'] as Map<String, dynamic>),
         time: DateTime.parse(json['time'] as String),
       );
+
+  bool shouldDedup(PostFilterHistory? cache) =>
+      cache != null &&
+      DateTime.now().difference(cache.time).inMilliseconds < 1048576 &&
+      root == cache.root;
+
+  static PostFilterHistory? tryFromJsonString(String s) {
+    if (s.isEmpty) return null;
+    try {
+      if (jsonDecode(s) case Map<String, dynamic> map) {
+        return PostFilterHistory.fromJson(map);
+      }
+    } catch (e, stackTrace) {
+      assert(() {
+        debugPrint('Failed to parse PostFilterHistory: $e\n$stackTrace');
+        return true;
+      }());
+    }
+    return null;
+  }
 
   String relativeTime(BuildContext context) =>
       HumanDuration.tryFormat(context, time);
@@ -741,9 +802,12 @@ class PostFilterBar extends StatelessWidget {
             ),
             padding: EdgeInsets.zero,
             onPressed: () {
-              final expr = controller.root.toJs();
-              onApply(expr);
-              onSaveHistory?.call(PostFilterHistory(root: controller.root));
+              onApply(controller.root.toJs());
+              onSaveHistory?.call(
+                PostFilterHistory(
+                  root: PostFilterGroup.fromJson(controller.root.toJson()),
+                ),
+              );
             },
           ),
       ],

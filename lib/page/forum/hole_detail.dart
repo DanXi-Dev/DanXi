@@ -128,6 +128,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   Timer? _highlightTimer;
   Future<List<OTFloor>>? _loadAllContentFuture;
   final PostFilterState _postFilter = PostFilterState();
+  PostFilterHistory? _postFilterHistoryCache;
 
   final PagedListViewController<OTFloor> _listViewController =
       PagedListViewController<OTFloor>();
@@ -673,12 +674,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               filter: _postFilter,
               onApply: (expr) => setState(() => _postFilter.apply(expr)),
               onSaveHistory: (history) {
-                final stringified = jsonEncode(history.toJson());
-                if (stringified.isEmpty) return;
+                if (history.shouldDedup(_postFilterHistoryCache)) return;
+                _postFilterHistoryCache = history;
                 final settings = SettingsProvider.getInstance();
-                final entries = settings.postFilterHistoryHoles;
-                if (stringified == entries.lastOrNull) return;
-                settings.postFilterHistoryHoles = [...entries, stringified];
+                settings.postFilterHistoryFloors = [
+                  ...settings.postFilterHistoryFloors,
+                  jsonEncode(history.toJson()),
+                ];
               },
               onClearHistory: () =>
                   SettingsProvider.getInstance().postFilterHistoryFloors = null,

@@ -397,6 +397,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   String? _tagFilter;
   PostsType _postsType = PostsType.NORMAL_POSTS;
   final PostFilterState _postFilter = PostFilterState();
+  PostFilterHistory? _postFilterHistoryCache;
 
   ListDelegate? _delegate;
 
@@ -783,14 +784,15 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
             return WithPostFilterBar(
               filter: _postFilter,
               onApply: (expr) => setState(() => _postFilter.apply(expr)),
-              onSaveHistory: (history) {
-                final stringified = jsonEncode(history.toJson());
-                if (stringified.isEmpty) return;
-                final settings = SettingsProvider.getInstance();
-                final entries = settings.postFilterHistoryHoles;
-                if (stringified == entries.lastOrNull) return;
-                settings.postFilterHistoryHoles = [...entries, stringified];
-              },
+                onSaveHistory: (history) {
+                  if (history.shouldDedup(_postFilterHistoryCache)) return;
+                  _postFilterHistoryCache = history;
+                  final settings = SettingsProvider.getInstance();
+                  settings.postFilterHistoryHoles = [
+                    ...settings.postFilterHistoryHoles,
+                    jsonEncode(history.toJson()),
+                  ];
+                },
               onClearHistory: () =>
                   SettingsProvider.getInstance().postFilterHistoryHoles = null,
               getHistory: () => [
