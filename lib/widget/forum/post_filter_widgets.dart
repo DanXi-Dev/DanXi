@@ -404,6 +404,7 @@ class PostFilterGroup extends PostFilterExpr {
 
   @override
   String toJs() {
+    if (slots.isEmpty) return 'true';
     final joined = slots
         .map((slot) => '(${slot.expr.toJs()})')
         .join(' ${relation.token} ');
@@ -478,7 +479,7 @@ class PostFilterCondition extends PostFilterExpr {
       v.isOperator
           ? '${s.name} ${verb?.token} (${o.token})'
           : '${s.name}.${verb?.token}(${o.token})',
-    (null, _, _) || (_, null, _) || (_, _, null) => 'false',
+    (null, _, _) || (_, null, _) || (_, _, null) => 'true',
   };
 
   @override
