@@ -702,7 +702,12 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
               PostsType.SUBSCRIBED_DISCUSSION => S.of(context).subscriptions,
               _ => throw Exception("Unreachable"),
             }),
-            trailingActions: [_buildPostFilterButton(context)],
+            trailingActions: [
+              PostFilterToggleButton(
+                filter: _postFilter,
+                onToggle: () => setState(() {}),
+              ),
+            ],
           ),
           body: Builder(
             // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
@@ -717,7 +722,10 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           appBar: PlatformAppBarX(
             title: Text(S.of(context).list_my_posts),
             trailingActions: [
-              _buildPostFilterButton(context),
+              PostFilterToggleButton(
+                filter: _postFilter,
+                onToggle: () => setState(() {}),
+              ),
               PlatformIconButton(
                 padding: EdgeInsets.zero,
                 icon: Icon(Icons.restore_page),
@@ -745,7 +753,12 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: PlatformAppBarX(
             title: Text(S.of(context).filtering_by_tag(_tagFilter ?? "?")),
-            trailingActions: [_buildPostFilterButton(context)],
+            trailingActions: [
+              PostFilterToggleButton(
+                filter: _postFilter,
+                onToggle: () => setState(() {}),
+              ),
+            ],
           ),
           body: Builder(
             // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
@@ -831,14 +844,6 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
   void _togglePostFilter() {
     setState(() => _postFilter.toggle());
-  }
-
-  Widget _buildPostFilterButton(BuildContext context) {
-    return PlatformIconButton(
-      padding: EdgeInsets.zero,
-      icon: Icon(_postFilter.getIcon(context)),
-      onPressed: () => setState(() => _postFilter.toggle()),
-    );
   }
 
   Widget _buildOTListView(BuildContext context, {EdgeInsets? padding}) =>

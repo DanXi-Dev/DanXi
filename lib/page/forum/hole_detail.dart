@@ -647,7 +647,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   ? const Icon(Icons.more_vert)
                   : const Icon(CupertinoIcons.ellipsis),
             ),
-          ],
+          ] else
+            PostFilterToggleButton(
+              filter: _postFilter,
+              onToggle: () => setState(() {}),
+            ),
           if (_renderModel case ViewHistory())
             PlatformIconButton(
               padding: EdgeInsets.zero,

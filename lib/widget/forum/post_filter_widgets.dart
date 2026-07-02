@@ -725,6 +725,27 @@ class PostFilterPlaceholderWidget extends StatefulWidget {
       _PostFilterPlaceholderWidgetState();
 }
 
+class PostFilterToggleButton extends StatelessWidget {
+  final PostFilterState filter;
+  final void Function()? onToggle;
+
+  const PostFilterToggleButton({
+    super.key,
+    required this.filter,
+    this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) => PlatformIconButton(
+    padding: EdgeInsets.zero,
+    icon: Icon(filter.getIcon(context)),
+    onPressed: () {
+      filter.toggle();
+      onToggle?.call();
+    },
+  );
+}
+
 class _PostFilterPlaceholderWidgetState
     extends State<PostFilterPlaceholderWidget> {
   bool _showAbsolute = false;
