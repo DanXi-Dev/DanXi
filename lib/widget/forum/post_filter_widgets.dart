@@ -992,7 +992,7 @@ class PostFilterBar extends StatelessWidget {
     PostFilterGroup group, {
     PostFilterSlot? slot,
   }) {
-    return Container(
+    final child = Container(
       padding: EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
         border: Border.symmetric(
@@ -1036,6 +1036,16 @@ class PostFilterBar extends StatelessWidget {
         ],
       ),
     );
+    return group.slots.isEmpty
+        ? _AutoOpenWrapper(
+            onAutoOpen: () async {
+              if (await _showAddExprPopup(context, group) case final expr?) {
+                controller.addExpr(group, expr);
+              }
+            },
+            child: child,
+          )
+        : child;
   }
 
   // ======== GROUP EXPRESSION CONTENT AREA ========
@@ -1176,7 +1186,6 @@ class PostFilterBar extends StatelessWidget {
 
   Widget _buildGroupAddButton(BuildContext context, PostFilterGroup group) {
     return InkWell(
-      onTap: () => _showAddExprPopup(context, group),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(4),
@@ -1187,57 +1196,62 @@ class PostFilterBar extends StatelessWidget {
           color: _chipContentColor(context),
         ),
       ),
+      onTap: () async {
+        if (await _showAddExprPopup(context, group) case final expr?) {
+          controller.addExpr(group, expr);
+        }
+      },
     );
   }
 
-  Future<void> _showAddExprPopup(
+  Future<PostFilterExpr?> _showAddExprPopup(
     BuildContext context,
     PostFilterGroup group,
   ) async {
-    await showPlatformModalSheet(
+    return showPlatformModalSheet(
       context: context,
-      builder: (context) => SafeArea(
+      builder: (modalContext) => SafeArea(
         child: Material(
-          color: Theme.of(context).scaffoldBackgroundColor,
+          color: Theme.of(modalContext).scaffoldBackgroundColor,
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.5,
+              maxHeight: MediaQuery.of(modalContext).size.height * 0.5,
             ),
             child: ListView(
               shrinkWrap: true,
               children: [
                 _buildAddExprListTile(
-                  context,
+                  modalContext,
                   group,
                   S.of(context).field_expression,
                   PostFilterCondition.new,
                 ),
                 _buildAddExprListTile(
-                  context,
+                  modalContext,
                   group,
                   S.of(context).raw_expression,
                   PostFilterRawCondition.new,
                 ),
                 _buildAddExprListTile(
-                  context,
+                  modalContext,
                   group,
                   S.of(context).and_group,
                   PostFilterGroup.and,
                 ),
                 _buildAddExprListTile(
-                  context,
+                  modalContext,
                   group,
                   S.of(context).or_group,
                   PostFilterGroup.or,
                 ),
                 _buildAddExprListTile(
-                  context,
+                  modalContext,
                   group,
                   S.of(context).not_and_group,
                   PostFilterGroup.nand,
                 ),
                 _buildAddExprListTile(
-                  context,
+                  modalContext,
                   group,
                   S.of(context).not_or_group,
                   PostFilterGroup.nor,
@@ -1259,10 +1273,7 @@ class PostFilterBar extends StatelessWidget {
     return ListTile(
       title: Text(label),
       dense: true,
-      onTap: () {
-        Navigator.of(context).pop();
-        controller.addExpr(group, createExpr());
-      },
+      onTap: () => Navigator.of(context).pop(createExpr()),
     );
   }
 
