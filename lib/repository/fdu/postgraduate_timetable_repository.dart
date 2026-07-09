@@ -38,8 +38,7 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
 
   factory PostgraduateTimetableRepository.getInstance() => _instance;
 
-  Future<TimeTable?> loadTimeTableRemotely(
-      PersonInfo info, OnCaptchaCallback callback,
+  Future<TimeTable?> loadTimeTableRemotely(PersonInfo info,
       {DateTime? startTime}) {
     final options = RequestOptions(
       method: "GET",
@@ -57,13 +56,13 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
     }, info: info);
   }
 
-  Future<TimeTable?> loadTimeTable(PersonInfo info, OnCaptchaCallback callback,
+  Future<TimeTable?> loadTimeTable(PersonInfo info,
       {DateTime? startTime, bool forceLoadFromRemote = false}) async {
     startTime ??= TimeTable.defaultStartDate;
     if (forceLoadFromRemote) {
       TimeTable? result = (await Cache.getRemotely<TimeTable>(
           TimeTableRepository.KEY_TIMETABLE_CACHE,
-          () async => (await loadTimeTableRemotely(info, callback,
+          () async => (await loadTimeTableRemotely(info,
               startTime: startTime))!,
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson())));
@@ -72,7 +71,7 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
     } else {
       return Cache.get<TimeTable>(
           TimeTableRepository.KEY_TIMETABLE_CACHE,
-          () async => (await loadTimeTableRemotely(info, callback,
+          () async => (await loadTimeTableRemotely(info,
               startTime: startTime))!,
           (cachedValue) => TimeTable.fromJson(jsonDecode(cachedValue!)),
           (object) => jsonEncode(object.toJson()));
@@ -94,5 +93,3 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
   @override
   String get linkHost => "fudan.edu.cn";
 }
-
-typedef OnCaptchaCallback = Future<String> Function(String imageUrl);
