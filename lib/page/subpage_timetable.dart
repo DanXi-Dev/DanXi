@@ -19,7 +19,6 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/common/feature_registers.dart';
@@ -34,7 +33,6 @@ import 'package:dan_xi/repository/fdu/edu_service_repository.dart';
 import 'package:dan_xi/repository/fdu/postgraduate_timetable_repository.dart';
 import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
-import 'package:dan_xi/util/io/cache_manager_with_webvpn.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -184,37 +182,8 @@ class TimetableSubPageState extends PlatformSubpageState<TimetableSubPage> {
       } else if (forceLoadFromRemote) {
         _contentFuture = LazyFuture.pack(
             PostgraduateTimetableRepository.getInstance().loadTimeTable(
-                StateProvider.personInfo.value!, (imageUrl) async {
-          TextEditingController controller = TextEditingController();
-          // TODO: dispose
-          await showPlatformDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (cxt) => PlatformAlertDialog(
-                    title: Text(S.of(context).enter_captcha),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CachedNetworkImage(
-                            imageUrl: imageUrl,
-                            cacheManager: DefaultCacheManagerWithWebvpn(),
-                            // Ensure shape is the same as the loading indicator
-                            fit: BoxFit.contain,
-                            progressIndicatorBuilder:
-                                (context, url, progress) =>
-                                    PlatformCircularProgressIndicator()),
-                        TextField(controller: controller)
-                      ],
-                    ),
-                    actions: [
-                      PlatformDialogAction(
-                        child: Text(S.of(context).ok),
-                        onPressed: () => Navigator.of(cxt).pop(),
-                      )
-                    ],
-                  ));
-          return controller.text;
-        }, forceLoadFromRemote: forceLoadFromRemote));
+                StateProvider.personInfo.value!,
+                forceLoadFromRemote: forceLoadFromRemote));
       } else {
         try {
           _contentFuture = Future.value(

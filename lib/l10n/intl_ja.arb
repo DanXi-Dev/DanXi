@@ -126,7 +126,6 @@
   "enabled": "有効",
   "end_reached": "もう最後だ",
   "english_language": "英語",
-  "enter_captcha": "認証コードを入力してください",
   "entry_permission": "入校権限",
   "error_adding_exam": "試験「{name}」の追加の時にエラー",
   "error_detail": "詳細情報",
