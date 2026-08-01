@@ -19,4 +19,28 @@ class PostFilterPlaceholderHint {
   final int filteredCount;
 
   const PostFilterPlaceholderHint(this.filteredCount);
+
+  static List<T> collapseFilteredPosts<T>(
+    Iterable<T> posts, {
+    required bool Function(T post) filter,
+    required List<T> Function(List<T> posts) collapse,
+  }) {
+    final acc = <T>[];
+    var run = <T>[];
+    for (final post in posts) {
+      if (!filter(post)) {
+        run.add(post);
+        continue;
+      }
+      if (run.isNotEmpty) {
+        acc.addAll(collapse(run));
+        run = [];
+      }
+      acc.add(post);
+    }
+    if (run.isNotEmpty) {
+      acc.addAll(collapse(run));
+    }
+    return acc;
+  }
 }

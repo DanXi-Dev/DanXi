@@ -178,18 +178,18 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         _ => null,
       },
     );
-    return filtered ?? const [];
+    return filtered;
   }
 
-  List<OTFloor>? _applyPostFilter(List<OTFloor> posts, [OTHole? hole]) {
-    if (posts.isEmpty) return null;
-    final filtered = [
-      for (final post in posts)
-        if (_postFilter.floorMatches(post, hole)) post,
-    ];
-    return filtered.isEmpty
-        ? [posts.first.copyWith(pfHint: PostFilterPlaceholderHint(posts.length))]
-        : filtered;
+  List<OTFloor> _applyPostFilter(List<OTFloor> posts, [OTHole? hole]) {
+    final collapsedPosts = PostFilterPlaceholderHint.collapseFilteredPosts(
+      posts,
+      filter: (post) => _postFilter.floorMatches(post, hole),
+      collapse: (posts) => [
+        posts.first.copyWith(pfHint: PostFilterPlaceholderHint(posts.length)),
+      ],
+    );
+    return collapsedPosts;
   }
 
   /// Build the text form of a floor for sharing.

@@ -442,12 +442,12 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
         if (page > 1) return [];
         final loadedPost = await ForumRepository.getInstance().getFavoriteHoles();
         final filtered = _applyPostFilter(loadedPost ?? const []);
-        return filtered ?? const [];
+        return filtered;
       case PostsType.SUBSCRIBED_DISCUSSION:
         if (page > 1) return [];
         final loadedPost = await ForumRepository.getInstance().getSubscribedHoles();
         final filtered = _applyPostFilter(loadedPost ?? const []);
-        return filtered ?? const [];
+        return filtered;
       case PostsType.FILTER_BY_ME:
         List<OTHole>? loadedPost = await adaptLayer
             .generateReceiver(listViewController, (lastElement) {
@@ -474,7 +474,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
         // About this line, see [PagedListView].
         final filtered = _applyPostFilter(loadedPost ?? const []);
-        return filtered ?? [OTHole.DUMMY_POST];
+        return filtered;
       case PostsType.FILTER_BY_TAG:
       case PostsType.NORMAL_POSTS:
         List<OTHole>? loadedPost = await adaptLayer
@@ -523,22 +523,23 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
         // About this line, see [PagedListView].
         final filtered = _applyPostFilter(loadedPost ?? const []);
-        return filtered ?? [OTHole.DUMMY_POST];
+        if (filtered.isEmpty) return [OTHole.DUMMY_POST];
+        return filtered;
       case PostsType.EXTERNAL_VIEW:
         // If we are showing a widget predefined
         return [];
     }
   }
 
-  List<OTHole>? _applyPostFilter(List<OTHole> posts) {
-    if (posts.isEmpty) return null;
-    final filtered = [
-      for (final post in posts)
-        if (_postFilter.holeMatches(post)) post,
-    ];
-    return filtered.isEmpty
-        ? [posts.last.copyWith(pfHint: PostFilterPlaceholderHint(posts.length))]
-        : filtered;
+  List<OTHole> _applyPostFilter(List<OTHole> posts) {
+    final collapsedPosts = PostFilterPlaceholderHint.collapseFilteredPosts(
+      posts,
+      filter: (post) => _postFilter.holeMatches(post),
+      collapse: (posts) => [
+        posts.last.copyWith(pfHint: PostFilterPlaceholderHint(posts.length)),
+      ],
+    );
+    return collapsedPosts;
   }
 
   /// Refresh the whole list.
@@ -770,7 +771,6 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           ),
         );
       case PostsType.NORMAL_POSTS:
-        return _buildPageBody(context, PlatformX.isMaterial(context));
       case PostsType.EXTERNAL_VIEW:
         return _buildPageBody(context, PlatformX.isMaterial(context));
     }
