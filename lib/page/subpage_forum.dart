@@ -706,7 +706,10 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
             trailingActions: [
               PostFilterToggleButton(
                 filter: _postFilter,
-                onToggle: () => setState(() {}),
+                onToggle: () {
+                  setState(() {});
+                  refreshList();
+                },
               ),
             ],
           ),
@@ -810,7 +813,10 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           } else {
             return WithPostFilterBar(
               filter: _postFilter,
-              onApply: (expr) => setState(() => _postFilter.apply(expr)),
+              onApply: (expr) => setState(() {
+                _postFilter.apply(expr);
+                refreshList();
+              }),
                 onSaveHistory: (history) {
                   if (history.shouldDedup(_postFilterHistoryCache)) return;
                   _postFilterHistoryCache = history;
@@ -844,7 +850,10 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   }
 
   void _togglePostFilter() {
-    setState(() => _postFilter.toggle());
+    setState(() {
+      _postFilter.toggle();
+      refreshList();
+    });
   }
 
   Widget _buildOTListView(BuildContext context, {EdgeInsets? padding}) =>

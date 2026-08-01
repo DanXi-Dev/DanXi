@@ -493,7 +493,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             // invisible but real post is passed in.
             if (item.pfHint != null) return;
             SettingsProvider.getInstance().hiddenMyReplies = [
-              item.floor_id!,
+              // item.floor_id!,
               ...SettingsProvider.getInstance().hiddenMyReplies
             ];
             Noticing.showMaterialNotice(
@@ -578,7 +578,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                     }),
                 PopupMenuOption(
                   label: S.of(context).filter,
-                  onTap: (_) => setState(() => _postFilter.toggle()),
+                  onTap: (_) {
+                    setState(() => _postFilter.toggle());
+                    if (_renderModel case final Normal renderModel) {
+                      _clearSelectedPersonOtherThanFirstFloor(renderModel);
+                    }
+                    refreshListView();
+                  },
                 ),
                 // TODO: It is possible to use the post filter to show DZ only.
                 PopupMenuOption(
@@ -660,7 +666,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           ] else
             PostFilterToggleButton(
               filter: _postFilter,
-              onToggle: () => setState(() {}),
+              onToggle: () {
+                setState(() {});
+                if (_renderModel case final Normal renderModel) {
+                  _clearSelectedPersonOtherThanFirstFloor(renderModel);
+                }
+                refreshListView();
+              },
             ),
           if (_renderModel case ViewHistory())
             PlatformIconButton(
@@ -704,7 +716,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                         image: _backgroundImage!, fit: BoxFit.cover)),
             child: WithPostFilterBar(
               filter: _postFilter,
-              onApply: (expr) => setState(() => _postFilter.apply(expr)),
+              onApply: (expr) {
+                setState(() => _postFilter.apply(expr));
+                if (_renderModel case final Normal renderModel) {
+                  _clearSelectedPersonOtherThanFirstFloor(renderModel);
+                }
+                refreshListView();
+              },
               onSaveHistory: (history) {
                 if (history.shouldDedup(_postFilterHistoryCache)) return;
                 _postFilterHistoryCache = history;
@@ -725,24 +743,14 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               topSafeArea: PlatformX.isCupertino(context),
               fields: postFilterFloorFieldNames,
               child: switch (_renderModel) {
-                Normal() => RefreshIndicator(
+                final Normal renderModel => RefreshIndicator(
                     edgeOffset: MediaQuery.of(context).padding.top,
                     color: Theme.of(context).colorScheme.secondary,
                     backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
                     onRefresh: () async {
                       HapticFeedback.mediumImpact();
 
-                      // when users pull to refresh under "only this person" mode,
-                      // the mode should be quited since if the floor is deep
-                      // the initial request won't fetch them, and the page will be blank.
-                      if ((_renderModel as Normal).selectedPerson !=
-                          (_renderModel as Normal)
-                              .hole
-                              .floors
-                              ?.first_floor
-                              ?.anonyname) {
-                        (_renderModel as Normal).selectedPerson = null;
-                      }
+                      _clearSelectedPersonOtherThanFirstFloor(renderModel);
                       await refreshListView();
                     },
                     child: pagedListView),
@@ -767,6 +775,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         },
       ),
     ).withWatermarkRegion();
+  }
+
+  static void _clearSelectedPersonOtherThanFirstFloor(Normal renderModel) {
+    // when users pull to refresh under "only this person" mode, the mode should
+    // be quited since if the floor is deep the initial request won't fetch
+    // them, and the page will be blank.
+    if (renderModel.selectedPerson !=
+        renderModel.hole.floors?.first_floor?.anonyname) {
+      renderModel.selectedPerson = null;
+    }
   }
 
   bool get _shouldShowAiSummaryEntry {
