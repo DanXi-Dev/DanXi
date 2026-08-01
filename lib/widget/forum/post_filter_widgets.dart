@@ -701,12 +701,6 @@ class PostFilterState {
       : CupertinoIcons.slider_horizontal_3;
 }
 
-class PostFilterPlaceholderHint {
-  final int filteredCount;
-
-  const PostFilterPlaceholderHint(this.filteredCount);
-}
-
 class PostFilterPlaceholderWidget extends StatefulWidget {
   final int filteredCount;
   final DateTime time;

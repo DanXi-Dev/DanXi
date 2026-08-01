@@ -33,6 +33,7 @@ import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
+import 'package:dan_xi/util/forum/post_filter_support.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -187,7 +188,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         if (_postFilter.floorMatches(post, hole)) post,
     ];
     return filtered.isEmpty
-        ? [posts.first.copyWith(meta: PostFilterPlaceholderHint(posts.length))]
+        ? [posts.first.copyWith(pfHint: PostFilterPlaceholderHint(posts.length))]
         : filtered;
   }
 
@@ -1537,9 +1538,9 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   Widget _getListItems(BuildContext context, ListProvider<OTFloor> dataProvider,
       int index, OTFloor floor,
       {bool isNested = false}) {
-    if (floor.meta case PostFilterPlaceholderHint(:final filteredCount)) {
+    if (floor.pfHint case final hint?) {
       return PostFilterPlaceholderWidget(
-        filteredCount: filteredCount,
+        filteredCount: hint.filteredCount,
         time: DateTime.tryParse(floor.time_created ?? '') ?? DateTime.now(),
         labelBuilder: (context, count, time) =>
             S.of(context).post_filter_placeholder_floors(count, time),

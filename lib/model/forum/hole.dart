@@ -19,6 +19,7 @@
 
 import 'package:dan_xi/model/forum/floors.dart';
 import 'package:dan_xi/model/forum/tag.dart';
+import 'package:dan_xi/util/forum/post_filter_support.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'hole.g.dart';
@@ -41,7 +42,8 @@ class OTHole {
   int? subscription_count;
   bool? ai_summary_available;
   @JsonKey(includeFromJson: false, includeToJson: false)
-  Object? meta;
+  // Not underscored for not included from/to JSON.
+  PostFilterPlaceholderHint? pfHint;
 
   factory OTHole.fromJson(Map<String, dynamic> json) => _$OTHoleFromJson(json);
 
@@ -61,7 +63,7 @@ class OTHole {
     this.view,
     this.reply,
     this.floors, {
-    this.meta,
+    this.pfHint,
   });
 
   OTHole copyWith({
@@ -74,7 +76,7 @@ class OTHole {
     int? view,
     int? reply,
     OTFloors? floors,
-    Object? meta,
+    PostFilterPlaceholderHint? pfHint,
   }) => OTHole(
     hole_id ?? this.hole_id,
     division_id ?? this.division_id,
@@ -85,7 +87,7 @@ class OTHole {
     view ?? this.view,
     reply ?? this.reply,
     floors ?? this.floors,
-    meta: meta ?? this.meta,
+    pfHint: pfHint ?? this.pfHint,
   );
 
   /// Generate an empty BBSPost for special sakes.

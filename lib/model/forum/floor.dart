@@ -19,6 +19,7 @@
 
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/util/forum/clean_mode_filter.dart';
+import 'package:dan_xi/util/forum/post_filter_support.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'floor.g.dart';
@@ -42,7 +43,8 @@ class OTFloor {
   int? dislike;
   bool? disliked;
   @JsonKey(includeFromJson: false, includeToJson: false)
-  Object? meta;
+  // Not underscored for not included from/to JSON.
+  PostFilterPlaceholderHint? pfHint;
 
   factory OTFloor.fromJson(Map<String, dynamic> json) =>
       _$OTFloorFromJson(json);
@@ -84,7 +86,7 @@ class OTFloor {
     this.mention,
     this.dislike,
     this.disliked, {
-    this.meta
+    this.pfHint,
   });
 
   OTFloor copyWith({
@@ -103,7 +105,7 @@ class OTFloor {
     List<OTFloor>? mention,
     int? dislike,
     bool? disliked,
-    Object? meta,
+    PostFilterPlaceholderHint? pfHint,
   }) {
     return OTFloor(
       floor_id ?? this.floor_id,
@@ -121,7 +123,7 @@ class OTFloor {
       mention ?? this.mention,
       dislike ?? this.dislike,
       disliked ?? this.disliked,
-      meta: meta ?? this.meta,
+      pfHint: pfHint ?? this.pfHint,
     );
   }
 

@@ -33,12 +33,13 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
+import 'package:dan_xi/util/forum/post_filter_support.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
-import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/widget/forum/auto_banner.dart';
 import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:dan_xi/widget/forum/login_widgets.dart';
@@ -536,7 +537,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
         if (_postFilter.holeMatches(post)) post,
     ];
     return filtered.isEmpty
-        ? [posts.last.copyWith(meta: PostFilterPlaceholderHint(posts.length))]
+        ? [posts.last.copyWith(pfHint: PostFilterPlaceholderHint(posts.length))]
         : filtered;
   }
 
@@ -967,7 +968,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
   Widget _buildListItem(BuildContext context, ListProvider<OTHole>? _, int? __,
       OTHole postElement,
       {bool isPinned = false}) {
-    if (postElement.meta case PostFilterPlaceholderHint(:final filteredCount)) {
+    if (postElement.pfHint case final hint?) {
       final sortOrder =
           context.read<SettingsProvider>().forumSortOrder ??
           SortOrder.LAST_REPLIED;
@@ -976,7 +977,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
         SortOrder.LAST_REPLIED => postElement.time_updated,
       };
       return PostFilterPlaceholderWidget(
-        filteredCount: filteredCount,
+        filteredCount: hint.filteredCount,
         time: DateTime.tryParse(timeField ?? '') ?? DateTime.now(),
         labelBuilder: (context, count, time) =>
             S.of(context).post_filter_placeholder_holes(count, time),
