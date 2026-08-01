@@ -140,7 +140,7 @@ class OTFloor {
     return 'OTFloor{floor_id: $floor_id, hole_id: $hole_id, content: $content, anonyname: $anonyname, time_updated: $time_updated, time_created: $time_created, special_tag: $special_tag, deleted: $deleted, is_me: $is_me, liked: $liked, fold: $fold, modified: $modified, like: $like, mention: $mention}';
   }
 
-  static final dummyPost = OTFloor.dummy();
+  static final DUMMY_POST = OTFloor.dummy();
 
   @override
   int get hashCode => floor_id ?? 0;

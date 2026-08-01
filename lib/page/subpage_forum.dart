@@ -474,7 +474,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
         // About this line, see [PagedListView].
         final filtered = _applyPostFilter(loadedPost ?? const []);
-        return filtered ?? [OTHole.dummyPost];
+        return filtered ?? [OTHole.DUMMY_POST];
       case PostsType.FILTER_BY_TAG:
       case PostsType.NORMAL_POSTS:
         List<OTHole>? loadedPost = await adaptLayer
@@ -523,7 +523,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
         // About this line, see [PagedListView].
         final filtered = _applyPostFilter(loadedPost ?? const []);
-        return filtered ?? [OTHole.dummyPost];
+        return filtered ?? [OTHole.DUMMY_POST];
       case PostsType.EXTERNAL_VIEW:
         // If we are showing a widget predefined
         return [];
@@ -849,7 +849,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
   Widget _buildOTListView(BuildContext context, {EdgeInsets? padding}) =>
       PagedListView<OTHole>(
-        noneItem: OTHole.dummyPost,
+        noneItem: OTHole.DUMMY_POST,
         pagedController: listViewController,
         withScrollbar: true,
         scrollController: PrimaryScrollController.of(context),

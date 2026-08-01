@@ -106,7 +106,7 @@ class OTHole {
       time_deleted!.isNotEmpty &&
       DateTime.tryParse(time_deleted!) != null;
 
-  static final dummyPost = OTHole.dummy();
+  static final DUMMY_POST = OTHole.dummy();
 
   @override
   int get hashCode => hole_id!;

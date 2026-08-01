@@ -456,7 +456,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     final pagedListView = PagedListView<OTFloor>(
       pagedController: _listViewController,
-      noneItem: OTFloor.dummyPost,
+      noneItem: OTFloor.DUMMY_POST,
       withScrollbar: true,
       scrollController: PrimaryScrollController.of(context),
       dataReceiver: _loadContent,
