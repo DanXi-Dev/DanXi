@@ -918,6 +918,11 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
         dataReceiver: _loadContent,
         onDismissItem: switch (_postsType) {
           PostsType.FAVORED_DISCUSSION => (context, index, item) async {
+              // With a non-null hint, the post behind is invisible to users.
+              // For now hints never reach here because `isItemNonDismissible`
+              // already exempts them from dismissals, but we add this guard in
+              // case an invisible but real post is passed in.
+              if (item.pfHint != null) return;
               await ForumRepository.getInstance()
                   .setFavorite(SetStatusMode.DELETE, item.hole_id)
                   .onError((error, stackTrace) {
@@ -927,6 +932,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
               });
             },
           PostsType.SUBSCRIBED_DISCUSSION => (context, index, item) async {
+              // Ditto.
+              if (item.pfHint != null) return;
               await ForumRepository.getInstance()
                   .setSubscription(SetStatusMode.DELETE, item.hole_id)
                   .onError((error, stackTrace) {
@@ -936,6 +943,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
               });
             },
           PostsType.FILTER_BY_ME => (context, index, item) {
+              // Ditto.
+              if (item.pfHint != null) return;
               SettingsProvider.getInstance().hiddenMyPosts = [
                 item.hole_id!,
                 ...SettingsProvider.getInstance().hiddenMyPosts
@@ -943,7 +952,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
               Noticing.showMaterialNotice(
                   context, S.of(context).hide_post_success);
             },
-          _ => null
+          _ => null,
         },
         onConfirmDismissItem: switch (_postsType) {
           PostsType.FAVORED_DISCUSSION => (context, index, item) {
@@ -961,7 +970,13 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
                   context, S.of(context).hide_post_confirm,
                   isConfirmDestructive: true);
             },
-          _ => null
+          _ => null,
+        },
+        isItemNonDismissible: switch (_postsType) {
+          PostsType.FAVORED_DISCUSSION ||
+          PostsType.SUBSCRIBED_DISCUSSION ||
+          PostsType.FILTER_BY_ME => (index, item) => item.pfHint != null,
+          _ => null,
         },
       );
 

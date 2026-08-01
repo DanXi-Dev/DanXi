@@ -487,6 +487,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       },
       onDismissItem: switch (_renderModel) {
         MyReplies() => (context, index, item) {
+            // With a non-null hint, the post behind is invisible to users. For
+            // now hints never reach here because `isItemNonDismissible` already
+            // exempts them from dismissals, but we add this guard in case an
+            // invisible but real post is passed in.
+            if (item.pfHint != null) return;
             SettingsProvider.getInstance().hiddenMyReplies = [
               item.floor_id!,
               ...SettingsProvider.getInstance().hiddenMyReplies
@@ -494,14 +499,18 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             Noticing.showMaterialNotice(
                 context, S.of(context).hide_post_success);
           },
-        _ => null
+        _ => null,
       },
       onConfirmDismissItem: switch (_renderModel) {
         MyReplies() => (context, index, item) =>
             Noticing.showConfirmationDialog(
                 context, S.of(context).hide_post_confirm,
                 isConfirmDestructive: true),
-        _ => null
+        _ => null,
+      },
+      isItemNonDismissible: switch (_renderModel) {
+        MyReplies() => (index, item) => item.pfHint != null,
+        _ => null,
       },
     );
 
