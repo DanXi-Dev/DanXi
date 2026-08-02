@@ -188,14 +188,14 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       PunishmentHistory() => await loadPunishmentHistory(page),
     };
 
-    final filtered = _applyPostFilter(
+    final filteredPosts = _applyPostFilter(
       results ?? const [],
       switch (_renderModel) {
         Normal(:final hole) => hole,
         _ => null,
       },
     );
-    return filtered;
+    return filteredPosts;
   }
 
   List<OTFloor> _applyPostFilter(List<OTFloor> posts, [OTHole? hole]) {
@@ -909,9 +909,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     if (allFloors == null) {
       throw Exception("Failed to fetch all floors");
     }
-    _listViewController.replaceAllDataWith(allFloors);
+    final filteredFloors = _applyPostFilter(allFloors, switch (_renderModel) {
+      Normal(:final hole) => hole,
+      _ => null,
+    });
+    _listViewController.replaceAllDataWith(filteredFloors);
     _allDataLoaded = true;
-    return allFloors;
+    return filteredFloors;
   }
 
   Future<void> _loadAllAndScrollToEnd() async {
