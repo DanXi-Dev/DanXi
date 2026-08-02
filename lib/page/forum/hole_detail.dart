@@ -159,16 +159,23 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           accurate: accurate,
         ),
       MyReplies() =>
-        (await ForumRepository.getInstance().loadUserFloors(
-          startFloor: page * Constant.POST_COUNT_PER_PAGE,
-          length: Constant.POST_COUNT_PER_PAGE,
-        ))
-        // Filter manually hidden floors
-        .filter(
-          (element) => !SettingsProvider.getInstance().hiddenMyReplies.contains(
-            element.floor_id,
-          ),
-        ),
+        await ForumRepository.getInstance()
+            .loadUserFloors(
+              startFloor: page * Constant.POST_COUNT_PER_PAGE,
+              length: Constant.POST_COUNT_PER_PAGE,
+            )
+            .then((posts) {
+              if (posts == null) return null;
+              final hiddenMyReplies = SettingsProvider.getInstance()
+                  .hiddenMyReplies
+                  .toSet();
+              return posts
+                  // Filter manually hidden floors
+                  .where(
+                    (element) => !hiddenMyReplies.contains(element.floor_id),
+                  )
+                  .toList();
+            }),
       ViewHistory() =>
         (await ForumRepository.getInstance().loadHolesById(
                   SettingsProvider.getInstance().viewHistory
@@ -886,10 +893,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   Future<List<OTFloor>> _loadAllContent() async {
     if (_allDataLoaded) {
-      return List.generate(
-        _listViewController.length(),
-        (index) => _listViewController.getElementAt(index),
-      );
+      return _listViewController.elements.toList();
     }
     try {
       return await (_loadAllContentFuture ??= _fetchAllContent());
@@ -1591,40 +1595,15 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
     Future<List<ImageUrlInfo>?> loadPageImage(
         BuildContext pageContext, int pageIndex) async {
-      List<OTFloor>? result = switch (_renderModel) {
-        Normal(hole: var hole) => await ForumRepository.getInstance()
-            .loadFloors(hole,
-                offset: pageIndex * Constant.POST_COUNT_PER_PAGE),
-        Search(keyword: var searchKeyword, :final dateRange, :final accurate) =>
-          await ForumRepository.getInstance().loadSearchResults(searchKeyword,
-              startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE,
-              dateRange: dateRange,
-              accurate: accurate),
-        MyReplies() => (await ForumRepository.getInstance().loadUserFloors(
-            startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE)),
-        ViewHistory() => (await ForumRepository.getInstance().loadHolesById(
-                    SettingsProvider.getInstance()
-                        .viewHistory
-                        .skip(_listViewController.length())) ??
-                [])
-            .map((hole) => hole.floors!.first_floor!)
-            .toList(),
-        PunishmentHistory() =>
-          (await ForumRepository.getInstance().getPunishmentHistory())
-              ?.map((e) => e.floor!)
-              .toList(),
-      };
+      final List<OTFloor> result = await _loadContent(pageIndex) ?? const [];
+      if (result.isEmpty) return null;
 
-      if (result == null || result.isEmpty) {
-        return null;
-      } else {
-        List<ImageUrlInfo> imageList = [];
-        for (var floor in result) {
-          if (floor.content == null) continue;
-          imageList.addAll(extractAllImagesInFloor(floor.content!));
-        }
-        return imageList;
-      }
+      final List<ImageUrlInfo> imageList = [
+        for (final floor in result)
+          if (floor case OTFloor(:final content?, pfHint: null))
+            ...extractAllImagesInFloor(content),
+      ];
+      return imageList;
     }
 
     final floorWidget = OTFloorWidget(
@@ -1679,7 +1658,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               }
             },
       onTapImage: (String? url, Object heroTag) {
-        final int length = _listViewController.length();
         smartNavigatorPush(context, '/image/detail', arguments: {
           'preview_url': url,
           'hd_url':
@@ -1687,9 +1665,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           'hero_tag': heroTag,
           'image_list': extractAllImages(),
           'loader': loadPageImage,
-          'last_page': length % Constant.POST_COUNT_PER_PAGE == 0
-              ? (length ~/ Constant.POST_COUNT_PER_PAGE - 1)
-              : length ~/ Constant.POST_COUNT_PER_PAGE
+          'last_page': _listViewController.loadedPageIndex,
         });
       },
       searchKeyWord: switch (_renderModel) {
@@ -1743,13 +1719,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   List<ImageUrlInfo> extractAllImages() {
-    List<ImageUrlInfo> imageList = [];
-    final int length = _listViewController.length();
-    for (int i = 0; i < length; i++) {
-      var floor = _listViewController.getElementAt(i);
-      if (floor.content == null) continue;
-      imageList.addAll(extractAllImagesInFloor(floor.content!));
-    }
+    final List<ImageUrlInfo> imageList = [
+      for (final floor in _listViewController.elements)
+        if (floor case OTFloor(:final content?, pfHint: null))
+          ...extractAllImagesInFloor(content),
+    ];
     return imageList;
   }
 }

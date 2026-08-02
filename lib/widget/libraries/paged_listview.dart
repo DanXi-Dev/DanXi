@@ -138,6 +138,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   bool _shouldLoad = true;
 
   int pageIndex = 1;
+  int loadedPageIndex = 1;
   bool _isRefreshing = false;
   bool _isEnded = false;
   bool _hasHeadWidget = false;
@@ -177,7 +178,11 @@ class PagedListViewState<T> extends State<PagedListView<T>>
           }
           ++pageIndex;
           setState(() {
-            _futureData = LazyFuture.pack(widget.dataReceiver!(pageIndex));
+            _futureData = LazyFuture.pack(() async {
+              final data = widget.dataReceiver!(pageIndex);
+              ++loadedPageIndex;
+              return data;
+            }());
           });
         });
       }
@@ -244,6 +249,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
             // We cannot clear the error here
             _clearData(clearError: false);
             pageIndex = widget.startPage;
+            loadedPageIndex = pageIndex;
             return widget.fatalErrorBuilder!.call(context, snapshot.error);
           } else {
             return _buildListView(snapshot: snapshot);
@@ -422,6 +428,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
       _clearData();
     }
     pageIndex = widget.startPage;
+    loadedPageIndex = pageIndex;
     _futureData = _setFuture(useInitialData: useInitialData);
   }
 
@@ -577,6 +584,8 @@ class PagedListViewController<T> implements ListProvider<T> {
     _state = state;
   }
 
+  Iterable<T> get elements => Iterable.generate(length(), getElementAt);
+
   bool get isEnded => _state.isEnded;
 
   Future<void> notifyUpdate(
@@ -653,6 +662,8 @@ class PagedListViewController<T> implements ListProvider<T> {
 
   @override
   int length() => _state.length();
+
+  int get loadedPageIndex => _state.loadedPageIndex;
 }
 
 // HydrogenC: Naming isn't clear enough, should be something like `ListViewFailureException`
