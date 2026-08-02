@@ -143,7 +143,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             .toList();
       } else {
         // notify the list view that there is no more data - the first page is the last page.
-        return [];
+        return const [];
       }
     }
 
@@ -151,23 +151,33 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       Normal(hole: var hole) => await ForumRepository.getInstance()
           .loadFloors(hole, offset: page * Constant.POST_COUNT_PER_PAGE),
       Search(keyword: var searchKeyword, :final dateRange, :final accurate) =>
-        await ForumRepository.getInstance().loadSearchResults(searchKeyword,
-            startFloor: _listViewController.length(),
-            dateRange: dateRange,
-            accurate: accurate),
-      MyReplies() => (await ForumRepository.getInstance()
-              .loadUserFloors(startFloor: _listViewController.length()))
-          // Filter manually hidden floors
-          .filter((element) => !SettingsProvider.getInstance()
-              .hiddenMyReplies
-              .contains(element.floor_id)),
-      ViewHistory() => (await ForumRepository.getInstance().loadHolesById(
-                  SettingsProvider.getInstance()
-                      .viewHistory
-                      .skip(_listViewController.length())) ??
-              [])
-          .map((hole) => hole.floors!.first_floor!)
-          .toList(),
+        await ForumRepository.getInstance().loadSearchResults(
+          searchKeyword,
+          startFloor: page * Constant.POST_COUNT_PER_PAGE,
+          length: Constant.POST_COUNT_PER_PAGE,
+          dateRange: dateRange,
+          accurate: accurate,
+        ),
+      MyReplies() =>
+        (await ForumRepository.getInstance().loadUserFloors(
+          startFloor: page * Constant.POST_COUNT_PER_PAGE,
+          length: Constant.POST_COUNT_PER_PAGE,
+        ))
+        // Filter manually hidden floors
+        .filter(
+          (element) => !SettingsProvider.getInstance().hiddenMyReplies.contains(
+            element.floor_id,
+          ),
+        ),
+      ViewHistory() =>
+        (await ForumRepository.getInstance().loadHolesById(
+                  SettingsProvider.getInstance().viewHistory
+                      .skip(page * Constant.POST_COUNT_PER_PAGE)
+                      .take(Constant.POST_COUNT_PER_PAGE),
+                ) ??
+                const [])
+            .map((hole) => hole.floors!.first_floor!)
+            .toList(),
       PunishmentHistory() => await loadPunishmentHistory(page),
     };
 

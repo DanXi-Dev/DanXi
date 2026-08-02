@@ -536,6 +536,9 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
       posts,
       filter: (post) => _postFilter.holeMatches(post),
       collapse: (posts) => [
+        // This also keeps the last element inside the listViewController with
+        // its time_created or time_updated preserved, so the time-based loading
+        // is not broken.
         posts.last.copyWith(pfHint: PostFilterPlaceholderHint(posts.length)),
       ],
     );
