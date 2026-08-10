@@ -50,6 +50,12 @@ add_subdirectory("runner")
 # them to the application.
 include(flutter/generated_plugins.cmake)
 
+# gal currently relies on permissive MSVC language behavior. Keep the
+# workaround scoped to the plugin instead of weakening conformance globally.
+if(MSVC AND TARGET gal_plugin)
+  target_compile_options(gal_plugin PRIVATE /permissive)
+endif()
+
 
 # === Installation ===
 # Support files are copied into place next to the executable, so that it can
