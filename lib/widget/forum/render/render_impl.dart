@@ -219,7 +219,7 @@ final BaseRender kMarkdownSelectorRender = (BuildContext context,
     LinkTapCallback? onTapLink,
     ImageLongPressCallback? onLongPressImage}) {
   return SelectionArea(
-    child: Markdown(
+    child: MarkdownBody(
       softLineBreak: true,
       data: content!,
       styleSheet: _markdownStyleOverride(
