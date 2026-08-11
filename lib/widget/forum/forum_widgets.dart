@@ -47,7 +47,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
 
 /// The ellipsis char. From packages/flutter/lib/src/rendering/paragraph.dart.
@@ -74,7 +73,7 @@ void launchUrlWithNotice(BuildContext context, LinkableElement link) async {
 /// Turn tags into Widgets
 Widget generateTagWidgets(BuildContext context, OTHole? e,
     void Function(String?) onTap, bool useAccessibilityColoring) {
-  if (e == null || e.tags == null) return nil;
+  if (e == null || e.tags == null) return const SizedBox.shrink();
   List<Widget> tags = [];
   for (var element in e.tags!) {
     if (element.name == KEY_NO_TAG) continue;
@@ -750,7 +749,7 @@ class OTFloorMentionWidget extends StatelessWidget {
         successBuilder:
             (BuildContext context, AsyncSnapshot<OTFloor?> snapshot) {
           if (snapshot.data!.content?.isEmpty ?? true) {
-            return nil;
+            return const SizedBox.shrink();
           }
           return OTFloorWidget(
             hasBackgroundImage: hasBackgroundImage,
