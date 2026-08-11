@@ -77,7 +77,7 @@ void main() {
     // Scroll to the bottom: the content must not be stuck and the last
     // paragraph must become visible.
     await tester.fling(
-        find.byType(SingleChildScrollView), const Offset(0, -8000), 6000);
+        find.byType(ListView), const Offset(0, -8000), 6000);
     await tester.pumpAndSettle();
 
     expect(find.text('119 $paragraph'), findsOneWidget);
