@@ -52,7 +52,12 @@ void main() {
       (tester) async {
     final paragraph = '这是一段用于测试长文本选择复制功能的楼层内容。';
     final longContent =
-        List.generate(120, (index) => '$index $paragraph').join('\n\n');
+        List.generate(120, (index) {
+      final image = index % 10 == 0
+          ? '\n\n![图片](https://example.com/img/$index.png)'
+          : '';
+      return '$index $paragraph$image';
+    }).join('\n\n');
 
     await tester.pumpWidget(MaterialApp(
       localizationsDelegates: const [
