@@ -11,7 +11,7 @@ class LanguageManager {
       Language.JAPANESE => const Locale("ja"),
       Language.SIMPLIFIED_CHINESE => const Locale.fromSubtags(
         languageCode: "zh",
-        scriptCode: "Hans",
+        countryCode: "CN",
       ),
       Language.TRADITIONAL_CHINESE => const Locale.fromSubtags(
         languageCode: "zh",
