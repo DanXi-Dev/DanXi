@@ -59,7 +59,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:intl/intl.dart';
 import 'package:linkify/linkify.dart';
-import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
 
 /// This function preprocesses content downloaded from FDUHOLE so that
@@ -1593,7 +1592,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     }
     if (_renderModel case Normal(selectedPerson: var selectedPerson, hole: _)) {
       if (selectedPerson != null && floor.anonyname != selectedPerson) {
-        return nil;
+        return const SizedBox.shrink();
       }
     }
 

@@ -243,6 +243,9 @@ class ElectricityHistoryItem {
 
   factory ElectricityHistoryItem.fromList(List<String> elements) {
     return ElectricityHistoryItem(
-        elements[1].trim(), elements[0].trim(), elements[2].trim());
+      '${elements[1].trim()}/${elements[2].trim()}/${elements[3].trim()}',
+      elements[4].trim(),
+      elements[5].trim(),
+    );
   }
 }

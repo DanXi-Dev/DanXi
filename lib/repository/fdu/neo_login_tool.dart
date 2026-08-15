@@ -286,6 +286,13 @@ class FudanSession {
   /// Import cookies from an external source (e.g. InAppWebView) into the
   /// session cookie jar. Used after the user completes 2FA in a WebView.
   static Future<void> importCookies(List<Cookie> cookies, Uri uri) async {
+    // Remove previous cookies with the same names,
+    // so that the identically named cookies with different domain
+    // (e.g. `session_id` with *.fudan.edu.cn and id.fudan.edu.cn)
+    // do not conflict with each other and cause false request failures.
+    for (final cookie in cookies) {
+      _sessionCookieJar.deleteCookiesByName(cookie.name);
+    }
     await _sessionCookieJar.saveFromResponse(uri, cookies);
   }
 

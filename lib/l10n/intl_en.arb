@@ -128,7 +128,6 @@
   "enabled": "Enabled",
   "end_reached": "You have reached the end.",
   "english_language": "English",
-  "enter_captcha": "Enter Captcha",
   "entry_permission": "Entry Permission",
   "error_adding_exam": "There was an error adding exam \"{name}\".",
   "error_detail": "Show detail",

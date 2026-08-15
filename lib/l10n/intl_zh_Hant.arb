@@ -126,7 +126,6 @@
   "enabled": "已啓用",
   "end_reached": "已到底了",
   "english_language": "英文",
-  "enter_captcha": "請輸入驗證碼",
   "entry_permission": "入校權限",
   "error_adding_exam": "新增考試「{name}」時發生錯誤",
   "error_detail": "詳細資訊",
