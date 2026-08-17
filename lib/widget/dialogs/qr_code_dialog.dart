@@ -25,7 +25,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:riverpod/riverpod.dart'; // 为 ProviderContainer.defaultRetry
 
 part 'qr_code_dialog.g.dart';
 
