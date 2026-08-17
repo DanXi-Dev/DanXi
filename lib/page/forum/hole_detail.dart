@@ -33,6 +33,7 @@ import 'package:dan_xi/provider/forum_provider.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
+import 'package:dan_xi/util/forum/post_filter_support.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
@@ -42,6 +43,7 @@ import 'package:dan_xi/util/watermark.dart';
 import 'package:dan_xi/widget/forum/ai_summary_sheet.dart';
 import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:dan_xi/widget/forum/ottag_selector.dart';
+import 'package:dan_xi/widget/forum/post_filter_widgets.dart';
 import 'package:dan_xi/widget/forum/post_render.dart';
 import 'package:dan_xi/widget/forum/render/base_render.dart';
 import 'package:dan_xi/widget/forum/render/render_impl.dart';
@@ -125,6 +127,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   int? _highlightFloorId;
   Timer? _highlightTimer;
   Future<List<OTFloor>>? _loadAllContentFuture;
+  final PostFilterState _postFilter = PostFilterState();
+  PostFilterHistory? _postFilterHistoryCache;
 
   final PagedListViewController<OTFloor> _listViewController =
       PagedListViewController<OTFloor>();
@@ -138,7 +142,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             .toList();
       } else {
         // notify the list view that there is no more data - the first page is the last page.
-        return [];
+        return const [];
       }
     }
 
@@ -146,27 +150,62 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       Normal(hole: var hole) => await ForumRepository.getInstance()
           .loadFloors(hole, offset: page * Constant.POST_COUNT_PER_PAGE),
       Search(keyword: var searchKeyword, :final dateRange, :final accurate) =>
-        await ForumRepository.getInstance().loadSearchResults(searchKeyword,
-            startFloor: _listViewController.length(),
-            dateRange: dateRange,
-            accurate: accurate),
-      MyReplies() => (await ForumRepository.getInstance()
-              .loadUserFloors(startFloor: _listViewController.length()))
-          // Filter manually hidden floors
-          .filter((element) => !SettingsProvider.getInstance()
-              .hiddenMyReplies
-              .contains(element.floor_id)),
-      ViewHistory() => (await ForumRepository.getInstance().loadHolesById(
-                  SettingsProvider.getInstance()
-                      .viewHistory
-                      .skip(_listViewController.length())) ??
-              [])
-          .map((hole) => hole.floors!.first_floor!)
-          .toList(),
+        await ForumRepository.getInstance().loadSearchResults(
+          searchKeyword,
+          startFloor: page * Constant.POST_COUNT_PER_PAGE,
+          length: Constant.POST_COUNT_PER_PAGE,
+          dateRange: dateRange,
+          accurate: accurate,
+        ),
+      MyReplies() =>
+        await ForumRepository.getInstance()
+            .loadUserFloors(
+              startFloor: page * Constant.POST_COUNT_PER_PAGE,
+              length: Constant.POST_COUNT_PER_PAGE,
+            )
+            .then((posts) {
+              if (posts == null) return null;
+              final hiddenMyReplies = SettingsProvider.getInstance()
+                  .hiddenMyReplies
+                  .toSet();
+              return posts
+                  // Filter manually hidden floors
+                  .where(
+                    (element) => !hiddenMyReplies.contains(element.floor_id),
+                  )
+                  .toList();
+            }),
+      ViewHistory() =>
+        (await ForumRepository.getInstance().loadHolesById(
+                  SettingsProvider.getInstance().viewHistory
+                      .skip(page * Constant.POST_COUNT_PER_PAGE)
+                      .take(Constant.POST_COUNT_PER_PAGE),
+                ) ??
+                const [])
+            .map((hole) => hole.floors!.first_floor!)
+            .toList(),
       PunishmentHistory() => await loadPunishmentHistory(page),
     };
 
-    return results;
+    final filteredPosts = _applyPostFilter(
+      results ?? const [],
+      switch (_renderModel) {
+        Normal(:final hole) => hole,
+        _ => null,
+      },
+    );
+    return filteredPosts;
+  }
+
+  List<OTFloor> _applyPostFilter(List<OTFloor> posts, [OTHole? hole]) {
+    final collapsedPosts = PostFilterPlaceholderHint.collapseFilteredPosts(
+      posts,
+      filter: (post) => _postFilter.floorMatches(post, hole),
+      collapse: (posts) => [
+        posts.first.copyWith(pfHint: PostFilterPlaceholderHint(posts.length)),
+      ],
+    );
+    return collapsedPosts;
   }
 
   /// Build the text form of a floor for sharing.
@@ -399,6 +438,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   @override
   void dispose() {
     _highlightTimer?.cancel();
+    _postFilter.dispose();
     StateProvider.needScreenshotWarning = false;
     super.dispose();
   }
@@ -432,7 +472,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     _backgroundImage = SettingsProvider.getInstance().backgroundImage;
     final pagedListView = PagedListView<OTFloor>(
       pagedController: _listViewController,
-      noneItem: OTFloor.dummy(),
+      noneItem: OTFloor.DUMMY_POST,
       withScrollbar: true,
       scrollController: PrimaryScrollController.of(context),
       dataReceiver: _loadContent,
@@ -463,21 +503,30 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       },
       onDismissItem: switch (_renderModel) {
         MyReplies() => (context, index, item) {
+            // With a non-null hint, the post behind is invisible to users. For
+            // now hints never reach here because `isItemNonDismissible` already
+            // exempts them from dismissals, but we add this guard in case an
+            // invisible but real post is passed in.
+            if (item.pfHint != null) return;
             SettingsProvider.getInstance().hiddenMyReplies = [
-              item.floor_id!,
+              // item.floor_id!,
               ...SettingsProvider.getInstance().hiddenMyReplies
             ];
             Noticing.showMaterialNotice(
                 context, S.of(context).hide_post_success);
           },
-        _ => null
+        _ => null,
       },
       onConfirmDismissItem: switch (_renderModel) {
         MyReplies() => (context, index, item) =>
             Noticing.showConfirmationDialog(
                 context, S.of(context).hide_post_confirm,
                 isConfirmDestructive: true),
-        _ => null
+        _ => null,
+      },
+      isItemNonDismissible: switch (_renderModel) {
+        MyReplies() => (index, item) => item.pfHint != null,
+        _ => null,
       },
     );
 
@@ -543,6 +592,17 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                         shouldScrollToEnd = true;
                       });
                     }),
+                PopupMenuOption(
+                  label: S.of(context).filter,
+                  onTap: (_) {
+                    setState(() => _postFilter.toggle());
+                    if (_renderModel case final Normal renderModel) {
+                      _clearSelectedPersonOtherThanFirstFloor(renderModel);
+                    }
+                    refreshListView();
+                  },
+                ),
+                // TODO: It is possible to use the post filter to show DZ only.
                 PopupMenuOption(
                     label: selectedPerson == hole.floors?.first_floor?.anonyname
                         ? S.of(context).show_all_replies
@@ -619,7 +679,17 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                   ? const Icon(Icons.more_vert)
                   : const Icon(CupertinoIcons.ellipsis),
             ),
-          ],
+          ] else
+            PostFilterToggleButton(
+              filter: _postFilter,
+              onToggle: () {
+                setState(() {});
+                if (_renderModel case final Normal renderModel) {
+                  _clearSelectedPersonOtherThanFirstFloor(renderModel);
+                }
+                refreshListView();
+              },
+            ),
           if (_renderModel case ViewHistory())
             PlatformIconButton(
               padding: EdgeInsets.zero,
@@ -660,30 +730,49 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 : BoxDecoration(
                     image: DecorationImage(
                         image: _backgroundImage!, fit: BoxFit.cover)),
-            child: switch (_renderModel) {
-              Normal() => RefreshIndicator(
-                  edgeOffset: MediaQuery.of(context).padding.top,
-                  color: Theme.of(context).colorScheme.secondary,
-                  backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
-                  onRefresh: () async {
-                    HapticFeedback.mediumImpact();
+            child: WithPostFilterBar(
+              filter: _postFilter,
+              onApply: (expr) {
+                setState(() => _postFilter.apply(expr));
+                if (_renderModel case final Normal renderModel) {
+                  _clearSelectedPersonOtherThanFirstFloor(renderModel);
+                }
+                refreshListView();
+              },
+              onSaveHistory: (history) {
+                if (history.shouldDedup(_postFilterHistoryCache)) return;
+                _postFilterHistoryCache = history;
+                final settings = SettingsProvider.getInstance();
+                settings.postFilterHistoryFloors = [
+                  ...settings.postFilterHistoryFloors,
+                  jsonEncode(history.toJson()),
+                ];
+              },
+              onClearHistory: () =>
+                  SettingsProvider.getInstance().postFilterHistoryFloors = null,
+              getHistory: () => [
+                for (final e
+                    in SettingsProvider.getInstance().postFilterHistoryFloors)
+                  if (jsonDecode(e) case final Map<String, dynamic> map)
+                    PostFilterHistory.fromJson(map),
+              ],
+              topSafeArea: PlatformX.isCupertino(context),
+              fields: postFilterFloorFieldNames,
+              child: switch (_renderModel) {
+                final Normal renderModel => RefreshIndicator(
+                    edgeOffset: MediaQuery.of(context).padding.top,
+                    color: Theme.of(context).colorScheme.secondary,
+                    backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
+                    onRefresh: () async {
+                      HapticFeedback.mediumImpact();
 
-                    // when users pull to refresh under "only this person" mode,
-                    // the mode should be quited since if the floor is deep
-                    // the initial request won't fetch them, and the page will be blank.
-                    if ((_renderModel as Normal).selectedPerson !=
-                        (_renderModel as Normal)
-                            .hole
-                            .floors
-                            ?.first_floor
-                            ?.anonyname) {
-                      (_renderModel as Normal).selectedPerson = null;
-                    }
-                    await refreshListView();
-                  },
-                  child: pagedListView),
-              _ => pagedListView,
-            },
+                      _clearSelectedPersonOtherThanFirstFloor(renderModel);
+                      await refreshListView();
+                    },
+                    child: pagedListView),
+                _ => pagedListView,
+              },
+            ),
           );
 
           if (!_shouldShowAiSummaryEntry || PlatformX.isMaterial(context)) {
@@ -702,6 +791,16 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         },
       ),
     ).withWatermarkRegion();
+  }
+
+  static void _clearSelectedPersonOtherThanFirstFloor(Normal renderModel) {
+    // when users pull to refresh under "only this person" mode, the mode should
+    // be quited since if the floor is deep the initial request won't fetch
+    // them, and the page will be blank.
+    if (renderModel.selectedPerson !=
+        renderModel.hole.floors?.first_floor?.anonyname) {
+      renderModel.selectedPerson = null;
+    }
   }
 
   bool get _shouldShowAiSummaryEntry {
@@ -793,10 +892,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
   Future<List<OTFloor>> _loadAllContent() async {
     if (_allDataLoaded) {
-      return List.generate(
-        _listViewController.length(),
-        (index) => _listViewController.getElementAt(index),
-      );
+      return _listViewController.elements.toList();
     }
     try {
       return await (_loadAllContentFuture ??= _fetchAllContent());
@@ -812,9 +908,13 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     if (allFloors == null) {
       throw Exception("Failed to fetch all floors");
     }
-    _listViewController.replaceAllDataWith(allFloors);
+    final filteredFloors = _applyPostFilter(allFloors, switch (_renderModel) {
+      Normal(:final hole) => hole,
+      _ => null,
+    });
+    _listViewController.replaceAllDataWith(filteredFloors);
     _allDataLoaded = true;
-    return allFloors;
+    return filteredFloors;
   }
 
   Future<void> _loadAllAndScrollToEnd() async {
@@ -1482,6 +1582,14 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   Widget _getListItems(BuildContext context, ListProvider<OTFloor> dataProvider,
       int index, OTFloor floor,
       {bool isNested = false}) {
+    if (floor.pfHint case final hint?) {
+      return PostFilterPlaceholderWidget(
+        filteredCount: hint.filteredCount,
+        time: DateTime.tryParse(floor.time_created ?? '') ?? DateTime.now(),
+        labelBuilder: (context, count, time) =>
+            S.of(context).post_filter_placeholder_floors(count, time),
+      );
+    }
     if (_renderModel case Normal(selectedPerson: var selectedPerson, hole: _)) {
       if (selectedPerson != null && floor.anonyname != selectedPerson) {
         return const SizedBox.shrink();
@@ -1490,40 +1598,15 @@ class BBSPostDetailState extends State<BBSPostDetail> {
 
     Future<List<ImageUrlInfo>?> loadPageImage(
         BuildContext pageContext, int pageIndex) async {
-      List<OTFloor>? result = switch (_renderModel) {
-        Normal(hole: var hole) => await ForumRepository.getInstance()
-            .loadFloors(hole,
-                offset: pageIndex * Constant.POST_COUNT_PER_PAGE),
-        Search(keyword: var searchKeyword, :final dateRange, :final accurate) =>
-          await ForumRepository.getInstance().loadSearchResults(searchKeyword,
-              startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE,
-              dateRange: dateRange,
-              accurate: accurate),
-        MyReplies() => (await ForumRepository.getInstance().loadUserFloors(
-            startFloor: pageIndex * Constant.POST_COUNT_PER_PAGE)),
-        ViewHistory() => (await ForumRepository.getInstance().loadHolesById(
-                    SettingsProvider.getInstance()
-                        .viewHistory
-                        .skip(_listViewController.length())) ??
-                [])
-            .map((hole) => hole.floors!.first_floor!)
-            .toList(),
-        PunishmentHistory() =>
-          (await ForumRepository.getInstance().getPunishmentHistory())
-              ?.map((e) => e.floor!)
-              .toList(),
-      };
+      final List<OTFloor> result = await _loadContent(pageIndex) ?? const [];
+      if (result.isEmpty) return null;
 
-      if (result == null || result.isEmpty) {
-        return null;
-      } else {
-        List<ImageUrlInfo> imageList = [];
-        for (var floor in result) {
-          if (floor.content == null) continue;
-          imageList.addAll(extractAllImagesInFloor(floor.content!));
-        }
-        return imageList;
-      }
+      final List<ImageUrlInfo> imageList = [
+        for (final floor in result)
+          if (floor case OTFloor(:final content?, pfHint: null))
+            ...extractAllImagesInFloor(content),
+      ];
+      return imageList;
     }
 
     final floorWidget = OTFloorWidget(
@@ -1578,7 +1661,6 @@ class BBSPostDetailState extends State<BBSPostDetail> {
               }
             },
       onTapImage: (String? url, Object heroTag) {
-        final int length = _listViewController.length();
         smartNavigatorPush(context, '/image/detail', arguments: {
           'preview_url': url,
           'hd_url':
@@ -1586,9 +1668,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
           'hero_tag': heroTag,
           'image_list': extractAllImages(),
           'loader': loadPageImage,
-          'last_page': length % Constant.POST_COUNT_PER_PAGE == 0
-              ? (length ~/ Constant.POST_COUNT_PER_PAGE - 1)
-              : length ~/ Constant.POST_COUNT_PER_PAGE
+          'last_page': _listViewController.loadedPageIndex,
         });
       },
       searchKeyWord: switch (_renderModel) {
@@ -1642,13 +1722,11 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   List<ImageUrlInfo> extractAllImages() {
-    List<ImageUrlInfo> imageList = [];
-    final int length = _listViewController.length();
-    for (int i = 0; i < length; i++) {
-      var floor = _listViewController.getElementAt(i);
-      if (floor.content == null) continue;
-      imageList.addAll(extractAllImagesInFloor(floor.content!));
-    }
+    final List<ImageUrlInfo> imageList = [
+      for (final floor in _listViewController.elements)
+        if (floor case OTFloor(:final content?, pfHint: null))
+          ...extractAllImagesInFloor(content),
+    ];
     return imageList;
   }
 }
