@@ -25,6 +25,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:riverpod/riverpod.dart'; // 为 ProviderContainer.defaultRetry
 
 part 'qr_code_dialog.g.dart';
 
@@ -34,16 +35,22 @@ class QRHelper {
     try {
       ScreenProxy.setBrightness(1.0);
       await showPlatformDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) => QRDialog());
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) => QRDialog(),
+      );
     } finally {
       ScreenProxy.resetBrightness();
     }
   }
 }
 
-@riverpod
+Duration? _qrCodeRetry(int retryCount, Object error) {
+  if (error is TermsNotAgreed) return null;
+  return ProviderContainer.defaultRetry(retryCount, error);
+}
+
+@Riverpod(retry: _qrCodeRetry)
 Future<String> qrCode(Ref ref) async {
   return await QRCodeRepository.getInstance().getQRCode();
 }
@@ -61,7 +68,10 @@ class QRDialog extends HookConsumerWidget {
     switch (qrCode) {
       case AsyncData(:final value):
         body = QrImageView(
-            data: value, size: 200.0, backgroundColor: Colors.white);
+          data: value,
+          size: 200.0,
+          backgroundColor: Colors.white,
+        );
       case AsyncLoading():
         body = Text(S.of(context).loading_qr_code);
       case AsyncError(:final error, :final stackTrace):
@@ -69,8 +79,12 @@ class QRDialog extends HookConsumerWidget {
           termsNotAgreed = true;
           body = Text(S.of(context).qr_code_terms_not_agreed);
         } else {
-          body = ErrorPageWidget.buildWidget(context, error,
-              stackTrace: stackTrace, onTap: () => ref.refresh(qrCodeProvider));
+          body = ErrorPageWidget.buildWidget(
+            context,
+            error,
+            stackTrace: stackTrace,
+            onTap: () => ref.refresh(qrCodeProvider),
+          );
         }
       case _:
         body = const SizedBox.shrink();
@@ -79,17 +93,20 @@ class QRDialog extends HookConsumerWidget {
     return PlatformAlertDialog(
       title: Text(S.of(context).fudan_qr_code),
       content: SizedBox(
-          width: double.maxFinite, height: 200.0, child: Center(child: body)),
+        width: double.maxFinite,
+        height: 200.0,
+        child: Center(child: body),
+      ),
       actions: <Widget>[
         TextButton(
-            child: PlatformText(S.of(context).i_see),
-            onPressed: () async {
-              Navigator.pop(context);
-              if (termsNotAgreed) {
-                BrowserUtil.openUrl(
-                    QRCodeRepository.QR_URL, context, null, true);
-              }
-            }),
+          child: PlatformText(S.of(context).i_see),
+          onPressed: () async {
+            Navigator.pop(context);
+            if (termsNotAgreed) {
+              BrowserUtil.openUrl(QRCodeRepository.QR_URL, context, null, true);
+            }
+          },
+        ),
       ],
     );
   }
