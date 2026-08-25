@@ -368,32 +368,61 @@ class AuthenticationInAppBrowser extends InAppBrowser {
     }
   }
 
-  static io.Cookie _toIoCookie(Cookie c) => io.Cookie(c.name, '${c.value}')
-    ..domain = c.domain
-    ..path = c.path ?? '/'
-    ..secure = c.isSecure ?? false
-    ..httpOnly = c.isHttpOnly ?? false
-    ..expires = c.expiresDate != null
-        ? DateTime.fromMillisecondsSinceEpoch(c.expiresDate!)
-        : null;
+  @visibleForTesting
+  static io.Cookie webViewCookieToIoCookie(Cookie c,
+      {bool? webView2ReturnsSeconds}) {
+    final rawExpiresDate = c.expiresDate;
+    DateTime? expires;
+    if (c.isSessionOnly != true &&
+        rawExpiresDate != null &&
+        rawExpiresDate > 0) {
+      final shouldNormalizeWebView2 =
+          webView2ReturnsSeconds ?? PlatformX.isWindows;
+      // flutter_inappwebview_windows 0.7.0-beta.3 forwards the WebView2
+      // DevTools timestamp in seconds even though Cookie.expiresDate is
+      // documented as milliseconds. Keep this tolerant of a future fix.
+      final expiresDate = shouldNormalizeWebView2 &&
+              rawExpiresDate < DateTime.utc(2000).millisecondsSinceEpoch
+          ? rawExpiresDate * Duration.millisecondsPerSecond
+          : rawExpiresDate;
+      expires = DateTime.fromMillisecondsSinceEpoch(expiresDate, isUtc: true);
+    }
+
+    return io.Cookie(c.name, '${c.value}')
+      ..domain = c.domain
+      ..path = c.path ?? '/'
+      ..secure = c.isSecure ?? false
+      ..httpOnly = c.isHttpOnly ?? false
+      ..expires = expires;
+  }
 
   Future<void> _extractAndImportCookies(WebUri url) async {
     final cookieManager = CookieManager.instance(
       webViewEnvironment: webViewEnvironment,
     );
+    final controller = webViewController;
+    if (controller == null) {
+      throw StateError('Authentication WebView controller is unavailable');
+    }
 
     // Import cookies from the target service host.
-    final targetCookies = await cookieManager.getCookies(url: url);
+    final targetCookies = await cookieManager.getCookies(
+      url: url,
+      webViewController: controller,
+    );
     final targetUri = Uri.parse(url.toString());
     await FudanSession.importCookies(
-        targetCookies.map(_toIoCookie).toList(), targetUri);
+        targetCookies.map(webViewCookieToIoCookie).toList(), targetUri);
 
     // Also import cookies from id.fudan.edu.cn to maintain the session.
     final idUrl = WebUri('https://${FudanAuthenticationAPIV2.idHost}/');
-    final idCookies = await cookieManager.getCookies(url: idUrl);
+    final idCookies = await cookieManager.getCookies(
+      url: idUrl,
+      webViewController: controller,
+    );
     final idUri = Uri.parse(idUrl.toString());
     await FudanSession.importCookies(
-        idCookies.map(_toIoCookie).toList(), idUri);
+        idCookies.map(webViewCookieToIoCookie).toList(), idUri);
   }
 
   @override
