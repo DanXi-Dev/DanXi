@@ -30,10 +30,32 @@ import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class BrowserUtil {
+  static WebViewEnvironment? _webViewEnvironment;
+
+  /// Initialize the shared WebView2 environment used by embedded browsers.
+  ///
+  /// On Windows, WebView2 otherwise stores its user data next to the executable,
+  /// which may be read-only depending on where DanXi was extracted or installed.
+  static Future<void> initializeWebViewEnvironment() async {
+    if (!PlatformX.isWindows || _webViewEnvironment != null) return;
+
+    final supportDir = await getApplicationSupportDirectory();
+    final userDataDir =
+        io.Directory.fromUri(supportDir.uri.resolve('webview2/'));
+    await userDataDir.create(recursive: true);
+
+    _webViewEnvironment = await WebViewEnvironment.create(
+      settings: WebViewEnvironmentSettings(
+        userDataFolder: userDataDir.path,
+      ),
+    );
+  }
+
   static InAppBrowserClassSettings getOptions(BuildContext context) =>
       InAppBrowserClassSettings(
           browserSettings: InAppBrowserSettings(
@@ -129,6 +151,7 @@ class BrowserUtil {
     final browser = AuthenticationInAppBrowser(
       targetHost: targetHost,
       completer: completer,
+      webViewEnvironment: _webViewEnvironment,
     );
     browser.openUrlRequest(
       urlRequest: URLRequest(url: WebUri(url)),
@@ -259,11 +282,13 @@ class CustomInAppBrowser extends InAppBrowser {
 class AuthenticationInAppBrowser extends InAppBrowser {
   final String targetHost;
   final Completer<void> completer;
+  final WebViewEnvironment? webViewEnvironment;
 
   AuthenticationInAppBrowser({
     required this.targetHost,
     required this.completer,
-  });
+    required this.webViewEnvironment,
+  }) : super(webViewEnvironment: webViewEnvironment);
 
   String _uisLoginJavaScript(PersonInfo info) =>
       r'''try{
@@ -353,7 +378,9 @@ class AuthenticationInAppBrowser extends InAppBrowser {
         : null;
 
   Future<void> _extractAndImportCookies(WebUri url) async {
-    final cookieManager = CookieManager.instance();
+    final cookieManager = CookieManager.instance(
+      webViewEnvironment: webViewEnvironment,
+    );
 
     // Import cookies from the target service host.
     final targetCookies = await cookieManager.getCookies(url: url);
