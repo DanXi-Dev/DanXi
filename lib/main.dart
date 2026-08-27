@@ -54,6 +54,7 @@ import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
@@ -80,6 +81,10 @@ import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 Future<void> main() async {
   // Ensure that the engine has bound itself to
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Keep WebView2 data in a writable per-user directory on Windows. The same
+  // environment is shared by the 2FA browser and its CookieManager.
+  await BrowserUtil.initializeWebViewEnvironment();
 
   // Init Mi push Service.
   if (PlatformX.isAndroid) {

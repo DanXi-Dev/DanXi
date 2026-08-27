@@ -30,10 +30,32 @@ import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class BrowserUtil {
+  static WebViewEnvironment? _webViewEnvironment;
+
+  /// Initialize the shared WebView2 environment used by embedded browsers.
+  ///
+  /// On Windows, WebView2 otherwise stores its user data next to the executable,
+  /// which may be read-only depending on where DanXi was extracted or installed.
+  static Future<void> initializeWebViewEnvironment() async {
+    if (!PlatformX.isWindows || _webViewEnvironment != null) return;
+
+    final supportDir = await getApplicationSupportDirectory();
+    final userDataDir =
+        io.Directory.fromUri(supportDir.uri.resolve('webview2/'));
+    await userDataDir.create(recursive: true);
+
+    _webViewEnvironment = await WebViewEnvironment.create(
+      settings: WebViewEnvironmentSettings(
+        userDataFolder: userDataDir.path,
+      ),
+    );
+  }
+
   static InAppBrowserClassSettings getOptions(BuildContext context) =>
       InAppBrowserClassSettings(
           browserSettings: InAppBrowserSettings(
@@ -129,6 +151,7 @@ class BrowserUtil {
     final browser = AuthenticationInAppBrowser(
       targetHost: targetHost,
       completer: completer,
+      webViewEnvironment: _webViewEnvironment,
     );
     browser.openUrlRequest(
       urlRequest: URLRequest(url: WebUri(url)),
@@ -259,11 +282,13 @@ class CustomInAppBrowser extends InAppBrowser {
 class AuthenticationInAppBrowser extends InAppBrowser {
   final String targetHost;
   final Completer<void> completer;
+  final WebViewEnvironment? webViewEnvironment;
 
   AuthenticationInAppBrowser({
     required this.targetHost,
     required this.completer,
-  });
+    required this.webViewEnvironment,
+  }) : super(webViewEnvironment: webViewEnvironment);
 
   String _uisLoginJavaScript(PersonInfo info) =>
       r'''try{
@@ -343,30 +368,61 @@ class AuthenticationInAppBrowser extends InAppBrowser {
     }
   }
 
-  static io.Cookie _toIoCookie(Cookie c) => io.Cookie(c.name, '${c.value}')
-    ..domain = c.domain
-    ..path = c.path ?? '/'
-    ..secure = c.isSecure ?? false
-    ..httpOnly = c.isHttpOnly ?? false
-    ..expires = c.expiresDate != null
-        ? DateTime.fromMillisecondsSinceEpoch(c.expiresDate!)
-        : null;
+  @visibleForTesting
+  static io.Cookie webViewCookieToIoCookie(Cookie c,
+      {bool? webView2ReturnsSeconds}) {
+    final rawExpiresDate = c.expiresDate;
+    DateTime? expires;
+    if (c.isSessionOnly != true &&
+        rawExpiresDate != null &&
+        rawExpiresDate > 0) {
+      final shouldNormalizeWebView2 =
+          webView2ReturnsSeconds ?? PlatformX.isWindows;
+      // flutter_inappwebview_windows 0.7.0-beta.3 forwards the WebView2
+      // DevTools timestamp in seconds even though Cookie.expiresDate is
+      // documented as milliseconds. Keep this tolerant of a future fix.
+      final expiresDate = shouldNormalizeWebView2 &&
+              rawExpiresDate < DateTime.utc(2000).millisecondsSinceEpoch
+          ? rawExpiresDate * Duration.millisecondsPerSecond
+          : rawExpiresDate;
+      expires = DateTime.fromMillisecondsSinceEpoch(expiresDate, isUtc: true);
+    }
+
+    return io.Cookie(c.name, '${c.value}')
+      ..domain = c.domain
+      ..path = c.path ?? '/'
+      ..secure = c.isSecure ?? false
+      ..httpOnly = c.isHttpOnly ?? false
+      ..expires = expires;
+  }
 
   Future<void> _extractAndImportCookies(WebUri url) async {
-    final cookieManager = CookieManager.instance();
+    final cookieManager = CookieManager.instance(
+      webViewEnvironment: webViewEnvironment,
+    );
+    final controller = webViewController;
+    if (controller == null) {
+      throw StateError('Authentication WebView controller is unavailable');
+    }
 
     // Import cookies from the target service host.
-    final targetCookies = await cookieManager.getCookies(url: url);
+    final targetCookies = await cookieManager.getCookies(
+      url: url,
+      webViewController: controller,
+    );
     final targetUri = Uri.parse(url.toString());
     await FudanSession.importCookies(
-        targetCookies.map(_toIoCookie).toList(), targetUri);
+        targetCookies.map(webViewCookieToIoCookie).toList(), targetUri);
 
     // Also import cookies from id.fudan.edu.cn to maintain the session.
     final idUrl = WebUri('https://${FudanAuthenticationAPIV2.idHost}/');
-    final idCookies = await cookieManager.getCookies(url: idUrl);
+    final idCookies = await cookieManager.getCookies(
+      url: idUrl,
+      webViewController: controller,
+    );
     final idUri = Uri.parse(idUrl.toString());
     await FudanSession.importCookies(
-        idCookies.map(_toIoCookie).toList(), idUri);
+        idCookies.map(webViewCookieToIoCookie).toList(), idUri);
   }
 
   @override
