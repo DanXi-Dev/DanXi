@@ -124,11 +124,11 @@ dependency_overrides:
       ref: patch-2
       path: flutter_secure_storage_linux
 
-  # fixme: This fixes #645. This can be removed after the master branch fixes it.
+  # fixme: Temporary Linux rendering fix for black/white screen. Remove after the upstream fix is released.
   flutter_inappwebview_linux:
     git:
-      url: https://github.com/sseu-buhzzi/flutter_inappwebview.git
-      ref: 20260215/fix-webkit-check-version
+      url: https://github.com/w568w/flutter_inappwebview.git
+      ref: e1128b9f0a29f16deff50724d0fdd7d843a6dba6
       path: flutter_inappwebview_linux
 
 dev_dependencies:
