@@ -650,8 +650,8 @@ packages:
     dependency: "direct overridden"
     description:
       path: flutter_inappwebview_linux
-      ref: e1128b9f0a29f16deff50724d0fdd7d843a6dba6
-      resolved-ref: e1128b9f0a29f16deff50724d0fdd7d843a6dba6
+      ref: "19d15841917bb9777c96e9ad04041489cf5f6d72"
+      resolved-ref: "19d15841917bb9777c96e9ad04041489cf5f6d72"
       url: "https://github.com/w568w/flutter_inappwebview.git"
     source: git
     version: "0.1.0-beta.1"
