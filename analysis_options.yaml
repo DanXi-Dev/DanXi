@@ -31,6 +31,14 @@ linter:
 # https://dart.cn/guides/language/analysis-options
 
 analyzer:
-  exclude: [ build/**, lib/generated/** ]
+  exclude:
+    - build/**
+    - lib/generated/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
   language:
     strict-raw-types: true
