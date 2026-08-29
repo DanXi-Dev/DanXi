@@ -15,8 +15,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:ffi';
-
 import 'package:ffi/ffi.dart';
 import 'package:win32/win32.dart';
 
@@ -25,16 +23,17 @@ class Win32Shell {
   ///
   /// Notes: It WON'T wait the process to finish.
   static int executeShell(String filePath,
-      {int showCmd = SW_HIDE,
+      {SHOW_WINDOW_CMD showCmd = SW_HIDE,
       String? dir,
       String param = '',
       bool runAsAdmin = false}) {
-    return ShellExecute(
-        0,
-        runAsAdmin ? "runas".toNativeUtf16() : nullptr,
-        filePath.toNativeUtf16(),
-        param.toNativeUtf16(),
-        dir?.toNativeUtf16() ?? nullptr,
-        showCmd);
+    return using((arena) => ShellExecute(
+            null,
+            runAsAdmin ? arena.pcwstr("runas") : null,
+            arena.pcwstr(filePath),
+            arena.pcwstr(param),
+            dir == null ? null : arena.pcwstr(dir),
+            showCmd)
+        .address);
   }
 }

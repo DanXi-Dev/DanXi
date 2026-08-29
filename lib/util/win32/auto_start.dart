@@ -26,13 +26,13 @@ class WindowsAutoStart {
       r"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run";
 
   static bool get autoStart {
-    int hKey = Registry.getRegistryKeyHandle(HKEY_CURRENT_USER, KEY_PATH);
+    HKEY hKey = Registry.getRegistryKeyHandle(HKEY_CURRENT_USER, KEY_PATH);
     String? path;
     try {
       path = Registry.getStringKey(hKey, KEY_NAME);
     } catch (_) {
     } finally {
-      RegCloseKey(hKey);
+      hKey.close();
     }
     return PlatformX.executablePath == path;
   }

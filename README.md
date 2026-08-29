@@ -139,7 +139,7 @@ Tools • Dart 3.13.2 • DevTools 2.60.0
 flutter pub get
 flutter pub global activate intl_utils
 dart run intl_utils:generate
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 然后运行  `flutter run [ios/android]`即可运行应用。

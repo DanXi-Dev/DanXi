@@ -145,7 +145,7 @@ Run the command
 flutter pub get
 flutter pub global activate intl_utils
 dart run intl_utils:generate
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 and then  `flutter run [ios/android]` to start the app.
