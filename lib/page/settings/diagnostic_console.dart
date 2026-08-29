@@ -45,6 +45,7 @@ import 'package:device_identity/device_identity.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:xiao_mi_push_plugin/xiao_mi_push_plugin.dart';
 
 class DiagnosticConsole extends StatefulWidget {
   final Map<String, dynamic>? arguments;
@@ -63,7 +64,13 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
   @override
   void initState() {
     super.initState();
-    diagnoses = [diagnoseForum, diagnoseGoogleAds, diagnoseDanXi, diagnoseUrl];
+    diagnoses = [
+      diagnoseForum,
+      diagnoseMiPush,
+      diagnoseGoogleAds,
+      diagnoseDanXi,
+      diagnoseUrl,
+    ];
     unawaited(diagnose());
   }
 
@@ -130,6 +137,40 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     }
     final resolvedId = await PlatformX.getUniqueDeviceId();
     _console.writeln("Resolved Device Id: $resolvedId");
+  }
+
+  Future<void> diagnoseMiPush() async {
+    _console.writeln("MiPush:");
+    if (!PlatformX.isAndroid) {
+      _console.writeln("  Available: false (Android only)");
+      return;
+    }
+
+    _console.writeln("  Available: true");
+
+    Future<T?> writeValue<T>(String label, Future<T?> Function() query) async {
+      try {
+        final value = await query();
+        _console.writeln("  $label: $value");
+        return value;
+      } catch (e) {
+        _console.writeln("  $label: error ($e)");
+        return null;
+      }
+    }
+
+    await writeValue<String>("SDK version", XiaoMiPushPlugin.getSdkVersion);
+    final regId = await writeValue<String>("RegId", XiaoMiPushPlugin.getRegId);
+    final lastUploadToken = ForumRepository.getInstance().lastUploadToken;
+    _console.writeln(
+      "  RegId matches last uploaded token: ${lastUploadToken == null ? "unknown (not uploaded in this process)" : regId == lastUploadToken}",
+    );
+    await writeValue<List<String>>("Aliases", XiaoMiPushPlugin.getAllAlias);
+    await writeValue<List<String>>(
+      "User accounts",
+      XiaoMiPushPlugin.getAllUserAccount,
+    );
+    await writeValue<List<String>>("Topics", XiaoMiPushPlugin.getAllTopic);
   }
 
   Future<void> diagnoseGoogleAds() async {}
