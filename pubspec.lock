@@ -1751,7 +1751,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "33f9a8c1161a1c9f06e9d0f905acc7b55d3b64d9"
+      resolved-ref: "6b86c2764f9341e487fe94d3a795ddcfbdd0c2ec"
       url: "https://github.com/w568w/receive_intent.git"
     source: git
     version: "0.2.5"
@@ -2397,10 +2397,10 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "16ed4c3b4132ed0f402d1d25549ef7f8ef891665"
+      resolved-ref: f3c7e09a59727dbd7294bde7d676a015cbde630e
       url: "https://github.com/w568w/FlutterXiaoMiPushPlugin.git"
     source: git
-    version: "2.0.0"
+    version: "2.1.0"
   xml:
     dependency: transitive
     description:
