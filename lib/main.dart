@@ -253,7 +253,7 @@ class DanxiApp extends StatelessWidget {
         bool isPlatformCupertino = PlatformX.isCupertino(context);
 
         return DynamicColorBuilder(
-          builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+          builder: (lightDynamic, darkDynamic) {
             // Determine if dynamic colors should be used
             bool useSystemPalette = PlatformX.isAndroid && followSystemPalette;
             

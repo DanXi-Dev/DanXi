@@ -58,6 +58,7 @@ class ErrorPageWidget extends StatelessWidget {
         case DioExceptionType.connectionTimeout:
         case DioExceptionType.sendTimeout:
         case DioExceptionType.receiveTimeout:
+        case DioExceptionType.transformTimeout:
           errorType = locale.connection_timeout;
           break;
         case DioExceptionType.badResponse:

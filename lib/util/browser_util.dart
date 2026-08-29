@@ -358,13 +358,7 @@ class AuthenticationInAppBrowser extends InAppBrowser {
       if (!completer.isCompleted) {
         completer.complete();
       }
-      // flutter_inappwebview_linux 0.1.0-beta.1 has a bug where
-      // InAppBrowser.close() returns NOT_IMPLEMENTED because
-      // setInAppBrowserDelegate() is never called in setupWebView().
-      // On Linux, skip close() and let the user close the window manually.
-      if (!PlatformX.isLinux) {
-        close();
-      }
+      await close();
     }
   }
 

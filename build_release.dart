@@ -77,7 +77,7 @@ void main(List<String> arguments) async {
 
   print('Run build_runner...');
   await runFlutterProcess(
-      ['pub', 'run', 'build_runner', 'build', '--delete-conflicting-outputs']);
+      ['pub', 'run', 'build_runner', 'build']);
 
   switch (args['target']) {
     case 'android':
