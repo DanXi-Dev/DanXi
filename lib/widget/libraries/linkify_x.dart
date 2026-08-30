@@ -19,6 +19,14 @@ import 'package:dan_xi/common/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 
+// bugfix: flutter_linkify forwards null and overrides SelectableText's default menu.
+// Let's add it back.
+Widget _defaultContextMenuBuilder(
+    BuildContext _, EditableTextState editableTextState) {
+  return AdaptiveTextSelectionToolbar.editableText(
+      editableTextState: editableTextState);
+}
+
 /// [Linkify] with a default link theme.
 ///
 /// It is sad that [Linkify] hardcoded the link style in its source code, so we
@@ -49,5 +57,6 @@ class SelectableLinkifyX extends SelectableLinkify {
     super.style,
   }) : super(
           linkStyle: Constant.LINKIFY_THEME,
+          contextMenuBuilder: _defaultContextMenuBuilder,
         );
 }
