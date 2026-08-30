@@ -139,12 +139,11 @@ class DashboardReorderPageState extends State<DashboardReorderPage> {
                     ),
                   ),
                 ],
-            onReorder: (oldIndex, newIndex) {
+            onReorderItem: (oldIndex, newIndex) {
               if (oldIndex >= sequence!.length) {
                 Noticing.showNotice(context, S.of(context).unmovable_widget);
                 return;
               }
-              if (newIndex > oldIndex) --newIndex;
               DashboardCard tmp = sequence![oldIndex];
               sequence!.removeAt(oldIndex);
               sequence!.insert(newIndex, tmp);

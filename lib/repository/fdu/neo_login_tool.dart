@@ -63,10 +63,11 @@ class FudanSession {
 
   /// Login queues for each authentication type to coordinate concurrent requests.
   /// Ensures only one login operation runs at a time per authentication method.
-  static final Map<FudanLoginType, LoginQueue> _authenticationQueues =
-      FudanLoginType.values
-          .asMap()
-          .map((_, type) => MapEntry(type, LoginQueue()));
+  static Map<FudanLoginType, LoginQueue> _authenticationQueues =
+      _createAuthenticationQueues();
+
+  static Map<FudanLoginType, LoginQueue> _createAuthenticationQueues() =>
+      {for (final type in FudanLoginType.values) type: LoginQueue()};
 
   static Dio get dio {
     if (_dio == null) {
@@ -297,10 +298,16 @@ class FudanSession {
   }
 
   static Future<void> clearSession() async {
-    // Clear cookies to reset the session
+    // Make all in-flight login sessions fail
+    fail2FA(StateError('Fudan session cleared'), StackTrace.current);
+    // Close the dio client
+    _dio?.close(force: true);
+    // Clear cookies
     await _sessionCookieJar.deleteAll();
-    // Clear the Dio instance to reset interceptors and state
+    // Clear the Dio instance to reset interceptors
     _dio = null;
+    // Rebuild auth queues to flush all previous requests
+    _authenticationQueues = _createAuthenticationQueues();
   }
 
   /// Initialize the session by creating a [PersistentCookieJar] backed by
@@ -820,12 +827,11 @@ class LoginQueue {
         _mutex.release();
         return true;
       }
+    }
 
-      // Check if this request started after the most recent login, indicating a new batch
-      if (requestStartTime > _mostRecentLoginState.startTime) {
-        _loginAttemptsInCurrentBatch =
-            0; // Reset attempts counter for the new batch
-      }
+    // Requests that started after the previous login belong to a new batch.
+    if (requestStartTime > _mostRecentLoginState.startTime) {
+      _loginAttemptsInCurrentBatch = 0;
     }
 
     // Check if we've exceeded the retry limit for this batch

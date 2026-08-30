@@ -115,10 +115,10 @@ LIBGL_ALWAYS_SOFTWARE=1 ./danxi
 
 ```shell
 $ flutter --version
-Flutter 3.41.6 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision db50e20168 (3 周前) • 2026-03-25 16:21:00 -0700
-Engine • hash 5cdd32777948fa7a648fac915f8da7120ac7e97a (revision 425cfb54d0) (19 days ago) • 2026-03-25 20:14:42.000Z
-Tools • Dart 3.11.4 • DevTools 2.54.2
+Flutter 3.47.2 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision d3b14c8769 (2 天前) • 2026-08-26 16:07:51 -0700
+Engine • hash 1cf1c4773fb941c4c74a7f8bb144a8837596c0f4 (revision a804b26164) (47 hours ago) • 2026-08-26 18:46:13.000Z
+Tools • Dart 3.13.2 • DevTools 2.60.0
 ```
 
 ## 编译说明
@@ -139,7 +139,7 @@ Tools • Dart 3.11.4 • DevTools 2.54.2
 flutter pub get
 flutter pub global activate intl_utils
 dart run intl_utils:generate
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 然后运行  `flutter run [ios/android]`即可运行应用。
