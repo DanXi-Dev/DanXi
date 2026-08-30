@@ -29,7 +29,9 @@ import 'package:dan_xi/util/shared_preferences.dart';
 import 'package:dio/dio.dart';
 
 class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
-  static const String TIME_TABLE_UG_URL =
+  static const String TIME_TABLE_URL_PRIMARY =
+      'http://yjsxk.fudan.edu.cn/yjsxkapp/sys/xsxkappfudan/xsxkCourse/loadKbxx.do?_=';
+  static const String TIME_TABLE_URL_SECONDARY =
       'http://yjsxktest.fudan.sh.cn/yjsxkapp/sys/xsxkappfudan/xsxkCourse/loadKbxx.do?_=';
 
   PostgraduateTimetableRepository._();
@@ -39,10 +41,20 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
   factory PostgraduateTimetableRepository.getInstance() => _instance;
 
   Future<TimeTable?> loadTimeTableRemotely(PersonInfo info,
-      {DateTime? startTime}) {
+      {DateTime? startTime}) async {
+    try {
+      return await _loadTimeTableFrom(TIME_TABLE_URL_PRIMARY, info, startTime);
+    } catch (_) {
+      // The two endpoints are available during different periods of time, so we try the secondary one if the primary one fails.
+      return _loadTimeTableFrom(TIME_TABLE_URL_SECONDARY, info, startTime);
+    }
+  }
+
+  Future<TimeTable?> _loadTimeTableFrom(
+      String url, PersonInfo info, DateTime? startTime) {
     final options = RequestOptions(
       method: "GET",
-      path: TIME_TABLE_UG_URL + DateTime.now().millisecondsSinceEpoch.toString(),
+      path: url + DateTime.now().millisecondsSinceEpoch.toString(),
     );
     return FudanSession.request(options, (coursePage) {
       return TimeTable.fromPGJson(
