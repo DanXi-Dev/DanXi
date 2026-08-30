@@ -44,7 +44,8 @@ dependencies:
   app_links: ^7.0.0
   desktop_window: ^0.4.0
   http: ^1.0.0
-  dio: ^5.4.3+1
+  # TODO: Upgrade after Dio releases the fix for cfug/dio#2590; 5.11.0 breaks interceptors using `implements`.
+  dio: 5.10.0
   shared_preferences: ^2.0.15
   flutter_phoenix: ^1.0.0
   asn1lib: ^1.1.0
