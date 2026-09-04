@@ -61,19 +61,28 @@ class HomeSubpage extends PlatformSubpage<HomeSubpage> {
       ];
 
   @override
-  Create<List<AppBarButtonItem>> get trailing => (cxt) => [
-    AppBarButtonItem(
-        S.of(cxt).dashboard_layout,
-        Icon(Icons.create_outlined),
-            () => smartNavigatorPush(cxt, '/dashboard/reorder').then(
-                (value) => RefreshHomepageEvent(onlyRefreshOrder: true).fire())),
+  Create<List<AppBarButtonItem>> get trailing =>
+      (ctx) => [
+        AppBarButtonItem(
+          "dantaclaw",
+          Icon(Icons.pets),
+          () => smartNavigatorPush(ctx, '/claw/chat'),
+        ),
 
-    AppBarButtonItem(
-        S.of(cxt).settings,
-        Icon(Icons.settings_outlined),
-            () => smartNavigatorPush(cxt, '/settings')
-    ),
-  ];
+        AppBarButtonItem(
+          S.of(ctx).dashboard_layout,
+          Icon(Icons.create_outlined),
+          () => smartNavigatorPush(ctx, '/dashboard/reorder').then(
+            (value) => RefreshHomepageEvent(onlyRefreshOrder: true).fire(),
+          ),
+        ),
+
+        AppBarButtonItem(
+          S.of(ctx).settings,
+          Icon(Icons.settings_outlined),
+          () => smartNavigatorPush(ctx, '/settings'),
+        ),
+      ];
 }
 
 class RefreshHomepageEvent {
