@@ -16,6 +16,7 @@
  */
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/common/constant.dart';
@@ -32,15 +33,17 @@ import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/app/announcement_repository.dart';
 import 'package:dan_xi/repository/forum/forum_repository.dart';
+import 'package:dan_xi/util/forum/post_filter_support.dart';
+import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
 import 'package:dan_xi/util/noticing.dart';
 import 'package:dan_xi/util/platform_universal.dart';
 import 'package:dan_xi/util/public_extension_methods.dart';
 import 'package:dan_xi/util/stream_listener.dart';
-import 'package:dan_xi/util/haptic_feedback_util.dart';
 import 'package:dan_xi/widget/forum/auto_banner.dart';
 import 'package:dan_xi/widget/forum/forum_widgets.dart';
 import 'package:dan_xi/widget/forum/login_widgets.dart';
+import 'package:dan_xi/widget/forum/post_filter_widgets.dart';
 import 'package:dan_xi/widget/forum/render/render_impl.dart';
 import 'package:dan_xi/widget/forum/tag_selector/selector.dart';
 import 'package:dan_xi/widget/libraries/error_page_widget.dart';
@@ -138,8 +141,8 @@ class OTTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Note: these strings can be (and should be) localized. 
-    // But since other division names are not localized (yet), we leave them hardcoded for now. 
+    // Note: these strings can be (and should be) localized.
+    // But since other division names are not localized (yet), we leave them hardcoded for now.
     OTDivision homepageDivision = OTDivision(null, "全站", "展示所有板块", null);
 
     List<OTDivision> divisions =
@@ -239,6 +242,18 @@ class ForumSubpage extends PlatformSubpage<ForumSubpage> {
             currentSortOrder == SortOrder.LAST_CREATED
                 ? lastCreatedOption
                 : lastRepliedOption;
+        final bool postFilterShown =
+            forumPageKey.currentState?._postFilter.shown ?? false;
+        final PopupMenuOption filterOption = PopupMenuOption(
+          label: S.of(cxt).filter,
+          cupertino: (context, platform) =>
+              CupertinoPopupMenuOptionData(isDefaultAction: postFilterShown),
+          onTap: (_) => forumPageKey.currentState?._togglePostFilter(),
+        );
+        final List<PopupMenuOption> overflowOptions = [
+          ...sortOptions,
+          filterOption,
+        ];
 
         return [
           if (cxt.select<ForumProvider, bool>(
@@ -252,23 +267,28 @@ class ForumSubpage extends PlatformSubpage<ForumSubpage> {
             })
           ],
           AppBarButtonItem(
-              S.of(cxt).sort_order,
+              S.of(cxt).and_more,
               PlatformPopupMenuX(
-                options: sortOptions,
+                options: overflowOptions,
                 cupertino: (context, platform) => CupertinoPopupMenuData(
                     cancelButtonData: CupertinoPopupMenuCancelButtonData(
                         child: Text(S.of(context).cancel))),
                 material: (context, platform) => MaterialPopupMenuData(
                     initialValue: currentSortOption,
-                    itemBuilder: (context) => sortOptions
-                        .map((option) => CheckedPopupMenuItem<PopupMenuOption>(
+                    itemBuilder: (context) => overflowOptions
+                        .map(
+                          (option) => CheckedPopupMenuItem<PopupMenuOption>(
                             value: option,
-                            checked: option == currentSortOption,
-                            child: Text(option.label ?? '')))
-                        .toList()),
+                            checked:
+                                option == currentSortOption ||
+                                (option == filterOption && postFilterShown),
+                            child: Text(option.label ?? ''),
+                          ),
+                        )
+                        .toList(growable: false)),
                 icon: Icon(PlatformX.isMaterial(cxt)
-                    ? Icons.filter_list
-                    : CupertinoIcons.sort_down_circle),
+                    ? Icons.more_vert
+                    : CupertinoIcons.ellipsis),
               ),
               null,
               useCustomWidget: true),
@@ -377,6 +397,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
 
   String? _tagFilter;
   PostsType _postsType = PostsType.NORMAL_POSTS;
+  final PostFilterState _postFilter = PostFilterState();
+  PostFilterHistory? _postFilterHistoryCache;
 
   ListDelegate? _delegate;
 
@@ -418,10 +440,14 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
       case PostsType.FAVORED_DISCUSSION:
         // Favored discussion has only one page.
         if (page > 1) return [];
-        return await ForumRepository.getInstance().getFavoriteHoles();
+        final loadedPost = await ForumRepository.getInstance().getFavoriteHoles();
+        final filtered = _applyPostFilter(loadedPost ?? const []);
+        return filtered;
       case PostsType.SUBSCRIBED_DISCUSSION:
         if (page > 1) return [];
-        return await ForumRepository.getInstance().getSubscribedHoles();
+        final loadedPost = await ForumRepository.getInstance().getSubscribedHoles();
+        final filtered = _applyPostFilter(loadedPost ?? const []);
+        return filtered;
       case PostsType.FILTER_BY_ME:
         List<OTHole>? loadedPost = await adaptLayer
             .generateReceiver(listViewController, (lastElement) {
@@ -447,9 +473,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
                 .contains(element.hole_id));
 
         // About this line, see [PagedListView].
-        return loadedPost == null || loadedPost.isEmpty
-            ? [OTHole.DUMMY_POST]
-            : loadedPost;
+        final filtered = _applyPostFilter(loadedPost ?? const []);
+        return filtered;
       case PostsType.FILTER_BY_TAG:
       case PostsType.NORMAL_POSTS:
         List<OTHole>? loadedPost = await adaptLayer
@@ -497,13 +522,27 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
             hiddenPosts.any((blockPost) => element.hole_id == blockPost));
 
         // About this line, see [PagedListView].
-        return loadedPost == null || loadedPost.isEmpty
-            ? [OTHole.DUMMY_POST]
-            : loadedPost;
+        final filtered = _applyPostFilter(loadedPost ?? const []);
+        if (filtered.isEmpty) return [OTHole.DUMMY_POST];
+        return filtered;
       case PostsType.EXTERNAL_VIEW:
         // If we are showing a widget predefined
         return [];
     }
+  }
+
+  List<OTHole> _applyPostFilter(List<OTHole> posts) {
+    final collapsedPosts = PostFilterPlaceholderHint.collapseFilteredPosts(
+      posts,
+      filter: (post) => _postFilter.holeMatches(post),
+      collapse: (posts) => [
+        // This also keeps the last element inside the listViewController with
+        // its time_created or time_updated preserved, so the time-based loading
+        // is not broken.
+        posts.last.copyWith(pfHint: PostFilterPlaceholderHint(posts.length)),
+      ],
+    );
+    return collapsedPosts;
   }
 
   /// Refresh the whole list.
@@ -650,6 +689,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     _postSubscription.cancel();
     _refreshSubscription.cancel();
     _divisionChangedSubscription.cancel();
+    _postFilter.dispose();
   }
 
   @override
@@ -667,6 +707,15 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
               PostsType.SUBSCRIBED_DISCUSSION => S.of(context).subscriptions,
               _ => throw Exception("Unreachable"),
             }),
+            trailingActions: [
+              PostFilterToggleButton(
+                filter: _postFilter,
+                onToggle: () {
+                  setState(() {});
+                  refreshList();
+                },
+              ),
+            ],
           ),
           body: Builder(
             // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
@@ -681,6 +730,10 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           appBar: PlatformAppBarX(
             title: Text(S.of(context).list_my_posts),
             trailingActions: [
+              PostFilterToggleButton(
+                filter: _postFilter,
+                onToggle: () => setState(() {}),
+              ),
               PlatformIconButton(
                 padding: EdgeInsets.zero,
                 icon: Icon(Icons.restore_page),
@@ -708,6 +761,12 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: PlatformAppBarX(
             title: Text(S.of(context).filtering_by_tag(_tagFilter ?? "?")),
+            trailingActions: [
+              PostFilterToggleButton(
+                filter: _postFilter,
+                onToggle: () => setState(() {}),
+              ),
+            ],
           ),
           body: Builder(
             // The builder widget updates context so that MediaQuery below can use the correct context (that is, Scaffold considered)
@@ -755,12 +814,50 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
           if (_postsType == PostsType.EXTERNAL_VIEW) {
             return _delegate!.build(context);
           } else {
-            return _buildOTListView(context,
-                padding: buildTabBar ? EdgeInsets.zero : null);
+            return WithPostFilterBar(
+              filter: _postFilter,
+              onApply: (expr) => setState(() {
+                _postFilter.apply(expr);
+                refreshList();
+              }),
+              onToggle: _togglePostFilter,
+              onSaveHistory: (history) {
+                if (history.shouldDedup(_postFilterHistoryCache)) return;
+                _postFilterHistoryCache = history;
+                final settings = SettingsProvider.getInstance();
+                settings.postFilterHistoryHoles = [
+                  ...settings.postFilterHistoryHoles,
+                  jsonEncode(history.toJson()),
+                ];
+              },
+              onClearHistory: () =>
+                  SettingsProvider.getInstance().postFilterHistoryHoles = null,
+              getHistory: () => [
+                for (final e
+                    in SettingsProvider.getInstance().postFilterHistoryHoles)
+                  if (jsonDecode(e) case final Map<String, dynamic> map)
+                    PostFilterHistory.fromJson(map),
+              ],
+              topSafeArea:
+                  PlatformX.isCupertino(context) &&
+                  _postsType != PostsType.NORMAL_POSTS,
+              fields: postFilterHoleFieldNames,
+              child: _buildOTListView(
+                context,
+                padding: buildTabBar ? EdgeInsets.zero : null,
+              ),
+            );
           }
         }),
       ),
     );
+  }
+
+  void _togglePostFilter({bool? shown}) {
+    setState(() {
+      _postFilter.toggle(shown: shown);
+      refreshList();
+    });
   }
 
   Widget _buildOTListView(BuildContext context, {EdgeInsets? padding}) =>
@@ -834,6 +931,11 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
         dataReceiver: _loadContent,
         onDismissItem: switch (_postsType) {
           PostsType.FAVORED_DISCUSSION => (context, index, item) async {
+              // With a non-null hint, the post behind is invisible to users.
+              // For now hints never reach here because `isItemNonDismissible`
+              // already exempts them from dismissals, but we add this guard in
+              // case an invisible but real post is passed in.
+              if (item.pfHint != null) return;
               await ForumRepository.getInstance()
                   .setFavorite(SetStatusMode.DELETE, item.hole_id)
                   .onError((error, stackTrace) {
@@ -843,6 +945,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
               });
             },
           PostsType.SUBSCRIBED_DISCUSSION => (context, index, item) async {
+              // Ditto.
+              if (item.pfHint != null) return;
               await ForumRepository.getInstance()
                   .setSubscription(SetStatusMode.DELETE, item.hole_id)
                   .onError((error, stackTrace) {
@@ -852,6 +956,8 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
               });
             },
           PostsType.FILTER_BY_ME => (context, index, item) {
+              // Ditto.
+              if (item.pfHint != null) return;
               SettingsProvider.getInstance().hiddenMyPosts = [
                 item.hole_id!,
                 ...SettingsProvider.getInstance().hiddenMyPosts
@@ -859,7 +965,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
               Noticing.showMaterialNotice(
                   context, S.of(context).hide_post_success);
             },
-          _ => null
+          _ => null,
         },
         onConfirmDismissItem: switch (_postsType) {
           PostsType.FAVORED_DISCUSSION => (context, index, item) {
@@ -877,13 +983,34 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
                   context, S.of(context).hide_post_confirm,
                   isConfirmDestructive: true);
             },
-          _ => null
+          _ => null,
+        },
+        isItemNonDismissible: switch (_postsType) {
+          PostsType.FAVORED_DISCUSSION ||
+          PostsType.SUBSCRIBED_DISCUSSION ||
+          PostsType.FILTER_BY_ME => (index, item) => item.pfHint != null,
+          _ => null,
         },
       );
 
   Widget _buildListItem(BuildContext context, ListProvider<OTHole>? _, int? __,
       OTHole postElement,
       {bool isPinned = false}) {
+    if (postElement.pfHint case final hint?) {
+      final sortOrder =
+          context.read<SettingsProvider>().forumSortOrder ??
+          SortOrder.LAST_REPLIED;
+      final timeField = switch (sortOrder) {
+        SortOrder.LAST_CREATED => postElement.time_created,
+        SortOrder.LAST_REPLIED => postElement.time_updated,
+      };
+      return PostFilterPlaceholderWidget(
+        filteredCount: hint.filteredCount,
+        time: DateTime.tryParse(timeField ?? '') ?? DateTime.now(),
+        labelBuilder: (context, count, time) =>
+            S.of(context).post_filter_placeholder_holes(count, time),
+      );
+    }
     // Avoid excluding pinned posts from favorite and subscription list
     bool isSpecialView = _postsType == PostsType.FAVORED_DISCUSSION ||
         _postsType == PostsType.SUBSCRIBED_DISCUSSION;
@@ -895,7 +1022,7 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
             ForumRepository.getInstance()
                 .getPinned(getDivisionId(context))
                 .contains(postElement))) {
-      return const SizedBox();
+      return const SizedBox.shrink();
     }
     return OTHoleWidget(
         postElement: postElement,
@@ -976,7 +1103,7 @@ Widget buildForumTopBar() => Selector<ForumProvider, bool>(
                     : EdgeInsets.zero,
                 child: PlatformIconButton(
                   icon: Icon(PlatformIcons(context).search),
-                  onPressed: () { 
+                  onPressed: () {
                     HapticFeedbackUtil.light();
                     smartNavigatorPush(context, '/bbs/search',
                       forcePushOnMainNavigator: true);
