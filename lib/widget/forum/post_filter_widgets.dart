@@ -679,8 +679,9 @@ class PostFilterState {
     }
   }
 
-  void toggle() {
-    _shown = !_shown;
+  /// [shown] when non-null, sets the shown state instead of toggling it.
+  void toggle({bool? shown}) {
+    _shown = shown ?? !_shown;
   }
 
   void apply(String expr) {
@@ -1883,9 +1884,17 @@ class _AutoOpenWrapperState extends State<_AutoOpenWrapper> {
   Widget build(BuildContext context) => widget.child;
 }
 
+/// Shortcut intent for toggling the post filter.
+class ToggleFilterIntent extends Intent {
+  final bool? shown;
+
+  const ToggleFilterIntent({this.shown});
+}
+
 class WithPostFilterBar extends StatelessWidget {
   final PostFilterState filter;
   final void Function(String expr) onApply;
+  final void Function({bool? shown})? onToggle;
   final void Function(PostFilterHistory history)? onSaveHistory;
   final void Function()? onClearHistory;
   final List<PostFilterHistory> Function()? getHistory;
@@ -1897,6 +1906,7 @@ class WithPostFilterBar extends StatelessWidget {
     super.key,
     required this.filter,
     required this.onApply,
+    this.onToggle,
     this.onSaveHistory,
     this.onClearHistory,
     this.getHistory,
@@ -1907,29 +1917,52 @@ class WithPostFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        if (filter.shown)
-          PostFilterBar(
-            controller: filter.controller,
-            appliedJsExpr: filter.appliedJsExpr,
-            onApply: onApply,
-            onSaveHistory: onSaveHistory,
-            onClearHistory: onClearHistory,
-            getHistory: getHistory,
-            topSafeArea: topSafeArea,
-            fields: fields,
-          ),
-        Expanded(
-          child: filter.shown && topSafeArea
-              ? MediaQuery.removePadding(
-                  context: context,
-                  removeTop: true,
-                  child: child,
-                )
-              : child,
+    return Shortcuts(
+      shortcuts: {
+        SingleActivator(LogicalKeyboardKey.escape): ToggleFilterIntent(
+          shown: false,
         ),
-      ],
+        SingleActivator(LogicalKeyboardKey.slash): ToggleFilterIntent(),
+        SingleActivator(LogicalKeyboardKey.keyF, control: true):
+            ToggleFilterIntent(),
+      },
+      child: Actions(
+        actions: {
+          ToggleFilterIntent: CallbackAction<ToggleFilterIntent>(
+            onInvoke: (intent) {
+              onToggle?.call(shown: intent.shown);
+              return null;
+            },
+          ),
+        },
+        child: Focus(
+          autofocus: true,
+          child: Column(
+            children: [
+              if (filter.shown)
+                PostFilterBar(
+                  controller: filter.controller,
+                  appliedJsExpr: filter.appliedJsExpr,
+                  onApply: onApply,
+                  onSaveHistory: onSaveHistory,
+                  onClearHistory: onClearHistory,
+                  getHistory: getHistory,
+                  topSafeArea: topSafeArea,
+                  fields: fields,
+                ),
+              Expanded(
+                child: filter.shown && topSafeArea
+                    ? MediaQuery.removePadding(
+                        context: context,
+                        removeTop: true,
+                        child: child,
+                      )
+                    : child,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

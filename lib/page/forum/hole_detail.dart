@@ -595,11 +595,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 PopupMenuOption(
                   label: S.of(context).filter,
                   onTap: (_) {
-                    setState(() => _postFilter.toggle());
-                    if (_renderModel case final Normal renderModel) {
-                      _clearSelectedPersonOtherThanFirstFloor(renderModel);
-                    }
-                    refreshListView();
+                    _togglePostFilter();
                   },
                 ),
                 // TODO: It is possible to use the post filter to show DZ only.
@@ -739,6 +735,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
                 }
                 refreshListView();
               },
+              onToggle: _togglePostFilter,
               onSaveHistory: (history) {
                 if (history.shouldDedup(_postFilterHistoryCache)) return;
                 _postFilterHistoryCache = history;
@@ -791,6 +788,14 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         },
       ),
     ).withWatermarkRegion();
+  }
+
+  void _togglePostFilter({bool? shown}) {
+    setState(() => _postFilter.toggle(shown: shown));
+    if (_renderModel case final Normal renderModel) {
+      _clearSelectedPersonOtherThanFirstFloor(renderModel);
+    }
+    refreshListView();
   }
 
   static void _clearSelectedPersonOtherThanFirstFloor(Normal renderModel) {

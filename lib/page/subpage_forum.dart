@@ -820,15 +820,16 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
                 _postFilter.apply(expr);
                 refreshList();
               }),
-                onSaveHistory: (history) {
-                  if (history.shouldDedup(_postFilterHistoryCache)) return;
-                  _postFilterHistoryCache = history;
-                  final settings = SettingsProvider.getInstance();
-                  settings.postFilterHistoryHoles = [
-                    ...settings.postFilterHistoryHoles,
-                    jsonEncode(history.toJson()),
-                  ];
-                },
+              onToggle: _togglePostFilter,
+              onSaveHistory: (history) {
+                if (history.shouldDedup(_postFilterHistoryCache)) return;
+                _postFilterHistoryCache = history;
+                final settings = SettingsProvider.getInstance();
+                settings.postFilterHistoryHoles = [
+                  ...settings.postFilterHistoryHoles,
+                  jsonEncode(history.toJson()),
+                ];
+              },
               onClearHistory: () =>
                   SettingsProvider.getInstance().postFilterHistoryHoles = null,
               getHistory: () => [
@@ -852,9 +853,9 @@ class ForumSubpageState extends PlatformSubpageState<ForumSubpage> {
     );
   }
 
-  void _togglePostFilter() {
+  void _togglePostFilter({bool? shown}) {
     setState(() {
-      _postFilter.toggle();
+      _postFilter.toggle(shown: shown);
       refreshList();
     });
   }
