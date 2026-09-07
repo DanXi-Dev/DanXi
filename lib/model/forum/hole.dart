@@ -19,6 +19,7 @@
 
 import 'package:dan_xi/model/forum/floors.dart';
 import 'package:dan_xi/model/forum/tag.dart';
+import 'package:dan_xi/util/forum/post_filter_support.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'hole.g.dart';
@@ -40,6 +41,9 @@ class OTHole {
   int? favorite_count;
   int? subscription_count;
   bool? ai_summary_available;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  // Not underscored for not included from/to JSON.
+  PostFilterPlaceholderHint? pfHint;
 
   factory OTHole.fromJson(Map<String, dynamic> json) => _$OTHoleFromJson(json);
 
@@ -49,8 +53,42 @@ class OTHole {
   bool operator ==(Object other) =>
       (other is OTHole) && hole_id == other.hole_id;
 
-  OTHole(this.hole_id, this.division_id, this.time_created, this.time_updated,
-      this.time_deleted, this.tags, this.view, this.reply, this.floors);
+  OTHole(
+    this.hole_id,
+    this.division_id,
+    this.time_created,
+    this.time_updated,
+    this.time_deleted,
+    this.tags,
+    this.view,
+    this.reply,
+    this.floors, {
+    this.pfHint,
+  });
+
+  OTHole copyWith({
+    int? hole_id,
+    int? division_id,
+    String? time_updated,
+    String? time_created,
+    String? time_deleted,
+    List<OTTag>? tags,
+    int? view,
+    int? reply,
+    OTFloors? floors,
+    PostFilterPlaceholderHint? pfHint,
+  }) => OTHole(
+    hole_id ?? this.hole_id,
+    division_id ?? this.division_id,
+    time_created ?? this.time_created,
+    time_updated ?? this.time_updated,
+    time_deleted ?? this.time_deleted,
+    tags ?? this.tags,
+    view ?? this.view,
+    reply ?? this.reply,
+    floors ?? this.floors,
+    pfHint: pfHint ?? this.pfHint,
+  );
 
   /// Generate an empty BBSPost for special sakes.
   factory OTHole.dummy() => OTHole(-1, -1, "", "", "", [], -1, -1, null);
