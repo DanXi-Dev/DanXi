@@ -801,10 +801,10 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "27b57cecd19d3dd3c3c3a2b4be0e28acf4fc09ab"
+      resolved-ref: "4f8dd50e82b468b40a8d46b7c3d3add00291621c"
       url: "https://github.com/w568w/flutter_markdown_plus.git"
     source: git
-    version: "1.0.7"
+    version: "1.0.12"
   flutter_math_fork:
     dependency: "direct main"
     description:
