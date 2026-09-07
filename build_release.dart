@@ -98,12 +98,23 @@ void main(List<String> arguments) async {
   }
 }
 
-Future<int> runFlutterProcess(List<String> args) async {
-  final buildProcess =
-      await Process.start(flutterExecutable, args, runInShell: true);
+Future<void> runFlutterProcess(List<String> args) async {
+  final buildProcess = await Process.start(
+    flutterExecutable,
+    args,
+    runInShell: true,
+  );
   stdout.addStream(buildProcess.stdout);
   stderr.addStream(buildProcess.stderr);
-  return await buildProcess.exitCode;
+  final exitCode = await buildProcess.exitCode;
+  if (exitCode != 0) {
+    throw ProcessException(
+      flutterExecutable,
+      args,
+      'Process exited with code $exitCode',
+      exitCode,
+    );
+  }
 }
 
 Future<int> runDartProcess(List<String> args) async {
@@ -157,7 +168,12 @@ Future<void> buildWindows(String? versionCode, String gitHash) async {
   var encoder = ZipFileEncoder();
   File newFile = File('build/app/DanXi-$versionCode-release.windows-x64.zip');
   Directory sourceDir = Directory('build/windows/x64/runner/Release');
-  encoder.zipDirectory(sourceDir, filename: newFile.path);
+  await encoder.zipDirectory(
+    sourceDir,
+    filename: newFile.path,
+    filter: (entity, _) =>
+        entity is Directory ? ZipFileOperation.skip : ZipFileOperation.include,
+  );
   print('Build success.');
 }
 
@@ -200,6 +216,11 @@ Future<void> buildLinux(String? versionCode, String gitHash) async {
   var encoder = ZipFileEncoder();
   File newFile = File('build/app/DanXi-$versionCode-release.linux-x64.zip');
   Directory sourceDir = Directory('build/linux/x64/release/bundle');
-  encoder.zipDirectory(sourceDir, filename: newFile.path);
+  await encoder.zipDirectory(
+    sourceDir,
+    filename: newFile.path,
+    filter: (entity, _) =>
+        entity is Directory ? ZipFileOperation.skip : ZipFileOperation.include,
+  );
   print('Build success.');
 }
