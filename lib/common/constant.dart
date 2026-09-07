@@ -629,7 +629,7 @@ extension CampusEx on Campus? {
   List<String> getTeachingBuildings() {
     switch (this) {
       case Campus.HANDAN_CAMPUS:
-        return ['HGX', 'H2', 'H3', 'H4', 'H5', 'H6'];
+        return ['HGD', 'HGX', 'H2', 'H3', 'H4', 'H5', 'H6'];
       case Campus.FENGLIN_CAMPUS:
         return ['F1', 'F2'];
       case Campus.JIANGWAN_CAMPUS:
