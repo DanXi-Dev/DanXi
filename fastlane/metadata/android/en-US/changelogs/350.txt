@@ -1,0 +1,1 @@
+This release adds diagnostics access from the login page and Guanghua East Auxiliary Building to empty-classroom queries. It also fixes login state, 2FA, postgraduate timetables, image posts, and embedded browsers. Full release notes: https://github.com/DanXi-Dev/DanXi/releases.
