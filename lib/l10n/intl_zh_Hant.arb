@@ -113,6 +113,7 @@
   "deleted": "已刪除",
   "developer_announcement": "開發組公告 {date}",
   "diagnostic_information": "診斷資訊",
+  "diagnostic_information_notice": "這是診斷資訊頁面，請在開發者指導下使用。",
   "dining_hall_crowdedness": "食堂排隊與消費狀況",
   "disabled": "已停用",
   "divider": "分隔線",

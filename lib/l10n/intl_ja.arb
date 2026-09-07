@@ -113,6 +113,7 @@
   "deleted": "削除済み",
   "developer_announcement": "開発チームのお知らせ {date}",
   "diagnostic_information": "診断情報",
+  "diagnostic_information_notice": "これは診断情報ページです。開発者の指示に従って使用してください。",
   "dining_hall_crowdedness": "食堂の利用状況",
   "disabled": "無効",
   "divider": "ディバイダー",

@@ -115,6 +115,7 @@
   "deleted": "Deleted",
   "developer_announcement": "Dev Team Announcement {date}",
   "diagnostic_information": "Diagnostics",
+  "diagnostic_information_notice": "This is the diagnostics page. Please use it under a developer's guidance.",
   "dining_hall_crowdedness": "Canteen Popularity",
   "disabled": "Disabled",
   "divider": "Divider",
