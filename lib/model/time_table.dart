@@ -288,6 +288,7 @@ class Course {
 
   factory Course.fromPGPart(dynamic PGPart) {
     Course newCourse = Course();
+    final String? teacherName = PGPart["JSXM"] as String?;
     return newCourse
       ..courseName = PGPart["KCMC"]
       ..roomName = PGPart["JASMC"]
@@ -295,7 +296,7 @@ class Course {
       // The 0th digit of Postgraduates ZCBH mean the 1st week. Add a prefix zero to work with [_parseWeeksFromString].
       ..availableWeeks = _parseWeeksFromString("0" + PGPart["ZCBH"])
       ..times = [CourseTime(PGPart["XQ"] - 1, PGPart["KSJCDM"] - 1)]
-      ..teacherNames = [PGPart["JSXM"]];
+      ..teacherNames = teacherName == null ? <String>[] : [teacherName];
   }
 
   factory Course.fromJWGLJson(dynamic activity) {

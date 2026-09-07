@@ -76,6 +76,20 @@ sudo pacman -S danxi # 最新稳定版
 sudo pacman -S danxi-git # 最新 Git 版
 ```
 
+### NixOS
+
+使用 Nix flake 构建和运行：
+
+```shell
+# 直接运行（不安装）
+nix run github:DanXi-Dev/DanXi-nix
+```
+
+```shell
+# 进入开发环境
+nix develop github:DanXi-Dev/DanXi-nix
+```
+
 ### 其他 Linux 发行版
 
 打开 [release 页面](https://github.com/DanXi-Dev/DanXi/releases/latest) 下载最新版 zip 压缩包，解压运行即可。
@@ -108,10 +122,10 @@ LIBGL_ALWAYS_SOFTWARE=1 ./danxi
 
 ```shell
 $ flutter --version
-Flutter 3.41.6 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision db50e20168 (3 周前) • 2026-03-25 16:21:00 -0700
-Engine • hash 5cdd32777948fa7a648fac915f8da7120ac7e97a (revision 425cfb54d0) (19 days ago) • 2026-03-25 20:14:42.000Z
-Tools • Dart 3.11.4 • DevTools 2.54.2
+Flutter 3.47.2 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision d3b14c8769 (2 天前) • 2026-08-26 16:07:51 -0700
+Engine • hash 1cf1c4773fb941c4c74a7f8bb144a8837596c0f4 (revision a804b26164) (47 hours ago) • 2026-08-26 18:46:13.000Z
+Tools • Dart 3.13.2 • DevTools 2.60.0
 ```
 
 ## 编译说明
@@ -132,10 +146,29 @@ Tools • Dart 3.11.4 • DevTools 2.54.2
 flutter pub get
 flutter pub global activate intl_utils
 dart run intl_utils:generate
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 然后运行  `flutter run [ios/android]`即可运行应用。
+
+### Nix Flake 构建
+
+本项目提供 Nix flake，可在 NixOS 上构建（产物预设在 `./result/` 中）：
+
+```shell
+# Linux 桌面版
+nix build github:DanXi-Dev/DanXi-nix
+```
+
+```shell
+# Android APK
+nix build github:DanXi-Dev/DanXi-nix#android
+```
+
+```shell
+# Android APK，另一种方式
+nix develop github:DanXi-Dev/DanXi-nix -c flutter build apk
+```
 
 ## 赞助
 

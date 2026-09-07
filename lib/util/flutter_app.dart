@@ -42,8 +42,9 @@ class FlutterApp {
 
   static Future<void> restartApp(BuildContext context) async {
     await BaseRepositoryWithDio.clearAllCookies();
-    FudanSession.clearSession();
+    await FudanSession.clearSession();
     ForumRepository.getInstance().clearCache();
+    if (!context.mounted) return;
     StateProvider.initialize(context);
     while (auxiliaryNavigatorState?.canPop() == true) {
       auxiliaryNavigatorState?.pop();

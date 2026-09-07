@@ -22,7 +22,6 @@ import 'package:ffi/ffi.dart';
 import 'package:win32/win32.dart';
 
 const MAX_ITEMLENGTH = 1024;
-const WCHAR_SIZE = 4;
 
 class RegistryKeyValuePair {
   final String key;
@@ -37,15 +36,15 @@ class RegistryKeyValuePair {
 /// We badly need a Windows developer :(
 class Registry {
   /// Get handle of the [key] in the registry root [hive].
-  static int getRegistryKeyHandle(int hive, String key) {
-    final phKey = calloc<HANDLE>();
-    final lpKeyPath = key.toNativeUtf16();
+  static HKEY getRegistryKeyHandle(HKEY hive, String key) {
+    final phKey = calloc<Pointer>();
+    final lpKeyPath = key.toPcwstr();
     try {
       if (RegOpenKeyEx(hive, lpKeyPath, 0, KEY_READ, phKey) !=
           ERROR_SUCCESS) {
         throw Exception("Can't open registry key");
       }
-      return phKey.value;
+      return HKEY(phKey.value);
     } finally {
       free(phKey);
       free(lpKeyPath);
@@ -53,12 +52,13 @@ class Registry {
   }
 
   /// Get a String Key-Value Pair at [hKey].
-  static String getStringKey(int hKey, String keyName) {
+  static String getStringKey(HKEY hKey, String keyName) {
     final pvData = calloc<BYTE>(MAX_ITEMLENGTH);
     final pcbData = calloc<DWORD>()..value = MAX_ITEMLENGTH;
+    final lpValueName = keyName.toPcwstr();
     try {
-      int status = RegGetValue(hKey, nullptr, keyName.toNativeUtf16(),
-          RRF_RT_REG_SZ, nullptr, pvData, pcbData);
+      int status = RegGetValue(
+          hKey, null, lpValueName, RRF_RT_REG_SZ, null, pvData, pcbData);
       switch (status) {
         case ERROR_SUCCESS:
           return pvData.cast<Utf16>().toDartString();
@@ -68,6 +68,7 @@ class Registry {
     } finally {
       free(pvData);
       free(pcbData);
+      free(lpValueName);
     }
   }
 
@@ -77,7 +78,7 @@ class Registry {
   ///
   /// If the [index]-th pair is not a String ([REG_SZ])
   /// or the value length is more than [MAX_ITEMLENGTH], throw an exception.
-  static RegistryKeyValuePair? enumerateKey(int hKey, int index) {
+  static RegistryKeyValuePair? enumerateKey(HKEY hKey, int index) {
     final lpValueName = wsalloc(MAX_PATH);
     final lpcchValueName = calloc<DWORD>()..value = MAX_PATH;
     final lpType = calloc<DWORD>();
@@ -85,8 +86,8 @@ class Registry {
     final lpcbData = calloc<DWORD>()..value = MAX_ITEMLENGTH;
 
     try {
-      final status = RegEnumValue(hKey, index, lpValueName, lpcchValueName,
-          nullptr, lpType, lpData, lpcbData);
+      final status = RegEnumValue(hKey, index, PWSTR(lpValueName),
+          lpcchValueName, lpType, lpData, lpcbData);
 
       switch (status) {
         case ERROR_SUCCESS:
@@ -115,20 +116,21 @@ class Registry {
   }
 
   /// Set a String Key-Value Pair at [hKey].
-  static void setStringValue(int hKey, String keyName, String value) {
-    Pointer<Utf16> nativeValue = value.toNativeUtf16();
-    int status = RegSetValueEx(
-        hKey,
-        keyName.toNativeUtf16(),
-        0,
-        REG_SZ,
-        nativeValue.cast<Uint8>(),
-        nativeValue.length * WCHAR_SIZE);
-    switch (status) {
-      case NO_ERROR:
-        break;
-      case ERROR_ACCESS_DENIED:
-        throw Exception("Access denied");
+  static void setStringValue(HKEY hKey, String keyName, String value) {
+    final nativeKeyName = keyName.toPcwstr();
+    final nativeValue = value.toPcwstr();
+    try {
+      int status = RegSetValueEx(hKey, nativeKeyName, REG_SZ,
+          nativeValue.cast<Uint8>(), nativeValue.byteLength + sizeOf<WCHAR>());
+      switch (status) {
+        case NO_ERROR:
+          break;
+        case ERROR_ACCESS_DENIED:
+          throw Exception("Access denied");
+      }
+    } finally {
+      free(nativeKeyName);
+      free(nativeValue);
     }
   }
 
@@ -140,13 +142,18 @@ class Registry {
   }
 
   /// Delete a String Key-Value Pair at [hKey].
-  static void deleteStringKey(int hKey, String keyName) {
-    int status = RegDeleteValue(hKey, keyName.toNativeUtf16());
-    switch (status) {
-      case NO_ERROR:
-        break;
-      case ERROR_ACCESS_DENIED:
-        throw Exception("Access denied");
+  static void deleteStringKey(HKEY hKey, String keyName) {
+    final nativeKeyName = keyName.toPcwstr();
+    try {
+      int status = RegDeleteValue(hKey, nativeKeyName);
+      switch (status) {
+        case NO_ERROR:
+          break;
+        case ERROR_ACCESS_DENIED:
+          throw Exception("Access denied");
+      }
+    } finally {
+      free(nativeKeyName);
     }
   }
 

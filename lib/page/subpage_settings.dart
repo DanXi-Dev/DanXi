@@ -56,7 +56,6 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:nil/nil.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -205,7 +204,6 @@ class SettingsPageState extends State<SettingsPage> {
         "js", LICENSE_BSD_3_0_CLAUSE, "https://github.com/dart-lang/sdk"),
     LicenseItem("device_info_plus", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/fluttercommunity/plus_plugins/tree/main/packages/device_info_plus"),
-    LicenseItem("nil", LICENSE_MIT, "https://github.com/letsar/nil"),
     LicenseItem("flex_color_picker", LICENSE_BSD_3_0_CLAUSE,
         "https://github.com/rydmike/flex_color_picker"),
     LicenseItem("material_color_generator", LICENSE_BSD_2_0_CLAUSE,
@@ -985,7 +983,7 @@ class SettingsPageState extends State<SettingsPage> {
                                 .isMarkdownRenderingEnabled;
                       }),
                 ListTile(
-                  leading: nil,
+                  leading: null,
                   title: Text(S.of(context).modify_password),
                   onTap: () {
                     HapticFeedbackUtil.light();
@@ -994,7 +992,7 @@ class SettingsPageState extends State<SettingsPage> {
                       }
                 ),
                 ListTile(
-                  leading: nil,
+                  leading: null,
                   title: Text(S.of(context).list_my_posts),
                   onTap: () {
                     HapticFeedbackUtil.light();
@@ -1004,7 +1002,7 @@ class SettingsPageState extends State<SettingsPage> {
                       }
                 ),
                 ListTile(
-                  leading: nil,
+                  leading: null,
                   title: Text(S.of(context).list_my_replies),
                   onTap: () {
                     HapticFeedbackUtil.light();
@@ -1014,7 +1012,7 @@ class SettingsPageState extends State<SettingsPage> {
                       }
                 ),
                 ListTile(
-                  leading: nil,
+                  leading: null,
                   title: Text(S.of(context).list_view_history),
                   onTap: () {
                     HapticFeedbackUtil.light();
@@ -1024,7 +1022,7 @@ class SettingsPageState extends State<SettingsPage> {
                       }
                 ),
                 ListTile(
-                  leading: nil,
+                  leading: null,
                   title: Text(S.of(context).list_my_punishments),
                   onTap: () {
                     HapticFeedbackUtil.light();
@@ -1034,7 +1032,7 @@ class SettingsPageState extends State<SettingsPage> {
                 ),
               ],
               ListTile(
-                leading: nil,
+                leading: null,
                 title: context.read<ForumProvider>().isUserInitialized
                     ? Text(
                         S.of(context).logout,

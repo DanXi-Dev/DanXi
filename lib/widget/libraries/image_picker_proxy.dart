@@ -46,7 +46,7 @@ class _ImagePickerMobile extends ImagePickerProxy {
 class _ImagePickerUniversal extends ImagePickerProxy {
   @override
   Future<String?> pickImage() async {
-    FilePickerResult? result = await FilePicker.pickFiles(type: FileType.image);
-    return result?.files.single.path;
+    PlatformFile? file = await FilePicker.pickFile(type: FileType.image);
+    return file?.path;
   }
 }

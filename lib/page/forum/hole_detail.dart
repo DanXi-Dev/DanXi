@@ -57,7 +57,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:intl/intl.dart';
 import 'package:linkify/linkify.dart';
-import 'package:nil/nil.dart';
 import 'package:provider/provider.dart';
 
 /// This function preprocesses content downloaded from FDUHOLE so that
@@ -425,18 +424,8 @@ class BBSPostDetailState extends State<BBSPostDetail> {
         }
 
         if (shouldScrollToEnd) {
-          try {
-            if (!_allDataLoaded) {
-              await _loadAllContent();
-            }
-            // scroll to end.
-            _listViewController.scheduleLoadedCallback(
-                () async => await _listViewController.scrollToEnd(),
-                rebuild: true);
-            shouldScrollToEnd = false;
-          } catch (_) {
-            // we don't care if we failed to scroll to the end.
-          }
+          await _loadAllAndScrollToEnd();
+          shouldScrollToEnd = false;
         }
       }
     });
@@ -539,6 +528,14 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             ),
             PlatformPopupMenuX(
               options: [
+                PopupMenuOption(
+                  label: S.of(context).scroll_to_new,
+                  onTap: (_) {
+                    _allDataLoaded = false;
+                    _loadAllContentFuture = null;
+                    _loadAllAndScrollToEnd();
+                  },
+                ),
                 PopupMenuOption(
                     label: S.of(context).scroll_to_end,
                     onTap: (_) {
@@ -818,6 +815,21 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     _listViewController.replaceAllDataWith(allFloors);
     _allDataLoaded = true;
     return allFloors;
+  }
+
+  Future<void> _loadAllAndScrollToEnd() async {
+    try {
+      if (!_allDataLoaded) {
+        await _loadAllContent();
+      }
+      // scroll to end.
+      _listViewController.scheduleLoadedCallback(
+        () async => await _listViewController.scrollToEnd(),
+        rebuild: true,
+      );
+    } catch (_) {
+      // we don't care if we failed to scroll to the end.
+    }
   }
 
   Widget _buildFavoredActionButton() {
@@ -1472,7 +1484,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       {bool isNested = false}) {
     if (_renderModel case Normal(selectedPerson: var selectedPerson, hole: _)) {
       if (selectedPerson != null && floor.anonyname != selectedPerson) {
-        return nil;
+        return const SizedBox.shrink();
       }
     }
 

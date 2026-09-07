@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:dan_xi/model/person.dart';
 import 'package:dan_xi/provider/state_provider.dart';
+import 'package:dan_xi/repository/cookie/independent_cookie_jar.dart';
 import 'package:dan_xi/repository/cookie/persistent_cookie_jar.dart';
 import 'package:dan_xi/util/condition_variable.dart';
 import 'package:dan_xi/util/io/cookie_manager_fix.dart';
@@ -60,43 +61,70 @@ class FudanSession {
   /// Shared cookie jar to maintain authentication sessions across all requests.
   /// Initialized by [initSession] before [dio] is first accessed.
   static late PersistentCookieJar _sessionCookieJar;
+  /// A coordinator that tracks the cookie epoch and manages how old in-flight requests' `Set-Cookie` headers are handled when a new login occurs.
+  static late SessionCookieCoordinator _sessionCookies;
 
   /// Login queues for each authentication type to coordinate concurrent requests.
   /// Ensures only one login operation runs at a time per authentication method.
-  static final Map<FudanLoginType, LoginQueue> _authenticationQueues =
-      FudanLoginType.values
-          .asMap()
-          .map((_, type) => MapEntry(type, LoginQueue()));
+  static Map<FudanLoginType, LoginQueue> _authenticationQueues =
+      _createAuthenticationQueues();
+
+  static Map<FudanLoginType, LoginQueue> _createAuthenticationQueues() =>
+      {for (final type in FudanLoginType.values) type: LoginQueue()};
 
   static Dio get dio {
-    if (_dio == null) {
-      _dio = DioUtils.newDioWithProxy(
-        options: BaseOptions(
-          receiveDataWhenStatusError: true,
-          connectTimeout: const Duration(seconds: 5),
-          receiveTimeout: const Duration(seconds: 5),
-          sendTimeout: const Duration(seconds: 5),
-          // Disable Dio's built-in redirect handling as it has issues
-          // RedirectInterceptor provides proper redirect tracking
-          followRedirects: false,
-          // Allow 3xx status codes to avoid exceptions, since we handle redirects manually
-          validateStatus: (status) => status != null && status < 400,
-        ),
-        track: true,
-      );
-
-      // 1. Request throttling (must be first)
-      _dio!.interceptors.add(LimitedQueuedInterceptor.getInstance());
-      // 2. User agent spoofing to bypass restrictions
-      _dio!.interceptors.add(UserAgentInterceptor(important: false));
-      // 3. Cookie management for session persistence
-      _dio!.interceptors.add(TolerantCookieManager(_sessionCookieJar));
-      // 4. Dio Logger for debugging
-      _dio!.interceptors.add(DioLogInterceptor());
-      // 5. Custom redirect handling (must be last)
-      _dio!.interceptors.add(RedirectInterceptor(() => _dio!));
-    }
+    _dio ??= _createDio(_sessionCookieJar,
+        sessionCookies: _sessionCookies, track: true);
     return _dio!;
+  }
+
+  /// Create a new Dio instance linked with given [cookieJar] and [sessionCookies] (if any).
+  ///
+  /// If [track] is true, the Dio instance will be updated when proxy settings change.
+  static Dio _createDio(IndependentCookieJar cookieJar,
+      {SessionCookieCoordinator? sessionCookies, bool track = false}) {
+    final client = DioUtils.newDioWithProxy(
+      options: BaseOptions(
+        receiveDataWhenStatusError: true,
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 5),
+        sendTimeout: const Duration(seconds: 5),
+        // Disable Dio's built-in redirect handling as it has issues
+        // RedirectInterceptor provides proper redirect tracking
+        followRedirects: false,
+        // Allow 3xx status codes to avoid exceptions, since we handle redirects manually
+        validateStatus: (status) => status != null && status < 400,
+      ),
+      track: track,
+    );
+    // 1. Request throttling (must be first)
+    client.interceptors.add(LimitedQueuedInterceptor.getInstance());
+    // 2. User agent spoofing to bypass restrictions
+    client.interceptors.add(UserAgentInterceptor(important: false));
+    // 3. Cookie management for session persistence
+    client.interceptors.add(TolerantCookieManager(cookieJar,
+        sessionCookies: sessionCookies));
+    // 4. Dio Logger for debugging
+    client.interceptors.add(DioLogInterceptor());
+    // 5. Custom redirect handling (must be last)
+    client.interceptors.add(RedirectInterceptor(() => client));
+    return client;
+  }
+
+  /// Helper method to perform Neo authentication with a dio client within a transaction cookie jar.
+  ///
+  /// All parameters are passed to [FudanAuthenticationAPIV2.authenticate].
+  static Future<void> _authenticateNeoInTransaction(PersonInfo personInfo,
+      Uri serviceUrl, String? serviceRequestMethod) async {
+    final transaction = await _sessionCookies.beginTransaction();
+    final workDio = _createDio(transaction);
+    try {
+      await FudanAuthenticationAPIV2.authenticate(
+          workDio, personInfo, serviceUrl, serviceRequestMethod);
+      await _sessionCookies.commit(transaction);
+    } finally {
+      workDio.close(force: true);
+    }
   }
 
   /// Executes an authenticated request to a Fudan service with automatic login retry.
@@ -158,6 +186,7 @@ class FudanSession {
     switch (type) {
       case FudanLoginType.Neo:
       case FudanLoginType.Neo2FA:
+        int? requestEpoch;
         return _authenticationQueues[type]!.runNormalRequest(
           () async {
             // Shallow-copy the request to avoid cookie header pollution across retries:
@@ -169,7 +198,14 @@ class FudanSession {
               reqCopy.data = (reqCopy.data as FormData).clone();
             }
 
-            final response = await dio.fetch(reqCopy);
+            late final Response<dynamic> response;
+            try {
+              response = await dio.fetch(reqCopy);
+            } finally {
+              requestEpoch = _sessionCookies.requestEpoch(reqCopy);
+            }
+            // tip: [response] must have been initialized at this point.
+            // Because try-finally won't catch exceptions.
             if (isNeoAuthenticationRequired(response)) {
               throw Exception(
                   "Authentication required for request: ${response.realUri}");
@@ -178,7 +214,7 @@ class FudanSession {
           },
           () async {
             try {
-              await FudanAuthenticationAPIV2.authenticate(
+              await _authenticateNeoInTransaction(
                   personInfo, effectiveServiceUrl, effectiveLoginMethod);
             } on EnhancedAuthenticationRequiredException catch (e) {
               // Enhanced authentication (2FA) is required.
@@ -196,6 +232,8 @@ class FudanSession {
             }
           },
           isFatalError: effectiveIsFatalErrorNeo,
+          shouldRetryWithoutLogin: () =>
+              _sessionCookies.hasAdvancedSince(requestEpoch),
         );
       case FudanLoginType.UISNeo:
         return _authenticationQueues[type]!.runNormalRequest(
@@ -283,17 +321,24 @@ class FudanSession {
     _enhancedAuthCompleter = null;
   }
 
-  /// Import cookies from an external source (e.g. InAppWebView) into the
-  /// session cookie jar. Used after the user completes 2FA in a WebView.
-  static Future<void> importCookies(List<Cookie> cookies, Uri uri) async {
-    await _sessionCookieJar.saveFromResponse(uri, cookies);
-  }
+  /// Import [cookies] from an external source (e.g. InAppWebView) into the
+  /// session [_sessionCookies] for the given [uri].
+  ///
+  /// Used after the user completes 2FA in a WebView.
+  static Future<void> importCookies(List<Cookie> cookies, Uri uri) async =>
+      await _sessionCookies.importCookies(cookies, uri);
 
   static Future<void> clearSession() async {
-    // Clear cookies to reset the session
-    await _sessionCookieJar.deleteAll();
-    // Clear the Dio instance to reset interceptors and state
+    // Make all in-flight login sessions fail
+    fail2FA(StateError('Fudan session cleared'), StackTrace.current);
+    // Close the dio client
+    _dio?.close(force: true);
+    // Clear cookies
+    await _sessionCookies.clear();
+    // Clear the Dio instance to reset interceptors
     _dio = null;
+    // Rebuild auth queues to flush all previous requests
+    _authenticationQueues = _createAuthenticationQueues();
   }
 
   /// Initialize the session by creating a [PersistentCookieJar] backed by
@@ -305,6 +350,7 @@ class FudanSession {
     XSharedPreferences prefs = await XSharedPreferences.getInstance();
     _sessionCookieJar = PersistentCookieJar(prefs);
     _sessionCookieJar.restore();
+    _sessionCookies = SessionCookieCoordinator(_sessionCookieJar);
   }
 
   /// Force the cookie jar to persist any pending changes immediately.
@@ -333,12 +379,11 @@ class FudanAuthenticationAPIV2 {
   } */
   static const String CREDENTIALS_INVALID = "用户名或密码错误";
 
-  static Future<Response<dynamic>> authenticate(
-      PersonInfo info, Uri serviceUrl, String? serviceRequestMethod) async {
+  static Future<Response<dynamic>> authenticate(Dio dio, PersonInfo info,
+      Uri serviceUrl, String? serviceRequestMethod) async {
     Response<dynamic> firstResponse;
     try {
-      firstResponse = await FudanSession.dio
-          .requestUri(
+      firstResponse = await dio.requestUri(
           serviceUrl, options: Options(method: serviceRequestMethod));
     } on DioException catch (e) {
       if (e.type != DioExceptionType.badResponse) {
@@ -376,21 +421,21 @@ class FudanAuthenticationAPIV2 {
       // check if already authenticated by try to call [_retrieveUrlWithTicket]
       final document = BeautifulSoup(firstResponse.data.toString());
       final targetUrl = _retrieveUrlWithTicket(document);
-      return await FudanSession.dio.getUri(targetUrl);
+      return await dio.getUri(targetUrl);
     } catch (_) {}
 
     // If not authenticated, we need to login
-    final params = await _getAuthParams(redirectedUrl, serviceUrl);
-    final publicKey = await _getPublicKey();
+    final params = await _getAuthParams(dio, redirectedUrl, serviceUrl);
+    final publicKey = await _getPublicKey(dio);
     final loginToken = await _login(
-        params, publicKey, info.id!, info.password!,
+        dio, params, publicKey, info.id!, info.password!,
         redirectedUrl, serviceUrl.host);
-    final document = await _postToken(loginToken);
+    final document = await _postToken(dio, loginToken);
     final targetUrl = _retrieveUrlWithTicket(document);
 
     // Now we have the target URL with the ticket, we can redirect to it
     try {
-      return await FudanSession.dio.getUri(targetUrl);
+      return await dio.getUri(targetUrl);
     } on DioException catch (e) {
       if (e.response?.realUri.host != serviceUrl.host) {
         // If the final redirect is not to the target service, rethrow
@@ -420,9 +465,9 @@ class FudanAuthenticationAPIV2 {
     return submitUrl.replace(queryParameters: mutableQueryMap);
   }
 
-  static Future<RSAPublicKey> _getPublicKey() async {
+  static Future<RSAPublicKey> _getPublicKey(Dio dio) async {
     final Response<Map<String, dynamic>> response =
-        await FudanSession.dio.post("https://$idHost/idp/authn/getJsPublicKey");
+        await dio.post("https://$idHost/idp/authn/getJsPublicKey");
     final encodedKey = response.data!["data"] as String;
     final pcks8Key =
         "-----BEGIN PUBLIC KEY-----\n$encodedKey\n-----END PUBLIC KEY-----";
@@ -430,7 +475,7 @@ class FudanAuthenticationAPIV2 {
   }
 
   static Future<AuthenticationParameters> _getAuthParams(
-      Uri idUrl, Uri serviceUrl) async {
+      Dio dio, Uri idUrl, Uri serviceUrl) async {
     // 1. parse lck and entityId from the idUrl
     // concat fragment (#...) with a new URL to parse it as query parameters
     final Uri tmpUrlForParsing = Uri.parse("https://$idHost/${idUrl.fragment}");
@@ -439,7 +484,7 @@ class FudanAuthenticationAPIV2 {
 
     // 2. get chainCode from the server
     final Response<Map<String, dynamic>> chainCodeResponse =
-        await FudanSession.dio.post(
+        await dio.post(
       "https://$idHost/idp/authn/queryAuthMethods",
       data: {
         "lck": lck,
@@ -470,13 +515,13 @@ class FudanAuthenticationAPIV2 {
     return AuthenticationParameters(lck, entityId, authChainCode);
   }
 
-  static Future<String> _login(AuthenticationParameters params,
+  static Future<String> _login(Dio dio, AuthenticationParameters params,
       RSAPublicKey publicKey, String username, String password,
       Uri loginUrl, String targetHost) async {
     final encrypter =
         Encrypter(RSA(publicKey: publicKey, encoding: RSAEncoding.PKCS1));
     final encryptedPassword = encrypter.encrypt(password).base64;
-    final Response<Map<String, dynamic>> response = await FudanSession.dio.post(
+    final Response<Map<String, dynamic>> response = await dio.post(
       "https://$idHost/idp/authn/authExecute",
       data: {
         "authModuleCode": "userAndPwd",
@@ -509,8 +554,8 @@ class FudanAuthenticationAPIV2 {
     return loginToken;
   }
 
-  static Future<BeautifulSoup> _postToken(String loginToken) async {
-    final Response<dynamic> response = await FudanSession.dio.post(
+  static Future<BeautifulSoup> _postToken(Dio dio, String loginToken) async {
+    final Response<dynamic> response = await dio.post(
       "https://$idHost/idp/authCenter/authnEngine",
       data: {"loginToken": loginToken},
       options: Options(contentType: Headers.formUrlEncodedContentType),
@@ -734,11 +779,13 @@ class LoginQueue {
   /// [hasBeenRetried] - Flag to prevent infinite retry loops (for internal use)
   /// [actionStartTime] - Override for the request start timestamp (for internal use)
   /// [isFatalError] - Optional function to identify errors that should not trigger login
+  /// [shouldRetryWithoutLogin] - Whether to retry once before starting a login. For example, when the session has advanced since the request started
   Future<T> runNormalRequest<T>(
       Future<T> Function() action, Future<void> Function() loginLogic,
       {bool hasBeenRetried = false,
       int? actionStartTime,
-      bool Function(dynamic error)? isFatalError}) async {
+      bool Function(dynamic error)? isFatalError,
+      bool Function()? shouldRetryWithoutLogin}) async {
     // Wait for any currently running login to complete before proceeding
     await _mutex.protect(() async {
       while (_isCurrentlyLoggingIn) {
@@ -761,6 +808,15 @@ class LoginQueue {
       // If we've already retried once, don't retry again to avoid infinite loops
       if (hasBeenRetried) {
         rethrow;
+      }
+
+      if (shouldRetryWithoutLogin?.call() ?? false) {
+        // If we are allowed to retry without login (e.g., session has advanced),
+        // retry the action once by recursively calling self.
+        return runNormalRequest(action, loginLogic,
+            hasBeenRetried: hasBeenRetried,
+            actionStartTime: requestStartTime,
+            isFatalError: isFatalError);
       }
 
       // The action failed, likely due to authentication. Try to login and retry.
@@ -813,12 +869,11 @@ class LoginQueue {
         _mutex.release();
         return true;
       }
+    }
 
-      // Check if this request started after the most recent login, indicating a new batch
-      if (requestStartTime > _mostRecentLoginState.startTime) {
-        _loginAttemptsInCurrentBatch =
-            0; // Reset attempts counter for the new batch
-      }
+    // Requests that started after the previous login belong to a new batch.
+    if (requestStartTime > _mostRecentLoginState.startTime) {
+      _loginAttemptsInCurrentBatch = 0;
     }
 
     // Check if we've exceeded the retry limit for this batch

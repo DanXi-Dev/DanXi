@@ -32,7 +32,6 @@ import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:highlighting/languages/all.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:markdown/markdown.dart' as md;
-import 'package:nil/nil.dart';
 
 const double kFontSize = 16.0;
 const double kFontLargerSize = 24.0;
@@ -226,7 +225,8 @@ final BaseRender kMarkdownSelectorRender = (BuildContext context,
           _getMarkdownStyleSheetFromPlatform(context), kFontLargerSize),
       onTapLink: (String text, String? href, String title) =>
           onTapLink?.call(href),
-      imageBuilder: (Uri uri, String? title, String? alt) => nil,
+      imageBuilder: (Uri uri, String? title, String? alt) =>
+          const SizedBox.shrink(),
     ),
   );
 };

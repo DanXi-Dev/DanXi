@@ -29,6 +29,10 @@ set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE}")
 # Use Unicode for all projects.
 add_definitions(-DUNICODE -D_UNICODE)
 
+if(MSVC)
+  add_compile_definitions(_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
+endif()
+
 # Compilation settings that should be applied to most targets.
 function(APPLY_STANDARD_SETTINGS TARGET)
   target_compile_features(${TARGET} PUBLIC cxx_std_17)
@@ -49,6 +53,12 @@ add_subdirectory("runner")
 # Generated plugin build rules, which manage building the plugins and adding
 # them to the application.
 include(flutter/generated_plugins.cmake)
+
+# gal currently relies on permissive MSVC language behavior. Keep the
+# workaround scoped to the plugin instead of weakening conformance globally.
+if(MSVC AND TARGET gal_plugin)
+  target_compile_options(gal_plugin PRIVATE /permissive)
+endif()
 
 
 # === Installation ===

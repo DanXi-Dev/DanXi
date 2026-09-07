@@ -96,6 +96,14 @@ class LoginPage extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: TextButton.icon(
+                    onPressed: () => smartNavigatorPush(context, '/diagnose'),
+                    icon: const Icon(Icons.troubleshoot_outlined),
+                    label: Text(S.of(context).diagnostic_information),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Align(
                     alignment: Alignment.center,
                     child: Text.rich(

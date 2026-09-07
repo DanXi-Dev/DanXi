@@ -36,7 +36,7 @@ jobs:
           flutter pub global run cider bump build
       
       - name: Generate Models
-        run: dart run build_runner build --delete-conflicting-outputs
+        run: dart run build_runner build
       
       - name: Get Flutter Version
         id: get_flutter_version

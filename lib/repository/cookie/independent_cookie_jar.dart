@@ -22,6 +22,13 @@ import 'package:cookie_jar/src/cookie_jar.dart';
 // ignore: implementation_imports
 import 'package:cookie_jar/src/serializable_cookie.dart';
 
+typedef CookieStorageKey = ({
+  bool domainCookie,
+  String domain,
+  String path,
+  String name,
+});
+
 /// A copy of [DefaultCookieJar], but with an independent cookie storage.
 class IndependentCookieJar implements CookieJar {
   /// A array to save cookies.
@@ -74,6 +81,12 @@ class IndependentCookieJar implements CookieJar {
               if (_check(uri.scheme, cookie)) {
                 if (list.indexWhere((e) => e.name == cookie.cookie.name) ==
                     -1) {
+                  _onCookieLoaded((
+                    domainCookie: false,
+                    domain: hostname,
+                    path: path,
+                    name: key,
+                  ));
                   list.add(cookie.cookie);
                 }
               }
@@ -90,6 +103,12 @@ class IndependentCookieJar implements CookieJar {
           if (urlPath.toLowerCase().contains(path)) {
             values.forEach((String key, SerializableCookie v) {
               if (_check(uri.scheme, v)) {
+                _onCookieLoaded((
+                  domainCookie: true,
+                  domain: domain,
+                  path: path,
+                  name: key,
+                ));
                 list.add(v.cookie);
               }
             });
@@ -100,37 +119,66 @@ class IndependentCookieJar implements CookieJar {
     return list;
   }
 
+  // A helper callback to let child classes do something when the cookie is read.
+  void _onCookieLoaded(CookieStorageKey key) {}
+
   @override
   Future<void> saveFromResponse(Uri uri, List<Cookie> cookies) async {
     for (final cookie in cookies) {
-      var domain = cookie.domain;
-      String path;
-      var index = 0;
-      // Save cookies with "domain" attribute
-      if (domain != null) {
-        if (domain.startsWith('.')) {
-          domain = domain.substring(1);
-        }
-        path = cookie.path ?? '/';
-      } else {
-        index = 1;
-        // Save cookies without "domain" attribute
-        path = cookie.path ?? (uri.path.isEmpty ? '/' : uri.path);
-        domain = uri.host;
-      }
-      var mapDomain =
-          _cookies[index][domain] ?? <String, Map<String, dynamic>>{};
-      mapDomain = mapDomain.cast<String, Map<String, dynamic>>();
-
-      final map = mapDomain[path] ?? <String, dynamic>{};
-      map[cookie.name] = SerializableCookie(cookie);
-      if (_isExpired(map[cookie.name])) {
-        map.remove(cookie.name);
-      }
-      mapDomain[path] = map.cast<String, SerializableCookie>();
-      _cookies[index][domain] =
-          mapDomain.cast<String, Map<String, SerializableCookie>>();
+      await replaceCookie(cookieStorageKey(uri, cookie), cookie);
     }
+  }
+
+  CookieStorageKey cookieStorageKey(Uri uri, Cookie cookie) {
+    String? domain = cookie.domain;
+    final bool domainCookie = domain != null;
+    // Save cookies with "domain" attribute
+    if (domain != null) {
+      if (domain.startsWith('.')) {
+        domain = domain.substring(1);
+      }
+    } else {
+      // Save cookies without "domain" attribute
+      domain = uri.host;
+    }
+    return (
+      domainCookie: domainCookie,
+      domain: domain,
+      path:
+          cookie.path ??
+          (domainCookie ? '/' : (uri.path.isEmpty ? '/' : uri.path)),
+      name: cookie.name,
+    );
+  }
+
+  Cookie? cookieForKey(CookieStorageKey key) {
+    final store = key.domainCookie ? domainCookies : hostCookies;
+    return store[key.domain]?[key.path]?[key.name]?.cookie;
+  }
+
+  Future<void> replaceCookie(CookieStorageKey key, Cookie? cookie) async {
+    final index = key.domainCookie ? 0 : 1;
+    final store = _cookies[index];
+    if (cookie == null) {
+      final pathMap = store[key.domain];
+      final cookieMap = pathMap?[key.path];
+      cookieMap?.remove(key.name);
+      if (cookieMap?.isEmpty ?? false) pathMap?.remove(key.path);
+      if (pathMap?.isEmpty ?? false) store.remove(key.domain);
+      return;
+    }
+
+    var mapDomain = store[key.domain] ?? <String, Map<String, dynamic>>{};
+    mapDomain = mapDomain.cast<String, Map<String, dynamic>>();
+
+    final map = mapDomain[key.path] ?? <String, dynamic>{};
+    map[key.name] = SerializableCookie(cookie);
+    if (_isExpired(map[key.name])) {
+      map.remove(key.name);
+    }
+    mapDomain[key.path] = map.cast<String, SerializableCookie>();
+    store[key.domain] = mapDomain
+        .cast<String, Map<String, SerializableCookie>>();
   }
 
   /// Delete cookies for specified [uri].
@@ -193,20 +241,62 @@ class IndependentCookieJar implements CookieJar {
   @override
   final bool ignoreExpires;
 
-  void deleteCookiesByName(String name) {
+  Set<CookieStorageKey> deleteCookiesByName(String name) {
+    final deletedKeys = <CookieStorageKey>{};
     for (final domain in hostCookies.keys) {
       final cookies = hostCookies[domain]!;
       for (final path in cookies.keys) {
         final values = cookies[path]!;
-        values.remove(name);
+        if (values.remove(name) != null) {
+          deletedKeys.add((
+            domainCookie: false,
+            domain: domain!,
+            path: path,
+            name: name,
+          ));
+        }
       }
     }
     for (final domain in domainCookies.keys) {
       final cookies = domainCookies[domain]!;
       for (final path in cookies.keys) {
         final values = cookies[path]!;
-        values.remove(name);
+        if (values.remove(name) != null) {
+          deletedKeys.add((
+            domainCookie: true,
+            domain: domain!,
+            path: path,
+            name: name,
+          ));
+        }
       }
     }
+    return deletedKeys;
+  }
+}
+
+/// An isolated cookie snapshot that records the keys used during a login.
+class TransactionalCookieJar extends IndependentCookieJar {
+  final Set<CookieStorageKey> touchedKeys = <CookieStorageKey>{};
+
+  TransactionalCookieJar.from(IndependentCookieJar source)
+    : super(ignoreExpires: source.ignoreExpires) {
+    cloneFrom(source);
+  }
+
+  @override
+  void _onCookieLoaded(CookieStorageKey key) => touchedKeys.add(key);
+
+  @override
+  Future<void> replaceCookie(CookieStorageKey key, Cookie? cookie) {
+    touchedKeys.add(key);
+    return super.replaceCookie(key, cookie);
+  }
+
+  @override
+  Set<CookieStorageKey> deleteCookiesByName(String name) {
+    final deletedKeys = super.deleteCookiesByName(name);
+    touchedKeys.addAll(deletedKeys);
+    return deletedKeys;
   }
 }

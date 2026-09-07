@@ -54,6 +54,7 @@ import 'package:dan_xi/page/subpage_settings.dart';
 import 'package:dan_xi/provider/settings_provider.dart';
 import 'package:dan_xi/provider/state_provider.dart';
 import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
+import 'package:dan_xi/util/browser_util.dart';
 import 'package:dan_xi/util/io/dio_utils.dart';
 import 'package:dan_xi/util/lazy_future.dart';
 import 'package:dan_xi/util/master_detail_view.dart';
@@ -78,6 +79,10 @@ import 'package:provider/provider.dart';
 Future<void> main() async {
   // Ensure that the engine has bound itself to
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Keep WebView2 data in a writable per-user directory on Windows. The same
+  // environment is shared by the 2FA browser and its CookieManager.
+  await BrowserUtil.initializeWebViewEnvironment();
 
   // Init Mi push Service.
   // if (PlatformX.isAndroid) {
@@ -242,7 +247,7 @@ class DanxiApp extends StatelessWidget {
         bool isPlatformCupertino = PlatformX.isCupertino(context);
 
         return DynamicColorBuilder(
-          builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+          builder: (lightDynamic, darkDynamic) {
             // Determine if dynamic colors should be used
             bool useSystemPalette = PlatformX.isAndroid && followSystemPalette;
 
@@ -301,9 +306,7 @@ class DanxiApp extends StatelessWidget {
                   ],
                   locale: LanguageManager.toLocale(
                       context.watch<SettingsProvider>().language),
-                  // Configure supported locales. Hard-code "zh-CN" locale for correct Chinese font selection on Windows.
-                  // See https://github.com/flutter/flutter/issues/103811#issuecomment-1199012026 for details.
-                  supportedLocales: [...S.delegate.supportedLocales, const Locale('zh', 'CN')],
+                  supportedLocales: S.delegate.supportedLocales,
                   onUnknownRoute: (settings) => throw AssertionError(
                       "ERROR: onUnknownRoute() has been called inside the root navigator.\nDevelopers are not supposed to push on this Navigator. There should be something wrong in the code."),
                   home: ThemedSystemOverlay(

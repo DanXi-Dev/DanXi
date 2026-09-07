@@ -38,8 +38,8 @@ class PersistentCookieJar extends IndependentCookieJar {
   PersistentCookieJar(this._preferences);
 
   @override
-  Future<void> saveFromResponse(Uri uri, List<Cookie> cookies) async {
-    await super.saveFromResponse(uri, cookies);
+  Future<void> replaceCookie(CookieStorageKey key, Cookie? cookie) async {
+    await super.replaceCookie(key, cookie);
     _scheduleSave();
   }
 

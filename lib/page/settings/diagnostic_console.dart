@@ -64,7 +64,7 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
     diagnoses = [
       diagnoseForum,
       diagnoseDanXi,
-      diagnoseUrl
+      diagnoseUrl,
     ];
     unawaited(diagnose());
   }
@@ -94,8 +94,6 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
 
     _console.writeln('Device identifier diagnostics disabled in FOSS build.');
   }
-
-  Future<void> diagnoseGoogleAds() async {}
 
   static const _IGNORE_KEYS = ["password"];
 
@@ -351,6 +349,25 @@ class DiagnosticConsoleState extends State<DiagnosticConsole> {
             primary: true,
             child: Column(
               children: [
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            S.of(context).diagnostic_information_notice,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 PlatformElevatedButton(
                   onPressed: exportLogArchive,
                   child: const Text("Export Log Archive"),
