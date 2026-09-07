@@ -10684,7 +10684,7 @@ case"grey":return B.e0}return B.bP},
 cvW(a){var s
 if(a!=null)for(s=0;s<4;++s)if(B.d.p(a,B.bcb[s]))return B.eG[s]
 return B.fG},
-b0v(a){switch(a){case B.fF:return A.a(["HGX","H2","H3","H4","H5","H6"],t.s)
+b0v(a){switch(a){case B.fF:return A.a(["HGD","HGX","H2","H3","H4","H5","H6"],t.s)
 case B.qu:return A.a(["F1","F2"],t.s)
 case B.qv:return A.a(["JA","JB"],t.s)
 case B.qw:return A.a(["Z2"],t.s)
