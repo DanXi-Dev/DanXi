@@ -1,0 +1,720 @@
+
+
+2、创建新工程
+可以在任意目录，打开命令窗口，执行如下命令：flutter create --template=module my_flutter_module2，其中my_flutter_module2为工程目录名
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+工程目录结构如下，其中.android，.ohos，.ios就是三端的壳目录，lib目录就是我们开发flutter页面逻辑的目录，后续开发主要就是在lib目录下开发。
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+3、生成har包
+flutter工程要集成到鸿蒙应用中，主要就是通过将flutter工程编译成har包，然后发布到ohpm中心仓，鸿蒙应用就可以通过坐标方式来引入。生成har包方式主要执行如下命令：flutter build har --debug（要指定类型debug/release，这里构建的是har包，而不是hap包）
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+命令执行成功后，会在.ohos/har目录下生成两个har包，这个就是flutter工程编译的产物，其中flutter.har是引擎包，只要同一个flutter SDK版本的引擎包都是一样的，都是从SDK包的模板中复制过来的，flutter_module.har就是包含页面逻辑的包。后续我们鸿蒙应用需要集成这两个har包。另外注意一点，debug模式编译的包和release模式编译的包不能混用，比如，鸿蒙应用引入har包时，不能引擎包用的是debug模式的包，module包用的是release的包，否则引起功能问题。
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+三、鸿蒙应用集成Flutter
+1、首先我们创建一个鸿蒙应用，选择“Empty Ability”
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+工程目录如下：
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+2、集成第二章节中Flutter工程编译出来的两个har包
+这里我们演示下本地目录集成，后续如果要走正常版本发布的话，建议将两个har包先发布到ohpm仓库，和其他三方组件一样通过坐标来集成。
+
+（1）在鸿蒙应用目录下新增一个目录，并将两个har包放入其中
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+（2）在app工程目录下的oh-package.json5中引用该两个依赖
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+（3）修改EntryAbility代码，在EntryAbility几个生命周期函数中，调用FlutterManager的方法，将相关UIAbility传给flutter。用于后续flutter页面的挂载
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+（4）在鸿蒙应用中新增page页面来集成flutter页面
+代码实现如下，这就相当于集成了flutter页面，当从native的其他页面跳转到该页面时，就会展示flutter中的main.dart页面。如果想路由到flutter其他页面，可以在FlutterEntry对象传入路由名称{'route': '/page1'}
+
+import { FlutterEntry, FlutterPage, FlutterView } from '@ohos/flutter_ohos';
+@Entry
+@Component
+struct FlutterTestPage1 {
+  private flutterEntry: FlutterEntry | null = null;
+  private flutterView?: FlutterView
+  aboutToAppear() {
+    this.flutterEntry = new FlutterEntry(getContext(this), {'route': '/page1'})
+    this.flutterEntry.aboutToAppear()
+    this.flutterView = this.flutterEntry.getFlutterView()
+  }
+  aboutToDisappear() {
+    this.flutterEntry?.aboutToDisappear()
+  }
+  onPageShow() {
+    this.flutterEntry?.onPageShow()
+  }
+  onPageHide() {
+    this.flutterEntry?.onPageHide()
+  }
+  build() {
+    Stack(){
+      FlutterPage({ viewId: this.flutterView?.getId() })
+    }
+  }
+}
+
+（5）路由跳转flutter页面，这里就是从native跳转到上一步中的页面，可以使用router或者Navigation实现页面跳转
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+四、集成三方库
+1、目前三方库分为三种类型
+（1）官网的pub依赖，链接地址：https://pub.dev/packages，其中如果是纯dart语言编写的组件，无需适配鸿蒙操作系统，可以直接正常通过坐标引入
+
+（2）鸿蒙版的packages组件，但无独立的git地址，所有组件都在https://gitcode.com/openharmony-sig/flutter_packages下
+
+（3）鸿蒙版组件，有独立的git地址
+
+这里附上已经适配鸿蒙操作系统的组件列表：https://gitcode.com/openharmony-tpc/flutter_packages/blob/master/README.md
+
+2、引入官网pub依赖
+直接在Flutter工程中的pubspec.yaml文件中通过版本号引入，下载地址就是我们在第一章节环境变量中配置的PUB_HOSTED_URL=https://pub.flutter-io.cn，编译时，会根据组件及版本号自动从该地址下载对应组件。
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+3、鸿蒙版的packages组件，无独立的git地址，所有组件都在https://gitcode.com/openharmony-sig/flutter_packages下
+如果支持访问外网，可以通过git方式引入
+
+dev_dependencies:
+  pigeon:
+    git:
+      url: "https://gitcode.com/openharmony-tpc/flutter_packages.git"
+      path: "packages/pigeon"
+
+如果不支持访问外网，可以将软件包下载到本地，通过本地路径方式引入
+
+（1）组件下载
+
+进入https://gitcode.com/openharmony-sig/flutter_packagesyemian页面，选择某个tag版本，下载某个鸿蒙版组件包
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+（2）将压缩包解压到本地，通过本地包依赖
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+4、引入鸿蒙版组件，有独立的git地址
+配置git地址，并指定commitId
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+5、如果公司内部可信要求无法访问外网，则需要将所有依赖上传至公司内部的pub公共仓库，然后修改环境变量中的PUB_HOSTED_URL=https://pub.flutter-io.cn地址，将url改为公司内部的pub仓库地址，然后参考官网pub组件引入的方式，通过组件名及版本号的方式引入。
+五、高阶特性
+1、Flutter与单框架数据交互
+（1）MethodChannel
+使用场景：主要用于一些离散的调用，调用方式是基于方法的调用，支持双向通信
+
+Dart端：
+
+// 创建实例
+final _platform = const MethodChannel('samples.flutter.dev/battery');
+// 调用方法 getBatteryLevel
+final result = await _platform.invokeMethod<int>('getBatteryLevel', '参数');
+
+鸿蒙应用：
+
+需要创建一个类，并实现FlutterPlugin接口，该接口中需要实现onAttachedToEngine方法，在该方法中去初始化MethodChannel
+
+onAttachedToEngine(binding: FlutterPluginBinding): void {
+    let that = this;
+    // 创建实例
+    this.channel = new MethodChannel(binding.getBinaryMessenger(), "samples.flutter.dev/battery");
+    // 设置回调，调用具体的实现
+    this.channel.setMethodCallHandler({
+        onMethodCall(call: MethodCall, result: MethodResult) {
+        switch (call.method) {
+            case "getBatteryLevel":
+                that.api.getBatteryLevel(result);
+            break;
+            default:
+                result.notImplemented();
+            break;
+        }
+        }
+    })
+}
+
+（2）BasicMessageChannel
+使用场景：更加轻量级的，传输一些简单类型的信息，频繁的小数据交换，支持双向通信
+
+Dart端：
+
+int count = 0;
+// 创建实例
+final _basicChannel = const BasicMessageChannel(
+      "samples.flutter.dev/basic_channel", StandardMessageCodec());
+// 调用方法，获取平台侧的返回值
+String result = await _basicChannel.send(++count) as String;
+
+鸿蒙应用：
+
+onAttachedToEngine(binding: FlutterPluginBinding): void {
+    // 创建实例
+    this.basicChannel = new BasicMessageChannel(binding.getBinaryMessenger(), "samples.flutter.dev/basic_channel", new StandardMessageCodec());
+    // 设置回调，调用具体的实现
+    this.basicChannel.setMessageHandler({
+        onMessage(message: Any, reply: Reply<Any>) {
+        Log.i(TAG, "message=" + message);
+        if (message % 2 == 0) {
+            reply.reply("run with if case.");
+        } else {
+            reply.reply("run with else case");
+        }
+        }
+    })
+}
+
+（3）EventChannel
+使用场景：native向 Flutter 推送实时数据的，只支持单向，使用的是长链接
+
+Dart端：
+
+// 创建实例
+final _eventChannel = const EventChannel('samples.flutter.dev/event_channel');
+// 注册事件监听
+_eventChannel.receiveBroadcastStream().listen((event) {
+    setState(() {
+        message = "EventChannel event=$event";
+    });
+});
+
+鸿蒙应用：
+
+private eventSink?: EventSink;
+onAttachedToEngine(binding: FlutterPluginBinding): void {
+    let that = this;
+    // 创建实例
+    this.eventChannel = new EventChannel(binding.getBinaryMessenger(), "samples.flutter.dev/event_channel");
+    // 设置回调，获取EventSink
+    this.eventChannel.setStreamHandler({
+        onListen(args: Any, events: EventSink): void {
+            that.eventSink = events;
+            Log.i(TAG, "onListen: " + args);
+        },
+        onCancel(args: Any): void {
+            that.eventSink = undefined;
+            Log.i(TAG, "onCancel: " + args);
+        }
+    });
+}
+// ...
+// 使用 EventSink 发送数据后，dart断的事件监听回调会收到发送的数据。
+that.eventSink?.success("Success at " + new Date());
+
+（4）将上面创建的FlutterPlugin类注册到FlutterEntry中，完整的事例如下，最终把ComFlutterEntry参照第3中第2节中Flutter页面中用的系统的FlutterEntry替换为我们自己实现的ComFlutterEntry。就可以实现flutter页面与native端互相通信
+
+import { GeneratedPluginRegistrant } from "@ohos/flutter_module";
+import {
+  BasicMessageChannel,
+  EventChannel,
+  FlutterEngine, FlutterEntry,FlutterPlugin, FlutterPluginBinding,
+  MethodCall,
+  MethodChannel,
+  MethodResult,
+  Reply,
+  StandardMessageCodec} from "@ohos/flutter_ohos";
+import { EventSink } from '@ohos/flutter_ohos/src/main/ets/plugin/common/EventChannel';
+
+
+export class ComFlutterEntry extends FlutterEntry {
+  configureFlutterEngine(flutterEngine: FlutterEngine): void {
+    super.configureFlutterEngine(flutterEngine);
+    GeneratedPluginRegistrant.registerWith(flutterEngine);
+    this.addPlugin(new BatteryPlugin())
+  }
+}
+
+export default class BatteryPlugin implements FlutterPlugin {
+  private channel?: MethodChannel;
+  private basicChannel?: BasicMessageChannel<string>;
+  private eventChannel?: EventChannel;
+  private eventSink?: EventSink;
+  private api = new BatteryApi();
+
+  onAttachedToEngine(binding: FlutterPluginBinding): void {
+    this.channel = new MethodChannel(binding.getBinaryMessenger(), "samples.flutter.dev/battery");
+    let that = this;
+    this.channel.setMethodCallHandler({
+      onMethodCall(call: MethodCall, result: MethodResult) {
+        switch (call.method) {
+          case "getBatteryLevel":
+            that.api.getBatteryLevel(result);
+            break;
+          case "callEvent":
+            that.eventSink?.success("Success at " + new Date());
+            break;
+            break;
+          default:
+            result.notImplemented();
+            break;
+        }
+      }
+    })
+
+    this.basicChannel = new BasicMessageChannel(binding.getBinaryMessenger(), "samples.flutter.dev/basic_channel", new StandardMessageCodec());
+    this.basicChannel.setMessageHandler({
+      onMessage(message: string, reply: Reply<string>) {
+        reply.reply("run with if case.");
+      }
+    })
+
+    this.eventChannel = new EventChannel(binding.getBinaryMessenger(), "samples.flutter.dev/event_channel");
+    this.eventChannel.setStreamHandler({
+      onListen(args: string, events: EventSink): void {
+        that.eventSink = events;
+      },
+      onCancel(args: string): void {
+        that.eventSink = undefined;
+      }
+    });
+  }
+
+  onDetachedFromEngine(binding: FlutterPluginBinding): void {
+    this.channel?.setMethodCallHandler(null);
+    this.eventChannel?.setStreamHandler(null);
+
+  }
+
+  getUniqueClassName(): string {
+    return "BatteryPlugin";
+  }
+}
+
+class BatteryApi {
+  getBatteryLevel(result: MethodResult) {
+    let level: number = 11;
+    let wrapped: Map<String, String> = new Map<String, String>();
+    if (level >= 0) {
+      result.success(level);
+    } else {
+      wrapped.set("UNAVAILABLE", "Battery level not available.");
+      result.error("UNAVAILABLE", "Battery level not available.", null)
+    }
+  }
+}
+
+2、Pigeon插件的使用
+Pigeon 是一个代码生成工具，用于简化 Flutter 与原生平台(Android/iOS)之间的通信。它比传统的 MethodChannel 更类型安全、更高效，Pigeon本质上生成的代码就是通过
+
+BasicMessageChannel进行通信的，它只不过将一些模板代码通过工具直接生成，提升开发效率。
+
+鸿蒙版的插件地址：https://gitcode.com/openharmony-sig/flutter_packages/blob/master/README.md
+
+1、该组件的引入方式，参考第四章节的第3小点，通过下载组件包后，指定本地包路径的方式引入。或者上传公司pub仓库，以坐标方式引入，如果能访问外网，则直接git方式引入
+
+2、配置接口定义
+
+其中@ConfigurePigeon配置的是插件生成的ets代码，Android的java代码，IOS的swift代码和dart代码的路径，@HostApi即定义的需要鸿蒙/安卓/IOS需要实现的接口
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+3、执行flutter pub run pigeon --input lib/common/pigeon/ComChannelConfig.dart命令，生成dart端和host端接口文件
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+4、其中ComChannelApi.dart就是flutter端的接口类，使用方式如下，直接创建该类对象，调用相应接口，就能从native端获取数据
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+5、步骤3中生成的其他几个文件分别对应了Android端、鸿蒙应用和IOS端，这里以鸿蒙应用为例，将ComChannelApi.ets文件复制到鸿蒙应用中，并实现该接口，代码如下
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+6、集成FlutterEntry类，将上一步中的实现类，在引擎渲染的时候注册进去
+
+7、在鸿蒙应用，跳转flutter页面的时候，使用上一步的ComFlutterEntry，如下，这样，当渲染flutter页面后，在flutter页面生命周期中就可以调用native方法，获取一些数据用于页面展示。
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+3、使用flutter_boost，实现鸿蒙应用的路由跳转
+flutter_boost是阿里推出的一款Flutter插件，它可以轻松地为现有原生应用程序提供Flutter混合集成方案。FlutterBoost的理念是将Flutter像Webview那样来使用。在现有应用程序中同时管理Native页面和Flutter页面并非易事。 FlutterBoost帮你处理页面的映射和跳转，你只需关心页面的名字和参数即可（通常可以是URL）。flutter_boost已完全适配ohos鸿蒙应用。
+
+项目地址：https://github.com/alibaba/flutter_boost
+
+（1）dart端实现
+
+（1.1）首先，需要添加FlutterBoost依赖到yaml文件
+
+flutter_boost:
+  git:
+    url: 'https://github.com/alibaba/flutter_boost.git'
+    ref: '4.6.5'
+
+（1.2）dart端代码实现如下，总共定义了两个路由页面，一个是simplePage，一个是mainPage，simplePage可以接收native传来的参数，并展示该参数
+
+import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_boost/flutter_boost.dart';
+
+void main() {
+  ///这里的CustomFlutterBinding调用务必不可缺少，用于控制Boost状态的resume和pause
+  CustomFlutterBinding();
+  runApp(MyApp());
+}
+
+
+///创建一个自定义的Binding，继承和with的关系如下，里面什么都不用写
+class CustomFlutterBinding extends WidgetsFlutterBinding with BoostFlutterBinding {}
+
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  Map<String, FlutterBoostRouteFactory> routerMap = {
+    'mainPage': (settings,bool isContainerPage, uniqueId) {
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (_) {
+            return MainPage(
+              data: 'MainPage',
+            );
+          });
+    },
+    'simplePage': (settings,bool isContainerPage, uniqueId) {
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (_) {
+            return SimplePage(
+              data: json.encode(settings.arguments),
+            );
+          });
+    },
+  };
+
+  Route<dynamic>? routeFactory(RouteSettings settings,bool isContainerPage, String? uniqueId) {
+    FlutterBoostRouteFactory func = routerMap[settings.name] as FlutterBoostRouteFactory;
+    return func(settings, isContainerPage, uniqueId);
+  }
+
+  Widget appBuilder(Widget home) {
+    return MaterialApp(
+      home: home,
+      debugShowCheckedModeBanner: true,
+
+      ///必须加上builder参数，否则showDialog等会出问题
+      builder: (_, __) {
+        return home;
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FlutterBoostApp(
+      routeFactory,
+      appBuilder: appBuilder,
+    );
+  }
+}
+
+class MainPage extends StatelessWidget {
+  const MainPage({required Object data});
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(child: Text('Main Page')),
+    );
+  }
+}
+
+class SimplePage extends StatelessWidget {
+  String data;
+
+  SimplePage({String data = ""}) : this.data = data ?? "SimplePage";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text(
+          data ?? "SimplePage", // 使用空合并运算符确保非空
+          style: TextStyle(
+            fontSize: 20,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+（2）鸿蒙应用的实现
+
+（2.1）将flutter工程编译成har包，执行命令flutter build har --release，这里会生成如下3个har包
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+（2.2）将3个har包引入到鸿蒙应用中
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+（2.3）在EntryAbility中将Flutter与UIAbility进行绑定
+
+async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam) {
+  FlutterManager.getInstance().pushUIAbility(this)：
+}
+
+onDestroy(): void {
+  FlutterManager.getInstance().popUIAbility(this);
+}
+
+onWindowStageCreate(windowStage: window.WindowStage): void {
+  FlutterManager.getInstance().pushWindowStage(this, windowStage)
+}
+
+onWindowStageDestroy(): void {
+  FlutterManager.getInstance().popWindowStage(this);
+}
+
+（2.4）在EntryAbility中的onWindowStageCreate初始化flutter_boost
+
+onWindowStageCreate(windowStage: window.WindowStage): void {
+    // Main window is created, set main page for this ability
+    hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+    FlutterManager.getInstance().pushWindowStage(this, windowStage)
+
+    let applicationInfo = ApplicationInfoLoader.load(this.context);
+    const options: FlutterBoostSetupOptions = new FlutterBoostSetupOptionsBuilder()
+      .setDebugLoggingEnabled(applicationInfo.isDebugMode)
+      .build()
+
+    FlutterBoost.getInstance().setup(this, this.context, (engine) => {
+      // Register plugins
+      GeneratedPluginRegistrant.registerWith(engine)
+      windowStage.loadContent('pages/Index', (err) => {
+        if (err.code) {
+          hilog.error(0x0000, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
+          return;
+        }
+        hilog.info(0x0000, 'testTag', 'Succeeded in loading the content.');
+      });
+    }, options)
+
+  }
+
+（2.5）实现自定义FlutterPage页面
+
+import { FlutterPage, FlutterView } from '@ohos/flutter_ohos';
+import { FlutterBoost, FlutterBoostEntry } from 'flutter_boost';
+import { router } from '@kit.ArkUI';
+import hilog from '@ohos.hilog';
+
+@Entry
+@Component
+struct MyFlutterPage {
+  private flutterEntry: FlutterBoostEntry | null = null;
+  private flutterView?: FlutterView
+
+  aboutToAppear() {
+    this.flutterEntry = new FlutterBoostEntry(getContext(this), router.getParams());
+    this.flutterEntry.aboutToAppear();
+    this.flutterView = this.flutterEntry.getFlutterView();
+    hilog.info(0x0000, "Flutter", "Index aboutToAppear===");
+  }
+  //2
+  aboutToDisappear() {
+    hilog.info(0x0000, "Flutter", "Index aboutToDisappear===");
+    this.flutterEntry?.aboutToDisappear()
+  }
+
+  onPageShow() {
+    hilog.info(0x0000, "Flutter", "Index onPageShow===");
+    this.flutterEntry?.onPageShow()
+  }
+  // 1
+  onPageHide() {
+    hilog.info(0x0000, "Flutter", "Index onPageHide===");
+    this.flutterEntry?.onPageHide()
+  }
+
+  build() {
+    Stack() {
+      FlutterPage({ viewId: this.flutterView?.getId() })
+    }
+  }
+
+  // 拦截返回键
+  onBackPress(): boolean | void {
+    FlutterBoost.getInstance().getPlugin()?.onBackPressed();
+    return true;
+  }
+}
+
+（2.6）跳转Flutter界面，后面直接使用router跳转到（2.5）步骤中的page即可，如下，就会跳转到simplePage页面，并将参数传递给flutter页面
+
+router.pushUrl({
+  url: 'pages/MyFlutterPage', params: {
+uri: 'simplePage',
+params: {data:'ohos Data'},
+  }
+}).then(() => {
+  console.info('Succeeded in jumping to the second page.')
+})
+
+六、页面调试
+flutter页面开发过程中，如果想实时查看页面效果，可以通过执行flutter run的命令，将flutter工程运行在真机上，并且flutter支持热更新，代码有改动可实时更新到真机上。
+
+1、调试步骤：
+1、在idea中打开Terminal窗口
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+2、在窗口中执行flutter run命令
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+3、首次执行的时候会报错
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+4、用DevEco Studio打开flutter工程下.ohos的工程
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+5、打开工程File -> Project Structure目录
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+6、选择Signing Configs -> Sign in
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+7、此时会拉起华为账号登录界面，登录成功后，DevEco Studio界面显示如下，点击OK后，就签名完成
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+8、此时回到flutter工程的idea中，再次执行flutter run命令，此时在真机上就会拉起flutter工程中的默认页面
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+真机中的flutter页面：
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+9、当有代码改动时，可以在命名窗口，按shift + r键进行代码热更新，真机页面就会立马刷新
+
+2、注意点：
+开发环境中的jdk必须是jdk17版本才行，否则在执行flutter run命令时，会报如下错误
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+我们可以进入.ohos目录下，执行 hvigorw assembleHap -p product=default -p buildMode=debug --no-daemon 命令进一步查看报错原因，可以看到是jdk版本和签名用的jdk版本不一致
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+由于我们可能在开发过程中，不同工程可能要求的jdk版本不一样，比如安卓，或者云测代码，为了不修改环境变量中的jdk版本，又能正常执行flutter编译命令，我们可以写个脚本flutterWrap.bat，在编译flutter工程时，设置jdk版本为jdk17，脚本如下，这里指定了DevEco Studio目录下的jdk，该jdk本身就是jdk17版本。后面我们执行flutter run命令时，可以换成./flutterWrap.bat run来替换。
+
+set PATH=F:\Program Files\DevEco Studio\jbr\bin;%PATH%
+if "%~1" == "run" (
+flutter run --release
+) else if "%~1" == "har" (
+flutter build har --release
+)else if "%~1" == "aar" (
+flutter build aar --release
+)
+
+七、离线构建（针对无法访问外网，且内部没有标准的pub和storage的库）
+1、外网依赖
+我们在构建鸿蒙版的flutter工程的时候，主要依赖外网的就是三大类
+
+（1）环境变量中的PUB_HOSTED_URL=https://pub.flutter-io.cn，该链接主要访问的是外部pub仓库，下载flutter页面开发中依赖的三方组件。
+
+（2）环境变量中的FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn，该链接主要是会下载一些flutter sdk编译的依赖，比如dart-sdk编译工具等。
+
+（3）环境变量中的FLUTTER_OHOS_STORAGE_BASE_URL=https://flutter-ohos.obs.cn-south-1.myhuaweicloud.com，该链接是鸿蒙版的storage仓库，也是下载flutter sdk编译的依赖，只不过部分依赖是需要鸿蒙版适配的。
+
+2、外网依赖离线处理
+2.1、 分析pub依赖下载后的路径
+
+我们首先看下pub依赖下载后的目录结构如下，lilux系统下，默认的下载的pub依赖都放在~/.pub-cache目录下，该目录下有两个子目录
+
+（1）hosted目录，内部有个pub.flutter-io.cn的子目录，该目录名称就是我们配置的环境变量PUB_HOSTED_URL=https://pub.flutter-io.cn 中域名的名称命名的，主要存放的就是三方组件包，另外它有个子目录.cache目录，该目录存放的是三方组件包的版本信息的json文件，该json文件记录了每个三方组件的版本信息，及组件依赖的其他组件信息，及版本的hashed值，用来做相关校验。
+
+（2）hosted-hashes目录，该目录记录了每个三方组件包的hashes值，当编译flutter工程时，flutter sdk会校验hashed值是否与当前的组件包一致。
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+2.2、分析完pub依赖下载后的包结构后，我们要做的就是在离线场景下生成这些目录
+
+（1）首先我们修改下访问外网的环境变量的url，否则，编译时还是会根据环境变量的链接，访问外网，会导致编译失败，修改如下，我们把所有的url改为localhost
+
+export FLUTTER_STORAGE_BASE_URL=http://localhost:8099
+export PUB_HOSTED_URL=http://localhost:8099
+export FLUTTER_OHOS_STORAGE_BASE_URL=http://localhost:8099
+
+（2）我们将所有依赖的组件包事先下载好传到编译环境，或者如果内部没有标准的pub仓库但是有一些通用仓库的，可以将这些依赖包上传到通用仓库，在编译前将这些依赖下载到编译环境，然后将这些组件解压，放到./pub-cache/hosted/localhost%588099目录下，localhost%588099该名称就是环境变量中配置的域名的名称。
+
+（3）下载每个组件包对应的版本json文件，比如intl_utils组件，其对应的版本json文件下载地址就是 https://pub.flutter-io.cn/api/packages/intl_utils，然后传到编译环境的./pub-cache/hosted/localhost%588099/.cache目录下
+
+（4）从上面的版本json文件中获取当前组件的hash值，并写入./pub-cache/hosted-hashes/localhost%588099/xxx.sha256文件中，这样我们就离线构建了一个pub依赖的本地路径，唯一不同的就是如下的目录名称换成了我们本地localhost的名称
+
+0900086000300134184.20201216095126.86523331460016843504112994983392.png
+
+（5）本地用python启动一个服务，模拟pub仓库访问路径，访问路径就设定为环境变量中的http://localhost:8099，来访问组件版本的json文件，因为在编译过程中flutter sdk会从服务器拉取组件json配置，来校验当前pub目录下的组件的sha256的值，在有网场景，flutter sdk请求json文件的url是https://pub.flutter-io.cn/api/packages/xxxx，因此我们本地也要是这种请求路径，具体步骤如下，然后将所有下载好的json文件放入/opt/flutter/api/packages目录下，根据环境变量的配置，flutter sdk的请求路径就会变为http://localhost:8099/api/packages/xxxx，就会请求到我们本地对应的路径下的json文件。
+
+mkdir /opt/flutter/api/packages
+cd /opt/flutter
+nohup python -m http.server 8099
+
+2.3、storage依赖离线处理
+
+storage依赖主要就是通过环境变量中配置的如下两个url下载的依赖
+
+export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn
+
+export FLUTTER_OHOS_STORAGE_BASE_URL=https://flutter-ohos.obs.cn-south-1.myhuaweicloud.com 
+
+这两个下载的依赖都会放在flutterskd/bin/cache目录下，主要用来编译flutter工程用的相关依赖比如dart-sdk等。这些依赖的下载也是有固定url结构的，一般都是这种https://storage.flutter-io.cn/flutter_infra_release/flutter/98b1104ff3676642c6a4b62cc6a515593306fe63/xxxx，其中98b1104ff3676642c6a4b62cc6a515593306fe63这一串编码是和flutter sdk版本关联的，3.7.12的版本固定就是这个编码。
+
+由于我们上面在环境变量中将所有url都改为了本地http://localhost:8099，因此现在的下载路径就是http://localhost:8099/flutter_infra_release/flutter/98b1104ff3676642c6a4b62cc6a515593306fe63/xxxx。由于上面已经启动一个python本地服务，这里我们只需创建对应的目录结构，然后将下载好的所有组件包放入该目录下就可以了。
+
+mkdir /opt/flutter/flutter_infra_release/flutter/98b1104ff3676642c6a4b62cc6a515593306fe63/
+cp '下载好的软件包' /opt/flutter/flutter_infra_release/flutter/98b1104ff3676642c6a4b62cc6a515593306fe63/
+
+2.4 离线编译
+
+上面步骤完成后，所有离线依赖都已经处理完了，最后我们执行如下命令，就能在离线场景编译出har包
+
+cd 'flutter工程目录'
+flutter pub get --offline
+flutter build har --release
+
+八、已有Flutter工程，鸿蒙版适配
+1、flutter sdk替换为鸿蒙版的sdk，当前鸿蒙版的sdk版本是3.7.12和3.22版本，如果已有的工程不是该版本，需要进行相关适配
+
+2、三方依赖组件，如果是纯dart的组件，可以直接用，如果非纯dart的组件，需要替换为相应的鸿蒙版的组件。如果相关组件未鸿蒙版，可以给flutter鸿蒙版的项目组提需求
+
+3、涉及和平台相关的代码比如之前依赖Android或IOS平台相关代码的，需要重新适配鸿蒙操作系统
+
+九、性能分析参考指南
+1、【Flutter】Flutter框架性能分析和定界指南：https://gitee.com/openharmony-sig/flutter_samples/blob/master/ohos/docs/05_performance/%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E5%AE%9A%E7%95%8C%E6%8C%87%E5%8D%97.md
+
+2、【Flutter】trace分析的第一步：https://gitee.com/openharmony-sig/flutter_samples/blob/master/ohos/docs/05_performance/%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E7%AC%AC%E4%B8%80%E6%AD%A5-%E6%A2%B3%E7%90%86%E7%BA%BF%E7%A8%8B%E9%A1%BA%E5%BA%8F.md
+
+3、【Flutter】帧渲染的trace跟踪：https://gitee.com/openharmony-sig/flutter_samples/blob/master/ohos/docs/05_performance/%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90-%E5%B8%A7%E6%B8%B2%E6%9F%93%E8%B7%9F%E8%B8%AA.md
+
+4、【Flutter】滑动响应时延-案例分析：https://gitee.com/openharmony-sig/flutter_samples/blob/master/ohos/docs/05_performance/%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90-%E6%BB%91%E5%8A%A8%E5%93%8D%E5%BA%94%E6%97%B6%E5%BB%B6.md
+
+
+
+
+
+
