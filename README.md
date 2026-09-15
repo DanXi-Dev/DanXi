@@ -91,9 +91,10 @@ nix develop github:DanXi-Dev/DanXi-nix
 
 在 Linux 上运行旦挞需要以下依赖项：
 
-- **libsecret** 和 **gnome-keyring**：用于安全存储加密配置文件所用的主密钥。
+- **libsecret** 和一个 Secret Service 实现（如 **gnome-keyring** 或 **KWallet**）：用于安全存储加密配置文件所用的主密钥。
   - libsecret：[官网](https://gnome.pages.gitlab.gnome.org/libsecret/) | [安装源](https://repology.org/project/libsecret/versions)
   - gnome-keyring：[官网](https://gitlab.gnome.org/GNOME/gnome-keyring) | [安装源](https://repology.org/project/gnome-keyring/versions)
+  - KWallet：[官网](https://invent.kde.org/frameworks/kwallet) | [安装源](https://repology.org/project/kwallet/versions)
 - **gtk3**：用于显示 GTK3 窗口。
   - [官网](https://gtk.org/) | [安装源](https://repology.org/project/gtk/versions)
 - **wpewebkit**：用于显示应用内 WebView。
