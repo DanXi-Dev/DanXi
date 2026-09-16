@@ -21,6 +21,13 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:encrypt_shared_preferences/provider.dart';
+import 'package:flutter/foundation.dart'
+    show
+        TargetPlatform,
+        debugPrint,
+        defaultTargetPlatform,
+        kIsWeb,
+        visibleForTesting;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -38,9 +45,10 @@ class XSharedPreferences {
   late final EncryptedSharedPreferences _preferences;
 
   XSharedPreferences._()
-      : _keyStore = const FlutterSecureStorage(
-          wOptions: WindowsOptions(useBackwardCompatibility: true),
-        );
+    : _keyStore = const FlutterSecureStorage(
+        aOptions: AndroidOptions(migrateWithBackup: true),
+        wOptions: WindowsOptions(useBackwardCompatibility: true),
+      );
 
   static XSharedPreferences? _instance;
 
@@ -53,52 +61,78 @@ class XSharedPreferences {
     }
     // generate a 16-character random string using the characters [a-z0-9A-Z].
     String key = List.generate(
-            16,
-            (_) =>
-                PASSWORD_CANDIDATE[random.nextInt(PASSWORD_CANDIDATE.length)])
-        .join();
+      16,
+      (_) => PASSWORD_CANDIDATE[random.nextInt(PASSWORD_CANDIDATE.length)],
+    ).join();
     return key;
   }
 
   /// Returns the instance of [XSharedPreferences].
   static Future<XSharedPreferences> getInstance() async {
     if (_instance == null) {
-      _instance = XSharedPreferences._();
-      // initialize the key store if the key does not exist.
-      bool hasKey = await _instance!._keyStore.containsKey(key: KEY_CIPHER);
-      if (!hasKey) {
-        await _instance!._keyStore
-            .write(key: KEY_CIPHER, value: _generateKey());
+      final instance = XSharedPreferences._();
+      await instance._recoverFromUnreadableSecureStorage();
+
+      String? key = await instance._keyStore.read(key: KEY_CIPHER);
+      if (key == null) {
+        key = _generateKey();
+        await instance._keyStore.write(key: KEY_CIPHER, value: key);
       }
-      String key = (await _instance!._keyStore.read(key: KEY_CIPHER))!;
       // initialize the encrypted preferences.
-      await EncryptedSharedPreferences.initialize(key,
-          encryptor: LegacyAESEncryptor());
-      _instance!._preferences = EncryptedSharedPreferences.getInstance();
+      await EncryptedSharedPreferences.initialize(
+        key,
+        encryptor: LegacyAESEncryptor(),
+      );
+      instance._preferences = EncryptedSharedPreferences.getInstance();
       // migrate the data from [SharedPreferences] to [EncryptedSharedPreferences]
       // if the data has not been flagged as migrated.
-      if (_instance!.getBool(KEY_MIGRATED) != true) {
+      if (instance.getBool(KEY_MIGRATED) != true) {
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
         for (String oldKey in sharedPreferences.getKeys()) {
           dynamic value = sharedPreferences.get(oldKey);
           if (value is String) {
-            await _instance!.setString(oldKey, value);
+            await instance.setString(oldKey, value);
           } else if (value is int) {
-            await _instance!.setInt(oldKey, value);
+            await instance.setInt(oldKey, value);
           } else if (value is double) {
-            await _instance!.setDouble(oldKey, value);
+            await instance.setDouble(oldKey, value);
           } else if (value is bool) {
-            await _instance!.setBool(oldKey, value);
+            await instance.setBool(oldKey, value);
           } else if (value is List<String>) {
-            await _instance!.setStringList(oldKey, value);
+            await instance.setStringList(oldKey, value);
           }
           await sharedPreferences.remove(oldKey);
         }
-        await _instance!.setBool(KEY_MIGRATED, true);
+        await instance.setBool(KEY_MIGRATED, true);
       }
+      _instance = instance;
     }
     return _instance!;
+  }
+
+  Future<void> _recoverFromUnreadableSecureStorage() async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
+
+    final status = await _keyStore.checkUpgradeStatus();
+    if (!status.hasDataLoss) return;
+
+    debugPrint(
+      "Resetting unreadable secure preferences after storage upgrade: "
+      "${status.reason.name}",
+    );
+
+    // The master key is already unavailable, so the encrypted preferences
+    // cannot be recovered. Reset both stores once to avoid generating a new
+    // incompatible key on every process restart.
+    await _keyStore.deleteAll();
+    final sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.clear();
+  }
+
+  @visibleForTesting
+  static void resetForTesting() {
+    _instance = null;
   }
 
   // Proxy methods for [EncryptedSharedPreferences]
@@ -187,7 +221,9 @@ class LegacyAESEncryptor extends IEncryptor {
     final encryptService = Encrypter(AES(cipherKey, mode: AESMode.cbc));
     final initVector = IV.fromUtf8(key);
 
-    return encryptService.decrypt(Encrypted.fromBase64(encryptedData),
-        iv: initVector);
+    return encryptService.decrypt(
+      Encrypted.fromBase64(encryptedData),
+      iv: initVector,
+    );
   }
 }

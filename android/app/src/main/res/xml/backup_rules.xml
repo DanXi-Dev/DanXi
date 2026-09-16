@@ -3,4 +3,13 @@
     <exclude
         domain="sharedpref"
         path="FlutterSecureStorage" />
+    <exclude
+        domain="sharedpref"
+        path="FlutterSecureKeyStorage" />
+    <exclude
+        domain="sharedpref"
+        path="FlutterSecureStorageConfiguration" />
+    <exclude
+        domain="sharedpref"
+        path="FlutterSecureStorageConfiguration:FlutterSecureStorage" />
 </full-backup-content>
