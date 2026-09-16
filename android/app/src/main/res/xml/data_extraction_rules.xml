@@ -16,5 +16,25 @@
         <exclude
             domain="sharedpref"
             path="FlutterSecureStorageConfiguration:FlutterSecureStorage" />
+        <exclude
+            domain="sharedpref"
+            path="FlutterSharedPreferences" />
     </cloud-backup>
+    <device-transfer>
+        <exclude
+            domain="sharedpref"
+            path="FlutterSecureStorage" />
+        <exclude
+            domain="sharedpref"
+            path="FlutterSecureKeyStorage" />
+        <exclude
+            domain="sharedpref"
+            path="FlutterSecureStorageConfiguration" />
+        <exclude
+            domain="sharedpref"
+            path="FlutterSecureStorageConfiguration:FlutterSecureStorage" />
+        <exclude
+            domain="sharedpref"
+            path="FlutterSharedPreferences" />
+    </device-transfer>
 </data-extraction-rules>

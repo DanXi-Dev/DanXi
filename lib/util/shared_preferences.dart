@@ -51,6 +51,7 @@ class XSharedPreferences {
       );
 
   static XSharedPreferences? _instance;
+  static Future<XSharedPreferences>? _initialization;
 
   static String _generateKey() {
     Random random;
@@ -68,8 +69,15 @@ class XSharedPreferences {
   }
 
   /// Returns the instance of [XSharedPreferences].
-  static Future<XSharedPreferences> getInstance() async {
-    if (_instance == null) {
+  static Future<XSharedPreferences> getInstance() {
+    final instance = _instance;
+    if (instance != null) return Future.value(instance);
+
+    return _initialization ??= _initialize();
+  }
+
+  static Future<XSharedPreferences> _initialize() async {
+    try {
       final instance = XSharedPreferences._();
       await instance._recoverFromUnreadableSecureStorage();
 
@@ -107,8 +115,12 @@ class XSharedPreferences {
         await instance.setBool(KEY_MIGRATED, true);
       }
       _instance = instance;
+      return instance;
+    } catch (_) {
+      // Allow a later call to retry after a transient initialization failure.
+      _initialization = null;
+      rethrow;
     }
-    return _instance!;
   }
 
   Future<void> _recoverFromUnreadableSecureStorage() async {
@@ -122,9 +134,9 @@ class XSharedPreferences {
       "${status.reason.name}",
     );
 
-    // The master key is already unavailable, so the encrypted preferences
-    // cannot be recovered. Reset both stores once to avoid generating a new
-    // incompatible key on every process restart.
+    // The master key is already unavailable, so neither encrypted keys nor
+    // values can be identified. All current DanXi SharedPreferences access goes
+    // through this class, so reset the whole namespace with secure storage.
     await _keyStore.deleteAll();
     final sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.clear();
@@ -133,6 +145,7 @@ class XSharedPreferences {
   @visibleForTesting
   static void resetForTesting() {
     _instance = null;
+    _initialization = null;
   }
 
   // Proxy methods for [EncryptedSharedPreferences]

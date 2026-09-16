@@ -92,4 +92,19 @@ void main() {
       expect(calls.where((call) => call == 'deleteAll'), hasLength(1));
     },
   );
+
+  test('shares one initialization across concurrent callers', () async {
+    upgradeState = 'ok';
+    SharedPreferences.setMockInitialValues({});
+
+    final instances = await Future.wait([
+      XSharedPreferences.getInstance(),
+      XSharedPreferences.getInstance(),
+    ]);
+
+    expect(instances[1], same(instances[0]));
+    expect(calls.where((call) => call == 'checkUpgradeStatus'), hasLength(1));
+    expect(calls.where((call) => call == 'read'), hasLength(1));
+    expect(calls.where((call) => call == 'write'), hasLength(1));
+  });
 }

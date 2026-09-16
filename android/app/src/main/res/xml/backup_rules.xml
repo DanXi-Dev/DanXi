@@ -12,4 +12,7 @@
     <exclude
         domain="sharedpref"
         path="FlutterSecureStorageConfiguration:FlutterSecureStorage" />
+    <exclude
+        domain="sharedpref"
+        path="FlutterSharedPreferences" />
 </full-backup-content>
