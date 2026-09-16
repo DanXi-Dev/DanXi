@@ -28,6 +28,7 @@ void main() {
   final secureValues = <String, String>{};
   final calls = <String>[];
   var upgradeState = 'legacyDataUnreadable';
+  var rawPreferencesEmptyWhenDeletingSecureStorage = false;
 
   setUp(() {
     XSharedPreferences.resetForTesting();
@@ -35,6 +36,7 @@ void main() {
     secureValues.clear();
     calls.clear();
     upgradeState = 'legacyDataUnreadable';
+    rawPreferencesEmptyWhenDeletingSecureStorage = false;
     SharedPreferences.setMockInitialValues({'stale_ciphertext': 'unreadable'});
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -51,6 +53,10 @@ void main() {
                 'willDiscardOnNextAccess': upgradeState != 'ok',
               };
             case 'deleteAll':
+              final rawPreferences = await SharedPreferences.getInstance();
+              rawPreferencesEmptyWhenDeletingSecureStorage = rawPreferences
+                  .getKeys()
+                  .isEmpty;
               secureValues.clear();
               return null;
             case 'read':
@@ -79,6 +85,7 @@ void main() {
 
       expect(rawPreferences.containsKey('stale_ciphertext'), isFalse);
       expect(calls, containsAllInOrder(['checkUpgradeStatus', 'deleteAll']));
+      expect(rawPreferencesEmptyWhenDeletingSecureStorage, isTrue);
 
       await preferences.setString('id', '12345678901');
       expect(preferences.getString('id'), '12345678901');
@@ -90,6 +97,40 @@ void main() {
 
       expect(restoredPreferences.getString('id'), '12345678901');
       expect(calls.where((call) => call == 'deleteAll'), hasLength(1));
+    },
+  );
+
+  test(
+    'discards orphaned encrypted preferences before creating a key',
+    () async {
+      upgradeState = 'ok';
+      const oldKey = '0123456789abcdef';
+      final encryptor = LegacyAESEncryptor();
+      final orphanedKey = encryptor.encrypt(oldKey, 'id');
+      SharedPreferences.setMockInitialValues({
+        orphanedKey: encryptor.encrypt(oldKey, '12345678901'),
+      });
+
+      final preferences = await XSharedPreferences.getInstance();
+      final rawPreferences = await SharedPreferences.getInstance();
+
+      expect(preferences.getString('id'), isNull);
+      expect(rawPreferences.containsKey(orphanedKey), isFalse);
+      expect(secureValues[XSharedPreferences.KEY_CIPHER], isNotNull);
+    },
+  );
+
+  test(
+    'preserves the plaintext migration path when the key is missing',
+    () async {
+      upgradeState = 'ok';
+      SharedPreferences.setMockInitialValues({'legacy_id': '12345678901'});
+
+      final preferences = await XSharedPreferences.getInstance();
+      final rawPreferences = await SharedPreferences.getInstance();
+
+      expect(preferences.getString('legacy_id'), '12345678901');
+      expect(rawPreferences.containsKey('legacy_id'), isFalse);
     },
   );
 

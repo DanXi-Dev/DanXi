@@ -79,10 +79,19 @@ class XSharedPreferences {
   static Future<XSharedPreferences> _initialize() async {
     try {
       final instance = XSharedPreferences._();
-      await instance._recoverFromUnreadableSecureStorage();
+      final sharedPreferences = await SharedPreferences.getInstance();
+      await instance._recoverFromUnreadableSecureStorage(sharedPreferences);
 
       String? key = await instance._keyStore.read(key: KEY_CIPHER);
       if (key == null) {
+        if (!kIsWeb &&
+            defaultTargetPlatform == TargetPlatform.android &&
+            _containsOnlyLegacyEncryptedEntries(sharedPreferences)) {
+          debugPrint(
+            "Discarding encrypted preferences whose cipher key is missing.",
+          );
+          await _clearSharedPreferences(sharedPreferences);
+        }
         key = _generateKey();
         await instance._keyStore.write(key: KEY_CIPHER, value: key);
       }
@@ -95,8 +104,6 @@ class XSharedPreferences {
       // migrate the data from [SharedPreferences] to [EncryptedSharedPreferences]
       // if the data has not been flagged as migrated.
       if (instance.getBool(KEY_MIGRATED) != true) {
-        SharedPreferences sharedPreferences =
-            await SharedPreferences.getInstance();
         for (String oldKey in sharedPreferences.getKeys()) {
           dynamic value = sharedPreferences.get(oldKey);
           if (value is String) {
@@ -123,7 +130,50 @@ class XSharedPreferences {
     }
   }
 
-  Future<void> _recoverFromUnreadableSecureStorage() async {
+  static bool _containsOnlyLegacyEncryptedEntries(
+    SharedPreferences sharedPreferences,
+  ) {
+    final keys = sharedPreferences.getKeys();
+    if (keys.isEmpty) return false;
+
+    // Requiring the whole store to match the legacy CBC shape avoids deleting
+    // plaintext preferences that still need the migration below.
+    return keys.every((key) {
+      if (!_looksLikeLegacyCiphertext(key)) return false;
+
+      final value = sharedPreferences.get(key);
+      if (value is String) {
+        return value.isEmpty || _looksLikeLegacyCiphertext(value);
+      }
+      if (value is List<String>) {
+        return value.every(
+          (item) => item.isEmpty || _looksLikeLegacyCiphertext(item),
+        );
+      }
+      return false;
+    });
+  }
+
+  static bool _looksLikeLegacyCiphertext(String value) {
+    try {
+      final decoded = base64Decode(value);
+      return decoded.isNotEmpty && decoded.length % 16 == 0;
+    } on FormatException {
+      return false;
+    }
+  }
+
+  static Future<void> _clearSharedPreferences(
+    SharedPreferences sharedPreferences,
+  ) async {
+    if (!await sharedPreferences.clear()) {
+      throw StateError("Failed to clear unreadable SharedPreferences data.");
+    }
+  }
+
+  Future<void> _recoverFromUnreadableSecureStorage(
+    SharedPreferences sharedPreferences,
+  ) async {
     if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
 
     final status = await _keyStore.checkUpgradeStatus();
@@ -137,9 +187,8 @@ class XSharedPreferences {
     // The master key is already unavailable, so neither encrypted keys nor
     // values can be identified. All current DanXi SharedPreferences access goes
     // through this class, so reset the whole namespace with secure storage.
+    await _clearSharedPreferences(sharedPreferences);
     await _keyStore.deleteAll();
-    final sharedPreferences = await SharedPreferences.getInstance();
-    await sharedPreferences.clear();
   }
 
   @visibleForTesting
