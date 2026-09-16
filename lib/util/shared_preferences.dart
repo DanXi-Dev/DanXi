@@ -20,14 +20,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:encrypt_shared_preferences/provider.dart';
-import 'package:flutter/foundation.dart'
-    show
-        TargetPlatform,
-        debugPrint,
-        defaultTargetPlatform,
-        kIsWeb,
-        visibleForTesting;
+import 'package:flutter/foundation.dart' show debugPrint, visibleForTesting;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -45,13 +40,16 @@ class XSharedPreferences {
   late final EncryptedSharedPreferences _preferences;
 
   XSharedPreferences._()
-    : _keyStore = const FlutterSecureStorage(
-        aOptions: AndroidOptions(migrateWithBackup: true),
-        wOptions: WindowsOptions(useBackwardCompatibility: true),
-      );
+      : _keyStore = const FlutterSecureStorage(
+          aOptions: AndroidOptions(migrateWithBackup: true),
+          wOptions: WindowsOptions(useBackwardCompatibility: true),
+        );
 
   static XSharedPreferences? _instance;
   static Future<XSharedPreferences>? _initialization;
+  static bool? _isAndroidForTesting;
+
+  static bool get _isAndroid => _isAndroidForTesting ?? PlatformX.isAndroid;
 
   static String _generateKey() {
     Random random;
@@ -62,9 +60,10 @@ class XSharedPreferences {
     }
     // generate a 16-character random string using the characters [a-z0-9A-Z].
     String key = List.generate(
-      16,
-      (_) => PASSWORD_CANDIDATE[random.nextInt(PASSWORD_CANDIDATE.length)],
-    ).join();
+            16,
+            (_) =>
+                PASSWORD_CANDIDATE[random.nextInt(PASSWORD_CANDIDATE.length)])
+        .join();
     return key;
   }
 
@@ -80,12 +79,14 @@ class XSharedPreferences {
     try {
       final instance = XSharedPreferences._();
       final sharedPreferences = await SharedPreferences.getInstance();
+      // Recover storage upgrades that explicitly report lost key material.
       await instance._recoverFromUnreadableSecureStorage(sharedPreferences);
 
       String? key = await instance._keyStore.read(key: KEY_CIPHER);
       if (key == null) {
-        if (!kIsWeb &&
-            defaultTargetPlatform == TargetPlatform.android &&
+        // A backup restore can leave only ciphertext behind while secure
+        // storage is empty, which is not reported as upgrade data loss.
+        if (_isAndroid &&
             _containsOnlyLegacyEncryptedEntries(sharedPreferences)) {
           debugPrint(
             "Discarding encrypted preferences whose cipher key is missing.",
@@ -96,10 +97,8 @@ class XSharedPreferences {
         await instance._keyStore.write(key: KEY_CIPHER, value: key);
       }
       // initialize the encrypted preferences.
-      await EncryptedSharedPreferences.initialize(
-        key,
-        encryptor: LegacyAESEncryptor(),
-      );
+      await EncryptedSharedPreferences.initialize(key,
+          encryptor: LegacyAESEncryptor());
       instance._preferences = EncryptedSharedPreferences.getInstance();
       // migrate the data from [SharedPreferences] to [EncryptedSharedPreferences]
       // if the data has not been flagged as migrated.
@@ -133,34 +132,34 @@ class XSharedPreferences {
   static bool _containsOnlyLegacyEncryptedEntries(
     SharedPreferences sharedPreferences,
   ) {
+    bool looksLikeLegacyCiphertext(String value) {
+      try {
+        final decoded = base64Decode(value);
+        return decoded.isNotEmpty && decoded.length % 16 == 0;
+      } on FormatException {
+        return false;
+      }
+    }
+
     final keys = sharedPreferences.getKeys();
     if (keys.isEmpty) return false;
 
     // Requiring the whole store to match the legacy CBC shape avoids deleting
     // plaintext preferences that still need the migration below.
     return keys.every((key) {
-      if (!_looksLikeLegacyCiphertext(key)) return false;
+      if (!looksLikeLegacyCiphertext(key)) return false;
 
       final value = sharedPreferences.get(key);
       if (value is String) {
-        return value.isEmpty || _looksLikeLegacyCiphertext(value);
+        return value.isEmpty || looksLikeLegacyCiphertext(value);
       }
       if (value is List<String>) {
         return value.every(
-          (item) => item.isEmpty || _looksLikeLegacyCiphertext(item),
+          (item) => item.isEmpty || looksLikeLegacyCiphertext(item),
         );
       }
       return false;
     });
-  }
-
-  static bool _looksLikeLegacyCiphertext(String value) {
-    try {
-      final decoded = base64Decode(value);
-      return decoded.isNotEmpty && decoded.length % 16 == 0;
-    } on FormatException {
-      return false;
-    }
   }
 
   static Future<void> _clearSharedPreferences(
@@ -174,7 +173,7 @@ class XSharedPreferences {
   Future<void> _recoverFromUnreadableSecureStorage(
     SharedPreferences sharedPreferences,
   ) async {
-    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
+    if (!_isAndroid) return;
 
     final status = await _keyStore.checkUpgradeStatus();
     if (!status.hasDataLoss) return;
@@ -192,9 +191,10 @@ class XSharedPreferences {
   }
 
   @visibleForTesting
-  static void resetForTesting() {
+  static void resetForTesting({bool? isAndroid}) {
     _instance = null;
     _initialization = null;
+    _isAndroidForTesting = isAndroid;
   }
 
   // Proxy methods for [EncryptedSharedPreferences]
@@ -283,9 +283,7 @@ class LegacyAESEncryptor extends IEncryptor {
     final encryptService = Encrypter(AES(cipherKey, mode: AESMode.cbc));
     final initVector = IV.fromUtf8(key);
 
-    return encryptService.decrypt(
-      Encrypted.fromBase64(encryptedData),
-      iv: initVector,
-    );
+    return encryptService.decrypt(Encrypted.fromBase64(encryptedData),
+        iv: initVector);
   }
 }

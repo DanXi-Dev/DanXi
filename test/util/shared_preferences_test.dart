@@ -16,7 +16,6 @@
  */
 
 import 'package:dan_xi/util/shared_preferences.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,8 +30,7 @@ void main() {
   var rawPreferencesEmptyWhenDeletingSecureStorage = false;
 
   setUp(() {
-    XSharedPreferences.resetForTesting();
-    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    XSharedPreferences.resetForTesting(isAndroid: true);
     secureValues.clear();
     calls.clear();
     upgradeState = 'legacyDataUnreadable';
@@ -72,7 +70,7 @@ void main() {
   });
 
   tearDown(() {
-    debugDefaultTargetPlatformOverride = null;
+    XSharedPreferences.resetForTesting();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, null);
   });
