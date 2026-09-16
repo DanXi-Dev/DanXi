@@ -90,7 +90,7 @@ void main() {
       expect(await XSharedPreferences.getInstance(), same(preferences));
 
       upgradeState = 'ok';
-      XSharedPreferences.resetForTesting();
+      XSharedPreferences.resetForTesting(isAndroid: true);
       final restoredPreferences = await XSharedPreferences.getInstance();
 
       expect(restoredPreferences.getString('id'), '12345678901');
