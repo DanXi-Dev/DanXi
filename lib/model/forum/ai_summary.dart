@@ -47,8 +47,11 @@ class AiSummaryResponse {
 class AiSummaryData {
   final int hole_id;
   final String summary;
+  @JsonKey(defaultValue: [])
   final List<AiSummaryBranch> branches;
+  @JsonKey(defaultValue: [])
   final List<AiSummaryInteraction> interactions;
+  @JsonKey(defaultValue: [])
   final List<String> keywords;
   final String generated_at;
   final String trace_id;
