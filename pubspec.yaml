@@ -90,7 +90,7 @@ dependencies:
     git:
       url: https://github.com/w568w/receive_intent.git
 
-  flutter_secure_storage: ^11.0.0
+  flutter_secure_storage: ^11.1.1
   encrypt_shared_preferences: ^1.0.1
   encrypt: any
   device_identity: ^1.0.0
