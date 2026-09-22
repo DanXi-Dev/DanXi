@@ -1,0 +1,12 @@
+/node_modules
+/oh_modules
+/local.properties
+/.preview
+/build
+/.cxx
+/.test
+
+**/src/main/resources/rawfile/flutter_assets/
+**/libs/**/libapp.so
+**/libs/**/libflutter.so
+**/libs/**/libvmservice_snapshot.so

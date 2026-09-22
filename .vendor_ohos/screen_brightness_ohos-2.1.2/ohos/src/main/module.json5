@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "screen_brightness_ohos",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ]
+  }
+}
