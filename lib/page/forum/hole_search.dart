@@ -364,7 +364,7 @@ Widget searchByTag(BuildContext context, String searchKeyword,
                       HapticFeedbackUtil.light();
                       submit(context, searchKeyword);
                       smartNavigatorPush(context, '/bbs/discussions',
-                          arguments: {"tagFilter": e.name},
+                          arguments: {"tagFilters": [e.name]},
                           forcePushOnMainNavigator: true);
                     },
                   ))

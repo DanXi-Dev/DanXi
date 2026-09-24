@@ -206,7 +206,7 @@ class OTHoleWidget extends StatelessWidget {
                                 (String? tagName) {
                                   smartNavigatorPush(context,
                                       '/bbs/discussions',
-                                      arguments: {"tagFilter": tagName},
+                                      arguments: {"tagFilters": [tagName]},
                                       forcePushOnMainNavigator: true);
                                 },
                                 context
@@ -549,7 +549,7 @@ class OTFloorWidget extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
               child: generateTagWidgets(context, parentHole, (String? tagName) {
                 smartNavigatorPush(context, '/bbs/discussions',
-                    arguments: {"tagFilter": tagName},
+                    arguments: {"tagFilters": [tagName]},
                     forcePushOnMainNavigator: true);
               }, SettingsProvider.getInstance().useAccessibilityColoring)),
           card,

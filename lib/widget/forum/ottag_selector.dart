@@ -25,6 +25,49 @@ import 'package:dan_xi/widget/forum/tag_selector/flutter_tagging/tagging.dart';
 import 'package:dan_xi/widget/libraries/chip_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
+/// Show a dialog allowing the user to select multiple tags.
+///
+/// Returns the list of selected tag names, or `null` if cancelled.
+Future<List<String>?> showOTTagSelectionDialog(BuildContext context,
+    {List<String>? initialTagNames}) async {
+  // Resolve to real tags (which have a valid tag_id) so that
+  // [OTTag] equality works correctly inside [OTTagSelector].
+  final List<OTTag> allTags =
+      await ForumRepository.getInstance().loadTags() ?? [];
+  final List<OTTag> selectedTags = (initialTagNames ?? [])
+      .map((name) => allTags.firstWhere((tag) => tag.name == name,
+          orElse: () => OTTag(0, 0, name)))
+      .toList();
+  if (!context.mounted) return null;
+  return await showPlatformDialog<List<String>>(
+      context: context,
+      builder: (dialogContext) {
+        final double dialogWidth =
+            MediaQuery.sizeOf(dialogContext).width * 0.85;
+        return PlatformAlertDialog(
+          title: Text(S.of(dialogContext).filter_by_tags),
+          content: Material(
+            color: Colors.transparent,
+            child: SizedBox(
+              width: dialogWidth > 560 ? 560 : dialogWidth,
+              child: SingleChildScrollView(
+                  child: OTTagSelector(initialTags: selectedTags)),
+            ),
+          ),
+          actions: [
+            PlatformDialogAction(
+                child: PlatformText(S.of(dialogContext).cancel),
+                onPressed: () => Navigator.pop(dialogContext)),
+            PlatformDialogAction(
+                child: PlatformText(S.of(dialogContext).ok),
+                onPressed: () => Navigator.pop(
+                    dialogContext, [...selectedTags.map((tag) => tag.name!)])),
+          ],
+        );
+      });
+}
 
 /// A tag selector for [OTTag].
 ///

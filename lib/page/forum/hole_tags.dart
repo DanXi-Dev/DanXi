@@ -69,7 +69,7 @@ class BBSTagsPageState extends State<BBSTagsPage> {
                 tags: snapshot.data,
                 onTap: (e) => smartNavigatorPush(context, '/bbs/discussions',
                     arguments: {
-                      "tagFilter": e.name,
+                      "tagFilters": [e.name],
                     },
                     forcePushOnMainNavigator: true),
               ),
