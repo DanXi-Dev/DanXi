@@ -18,6 +18,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/forum/clean_mode_filter.dart';
 import 'package:dan_xi/util/forum/post_filter_support.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -42,8 +43,11 @@ class OTFloor {
   List<OTFloor>? mention;
   int? dislike;
   bool? disliked;
+  /// 0-based index in the hole, set by [ForumRepository.loadFloors].
   @JsonKey(includeFromJson: false, includeToJson: false)
-  // Not underscored for not included from/to JSON.
+  int? floorIndex;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  // Not split by underscores for being not included from/to JSON.
   PostFilterPlaceholderHint? pfHint;
 
   factory OTFloor.fromJson(Map<String, dynamic> json) =>
@@ -86,6 +90,7 @@ class OTFloor {
     this.mention,
     this.dislike,
     this.disliked, {
+    this.floorIndex,
     this.pfHint,
   });
 
@@ -105,6 +110,7 @@ class OTFloor {
     List<OTFloor>? mention,
     int? dislike,
     bool? disliked,
+    int? floorIndex,
     PostFilterPlaceholderHint? pfHint,
   }) {
     return OTFloor(
@@ -123,6 +129,7 @@ class OTFloor {
       mention ?? this.mention,
       dislike ?? this.dislike,
       disliked ?? this.disliked,
+      floorIndex: floorIndex ?? this.floorIndex,
       pfHint: pfHint ?? this.pfHint,
     );
   }

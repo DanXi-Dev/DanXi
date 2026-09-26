@@ -209,12 +209,17 @@ class BBSPostDetailState extends State<BBSPostDetail> {
   }
 
   /// Build the text form of a floor for sharing.
-  String _renderFloorAsText(OTFloor floor, int index) {
+  String _renderFloorAsText(OTFloor floor) {
     StringBuffer shareText = StringBuffer();
     String postTime = DateFormat("yyyy/MM/dd HH:mm")
         .format(DateTime.tryParse(floor.time_created!)!.toLocal());
     shareText.writeln("${floor.anonyname} 于 $postTime");
-    shareText.writeln("${index}F (##${floor.floor_id})");
+    // Match the behaviour of [OTFloorWidgetBottomBar.build].
+    final String locationText = switch (floor.floorIndex) {
+      final floorIndex? => "${floorIndex + 1}F",
+      _ => "#${floor.hole_id}",
+    };
+    shareText.writeln("$locationText (##${floor.floor_id})");
     shareText.write(renderText(
         floor.filteredContent ?? "",
         S.of(context).image_tag,
@@ -224,10 +229,10 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     return shareText.toString();
   }
 
-  Future<bool> _shareFloorAsText(OTFloor floor, int index) async {
+  Future<bool> _shareFloorAsText(OTFloor floor) async {
     try {
       await Clipboard.setData(
-          ClipboardData(text: _renderFloorAsText(floor, index)));
+          ClipboardData(text: _renderFloorAsText(floor)));
     } catch (e) {
       return false;
     }
@@ -364,7 +369,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     // build share text
     StringBuffer shareText = StringBuffer();
     result.forEachIndexed((index, floorIndex) {
-      shareText.write(_renderFloorAsText(allFloors[floorIndex], floorIndex));
+      shareText.write(_renderFloorAsText(allFloors[floorIndex]));
       if (index != result.length - 1) {
         shareText.writeln();
         shareText.writeln();
@@ -1078,7 +1083,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       list.map((e) => OTTag.fromJson(jsonDecode(jsonEncode(e)))).toList();
 
   List<Widget> _buildContextMenu(
-      BuildContext menuContext, OTFloor e, int index) {
+      BuildContext menuContext, OTFloor e) {
     List<Widget> buildAdminMenu(BuildContext menuContext, OTFloor e) {
       return [
         PlatformContextMenuItem(
@@ -1431,7 +1436,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
       PlatformContextMenuItem(
         menuContext: menuContext,
         onPressed: () async {
-          if (await _shareFloorAsText(e, index)) {
+          if (await _shareFloorAsText(e)) {
             if (mounted) {
               Noticing.showMaterialNotice(
                   context, S.of(context).shareFloorSuccess);
@@ -1617,7 +1622,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
     final floorWidget = OTFloorWidget(
       hasBackgroundImage: _backgroundImage != null,
       floor: floor,
-      index: _renderModel is Normal ? index : null,
+      index: _renderModel is Normal ? floor.floorIndex : null,
       isInMention: isNested,
       parentHole: switch (_renderModel) {
         Normal(hole: var hole) => hole,
@@ -1629,7 +1634,7 @@ class BBSPostDetailState extends State<BBSPostDetail> {
             builder: (BuildContext context) => PlatformContextMenu(
                 actions: _multiSelectMode
                     ? _buildMultiSelectContextMenu(context)
-                    : _buildContextMenu(context, floor, index),
+                    : _buildContextMenu(context, floor),
                 cancelButton: CupertinoActionSheetAction(
                   child: Text(S.of(context).cancel),
                   onPressed: () => Navigator.of(context).pop(),
