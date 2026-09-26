@@ -18,6 +18,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:dan_xi/common/constant.dart';
 import 'package:dan_xi/model/forum/ai_summary.dart';
 import 'package:dan_xi/model/forum/audit.dart';
@@ -462,7 +463,11 @@ class ForumRepository extends BaseRepositoryWithDio {
     }
     final Response<List<dynamic>> response =
         await WebvpnProxy.requestWithProxy(dio, options);
-    final floors = response.data?.map((e) => OTFloor.fromJson(e)).toList();
+    final floors = response.data?.mapIndexed((index, e) {
+      final floor = OTFloor.fromJson(e);
+      floor.floorIndex = offset + index;
+      return floor;
+    }).toList();
     for (var element in floors!) {
       cacheFloor(element);
       element.mention?.forEach((mention) {

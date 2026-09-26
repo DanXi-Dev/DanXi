@@ -18,7 +18,9 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:dan_xi/provider/settings_provider.dart';
+import 'package:dan_xi/repository/forum/forum_repository.dart';
 import 'package:dan_xi/util/forum/clean_mode_filter.dart';
+import 'package:dan_xi/util/forum/post_filter_support.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'floor.g.dart';
@@ -41,6 +43,12 @@ class OTFloor {
   List<OTFloor>? mention;
   int? dislike;
   bool? disliked;
+  /// 0-based index in the hole, set by [ForumRepository.loadFloors].
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  int? floorIndex;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  // Not split by underscores for being not included from/to JSON.
+  PostFilterPlaceholderHint? pfHint;
 
   factory OTFloor.fromJson(Map<String, dynamic> json) =>
       _$OTFloorFromJson(json);
@@ -67,29 +75,32 @@ class OTFloor {
       (other is OTFloor) && floor_id == other.floor_id;
 
   OTFloor(
-      this.floor_id,
-      this.hole_id,
-      this.content,
-      this.anonyname,
-      this.time_created,
-      this.time_updated,
-      this.deleted,
-      this.fold,
-      this.modified,
-      this.like,
-      this.is_me,
-      this.liked,
-      this.mention,
-      this.dislike,
-      this.disliked);
+    this.floor_id,
+    this.hole_id,
+    this.content,
+    this.anonyname,
+    this.time_created,
+    this.time_updated,
+    this.deleted,
+    this.fold,
+    this.modified,
+    this.like,
+    this.is_me,
+    this.liked,
+    this.mention,
+    this.dislike,
+    this.disliked, {
+    this.floorIndex,
+    this.pfHint,
+  });
 
   OTFloor copyWith({
     int? floor_id,
     int? hole_id,
     String? content,
     String? anonyname,
-    String? time_updated,
     String? time_created,
+    String? time_updated,
     bool? deleted,
     bool? is_me,
     bool? liked,
@@ -99,14 +110,16 @@ class OTFloor {
     List<OTFloor>? mention,
     int? dislike,
     bool? disliked,
+    int? floorIndex,
+    PostFilterPlaceholderHint? pfHint,
   }) {
     return OTFloor(
       floor_id ?? this.floor_id,
       hole_id ?? this.hole_id,
       content ?? this.content,
       anonyname ?? this.anonyname,
-      time_updated ?? this.time_updated,
       time_created ?? this.time_created,
+      time_updated ?? this.time_updated,
       deleted ?? this.deleted,
       fold ?? this.fold,
       modified ?? this.modified,
@@ -116,6 +129,8 @@ class OTFloor {
       mention ?? this.mention,
       dislike ?? this.dislike,
       disliked ?? this.disliked,
+      floorIndex: floorIndex ?? this.floorIndex,
+      pfHint: pfHint ?? this.pfHint,
     );
   }
 
@@ -131,6 +146,8 @@ class OTFloor {
   String toString() {
     return 'OTFloor{floor_id: $floor_id, hole_id: $hole_id, content: $content, anonyname: $anonyname, time_updated: $time_updated, time_created: $time_created, special_tag: $special_tag, deleted: $deleted, is_me: $is_me, liked: $liked, fold: $fold, modified: $modified, like: $like, mention: $mention}';
   }
+
+  static final DUMMY_POST = OTFloor.dummy();
 
   @override
   int get hashCode => floor_id ?? 0;

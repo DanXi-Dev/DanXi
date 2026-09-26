@@ -98,6 +98,10 @@ class PagedListView<T> extends StatefulWidget {
 
   final Future<bool?> Function(BuildContext, int, T)? onConfirmDismissItem;
 
+  /// Returns whether the item should be exempt from dismissal.
+  /// If the callback returns false, dismissal follows [onDismissItem].
+  final bool Function(int, T)? isItemNonDismissible;
+
   const PagedListView(
       {super.key,
       this.pagedController,
@@ -116,7 +120,8 @@ class PagedListView<T> extends StatefulWidget {
       this.fatalErrorBuilder,
       this.padding,
       this.onDismissItem,
-      this.onConfirmDismissItem})
+      this.onConfirmDismissItem,
+      this.isItemNonDismissible})
       : assert((!withScrollbar) || (withScrollbar && scrollController != null)),
         assert(dataReceiver != null || allDataReceiver != null);
 
@@ -133,6 +138,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
   bool _shouldLoad = true;
 
   int pageIndex = 1;
+  int loadedPageIndex = 1;
   bool _isRefreshing = false;
   bool _isEnded = false;
   bool _hasHeadWidget = false;
@@ -161,10 +167,23 @@ class PagedListViewState<T> extends State<PagedListView<T>>
           !_isEnded &&
           !_hasError &&
           _shouldLoad) {
-        pageIndex++;
         _isRefreshing = true;
-        setState(() {
-          _futureData = LazyFuture.pack(widget.dataReceiver!(pageIndex));
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) {
+            return;
+          }
+          if (_isEnded || _hasError || !_shouldLoad) {
+            _isRefreshing = false;
+            return;
+          }
+          ++pageIndex;
+          setState(() {
+            _futureData = LazyFuture.pack(() async {
+              final data = widget.dataReceiver!(pageIndex);
+              ++loadedPageIndex;
+              return data;
+            }());
+          });
         });
       }
       return false;
@@ -230,6 +249,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
             // We cannot clear the error here
             _clearData(clearError: false);
             pageIndex = widget.startPage;
+            loadedPageIndex = pageIndex;
             return widget.fatalErrorBuilder!.call(context, snapshot.error);
           } else {
             return _buildListView(snapshot: snapshot);
@@ -335,7 +355,8 @@ class PagedListViewState<T> extends State<PagedListView<T>>
         childKey: valueKeys[index],
         child: widget.builder(context, this, index, _data[index]),
       );
-      if (widget.onDismissItem != null) {
+      if (widget.onDismissItem != null &&
+          widget.isItemNonDismissible?.call(index, _data[index]) != true) {
         item = Dismissible(
           key: valueKeys[index],
           background: ColoredBox(color: Theme.of(context).colorScheme.error),
@@ -407,6 +428,7 @@ class PagedListViewState<T> extends State<PagedListView<T>>
       _clearData();
     }
     pageIndex = widget.startPage;
+    loadedPageIndex = pageIndex;
     _futureData = _setFuture(useInitialData: useInitialData);
   }
 
@@ -562,6 +584,8 @@ class PagedListViewController<T> implements ListProvider<T> {
     _state = state;
   }
 
+  Iterable<T> get elements => Iterable.generate(length(), getElementAt);
+
   bool get isEnded => _state.isEnded;
 
   Future<void> notifyUpdate(
@@ -638,6 +662,8 @@ class PagedListViewController<T> implements ListProvider<T> {
 
   @override
   int length() => _state.length();
+
+  int get loadedPageIndex => _state.loadedPageIndex;
 }
 
 // HydrogenC: Naming isn't clear enough, should be something like `ListViewFailureException`

@@ -790,6 +790,7 @@ class OTFloorWidgetBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = prebuiltStyle ??
         TextStyle(color: Theme.of(context).hintColor, fontSize: 12);
+    final index = this.index;
     return DefaultTextStyle(
       style: style,
       child: Row(
@@ -809,13 +810,13 @@ class OTFloorWidgetBottomBar extends StatelessWidget {
                       color: Theme.of(context).hintColor, fontSize: 10),
                 ),
               ],
-            ),
-          if (index != null)
+            )
+          else
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  "${index! + 1}F",
+                  "${index + 1}F",
                   style: TextStyle(
                       color: Theme.of(context).hintColor,
                       fontSize: 12,
