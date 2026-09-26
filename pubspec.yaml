@@ -1,7 +1,7 @@
 name: dan_xi
 description: Maybe the best all-rounded service app for Fudan University students.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
-version: 1.5.2+349
+version: 1.5.3+350
 
 environment:
   sdk: ">=3.8.0"
@@ -91,7 +91,7 @@ dependencies:
     git:
       url: https://github.com/w568w/receive_intent.git
 
-  flutter_secure_storage: ^11.0.0
+  flutter_secure_storage: ^11.1.1
   encrypt_shared_preferences: ^1.0.1
   encrypt: any
   device_identity: ^1.0.0

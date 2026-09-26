@@ -113,6 +113,7 @@
   "deleted": "已删除",
   "developer_announcement": "开发组公告 {date}",
   "diagnostic_information": "诊断信息",
+  "diagnostic_information_notice": "这是诊断信息页面，请在开发者指导下使用。",
   "dining_hall_crowdedness": "食堂排队消费状况",
   "disabled": "已禁用",
   "divider": "分割线",

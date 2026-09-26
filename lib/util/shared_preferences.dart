@@ -20,7 +20,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:dan_xi/util/platform_universal.dart';
 import 'package:encrypt_shared_preferences/provider.dart';
+import 'package:flutter/foundation.dart' show debugPrint, visibleForTesting;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -39,10 +41,15 @@ class XSharedPreferences {
 
   XSharedPreferences._()
       : _keyStore = const FlutterSecureStorage(
+          aOptions: AndroidOptions(migrateWithBackup: true),
           wOptions: WindowsOptions(useBackwardCompatibility: true),
         );
 
   static XSharedPreferences? _instance;
+  static Future<XSharedPreferences>? _initialization;
+  static bool? _isAndroidForTesting;
+
+  static bool get _isAndroid => _isAndroidForTesting ?? PlatformX.isAndroid;
 
   static String _generateKey() {
     Random random;
@@ -61,44 +68,133 @@ class XSharedPreferences {
   }
 
   /// Returns the instance of [XSharedPreferences].
-  static Future<XSharedPreferences> getInstance() async {
-    if (_instance == null) {
-      _instance = XSharedPreferences._();
-      // initialize the key store if the key does not exist.
-      bool hasKey = await _instance!._keyStore.containsKey(key: KEY_CIPHER);
-      if (!hasKey) {
-        await _instance!._keyStore
-            .write(key: KEY_CIPHER, value: _generateKey());
+  static Future<XSharedPreferences> getInstance() {
+    final instance = _instance;
+    if (instance != null) return Future.value(instance);
+
+    return _initialization ??= _initialize();
+  }
+
+  static Future<XSharedPreferences> _initialize() async {
+    try {
+      final instance = XSharedPreferences._();
+      final sharedPreferences = await SharedPreferences.getInstance();
+      // Recover storage upgrades that explicitly report lost key material.
+      await instance._recoverFromUnreadableSecureStorage(sharedPreferences);
+
+      String? key = await instance._keyStore.read(key: KEY_CIPHER);
+      if (key == null) {
+        // A backup restore can leave only ciphertext behind while secure
+        // storage is empty, which is not reported as upgrade data loss.
+        if (_isAndroid &&
+            _containsOnlyLegacyEncryptedEntries(sharedPreferences)) {
+          debugPrint(
+            "Discarding encrypted preferences whose cipher key is missing.",
+          );
+          await _clearSharedPreferences(sharedPreferences);
+        }
+        key = _generateKey();
+        await instance._keyStore.write(key: KEY_CIPHER, value: key);
       }
-      String key = (await _instance!._keyStore.read(key: KEY_CIPHER))!;
       // initialize the encrypted preferences.
       await EncryptedSharedPreferences.initialize(key,
           encryptor: LegacyAESEncryptor());
-      _instance!._preferences = EncryptedSharedPreferences.getInstance();
+      instance._preferences = EncryptedSharedPreferences.getInstance();
       // migrate the data from [SharedPreferences] to [EncryptedSharedPreferences]
       // if the data has not been flagged as migrated.
-      if (_instance!.getBool(KEY_MIGRATED) != true) {
-        SharedPreferences sharedPreferences =
-            await SharedPreferences.getInstance();
+      if (instance.getBool(KEY_MIGRATED) != true) {
         for (String oldKey in sharedPreferences.getKeys()) {
           dynamic value = sharedPreferences.get(oldKey);
           if (value is String) {
-            await _instance!.setString(oldKey, value);
+            await instance.setString(oldKey, value);
           } else if (value is int) {
-            await _instance!.setInt(oldKey, value);
+            await instance.setInt(oldKey, value);
           } else if (value is double) {
-            await _instance!.setDouble(oldKey, value);
+            await instance.setDouble(oldKey, value);
           } else if (value is bool) {
-            await _instance!.setBool(oldKey, value);
+            await instance.setBool(oldKey, value);
           } else if (value is List<String>) {
-            await _instance!.setStringList(oldKey, value);
+            await instance.setStringList(oldKey, value);
           }
           await sharedPreferences.remove(oldKey);
         }
-        await _instance!.setBool(KEY_MIGRATED, true);
+        await instance.setBool(KEY_MIGRATED, true);
+      }
+      _instance = instance;
+      return instance;
+    } catch (_) {
+      // Allow a later call to retry after a transient initialization failure.
+      _initialization = null;
+      rethrow;
+    }
+  }
+
+  static bool _containsOnlyLegacyEncryptedEntries(
+    SharedPreferences sharedPreferences,
+  ) {
+    bool looksLikeLegacyCiphertext(String value) {
+      try {
+        final decoded = base64Decode(value);
+        return decoded.isNotEmpty && decoded.length % 16 == 0;
+      } on FormatException {
+        return false;
       }
     }
-    return _instance!;
+
+    final keys = sharedPreferences.getKeys();
+    if (keys.isEmpty) return false;
+
+    // Requiring the whole store to match the legacy CBC shape avoids deleting
+    // plaintext preferences that still need the migration below.
+    return keys.every((key) {
+      if (!looksLikeLegacyCiphertext(key)) return false;
+
+      final value = sharedPreferences.get(key);
+      if (value is String) {
+        return value.isEmpty || looksLikeLegacyCiphertext(value);
+      }
+      if (value is List<String>) {
+        return value.every(
+          (item) => item.isEmpty || looksLikeLegacyCiphertext(item),
+        );
+      }
+      return false;
+    });
+  }
+
+  static Future<void> _clearSharedPreferences(
+    SharedPreferences sharedPreferences,
+  ) async {
+    if (!await sharedPreferences.clear()) {
+      throw StateError("Failed to clear unreadable SharedPreferences data.");
+    }
+  }
+
+  Future<void> _recoverFromUnreadableSecureStorage(
+    SharedPreferences sharedPreferences,
+  ) async {
+    if (!_isAndroid) return;
+
+    final status = await _keyStore.checkUpgradeStatus();
+    if (!status.hasDataLoss) return;
+
+    debugPrint(
+      "Resetting unreadable secure preferences after storage upgrade: "
+      "${status.reason.name}",
+    );
+
+    // The master key is already unavailable, so neither encrypted keys nor
+    // values can be identified. All current DanXi SharedPreferences access goes
+    // through this class, so reset the whole namespace with secure storage.
+    await _clearSharedPreferences(sharedPreferences);
+    await _keyStore.deleteAll();
+  }
+
+  @visibleForTesting
+  static void resetForTesting({bool? isAndroid}) {
+    _instance = null;
+    _initialization = null;
+    _isAndroidForTesting = isAndroid;
   }
 
   // Proxy methods for [EncryptedSharedPreferences]

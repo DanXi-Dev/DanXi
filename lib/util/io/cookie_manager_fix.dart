@@ -17,9 +17,119 @@
 
 import 'dart:io';
 
+import 'package:dan_xi/repository/cookie/independent_cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
+import 'package:mutex/mutex.dart';
+
+/// Coordinates shared session cookies with isolated login transactions.
+///
+/// This class is used to ensure that [_cookieJar] is not overwritten by old in-flight requests when a new login occurs.
+/// It maintains an [_epoch] counter that increments whenever login cookies are committed, and tracks the last epoch for each cookie storage key.
+///
+/// See https://github.com/DanXi-Dev/DanXi/issues/701 for more details.
+class SessionCookieCoordinator {
+  static const String _REQUEST_EPOCH = 'fudan_session_cookie_epoch';
+
+  final IndependentCookieJar _cookieJar;
+  final Mutex _mutex = Mutex();
+  final Map<CookieStorageKey, int> _lastLoginChangeEpoch =
+      <CookieStorageKey, int>{};
+  int _epoch = 0;
+
+  SessionCookieCoordinator(this._cookieJar);
+
+  /// Atomic helper for reading cookie epoch and load cookies together.
+  ///
+  /// [loader] should be a function that loads cookies from the cookie jar, e.g. `cookieJar.loadForRequest(options.uri)`.
+  Future<String> loadCookies(
+    RequestOptions options,
+    Future<String> Function() loader,
+  ) => _mutex.protect(() async {
+    options.extra.putIfAbsent(_REQUEST_EPOCH, () => _epoch);
+    return loader();
+  });
+
+  /// Returns the epoch of the request [options], or null if not set.
+  int? requestEpoch(RequestOptions options) =>
+      options.extra[_REQUEST_EPOCH] as int?;
+
+  bool hasAdvancedSince(int? epoch) => epoch != null && epoch < _epoch;
+
+  /// Begins a new transaction for cookie changes.
+  /// It copies the current [_cookieJar] and returns a [TransactionalCookieJar] that can be used to make changes in isolation.
+  Future<TransactionalCookieJar> beginTransaction() =>
+      _mutex.protect(() async => TransactionalCookieJar.from(_cookieJar));
+
+  /// Commits the changes made in the [transaction] to the main [_cookieJar].
+  ///
+  /// This method should be called after a successful login.
+  Future<void> commit(TransactionalCookieJar transaction) =>
+      _mutex.protect(() => _commitTransactionWhileLocked(transaction));
+
+  Future<void> _commitTransactionWhileLocked(
+      TransactionalCookieJar transaction) async {
+    final int nextEpoch = _epoch + 1;
+    for (final key in transaction.touchedKeys) {
+      await _cookieJar.replaceCookie(key, transaction.cookieForKey(key));
+      _lastLoginChangeEpoch[key] = nextEpoch;
+    }
+    _epoch = nextEpoch;
+  }
+
+  /// Atomically replaces same-named cookies with [cookies] for the given [uri].
+  ///
+  /// It starts a temporary transaction and replays the changes in [cookies] to the main [_cookieJar].
+  Future<void> importCookies(List<Cookie> cookies, Uri uri) =>
+      _mutex.protect(() async {
+        if (cookies.isEmpty) return;
+        final transaction = TransactionalCookieJar.from(_cookieJar);
+
+        // Remove previous cookies with the same names,
+        // so that the identically named cookies with different domain
+        // (e.g. `session_id` with *.fudan.edu.cn and id.fudan.edu.cn)
+        // do not conflict with each other and cause false request failures.
+        for (final name in cookies.map((cookie) => cookie.name).toSet()) {
+          transaction.deleteCookiesByName(name);
+        }
+
+        await transaction.saveFromResponse(uri, cookies);
+        await _commitTransactionWhileLocked(transaction);
+      });
+
+  /// Saves the [cookies] from the response to the cookie jar, but only if they have not been changed since the request [options] was made.
+  /// For example, if:
+  /// 1. A normal request A is made (epoch 0)
+  /// 2. A login request B is made (epoch 0)
+  /// 3. B commits and increments the epoch to 1
+  /// 4. A completes and tries to save cookies. Then with this method, any cookie that was changed by B will not be updated again.
+  Future<void> _saveResponseCookies(
+    RequestOptions options,
+    List<Uri> uris,
+    List<Cookie> cookies,
+  ) => _mutex.protect(() async {
+    final int requestEpoch = options.extra[_REQUEST_EPOCH] as int? ?? _epoch;
+    for (final uri in uris) {
+      final acceptedCookies = cookies
+          .where((cookie) {
+            final key = _cookieJar.cookieStorageKey(uri, cookie);
+            // We only save cookies that have not been touched by a more recent login transaction.
+            return (_lastLoginChangeEpoch[key] ?? -1) <= requestEpoch;
+          })
+          .toList(growable: false);
+      if (acceptedCookies.isNotEmpty) {
+        await _cookieJar.saveFromResponse(uri, acceptedCookies);
+      }
+    }
+  });
+
+  Future<void> clear() => _mutex.protect(() async {
+    await _cookieJar.deleteAll();
+    _lastLoginChangeEpoch.clear();
+    _epoch = 0;
+  });
+}
 
 /// A more tolerant CookieManager that can handle some malformed `Set-Cookie`
 /// headers.
@@ -30,7 +140,20 @@ import 'package:flutter/foundation.dart';
 class TolerantCookieManager extends CookieManager {
   static final _setCookieReg = RegExp('(?<=)(,)(?=[^;]+?=)');
 
-  TolerantCookieManager(super.cookieJar);
+  final SessionCookieCoordinator? _sessionCookies;
+
+  TolerantCookieManager(
+    super.cookieJar, {
+    SessionCookieCoordinator? sessionCookies,
+  }) : _sessionCookies = sessionCookies;
+
+  @override
+  Future<String> loadCookies(RequestOptions options) {
+    final coordinator = _sessionCookies;
+    return coordinator == null
+        ? super.loadCookies(options)
+        : coordinator.loadCookies(options, () => super.loadCookies(options));
+  }
 
   /// Copied from [CookieManager.saveCookies].
   @override
@@ -50,7 +173,7 @@ class TolerantCookieManager extends CookieManager {
     // Spec: https://www.rfc-editor.org/rfc/rfc7231#section-7.1.2.
     final originalUri = response.requestOptions.uri;
     final realUri = originalUri.resolveUri(response.realUri);
-    await cookieJar.saveFromResponse(realUri, cookies);
+    final uris = <Uri>[realUri];
 
     // Handle `Set-Cookie` when `followRedirects` is false
     // and the response returns a redirect status code.
@@ -63,14 +186,19 @@ class TolerantCookieManager extends CookieManager {
     final redirected = statusCode >= 300 && statusCode < 400;
     if (redirected && locations.isNotEmpty) {
       final originalUri = response.realUri;
+      // Resolves the location based on the current Uri.
+      uris.addAll(locations.map(originalUri.resolve));
+    }
+
+    final coordinator = _sessionCookies;
+    if (coordinator != null) {
+      await coordinator._saveResponseCookies(
+          response.requestOptions, uris, cookies);
+    } else {
+      await cookieJar.saveFromResponse(realUri, cookies);
+      // Here: uris.skip(1) == locations.map(originalUri.resolve).
       await Future.wait(
-        locations.map(
-          (location) => cookieJar.saveFromResponse(
-            // Resolves the location based on the current Uri.
-            originalUri.resolve(location),
-            cookies,
-          ),
-        ),
+        uris.skip(1).map((uri) => cookieJar.saveFromResponse(uri, cookies)),
       );
     }
   }

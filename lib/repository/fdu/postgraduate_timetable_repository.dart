@@ -26,6 +26,7 @@ import 'package:dan_xi/repository/fdu/neo_login_tool.dart';
 import 'package:dan_xi/repository/fdu/time_table_repository.dart';
 import 'package:dan_xi/util/io/cache.dart';
 import 'package:dan_xi/util/shared_preferences.dart';
+import 'package:dan_xi/widget/libraries/error_page_widget.dart';
 import 'package:dio/dio.dart';
 
 class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
@@ -44,9 +45,19 @@ class PostgraduateTimetableRepository extends BaseRepositoryWithDio {
       {DateTime? startTime}) async {
     try {
       return await _loadTimeTableFrom(TIME_TABLE_URL_PRIMARY, info, startTime);
-    } catch (_) {
+    } catch (primaryError, primaryStackTrace) {
       // The two endpoints are available during different periods of time, so we try the secondary one if the primary one fails.
-      return _loadTimeTableFrom(TIME_TABLE_URL_SECONDARY, info, startTime);
+      try {
+        return await _loadTimeTableFrom(
+            TIME_TABLE_URL_SECONDARY, info, startTime);
+      } catch (fallbackError, fallbackStackTrace) {
+        throw FallbackException(
+          primaryError: primaryError,
+          primaryStackTrace: primaryStackTrace,
+          fallbackError: fallbackError,
+          fallbackStackTrace: fallbackStackTrace,
+        );
+      }
     }
   }
 
