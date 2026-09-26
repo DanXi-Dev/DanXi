@@ -656,21 +656,22 @@ class PostFilterState {
   bool get shown => _shown;
 
   bool holeMatches(OTHole hole) {
-    return _matches(() => jsRuntime.evaluateHole(appliedJsExpr, hole));
+    return _matches((jsExpr) => jsRuntime.evaluateHole(jsExpr, hole));
   }
 
   bool floorMatches(OTFloor floor, [OTHole? hole]) {
     return _matches(
-      () => jsRuntime.evaluateFloor(appliedJsExpr, floor, hole: hole),
+      (jsExpr) => jsRuntime.evaluateFloor(jsExpr, floor, hole: hole),
     );
   }
 
-  bool _matches(bool Function() evaluateJs) {
-    if (!shown || appliedJsExpr.isEmpty) {
+  bool _matches(bool Function(String) evaluateJs) {
+    final jsExpr = appliedJsExpr;
+    if (!shown || jsExpr.isEmpty) {
       return true;
     }
     try {
-      return evaluateJs();
+      return evaluateJs(jsExpr);
     } catch (e) {
       if (kDebugMode) {
         debugPrint("PostFilterState JS error: $e");
