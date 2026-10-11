@@ -315,7 +315,10 @@ class Course {
       ..courseName = activity["courseName"]
       ..roomId = activity["room"]
       ..roomName = activity['room']
+      // JWGL weeks start on Sunday; our timetable weeks start on Monday.
       ..availableWeeks = List<int>.from(activity["weekIndexes"])
+          .map((week) => activity['weekday'] == DateTime.sunday ? week - 1 : week)
+          .toList()
       ..times = courseTimes;
   }
 
