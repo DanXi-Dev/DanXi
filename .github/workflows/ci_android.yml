@@ -43,6 +43,12 @@ jobs:
           mv -f secrets/key.properties android/key.properties
           mv -f secrets/danxi.keystore android/danxi.keystore
 
+      - name: Accept Android SDK licenses
+        shell: bash
+        run: |
+          set +o pipefail
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+
       - name: Build APK
         run: |
           dart build_release.dart --target android --versionCode dummy
