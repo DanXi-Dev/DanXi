@@ -16,6 +16,7 @@
  */
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io' as io;
 import 'dart:math';
 
@@ -209,23 +210,15 @@ class CustomInAppBrowser extends InAppBrowser {
   }
 
   String uisLoginJavaScript(PersonInfo info) =>
-      r'''try{
-            document.getElementById('username').value = String.raw`''' +
-      info.id! +
-      r'''`;
-            document.getElementById('password').value = String.raw`''' +
-      info.password! +
-      r'''`;
+      '''try{
+            document.getElementById('username').value = ${jsonEncode(info.id!)};
+            document.getElementById('password').value = ${jsonEncode(info.password!)};
             document.forms[0].submit();
         }
         catch (e) {
             try{
-                document.getElementById('mobileUsername').value = String.raw`''' +
-      info.id! +
-      r'''`;
-                document.getElementById('mobilePassword').value = String.raw`''' +
-      info.password! +
-      r'''`;
+                document.getElementById('mobileUsername').value = ${jsonEncode(info.id!)};
+                document.getElementById('mobilePassword').value = ${jsonEncode(info.password!)};
                 document.forms[0].submit();
             }
             catch (e) {
@@ -234,17 +227,13 @@ class CustomInAppBrowser extends InAppBrowser {
         }''';
 
   String idLoginJavaScript(PersonInfo info) =>
-      r'''try{
+      '''try{
             const usernameInput = document.getElementById('login-username');
-            usernameInput.value = String.raw`''' +
-      info.id! +
-      r'''`;
+            usernameInput.value = ${jsonEncode(info.id!)};
             usernameInput.dispatchEvent(new Event('input'));
             
             const passwordInput = document.getElementById('login-password');
-            passwordInput.value = String.raw`''' +
-      info.password! +
-      r'''`;
+            passwordInput.value = ${jsonEncode(info.password!)};
             passwordInput.dispatchEvent(new Event('input'));
 
             document.querySelector('.el-button.content_submit').click();
@@ -291,23 +280,15 @@ class AuthenticationInAppBrowser extends InAppBrowser {
   }) : super(webViewEnvironment: webViewEnvironment);
 
   String _uisLoginJavaScript(PersonInfo info) =>
-      r'''try{
-            document.getElementById('username').value = String.raw`''' +
-      info.id! +
-      r'''`;
-            document.getElementById('password').value = String.raw`''' +
-      info.password! +
-      r'''`;
+      '''try{
+            document.getElementById('username').value = ${jsonEncode(info.id!)};
+            document.getElementById('password').value = ${jsonEncode(info.password!)};
             document.forms[0].submit();
         }
         catch (e) {
             try{
-                document.getElementById('mobileUsername').value = String.raw`''' +
-      info.id! +
-      r'''`;
-                document.getElementById('mobilePassword').value = String.raw`''' +
-      info.password! +
-      r'''`;
+                document.getElementById('mobileUsername').value = ${jsonEncode(info.id!)};
+                document.getElementById('mobilePassword').value = ${jsonEncode(info.password!)};
                 document.forms[0].submit();
             }
             catch (e) {
@@ -316,17 +297,13 @@ class AuthenticationInAppBrowser extends InAppBrowser {
         }''';
 
   String _idLoginJavaScript(PersonInfo info) =>
-      r'''try{
+      '''try{
             const usernameInput = document.getElementById('login-username');
-            usernameInput.value = String.raw`''' +
-      info.id! +
-      r'''`;
+            usernameInput.value = ${jsonEncode(info.id!)};
             usernameInput.dispatchEvent(new Event('input'));
             
             const passwordInput = document.getElementById('login-password');
-            passwordInput.value = String.raw`''' +
-      info.password! +
-      r'''`;
+            passwordInput.value = ${jsonEncode(info.password!)};
             passwordInput.dispatchEvent(new Event('input'));
 
             document.querySelector('.el-button.content_submit').click();
