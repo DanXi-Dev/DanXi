@@ -54,6 +54,12 @@ add_subdirectory(${FLUTTER_MANAGED_DIR})
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
 
+# WPE WebKit >= 2.54 renamed WPE_SETTING_DISABLE_ANIMATIONS.
+pkg_check_modules(WPE_WEBKIT wpe-webkit-2.0)
+if(WPE_WEBKIT_VERSION VERSION_GREATER_EQUAL 2.54)
+    add_compile_definitions(WPE_SETTING_DISABLE_ANIMATIONS=WPE_SETTING_REDUCED_MOTION)
+endif()
+
 # @formatter:off
 add_definitions(-DAPPLICATION_ID="${APPLICATION_ID}")
 # @formatter:one
